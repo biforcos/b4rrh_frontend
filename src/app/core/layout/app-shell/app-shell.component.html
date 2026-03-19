@@ -1,0 +1,16 @@
+<div class="app-shell">
+  <header class="app-shell__header">
+    <div class="app-shell__brand">
+      <span class="app-shell__brand-mark">B4</span>
+      <div>
+        <h1>{{ texts.brandName }}</h1>
+        <p>{{ texts.moduleName }}</p>
+      </div>
+    </div>
+    <span class="app-shell__environment">{{ texts.environmentLabel }}</span>
+  </header>
+
+  <main class="app-shell__main">
+    <router-outlet />
+  </main>
+</div>

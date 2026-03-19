@@ -1,0 +1,16 @@
+<section class="panel">
+  @if (title() || subtitle()) {
+    <header class="panel__header">
+      @if (title()) {
+        <h2 class="panel__title">{{ title() }}</h2>
+      }
+      @if (subtitle()) {
+        <p class="panel__subtitle">{{ subtitle() }}</p>
+      }
+    </header>
+  }
+
+  <div class="panel__content">
+    <ng-content />
+  </div>
+</section>

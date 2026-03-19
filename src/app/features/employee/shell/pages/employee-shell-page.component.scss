@@ -1,0 +1,91 @@
+:host {
+  display: block;
+  height: 100%;
+  min-height: 0;
+}
+
+.employee-shell {
+  display: grid;
+  grid-template-columns: minmax(18rem, 22rem) minmax(0, 1fr);
+  gap: 1rem;
+  min-height: 0;
+  height: 100%;
+}
+
+.employee-shell__master,
+.employee-shell__detail {
+  min-height: 0;
+}
+
+.employee-shell__search-form {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.employee-shell__label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.employee-shell__search-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.45rem;
+}
+
+.employee-shell__search-row input,
+.employee-shell__search-row button {
+  min-height: 2.25rem;
+  border-radius: 0.55rem;
+}
+
+.employee-shell__search-row input {
+  width: 100%;
+  border: 1px solid var(--border-strong);
+  background: #ffffff;
+  padding: 0 0.7rem;
+}
+
+.employee-shell__search-row input:focus-visible {
+  outline: 2px solid #7dd3fc;
+  outline-offset: 1px;
+}
+
+.employee-shell__search-row button {
+  border: 1px solid var(--accent-strong);
+  background: var(--accent-strong);
+  color: #ffffff;
+  font-weight: 600;
+  padding: 0 0.9rem;
+}
+
+.employee-shell__search-row button:disabled {
+  border-color: var(--border-strong);
+  background: #d4dbe3;
+  color: #6b7280;
+}
+
+.employee-shell__result-block {
+  display: grid;
+  gap: 0.7rem;
+  margin-top: 1.15rem;
+}
+
+.employee-shell__result-block h3 {
+  margin: 0;
+  font-size: 0.83rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.employee-shell__detail app-panel {
+  display: block;
+}
+
+@media (max-width: 960px) {
+  .employee-shell {
+    grid-template-columns: 1fr;
+  }
+}

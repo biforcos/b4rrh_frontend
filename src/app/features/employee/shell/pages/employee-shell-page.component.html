@@ -1,0 +1,43 @@
+<div class="employee-shell">
+  <aside class="employee-shell__master">
+    <app-panel [title]="texts.masterTitle" [subtitle]="texts.masterSubtitle">
+      <form class="employee-shell__search-form" [formGroup]="searchForm" (ngSubmit)="openEmployeeFromSearch()">
+        <label class="employee-shell__label" for="employee-number-search">{{ texts.searchLabel }}</label>
+        <div class="employee-shell__search-row">
+          <input
+            id="employee-number-search"
+            type="text"
+            formControlName="searchTerm"
+            [placeholder]="texts.searchPlaceholder"
+            autocomplete="off"
+          />
+          <button type="submit" [disabled]="filteredEmployees().length === 0">
+            {{ texts.openAction }}
+          </button>
+        </div>
+      </form>
+
+      <section class="employee-shell__result-block">
+        <h3>{{ texts.resultEmployeesTitle }}</h3>
+        <app-employee-directory-list
+          [employees]="filteredEmployees()"
+          [selectedEmployeeKey]="activeEmployeeKey()"
+          (employeeSelected)="openEmployeeDetail($event)"
+        />
+      </section>
+    </app-panel>
+  </aside>
+
+  <section class="employee-shell__detail">
+    <app-panel [title]="texts.detailPanelTitle" [subtitle]="texts.detailPanelSubtitle">
+      @if (selectedEmployee(); as employee) {
+        <app-employee-detail-header [employee]="employee" />
+        @if (activeEmployeeKey(); as activeEmployeeKey) {
+          <app-employee-detail-nav [employeeKey]="activeEmployeeKey" />
+        }
+      }
+
+      <router-outlet />
+    </app-panel>
+  </section>
+</div>

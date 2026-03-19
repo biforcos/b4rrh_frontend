@@ -1,0 +1,27 @@
+.panel {
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.85rem;
+  background: var(--surface-panel);
+  box-shadow: var(--shadow-panel);
+}
+
+.panel__header {
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 0.95rem 1rem 0.85rem;
+}
+
+.panel__title {
+  margin: 0;
+  font-size: 0.96rem;
+  font-weight: 700;
+}
+
+.panel__subtitle {
+  margin: 0.3rem 0 0;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+.panel__content {
+  padding: 1rem;
+}

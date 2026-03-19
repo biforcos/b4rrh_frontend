@@ -1,0 +1,26 @@
+<header class="employee-detail-header" aria-label="Employee detail header">
+  <h2>{{ employee().displayName }}</h2>
+
+  <dl>
+    <div>
+      <dt>{{ texts.detailHeaderRuleSystemLabel }}</dt>
+      <dd>{{ employee().ruleSystemCode }}</dd>
+    </div>
+    <div>
+      <dt>{{ texts.detailHeaderEmployeeTypeLabel }}</dt>
+      <dd>{{ employee().employeeTypeCode }}</dd>
+    </div>
+    <div>
+      <dt>{{ texts.detailHeaderEmployeeNumberLabel }}</dt>
+      <dd>{{ employee().employeeNumber }}</dd>
+    </div>
+    <div>
+      <dt>{{ texts.detailHeaderWorkCenterLabel }}</dt>
+      <dd>{{ employee().workCenter }}</dd>
+    </div>
+    <div>
+      <dt>{{ texts.detailHeaderStatusLabel }}</dt>
+      <dd>{{ employee().statusLabel }}</dd>
+    </div>
+  </dl>
+</header>

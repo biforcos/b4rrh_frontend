@@ -1,0 +1,18 @@
+.empty-state {
+  border: 1px dashed var(--border-strong);
+  border-radius: 0.7rem;
+  background: var(--surface-muted);
+  padding: 1rem;
+}
+
+.empty-state h3 {
+  margin: 0;
+  font-size: 0.92rem;
+}
+
+.empty-state p {
+  margin: 0.35rem 0 0;
+  color: var(--text-muted);
+  font-size: 0.83rem;
+  line-height: 1.4;
+}

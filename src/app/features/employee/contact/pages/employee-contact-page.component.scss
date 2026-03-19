@@ -1,0 +1,25 @@
+.employee-vertical-placeholder {
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 1rem;
+  border: 1px dashed var(--border-strong);
+  border-radius: 0.7rem;
+  background: var(--surface-muted);
+  padding: 0.85rem;
+}
+
+.employee-vertical-placeholder h3 {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.employee-vertical-placeholder p {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+.employee-vertical-placeholder strong {
+  color: var(--text-primary);
+}

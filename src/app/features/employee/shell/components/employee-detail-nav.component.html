@@ -1,0 +1,12 @@
+<nav class="employee-detail-nav" aria-label="Employee vertical navigation">
+  @for (link of links; track link.section) {
+    <a
+      [routerLink]="buildLinkCommands(link.section)"
+      class="employee-detail-nav__link"
+      routerLinkActive="employee-detail-nav__link--active"
+      [routerLinkActiveOptions]="{ exact: true }"
+    >
+      {{ link.label }}
+    </a>
+  }
+</nav>

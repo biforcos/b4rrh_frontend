@@ -1,0 +1,11 @@
+<section class="employee-vertical-placeholder" aria-labelledby="employee-presence-title">
+  <h3 id="employee-presence-title">{{ texts.presencePanelTitle }}</h3>
+  @if (employeeKey(); as employeeKey) {
+    <p>
+      {{ texts.currentEmployeeKeyLabel }}:
+      <strong>{{ employeeKey.ruleSystemCode }} / {{ employeeKey.employeeTypeCode }} / {{ employeeKey.employeeNumber }}</strong>
+    </p>
+  }
+  <p>{{ texts.presencePanelSubtitle }}</p>
+  <p>{{ texts.placeholderMessage }}</p>
+</section>
