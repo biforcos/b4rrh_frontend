@@ -8,14 +8,26 @@
           type="button"
           class="employee-directory-list__item"
           [class.employee-directory-list__item--selected]="isSelected(employee)"
+          [attr.aria-pressed]="isSelected(employee)"
           (click)="selectEmployee(employee)"
         >
-          <span class="employee-directory-list__name">{{ employee.displayName }}</span>
-          <span class="employee-directory-list__key"
-            >{{ employee.ruleSystemCode }} / {{ employee.employeeTypeCode }} / {{ employee.employeeNumber }}</span
-          >
-          <span class="employee-directory-list__number">{{ employee.employeeNumber }}</span>
-          <span class="employee-directory-list__meta">{{ employee.workCenter }} · {{ employee.statusLabel }}</span>
+          <span class="employee-directory-list__topline">
+            <span class="employee-directory-list__name">{{ employee.displayName }}</span>
+            <span class="employee-directory-list__status-chip">{{ employee.statusLabel }}</span>
+          </span>
+
+          <span class="employee-directory-list__identity" [attr.aria-label]="texts.currentEmployeeKeyLabel">
+            <span class="employee-directory-list__identity-chip employee-directory-list__identity-chip--primary">
+              {{ employee.employeeNumber }}
+            </span>
+            <span class="employee-directory-list__identity-chip">{{ employee.employeeTypeCode }}</span>
+            <span class="employee-directory-list__identity-chip">{{ employee.ruleSystemCode }}</span>
+          </span>
+
+          <span class="employee-directory-list__context">
+            <span class="employee-directory-list__context-label">{{ texts.detailHeaderWorkCenterLabel }}:</span>
+            <span class="employee-directory-list__context-value">{{ employee.workCenter }}</span>
+          </span>
         </button>
       </div>
     }

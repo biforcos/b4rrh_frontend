@@ -1,26 +1,23 @@
 <header class="employee-detail-header" aria-label="Employee detail header">
-  <h2>{{ employee().displayName }}</h2>
+  <div class="employee-detail-header__title-row">
+    <h2>{{ employee().displayName }}</h2>
+    <span class="employee-detail-header__status-chip">{{ employee().statusLabel }}</span>
+  </div>
 
-  <dl>
-    <div>
-      <dt>{{ texts.detailHeaderRuleSystemLabel }}</dt>
-      <dd>{{ employee().ruleSystemCode }}</dd>
+  <dl class="employee-detail-header__meta-grid">
+    <div class="employee-detail-header__meta-item employee-detail-header__meta-item--identity">
+      <dt>{{ texts.currentEmployeeKeyLabel }}</dt>
+      <dd>
+        <span class="employee-detail-header__identity-chip employee-detail-header__identity-chip--primary">
+          {{ employee().employeeNumber }}
+        </span>
+        <span class="employee-detail-header__identity-chip">{{ employee().employeeTypeCode }}</span>
+        <span class="employee-detail-header__identity-chip">{{ employee().ruleSystemCode }}</span>
+      </dd>
     </div>
-    <div>
-      <dt>{{ texts.detailHeaderEmployeeTypeLabel }}</dt>
-      <dd>{{ employee().employeeTypeCode }}</dd>
-    </div>
-    <div>
-      <dt>{{ texts.detailHeaderEmployeeNumberLabel }}</dt>
-      <dd>{{ employee().employeeNumber }}</dd>
-    </div>
-    <div>
+    <div class="employee-detail-header__meta-item">
       <dt>{{ texts.detailHeaderWorkCenterLabel }}</dt>
       <dd>{{ employee().workCenter }}</dd>
-    </div>
-    <div>
-      <dt>{{ texts.detailHeaderStatusLabel }}</dt>
-      <dd>{{ employee().statusLabel }}</dd>
     </div>
   </dl>
 </header>
