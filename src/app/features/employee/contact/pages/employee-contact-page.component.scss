@@ -1,25 +1,35 @@
-.employee-vertical-placeholder {
+.employee-area {
   display: grid;
-  gap: 0.55rem;
-  margin-top: 1rem;
-  border: 1px dashed var(--border-strong);
-  border-radius: 0.7rem;
-  background: var(--surface-muted);
-  padding: 0.85rem;
+  gap: 0.64rem;
+  margin-top: 0.2rem;
 }
 
-.employee-vertical-placeholder h3 {
+.employee-area__state-stack {
+  display: grid;
+  gap: 0.18rem;
+}
+
+.employee-area__state {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 0.71rem;
+  line-height: 1.3;
+  color: #3d556b;
 }
 
-.employee-vertical-placeholder p {
-  margin: 0;
-  font-size: 0.84rem;
-  line-height: 1.45;
-  color: var(--text-muted);
+.employee-area__state--error {
+  color: #7f1d1d;
 }
 
-.employee-vertical-placeholder strong {
-  color: var(--text-primary);
+.employee-area__modules {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.68rem;
+}
+
+.employee-area__module {
+  align-self: start;
+  border: 1px solid #d1dce8;
+  border-radius: 0.62rem;
+  background: #f9fcff;
+  padding: 0.58rem 0.64rem;
 }

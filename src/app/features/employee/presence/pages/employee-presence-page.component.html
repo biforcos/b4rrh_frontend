@@ -1,11 +1,19 @@
-<section class="employee-vertical-placeholder" aria-labelledby="employee-presence-title">
-  <h3 id="employee-presence-title">{{ texts.presencePanelTitle }}</h3>
-  @if (employeeKey(); as employeeKey) {
-    <p>
-      {{ texts.currentEmployeeKeyLabel }}:
-      <strong>{{ employeeKey.ruleSystemCode }} / {{ employeeKey.employeeTypeCode }} / {{ employeeKey.employeeNumber }}</strong>
-    </p>
-  }
-  <p>{{ texts.presencePanelSubtitle }}</p>
-  <p>{{ texts.placeholderMessage }}</p>
+<section class="employee-area" aria-labelledby="employee-presence-title">
+  <header class="employee-area__header">
+    <h3 id="employee-presence-title">{{ texts.laborAreaTitle }}</h3>
+  </header>
+
+  <div class="employee-area__grid">
+    <article class="employee-area__card">
+      <h4>{{ texts.laborPresenceBlockTitle }}</h4>
+    </article>
+
+    <article class="employee-area__card">
+      <h4>{{ texts.laborContractBlockTitle }}</h4>
+    </article>
+
+    <article class="employee-area__card employee-area__card--wide">
+      <h4>{{ texts.laborFutureBlockTitle }}</h4>
+    </article>
+  </div>
 </section>

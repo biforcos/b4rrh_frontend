@@ -1,12 +1,20 @@
-<nav class="employee-detail-nav" aria-label="Employee vertical navigation">
-  @for (link of links; track link.section) {
-    <a
-      [routerLink]="buildLinkCommands(link.section)"
-      class="employee-detail-nav__link"
-      routerLinkActive="employee-detail-nav__link--active"
-      [routerLinkActiveOptions]="{ exact: true }"
-    >
-      {{ link.label }}
-    </a>
-  }
+<nav class="employee-detail-nav" [attr.aria-label]="texts.detailAreasNavLabel">
+  <div class="employee-detail-nav__tabs">
+    @for (area of routedAreas; track area.section) {
+      <a
+        [routerLink]="buildLinkCommands(area.section)"
+        class="employee-detail-nav__tab"
+        [class.employee-detail-nav__tab--active]="isAreaActive(area.section)"
+        [attr.aria-current]="isAreaActive(area.section) ? 'page' : null"
+      >
+        <span class="employee-detail-nav__tab-label">{{ area.label }}</span>
+      </a>
+    }
+
+    @for (area of disabledAreas; track area.label) {
+      <button type="button" class="employee-detail-nav__tab employee-detail-nav__tab--disabled" disabled>
+        <span class="employee-detail-nav__tab-label">{{ area.label }}</span>
+      </button>
+    }
+  </div>
 </nav>

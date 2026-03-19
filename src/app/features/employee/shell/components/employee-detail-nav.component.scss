@@ -1,31 +1,98 @@
 .employee-detail-nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.45rem;
+  display: grid;
+  gap: 0;
 }
 
-.employee-detail-nav__link {
+.employee-detail-nav__tabs {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.08rem;
+  border-bottom: 1px solid #d2dbe6;
+  padding: 0 0.16rem;
+  overflow-x: auto;
+}
+
+.employee-detail-nav__tab {
+  position: relative;
   display: inline-flex;
   align-items: center;
-  min-height: 2rem;
-  border-radius: 0.6rem;
-  border: 1px solid var(--border-subtle);
-  background: var(--surface-muted);
-  color: var(--text-muted);
+  justify-content: center;
+  min-width: 7.2rem;
+  min-height: 2.08rem;
+  border: none;
+  border-bottom: 1px solid transparent;
+  border-radius: 0.42rem 0.42rem 0 0;
+  background: transparent;
+  color: #52667b;
   text-decoration: none;
-  font-size: 0.8rem;
-  font-weight: 600;
-  padding: 0.35rem 0.7rem;
-  transition: border-color 120ms ease, color 120ms ease, background-color 120ms ease;
+  text-align: left;
+  cursor: pointer;
+  padding: 0.34rem 0.66rem;
+  transition:
+    border-bottom-color 120ms ease,
+    color 120ms ease,
+    background-color 120ms ease,
+    box-shadow 120ms ease;
 }
 
-.employee-detail-nav__link:hover {
-  border-color: var(--accent-soft);
-  color: var(--text-primary);
+.employee-detail-nav__tab:hover {
+  background: #f8fafd;
+  color: #0f172a;
 }
 
-.employee-detail-nav__link--active {
-  border-color: var(--accent-strong);
-  color: var(--accent-strong);
-  background: #e6f7fb;
+.employee-detail-nav__tab:focus-visible {
+  outline: 2px solid #1d4ed8;
+  outline-offset: 1px;
+}
+
+.employee-detail-nav__tab--active {
+  border-bottom-color: transparent;
+  background: transparent;
+  color: #0f172a;
+}
+
+.employee-detail-nav__tab--active::after {
+  content: '';
+  position: absolute;
+  left: 0.36rem;
+  right: 0.36rem;
+  bottom: -1px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--accent-strong);
+}
+
+.employee-detail-nav__tab--active .employee-detail-nav__tab-label {
+  color: #0f172a;
+}
+
+.employee-detail-nav__tab--disabled,
+.employee-detail-nav__tab--disabled:hover {
+  cursor: not-allowed;
+  border-bottom-color: transparent;
+  background: transparent;
+  color: #7b8897;
+  opacity: 0.64;
+  box-shadow: none;
+}
+
+.employee-detail-nav__tab-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: inherit;
+}
+
+@media (max-width: 1100px) {
+  .employee-detail-nav__tab {
+    min-width: 6.8rem;
+  }
+}
+
+@media (max-width: 760px) {
+  .employee-detail-nav__tab {
+    min-width: 6.2rem;
+    min-height: 1.98rem;
+    padding: 0.3rem 0.5rem;
+  }
 }

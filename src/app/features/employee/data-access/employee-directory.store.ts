@@ -47,28 +47,6 @@ export class EmployeeDirectoryStore {
     this.query.set(value);
   }
 
-  hydrateEmployeeByBusinessKey(key: EmployeeBusinessKey | null): void {
-    if (!key || this.findEmployeeByBusinessKey(key)) {
-      return;
-    }
-
-    this.employeeDirectoryReadGateway
-      .readEmployeeByBusinessKey(key)
-      .pipe(take(1))
-      .subscribe({
-        next: (employee) => {
-          if (!employee) {
-            return;
-          }
-
-          this.employeesState.update((employees) => this.upsertEmployee(employees, employee));
-        },
-        error: () => {
-          // Keep controlled UI state; local fallback already handles unknown employee context.
-        },
-      });
-  }
-
   findEmployeeByBusinessKey(key: EmployeeBusinessKey | null): EmployeeListItemModel | null {
     if (!key) {
       return null;
@@ -89,20 +67,5 @@ export class EmployeeDirectoryStore {
           this.employeesState.set(employeeDirectorySeed);
         },
       });
-  }
-
-  private upsertEmployee(
-    employees: ReadonlyArray<EmployeeListItemModel>,
-    candidate: EmployeeListItemModel,
-  ): ReadonlyArray<EmployeeListItemModel> {
-    const existingIndex = employees.findIndex((employee) =>
-      areEmployeeBusinessKeysEqual(employee, candidate),
-    );
-
-    if (existingIndex < 0) {
-      return [...employees, candidate];
-    }
-
-    return employees.map((employee, index) => (index === existingIndex ? candidate : employee));
   }
 }

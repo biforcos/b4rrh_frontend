@@ -1,18 +1,34 @@
 <header class="employee-detail-header" aria-label="Employee detail header">
-  <div class="employee-detail-header__title-row">
-    <h2>{{ employee().displayName }}</h2>
-    <span class="employee-detail-header__status-chip">{{ employee().statusLabel }}</span>
-  </div>
+  <div class="employee-detail-header__identity-row">
+    <div class="employee-detail-header__identity-main">
+      <h2>{{ employee().displayName }}</h2>
 
-  <dl class="employee-detail-header__meta-grid">
-    <div class="employee-detail-header__meta-item employee-detail-header__meta-item--identity">
-      <dt>{{ texts.currentEmployeeKeyLabel }}</dt>
-      <dd>
+      <div class="employee-detail-header__keyline" [attr.aria-label]="texts.currentEmployeeKeyLabel">
         <span class="employee-detail-header__identity-chip employee-detail-header__identity-chip--primary">
           {{ employee().employeeNumber }}
         </span>
         <span class="employee-detail-header__identity-chip">{{ employee().employeeTypeCode }}</span>
         <span class="employee-detail-header__identity-chip">{{ employee().ruleSystemCode }}</span>
+      </div>
+    </div>
+
+    <div class="employee-detail-header__avatar" [attr.aria-label]="texts.detailAvatarPlaceholderAriaLabel">
+      <span class="employee-detail-header__avatar-initials">{{ avatarInitials() }}</span>
+    </div>
+  </div>
+
+  <dl class="employee-detail-header__meta-row">
+    <div class="employee-detail-header__meta-item">
+      <dt>{{ texts.detailHeaderStatusLabel }}</dt>
+      <dd>
+        <span
+          class="employee-detail-header__status-chip"
+          [class.employee-detail-header__status-chip--positive]="statusTone() === 'positive'"
+          [class.employee-detail-header__status-chip--warning]="statusTone() === 'warning'"
+          [class.employee-detail-header__status-chip--neutral]="statusTone() === 'neutral'"
+        >
+          {{ employee().statusLabel }}
+        </span>
       </dd>
     </div>
     <div class="employee-detail-header__meta-item">

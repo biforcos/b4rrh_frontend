@@ -1,0 +1,83 @@
+<section class="employee-contact-block" aria-labelledby="employee-contact-block-title">
+  <header class="employee-contact-block__header">
+    <h4 id="employee-contact-block-title">{{ texts.contactBlockTitle }}</h4>
+  </header>
+
+  @if (hasAnyData()) {
+    <div class="employee-contact-block__primary">
+      @if (primaryPhone(); as primaryPhone) {
+        <article class="employee-contact-block__primary-item">
+          <p class="employee-contact-block__label">{{ texts.contactBlockPrimaryPhoneLabel }}</p>
+          <div class="employee-contact-block__value-row">
+            <p class="employee-contact-block__value">{{ primaryPhone }}</p>
+            <button
+              type="button"
+              class="employee-contact-block__copy-action"
+              (click)="copyContactValue(primaryPhone)"
+              [attr.aria-label]="texts.contactBlockCopyAction"
+              [attr.title]="texts.contactBlockCopyAction"
+            >
+              <svg
+                class="employee-contact-block__copy-icon"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path
+                  d="M9 9h11v12H9zM4 3h11v3h2V2c0-.6-.4-1-1-1H3c-.6 0-1 .4-1 1v13c0 .6.4 1 1 1h4v-2H4V3z"
+                />
+              </svg>
+              <span class="employee-contact-block__sr-only">{{ texts.contactBlockCopyAction }}</span>
+            </button>
+          </div>
+        </article>
+      }
+
+      @if (primaryEmail(); as primaryEmail) {
+        <article class="employee-contact-block__primary-item">
+          <p class="employee-contact-block__label">{{ texts.contactBlockPrimaryEmailLabel }}</p>
+          <div class="employee-contact-block__value-row">
+            <p class="employee-contact-block__value">{{ primaryEmail }}</p>
+            <button
+              type="button"
+              class="employee-contact-block__copy-action"
+              (click)="copyContactValue(primaryEmail)"
+              [attr.aria-label]="texts.contactBlockCopyAction"
+              [attr.title]="texts.contactBlockCopyAction"
+            >
+              <svg
+                class="employee-contact-block__copy-icon"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path
+                  d="M9 9h11v12H9zM4 3h11v3h2V2c0-.6-.4-1-1-1H3c-.6 0-1 .4-1 1v13c0 .6.4 1 1 1h4v-2H4V3z"
+                />
+              </svg>
+              <span class="employee-contact-block__sr-only">{{ texts.contactBlockCopyAction }}</span>
+            </button>
+          </div>
+        </article>
+      }
+    </div>
+
+    @if (secondaryContacts().length > 0) {
+      <section class="employee-contact-block__secondary" [attr.aria-label]="texts.contactBlockSecondaryTitle">
+        <h5>{{ texts.contactBlockSecondaryTitle }}</h5>
+        <div class="employee-contact-block__secondary-list" role="list">
+          @for (contact of secondaryContacts(); track contact.type + '-' + contact.value) {
+            <div class="employee-contact-block__secondary-item" role="listitem">
+              <span class="employee-contact-block__secondary-type">{{
+                resolveSecondaryTypeLabel(contact)
+              }}</span>
+              <span class="employee-contact-block__secondary-value">{{ contact.value }}</span>
+            </div>
+          }
+        </div>
+      </section>
+    }
+  } @else {
+    <p class="employee-contact-block__empty">{{ texts.contactBlockEmptyMessage }}</p>
+  }
+</section>

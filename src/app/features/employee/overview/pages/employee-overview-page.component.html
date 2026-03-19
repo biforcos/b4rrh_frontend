@@ -1,11 +1,19 @@
-<section class="employee-vertical-placeholder" aria-labelledby="employee-overview-title">
-  <h3 id="employee-overview-title">{{ texts.overviewPanelTitle }}</h3>
-  @if (employeeKey(); as employeeKey) {
-    <p>
-      {{ texts.currentEmployeeKeyLabel }}:
-      <strong>{{ employeeKey.ruleSystemCode }} / {{ employeeKey.employeeTypeCode }} / {{ employeeKey.employeeNumber }}</strong>
-    </p>
-  }
-  <p>{{ texts.overviewPanelSubtitle }}</p>
-  <p>{{ texts.placeholderMessage }}</p>
+<section class="employee-area" aria-labelledby="employee-overview-title">
+  <header class="employee-area__header">
+    <h3 id="employee-overview-title">{{ texts.summaryAreaTitle }}</h3>
+  </header>
+
+  <div class="employee-area__grid">
+    <article class="employee-area__card">
+      <h4>{{ texts.summaryProfileBlockTitle }}</h4>
+    </article>
+
+    <article class="employee-area__card">
+      <h4>{{ texts.summaryLifecycleBlockTitle }}</h4>
+    </article>
+
+    <article class="employee-area__card">
+      <h4>{{ texts.summaryPendingBlockTitle }}</h4>
+    </article>
+  </div>
 </section>

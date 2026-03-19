@@ -29,15 +29,49 @@
   </aside>
 
   <section class="employee-shell__detail">
-    <app-panel [title]="texts.detailPanelTitle" [subtitle]="texts.detailPanelSubtitle">
-      @if (selectedEmployee(); as employee) {
-        <app-employee-detail-header [employee]="employee" />
-        @if (activeEmployeeKey(); as activeEmployeeKey) {
-          <app-employee-detail-nav [employeeKey]="activeEmployeeKey" />
+    <app-panel>
+      @if (activeEmployeeKey()) {
+        @if (loadingDetail()) {
+          <p class="employee-shell__detail-feedback employee-shell__detail-feedback--loading">
+            {{ texts.detailLoadingMessage }}
+          </p>
+        }
+
+        @if (detailError() === 'not-found') {
+          <p class="employee-shell__detail-feedback employee-shell__detail-feedback--warning">
+            {{ texts.detailNotFoundMessage }}
+          </p>
+        }
+
+        @if (detailError() === 'request-failed') {
+          <p class="employee-shell__detail-feedback employee-shell__detail-feedback--error">
+            {{ texts.detailLoadFailedMessage }}
+          </p>
         }
       }
 
-      <router-outlet />
+      @if (selectedEmployee(); as employee) {
+        <section class="employee-shell__identity-zone">
+          <app-employee-detail-header [employee]="employee" />
+        </section>
+
+        <section class="employee-shell__timeline-zone">
+          <app-employee-detail-timeline [employee]="employee" />
+        </section>
+
+        @if (activeEmployeeKey(); as activeEmployeeKey) {
+          <section class="employee-shell__nav-zone">
+            <app-employee-detail-nav
+              [employeeKey]="activeEmployeeKey"
+              [activeSection]="activeDetailSection()"
+            />
+          </section>
+        }
+      }
+
+      <section class="employee-shell__detail-content-zone">
+        <router-outlet />
+      </section>
     </app-panel>
   </section>
 </div>

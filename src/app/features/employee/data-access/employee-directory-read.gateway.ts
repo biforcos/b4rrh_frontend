@@ -4,10 +4,8 @@ import { Observable, catchError, map, of } from 'rxjs';
 import { EmployeeReadClient } from '../../../core/api/clients/employee-read.client';
 import {
   mapEmployeeDirectoryApiToDirectoryModel,
-  mapEmployeeReadApiToDirectoryModel,
   EmployeeDirectoryReadModel,
 } from '../../../core/api/mappers/employee-directory.mapper';
-import { EmployeeBusinessKey } from '../models/employee-business-key.model';
 import { EmployeeListItemModel } from '../models/employee-list-item.model';
 import { employeeDirectorySeed } from './employee-directory.seed';
 
@@ -25,19 +23,6 @@ export class EmployeeDirectoryReadGateway {
         ),
       ),
       catchError(() => of(employeeDirectorySeed)),
-    );
-  }
-
-  // Contract-backed read using GET /employees/{ruleSystemCode}/{employeeTypeCode}/{employeeNumber}.
-  readEmployeeByBusinessKey(key: EmployeeBusinessKey): Observable<EmployeeListItemModel | null> {
-    return this.employeeReadClient.readEmployeeByBusinessKey(key).pipe(
-      map((employee) => {
-        if (!employee) {
-          return null;
-        }
-
-        return this.toEmployeeListItemModel(mapEmployeeReadApiToDirectoryModel(employee));
-      }),
     );
   }
 

@@ -9,13 +9,11 @@ describe('EmployeeDirectoryStore', () => {
   let store: EmployeeDirectoryStore;
   let readGatewayMock: {
     readDirectory: ReturnType<typeof vi.fn>;
-    readEmployeeByBusinessKey: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(() => {
     readGatewayMock = {
       readDirectory: vi.fn().mockReturnValue(of(employeeDirectorySeed)),
-      readEmployeeByBusinessKey: vi.fn().mockReturnValue(of(null)),
     };
 
     TestBed.configureTestingModule({

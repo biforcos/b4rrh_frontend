@@ -1,11 +1,25 @@
-<section class="employee-vertical-placeholder" aria-labelledby="employee-contact-title">
-  <h3 id="employee-contact-title">{{ texts.contactPanelTitle }}</h3>
-  @if (employeeKey(); as employeeKey) {
-    <p>
-      {{ texts.currentEmployeeKeyLabel }}:
-      <strong>{{ employeeKey.ruleSystemCode }} / {{ employeeKey.employeeTypeCode }} / {{ employeeKey.employeeNumber }}</strong>
-    </p>
-  }
-  <p>{{ texts.contactPanelSubtitle }}</p>
-  <p>{{ texts.placeholderMessage }}</p>
+<section class="employee-area" [attr.aria-label]="texts.personalAreaLabel">
+  <div class="employee-area__state-stack">
+    @if (loadingPersonals()) {
+      <p class="employee-area__state">{{ texts.personalLoadingMessage }}</p>
+    }
+
+    @if (contactsError() === 'request-failed') {
+      <p class="employee-area__state employee-area__state--error">{{ texts.contactLoadFailedMessage }}</p>
+    }
+
+    @if (addressesError() === 'request-failed') {
+      <p class="employee-area__state employee-area__state--error">{{ texts.addressLoadFailedMessage }}</p>
+    }
+  </div>
+
+  <div class="employee-area__modules">
+    <section class="employee-area__module">
+      <app-employee-contact-block [contact]="contactBlockModel()" />
+    </section>
+
+    <section class="employee-area__module">
+      <app-employee-address-block [address]="addressBlockModel()" />
+    </section>
+  </div>
 </section>

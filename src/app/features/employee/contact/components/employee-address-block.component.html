@@ -1,0 +1,43 @@
+<section class="employee-address-block" aria-labelledby="employee-address-block-title">
+  <header class="employee-address-block__header">
+    <h4 id="employee-address-block-title">{{ texts.personalAddressesBlockTitle }}</h4>
+  </header>
+
+  @if (hasAnyData()) {
+    @if (primaryAddress(); as primaryAddress) {
+      <article class="employee-address-block__primary-item">
+        <p class="employee-address-block__label">{{ texts.addressBlockPrimaryLabel }}</p>
+        <p class="employee-address-block__street">{{ primaryAddress.street }}</p>
+        <p class="employee-address-block__locality">{{ primaryAddress.locality }}</p>
+        <p class="employee-address-block__meta">
+          <span class="employee-address-block__type">{{ primaryAddress.typeLabel }}</span>
+          @if (primaryAddress.validity) {
+            <span>{{ primaryAddress.validity }}</span>
+          }
+        </p>
+      </article>
+    }
+
+    @if (secondaryAddresses().length > 0) {
+      <section class="employee-address-block__secondary" [attr.aria-label]="texts.addressBlockSecondaryTitle">
+        <h5>{{ texts.addressBlockSecondaryTitle }}</h5>
+        <div class="employee-address-block__secondary-list" role="list">
+          @for (address of secondaryAddresses(); track address.typeLabel + '-' + address.street + '-' + address.locality) {
+            <article class="employee-address-block__secondary-item" role="listitem">
+              <p class="employee-address-block__street">{{ address.street }}</p>
+              <p class="employee-address-block__locality">{{ address.locality }}</p>
+              <p class="employee-address-block__meta">
+                <span class="employee-address-block__type">{{ address.typeLabel }}</span>
+                @if (address.validity) {
+                  <span>{{ address.validity }}</span>
+                }
+              </p>
+            </article>
+          }
+        </div>
+      </section>
+    }
+  } @else {
+    <p class="employee-address-block__empty">{{ texts.addressBlockEmptyMessage }}</p>
+  }
+</section>

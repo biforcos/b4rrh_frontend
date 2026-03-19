@@ -1,0 +1,17 @@
+<section class="employee-detail-timeline" aria-labelledby="employee-detail-timeline-title">
+  <header class="employee-detail-timeline__header">
+    <h3 id="employee-detail-timeline-title">{{ texts.timelineTitle }}</h3>
+  </header>
+
+  <div class="employee-detail-timeline__rail">
+    <ol class="employee-detail-timeline__track" role="list">
+      @for (event of timelineEvents(); track event.title) {
+        <li class="employee-detail-timeline__event" role="listitem">
+          <span class="employee-detail-timeline__dot" aria-hidden="true"></span>
+          <p class="employee-detail-timeline__event-title">{{ event.title }}</p>
+          <p class="employee-detail-timeline__event-moment">{{ event.moment }}</p>
+        </li>
+      }
+    </ol>
+  </div>
+</section>

@@ -34,12 +34,12 @@ export const employeeRoutes: Routes = [
       {
         path: buildEmployeeKeyRoutePath(),
         pathMatch: 'full',
-        redirectTo: buildEmployeeDetailRoutePath('overview'),
+        redirectTo: buildEmployeeDetailRoutePath('contact'),
       },
       {
         path: buildEmployeeUnknownSectionRoutePath(),
         pathMatch: 'full',
-        redirectTo: buildEmployeeDetailRoutePath('overview'),
+        redirectTo: buildEmployeeDetailRoutePath('contact'),
       },
       {
         path: '',
