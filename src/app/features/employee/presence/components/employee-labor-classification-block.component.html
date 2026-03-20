@@ -1,0 +1,69 @@
+<section class="employee-labor-classification-block" aria-labelledby="employee-labor-classification-block-title">
+  <header class="employee-labor-classification-block__header">
+    <h4 id="employee-labor-classification-block-title">{{ texts.laborClassificationBlockTitle }}</h4>
+  </header>
+
+  @if (hasAnyData()) {
+    @if (currentClassification(); as currentClassification) {
+      <article class="employee-labor-classification-block__current-item">
+        <p class="employee-labor-classification-block__label">{{ resolveCurrentSectionLabel() }}</p>
+        <p class="employee-labor-classification-block__identity">
+          {{ buildClassificationIdentityLabel(currentClassification) }}
+        </p>
+        <p class="employee-labor-classification-block__period">
+          {{ texts.laborClassificationBlockPeriodLabel }}: {{ buildPeriodLabel(currentClassification) }}
+        </p>
+        <p class="employee-labor-classification-block__meta">
+          <span
+            class="employee-labor-classification-block__status-chip"
+            [class.employee-labor-classification-block__status-chip--active]="
+              currentClassification.isActive
+            "
+          >
+            {{ resolveStatusLabel(currentClassification) }}
+          </span>
+        </p>
+        <p class="employee-labor-classification-block__context">{{ resolveCurrentKindLabel() }}</p>
+      </article>
+    }
+
+    <section
+      class="employee-labor-classification-block__history"
+      [attr.aria-label]="texts.laborClassificationBlockHistoryTitle"
+    >
+      <h5>{{ texts.laborClassificationBlockHistoryTitle }}</h5>
+
+      @if (hasHistory()) {
+        <div class="employee-labor-classification-block__history-list" role="list">
+          @for (
+            classification of classificationHistory();
+            track classification.agreementCode + '-' + classification.agreementCategoryCode + '-' + classification.startDate
+          ) {
+            <article class="employee-labor-classification-block__history-item" role="listitem">
+              <p class="employee-labor-classification-block__identity">
+                {{ buildClassificationIdentityLabel(classification) }}
+              </p>
+              <p class="employee-labor-classification-block__period">
+                {{ texts.laborClassificationBlockPeriodLabel }}: {{ buildPeriodLabel(classification) }}
+              </p>
+              <p class="employee-labor-classification-block__meta">
+                <span
+                  class="employee-labor-classification-block__status-chip"
+                  [class.employee-labor-classification-block__status-chip--active]="classification.isActive"
+                >
+                  {{ resolveStatusLabel(classification) }}
+                </span>
+              </p>
+            </article>
+          }
+        </div>
+      } @else {
+        <p class="employee-labor-classification-block__history-empty">
+          {{ texts.laborClassificationBlockHistoryEmptyMessage }}
+        </p>
+      }
+    </section>
+  } @else {
+    <p class="employee-labor-classification-block__empty">{{ texts.laborClassificationBlockEmptyMessage }}</p>
+  }
+</section>

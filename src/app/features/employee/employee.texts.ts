@@ -102,7 +102,7 @@ export const employeeTexts = {
   personalAddressesBlockDescription:
     'Bloque preparado para direccion principal, historico y vigencias.',
   laborAreaTitle: 'Laborales',
-  laborAreaSubtitle: 'Bloques vinculados a presencia y condicion contractual.',
+  laborAreaSubtitle: 'Bloques vinculados a presencia, condicion contractual y clasificacion laboral.',
   laborLoadingMessage: 'Cargando datos laborales...',
   laborPresenceBlockTitle: 'Presence',
   laborPresenceBlockDescription:
@@ -148,6 +148,25 @@ export const employeeTexts = {
   contractBlockStatusClosed: 'Cerrado',
   contractBlockPeriodLabel: 'Periodo',
   contractBlockOpenPeriodLabel: 'actual',
+  laborClassificationBlockTitle: 'Clasificacion laboral',
+  laborClassificationBlockCurrentLabel: 'Clasificacion actual',
+  laborClassificationBlockCurrentActiveSectionLabel: 'Clasificacion activa',
+  laborClassificationBlockCurrentSectionLabel: 'Clasificacion actual',
+  laborClassificationBlockCurrentActiveLabel: 'Clasificacion activa actual.',
+  laborClassificationBlockCurrentActiveMostRecentLabel:
+    'Hay varias clasificaciones activas; se muestra la mas reciente.',
+  laborClassificationBlockCurrentLatestClosedLabel:
+    'No hay clasificacion activa; se muestra la ultima clasificacion registrada.',
+  laborClassificationBlockHistoryTitle: 'Historial de clasificaciones',
+  laborClassificationBlockHistoryEmptyMessage: 'Sin periodos anteriores registrados.',
+  laborClassificationBlockEmptyMessage: 'No hay clasificaciones laborales disponibles.',
+  laborClassificationLoadFailedMessage: 'No se pudo cargar la informacion de clasificacion laboral.',
+  laborClassificationBlockStatusActive: 'Activa',
+  laborClassificationBlockStatusClosed: 'Cerrada',
+  laborClassificationBlockPeriodLabel: 'Periodo',
+  laborClassificationBlockOpenPeriodLabel: 'actual',
+  laborClassificationBlockAgreementLabel: 'Convenio',
+  laborClassificationBlockCategoryLabel: 'Categoria',
   laborFutureBlockTitle: 'Evolucion laboral',
   laborFutureBlockDescription:
     'Preparado para eventos de movilidad, cambios de categoria y transiciones de jornada.',

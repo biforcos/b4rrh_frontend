@@ -11,6 +11,12 @@
     @if (contractsError() === 'request-failed') {
       <p class="employee-area__state employee-area__state--error">{{ texts.contractLoadFailedMessage }}</p>
     }
+
+    @if (laborClassificationsError() === 'request-failed') {
+      <p class="employee-area__state employee-area__state--error">
+        {{ texts.laborClassificationLoadFailedMessage }}
+      </p>
+    }
   </div>
 
   <div class="employee-area__modules">
@@ -20,6 +26,10 @@
 
     <section class="employee-area__module">
       <app-employee-contract-block [contract]="contractBlockModel()" />
+    </section>
+
+    <section class="employee-area__module">
+      <app-employee-labor-classification-block [classification]="classificationBlockModel()" />
     </section>
   </div>
 </section>

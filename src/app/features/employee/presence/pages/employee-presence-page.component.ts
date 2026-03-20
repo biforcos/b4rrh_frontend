@@ -10,14 +10,22 @@ import {
   EmployeeContractCurrentKind,
 } from '../components/employee-contract-block.component';
 import {
+  EmployeeLaborClassificationBlockComponent,
+  EmployeeLaborClassificationBlockItemModel,
+  EmployeeLaborClassificationBlockModel,
+  EmployeeLaborClassificationCurrentKind,
+} from '../components/employee-labor-classification-block.component';
+import {
   EmployeePresenceBlockComponent,
   EmployeePresenceBlockItemModel,
   EmployeePresenceBlockModel,
   EmployeePresenceCurrentKind,
 } from '../components/employee-presence-block.component';
+import { EmployeeLaborClassificationStore } from '../../data-access/employee-labor-classification.store';
 import { EmployeeContractStore } from '../../data-access/employee-contract.store';
 import { EmployeePresenceStore } from '../../data-access/employee-presence.store';
 import { EmployeeContractModel } from '../../models/employee-contract.model';
+import { EmployeeLaborClassificationModel } from '../../models/employee-labor-classification.model';
 import { employeeTexts } from '../../employee.texts';
 import { EmployeePresenceModel } from '../../models/employee-presence.model';
 import { readEmployeeBusinessKeyFromParamMap } from '../../routing/employee-route-key.util';
@@ -25,11 +33,16 @@ import { readEmployeeBusinessKeyFromParamMap } from '../../routing/employee-rout
 @Component({
   selector: 'app-employee-presence-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [EmployeePresenceBlockComponent, EmployeeContractBlockComponent],
+  imports: [
+    EmployeePresenceBlockComponent,
+    EmployeeContractBlockComponent,
+    EmployeeLaborClassificationBlockComponent,
+  ],
   templateUrl: './employee-presence-page.component.html',
   styleUrl: './employee-presence-page.component.scss',
 })
 export class EmployeePresencePageComponent {
+  private readonly employeeLaborClassificationStore = inject(EmployeeLaborClassificationStore);
   private readonly employeeContractStore = inject(EmployeeContractStore);
   private readonly route = inject(ActivatedRoute);
   private readonly employeePresenceStore = inject(EmployeePresenceStore);
@@ -47,8 +60,11 @@ export class EmployeePresencePageComponent {
   protected readonly contracts = this.employeeContractStore.contracts;
   protected readonly loadingContracts = this.employeeContractStore.loading;
   protected readonly contractsError = this.employeeContractStore.error;
+  protected readonly laborClassifications = this.employeeLaborClassificationStore.laborClassifications;
+  protected readonly loadingLaborClassifications = this.employeeLaborClassificationStore.loading;
+  protected readonly laborClassificationsError = this.employeeLaborClassificationStore.error;
   protected readonly laborAreaLoading = computed(
-    () => this.loadingPresences() || this.loadingContracts(),
+    () => this.loadingPresences() || this.loadingContracts() || this.loadingLaborClassifications(),
   );
   protected readonly presenceBlockModel = computed<EmployeePresenceBlockModel>(() =>
     this.toPresenceBlockModel(this.presences()),
@@ -56,9 +72,15 @@ export class EmployeePresencePageComponent {
   protected readonly contractBlockModel = computed<EmployeeContractBlockModel>(() =>
     this.toContractBlockModel(this.contracts()),
   );
+  protected readonly classificationBlockModel = computed<EmployeeLaborClassificationBlockModel>(() =>
+    this.toLaborClassificationBlockModel(this.laborClassifications()),
+  );
 
   constructor() {
     effect(() => {
+      this.employeeLaborClassificationStore.loadLaborClassificationsByBusinessKey(
+        this.activeEmployeeKey(),
+      );
       this.employeeContractStore.loadContractsByBusinessKey(this.activeEmployeeKey());
       this.employeePresenceStore.loadPresencesByBusinessKey(this.activeEmployeeKey());
     });
@@ -191,6 +213,88 @@ export class EmployeePresencePageComponent {
       startDate: contract.startDate,
       endDate: contract.endDate,
       isActive: contract.isActive,
+    };
+  }
+
+  private toLaborClassificationBlockModel(
+    laborClassifications: ReadonlyArray<EmployeeLaborClassificationModel>,
+  ): EmployeeLaborClassificationBlockModel {
+    if (laborClassifications.length === 0) {
+      return {
+        currentClassification: null,
+        currentClassificationKind: null,
+        classificationHistory: [],
+      };
+    }
+
+    const sortedClassifications = [...laborClassifications].sort((left, right) =>
+      this.compareLaborClassificationRecency(left, right),
+    );
+    const activeClassifications = sortedClassifications.filter((classification) => classification.isActive);
+
+    let currentClassification: EmployeeLaborClassificationModel;
+    let currentClassificationKind: EmployeeLaborClassificationCurrentKind;
+
+    // Domain rule for UI: prefer active (endDate missing); if several are active, keep the most recent.
+    if (activeClassifications.length === 1) {
+      currentClassification = activeClassifications[0];
+      currentClassificationKind = 'active';
+    } else if (activeClassifications.length > 1) {
+      currentClassification = activeClassifications[0];
+      currentClassificationKind = 'active-most-recent';
+    } else {
+      currentClassification = sortedClassifications[0];
+      currentClassificationKind = 'latest-closed';
+    }
+
+    return {
+      currentClassification: this.toLaborClassificationBlockItemModel(currentClassification),
+      currentClassificationKind,
+      classificationHistory: sortedClassifications
+        .filter(
+          (classification) => !this.isSameLaborClassification(classification, currentClassification),
+        )
+        .map((classification) => this.toLaborClassificationBlockItemModel(classification)),
+    };
+  }
+
+  private compareLaborClassificationRecency(
+    left: EmployeeLaborClassificationModel,
+    right: EmployeeLaborClassificationModel,
+  ): number {
+    const startDateOrder = right.startDate.localeCompare(left.startDate);
+    if (startDateOrder !== 0) {
+      return startDateOrder;
+    }
+
+    const agreementCodeOrder = right.agreementCode.localeCompare(left.agreementCode);
+    if (agreementCodeOrder !== 0) {
+      return agreementCodeOrder;
+    }
+
+    return right.agreementCategoryCode.localeCompare(left.agreementCategoryCode);
+  }
+
+  private isSameLaborClassification(
+    left: EmployeeLaborClassificationModel,
+    right: EmployeeLaborClassificationModel,
+  ): boolean {
+    return (
+      left.agreementCode === right.agreementCode &&
+      left.agreementCategoryCode === right.agreementCategoryCode &&
+      left.startDate === right.startDate
+    );
+  }
+
+  private toLaborClassificationBlockItemModel(
+    classification: EmployeeLaborClassificationModel,
+  ): EmployeeLaborClassificationBlockItemModel {
+    return {
+      agreementCode: classification.agreementCode,
+      agreementCategoryCode: classification.agreementCategoryCode,
+      startDate: classification.startDate,
+      endDate: classification.endDate,
+      isActive: classification.isActive,
     };
   }
 }
