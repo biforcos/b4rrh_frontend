@@ -103,9 +103,26 @@ export const employeeTexts = {
     'Bloque preparado para direccion principal, historico y vigencias.',
   laborAreaTitle: 'Laborales',
   laborAreaSubtitle: 'Bloques vinculados a presencia y condicion contractual.',
+  laborLoadingMessage: 'Cargando datos laborales...',
   laborPresenceBlockTitle: 'Presence',
   laborPresenceBlockDescription:
     'Area conectada al vertical de presencia con capacidad de historial y estado activo.',
+  presenceBlockTitle: 'Presencia',
+  presenceBlockCurrentLabel: 'Presencia principal',
+  presenceBlockCurrentActiveLabel: 'Presencia activa actual.',
+  presenceBlockCurrentActiveMostRecentLabel:
+    'Hay varias presencias activas; se muestra la mas reciente.',
+  presenceBlockCurrentLatestClosedLabel:
+    'No hay presencia activa; se muestra la ultima presencia registrada.',
+  presenceBlockHistoryTitle: 'Historial de presencias',
+  presenceBlockEmptyMessage: 'No hay presencias disponibles.',
+  presenceLoadFailedMessage: 'No se pudo cargar la informacion de presencia.',
+  presenceBlockStatusActive: 'Activa',
+  presenceBlockStatusClosed: 'Cerrada',
+  presenceBlockOpenPeriodLabel: 'actual',
+  presenceBlockCompanyLabel: 'Compania',
+  presenceBlockEntryReasonLabel: 'Motivo entrada',
+  presenceBlockExitReasonLabel: 'Motivo salida',
   laborContractBlockTitle: 'Contract',
   laborContractBlockDescription:
     'Bloque reservado para tipo contractual, fechas clave y cambios vigentes.',

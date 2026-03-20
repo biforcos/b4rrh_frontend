@@ -1,19 +1,17 @@
-<section class="employee-area" aria-labelledby="employee-presence-title">
-  <header class="employee-area__header">
-    <h3 id="employee-presence-title">{{ texts.laborAreaTitle }}</h3>
-  </header>
+<section class="employee-area" [attr.aria-label]="texts.laborAreaLabel">
+  <div class="employee-area__state-stack">
+    @if (laborAreaLoading()) {
+      <p class="employee-area__state">{{ texts.laborLoadingMessage }}</p>
+    }
 
-  <div class="employee-area__grid">
-    <article class="employee-area__card">
-      <h4>{{ texts.laborPresenceBlockTitle }}</h4>
-    </article>
+    @if (presencesError() === 'request-failed') {
+      <p class="employee-area__state employee-area__state--error">{{ texts.presenceLoadFailedMessage }}</p>
+    }
+  </div>
 
-    <article class="employee-area__card">
-      <h4>{{ texts.laborContractBlockTitle }}</h4>
-    </article>
-
-    <article class="employee-area__card employee-area__card--wide">
-      <h4>{{ texts.laborFutureBlockTitle }}</h4>
-    </article>
+  <div class="employee-area__modules">
+    <section class="employee-area__module">
+      <app-employee-presence-block [presence]="presenceBlockModel()" />
+    </section>
   </div>
 </section>
