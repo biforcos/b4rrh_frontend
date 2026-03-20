@@ -7,11 +7,19 @@
     @if (presencesError() === 'request-failed') {
       <p class="employee-area__state employee-area__state--error">{{ texts.presenceLoadFailedMessage }}</p>
     }
+
+    @if (contractsError() === 'request-failed') {
+      <p class="employee-area__state employee-area__state--error">{{ texts.contractLoadFailedMessage }}</p>
+    }
   </div>
 
   <div class="employee-area__modules">
     <section class="employee-area__module">
       <app-employee-presence-block [presence]="presenceBlockModel()" />
+    </section>
+
+    <section class="employee-area__module">
+      <app-employee-contract-block [contract]="contractBlockModel()" />
     </section>
   </div>
 </section>

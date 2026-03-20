@@ -131,6 +131,23 @@ export const employeeTexts = {
   laborContractBlockTitle: 'Contract',
   laborContractBlockDescription:
     'Bloque reservado para tipo contractual, fechas clave y cambios vigentes.',
+  contractBlockTitle: 'Contrato',
+  contractBlockCurrentLabel: 'Contrato actual',
+  contractBlockCurrentActiveSectionLabel: 'Contrato activo',
+  contractBlockCurrentSectionLabel: 'Contrato actual',
+  contractBlockCurrentActiveLabel: 'Contrato activo actual.',
+  contractBlockCurrentActiveMostRecentLabel:
+    'Hay varios contratos activos; se muestra el mas reciente.',
+  contractBlockCurrentLatestClosedLabel:
+    'No hay contrato activo; se muestra el ultimo contrato registrado.',
+  contractBlockHistoryTitle: 'Historial de contratos',
+  contractBlockHistoryEmptyMessage: 'Sin periodos contractuales anteriores registrados.',
+  contractBlockEmptyMessage: 'No hay contratos disponibles.',
+  contractLoadFailedMessage: 'No se pudo cargar la informacion de contrato.',
+  contractBlockStatusActive: 'Activo',
+  contractBlockStatusClosed: 'Cerrado',
+  contractBlockPeriodLabel: 'Periodo',
+  contractBlockOpenPeriodLabel: 'actual',
   laborFutureBlockTitle: 'Evolucion laboral',
   laborFutureBlockDescription:
     'Preparado para eventos de movilidad, cambios de categoria y transiciones de jornada.',

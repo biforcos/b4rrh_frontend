@@ -1,0 +1,55 @@
+<section class="employee-contract-block" aria-labelledby="employee-contract-block-title">
+  <header class="employee-contract-block__header">
+    <h4 id="employee-contract-block-title">{{ texts.contractBlockTitle }}</h4>
+  </header>
+
+  @if (hasAnyData()) {
+    @if (currentContract(); as currentContract) {
+      <article class="employee-contract-block__current-item">
+        <p class="employee-contract-block__label">{{ resolveCurrentSectionLabel() }}</p>
+        <p class="employee-contract-block__identity">{{ buildContractIdentityLabel(currentContract) }}</p>
+        <p class="employee-contract-block__period">
+          {{ texts.contractBlockPeriodLabel }}: {{ buildPeriodLabel(currentContract) }}
+        </p>
+        <p class="employee-contract-block__meta">
+          <span
+            class="employee-contract-block__status-chip"
+            [class.employee-contract-block__status-chip--active]="currentContract.isActive"
+          >
+            {{ resolveStatusLabel(currentContract) }}
+          </span>
+        </p>
+        <p class="employee-contract-block__context">{{ resolveCurrentKindLabel() }}</p>
+      </article>
+    }
+
+    <section class="employee-contract-block__history" [attr.aria-label]="texts.contractBlockHistoryTitle">
+      <h5>{{ texts.contractBlockHistoryTitle }}</h5>
+
+      @if (hasHistory()) {
+        <div class="employee-contract-block__history-list" role="list">
+          @for (contract of contractHistory(); track contract.contractCode + '-' + contract.startDate) {
+            <article class="employee-contract-block__history-item" role="listitem">
+              <p class="employee-contract-block__identity">{{ buildContractIdentityLabel(contract) }}</p>
+              <p class="employee-contract-block__period">
+                {{ texts.contractBlockPeriodLabel }}: {{ buildPeriodLabel(contract) }}
+              </p>
+              <p class="employee-contract-block__meta">
+                <span
+                  class="employee-contract-block__status-chip"
+                  [class.employee-contract-block__status-chip--active]="contract.isActive"
+                >
+                  {{ resolveStatusLabel(contract) }}
+                </span>
+              </p>
+            </article>
+          }
+        </div>
+      } @else {
+        <p class="employee-contract-block__history-empty">{{ texts.contractBlockHistoryEmptyMessage }}</p>
+      }
+    </section>
+  } @else {
+    <p class="employee-contract-block__empty">{{ texts.contractBlockEmptyMessage }}</p>
+  }
+</section>
