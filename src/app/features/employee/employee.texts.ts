@@ -92,6 +92,13 @@ export const employeeTexts = {
   addressBlockEmptyMessage: 'No hay informacion de direcciones disponible.',
   addressLoadingMessage: 'Cargando informacion de direcciones...',
   addressLoadFailedMessage: 'No se pudo cargar la informacion de direcciones.',
+  personalIdentifiersBlockTitle: 'Identificadores',
+  identifierBlockPrimaryLabel: 'Identificador principal',
+  identifierBlockSecondaryTitle: 'Otros identificadores',
+  identifierBlockEmptyMessage: 'No hay identificadores disponibles.',
+  identifierLoadFailedMessage: 'No se pudo cargar la informacion de identificadores.',
+  identifierBlockIssuingCountryLabel: 'Pais emisor',
+  identifierBlockExpirationDateLabel: 'Expira',
   personalAddressesBlockDescription:
     'Bloque preparado para direccion principal, historico y vigencias.',
   laborAreaTitle: 'Laborales',

@@ -12,17 +12,24 @@ import {
   EmployeeContactBlockComponent,
   EmployeeContactBlockModel,
 } from '../components/employee-contact-block.component';
+import {
+  EmployeeIdentifierBlockComponent,
+  EmployeeIdentifierBlockItemModel,
+  EmployeeIdentifierBlockModel,
+} from '../components/employee-identifier-block.component';
 import { EmployeeAddressStore } from '../../data-access/employee-address.store';
 import { EmployeeContactStore } from '../../data-access/employee-contact.store';
+import { EmployeeIdentifierStore } from '../../data-access/employee-identifier.store';
 import { employeeTexts } from '../../employee.texts';
 import { EmployeeAddressModel } from '../../models/employee-address.model';
 import { EmployeeContactModel } from '../../models/employee-contact.model';
+import { EmployeeIdentifierModel } from '../../models/employee-identifier.model';
 import { readEmployeeBusinessKeyFromParamMap } from '../../routing/employee-route-key.util';
 
 @Component({
   selector: 'app-employee-contact-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [EmployeeContactBlockComponent, EmployeeAddressBlockComponent],
+  imports: [EmployeeContactBlockComponent, EmployeeAddressBlockComponent, EmployeeIdentifierBlockComponent],
   templateUrl: './employee-contact-page.component.html',
   styleUrl: './employee-contact-page.component.scss',
 })
@@ -30,6 +37,7 @@ export class EmployeeContactPageComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly employeeAddressStore = inject(EmployeeAddressStore);
   private readonly employeeContactStore = inject(EmployeeContactStore);
+  private readonly employeeIdentifierStore = inject(EmployeeIdentifierStore);
 
   protected readonly texts = employeeTexts;
   protected readonly activeEmployeeKey = toSignal(
@@ -44,8 +52,11 @@ export class EmployeeContactPageComponent {
   protected readonly addresses = this.employeeAddressStore.addresses;
   protected readonly loadingAddresses = this.employeeAddressStore.loading;
   protected readonly addressesError = this.employeeAddressStore.error;
+  protected readonly identifiers = this.employeeIdentifierStore.identifiers;
+  protected readonly loadingIdentifiers = this.employeeIdentifierStore.loading;
+  protected readonly identifiersError = this.employeeIdentifierStore.error;
   protected readonly loadingPersonals = computed(
-    () => this.loadingContacts() || this.loadingAddresses(),
+    () => this.loadingContacts() || this.loadingAddresses() || this.loadingIdentifiers(),
   );
   protected readonly contactBlockModel = computed<EmployeeContactBlockModel>(() =>
     this.toContactBlockModel(this.contacts()),
@@ -53,11 +64,15 @@ export class EmployeeContactPageComponent {
   protected readonly addressBlockModel = computed<EmployeeAddressBlockModel>(() =>
     this.toAddressBlockModel(this.addresses()),
   );
+  protected readonly identifierBlockModel = computed<EmployeeIdentifierBlockModel>(() =>
+    this.toIdentifierBlockModel(this.identifiers()),
+  );
 
   constructor() {
     effect(() => {
       this.employeeContactStore.loadContactsByBusinessKey(this.activeEmployeeKey());
       this.employeeAddressStore.loadAddressesByBusinessKey(this.activeEmployeeKey());
+      this.employeeIdentifierStore.loadIdentifiersByBusinessKey(this.activeEmployeeKey());
     });
   }
 
@@ -137,5 +152,41 @@ export class EmployeeContactPageComponent {
     }
 
     return `${startDate} - ${endDate}`;
+  }
+
+  private toIdentifierBlockModel(
+    identifiers: ReadonlyArray<EmployeeIdentifierModel>,
+  ): EmployeeIdentifierBlockModel {
+    if (identifiers.length === 0) {
+      return {
+        primaryIdentifier: null,
+        secondaryIdentifiers: [],
+      };
+    }
+
+    const primaryIdentifierIndex = identifiers.findIndex((identifier) => identifier.isPrimary);
+    const selectedPrimaryIndex = primaryIdentifierIndex >= 0 ? primaryIdentifierIndex : 0;
+    const primaryIdentifier = identifiers[selectedPrimaryIndex] ?? null;
+
+    return {
+      primaryIdentifier: primaryIdentifier
+        ? this.toIdentifierBlockItemModel(primaryIdentifier)
+        : null,
+      secondaryIdentifiers: identifiers
+        .filter((_, index) => index !== selectedPrimaryIndex)
+        .map((identifier) => this.toIdentifierBlockItemModel(identifier)),
+    };
+  }
+
+  private toIdentifierBlockItemModel(
+    identifier: EmployeeIdentifierModel,
+  ): EmployeeIdentifierBlockItemModel {
+    return {
+      typeCode: identifier.typeCode,
+      value: identifier.value,
+      issuingCountryCode: identifier.issuingCountryCode,
+      expirationDate: identifier.expirationDate,
+      isPrimary: identifier.isPrimary,
+    };
   }
 }

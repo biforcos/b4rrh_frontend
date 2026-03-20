@@ -1,0 +1,58 @@
+<section class="employee-identifier-block" aria-labelledby="employee-identifier-block-title">
+  <header class="employee-identifier-block__header">
+    <h4 id="employee-identifier-block-title">{{ texts.personalIdentifiersBlockTitle }}</h4>
+  </header>
+
+  @if (hasAnyData()) {
+    @if (primaryIdentifier(); as primaryIdentifier) {
+      <article class="employee-identifier-block__primary-item">
+        <p class="employee-identifier-block__label">{{ texts.identifierBlockPrimaryLabel }}</p>
+        <p class="employee-identifier-block__type">{{ primaryIdentifier.typeCode }}</p>
+        <p class="employee-identifier-block__value">{{ primaryIdentifier.value }}</p>
+        @if (primaryIdentifier.issuingCountryCode || primaryIdentifier.expirationDate) {
+          <p class="employee-identifier-block__meta">
+            @if (primaryIdentifier.issuingCountryCode) {
+              <span>
+                {{ texts.identifierBlockIssuingCountryLabel }}: {{ primaryIdentifier.issuingCountryCode }}
+              </span>
+            }
+            @if (primaryIdentifier.expirationDate) {
+              <span>{{ texts.identifierBlockExpirationDateLabel }}: {{ primaryIdentifier.expirationDate }}</span>
+            }
+          </p>
+        }
+      </article>
+    }
+
+    @if (secondaryIdentifiers().length > 0) {
+      <section
+        class="employee-identifier-block__secondary"
+        [attr.aria-label]="texts.identifierBlockSecondaryTitle"
+      >
+        <h5>{{ texts.identifierBlockSecondaryTitle }}</h5>
+        <div class="employee-identifier-block__secondary-list" role="list">
+          @for (identifier of secondaryIdentifiers(); track identifier.typeCode + '-' + identifier.value) {
+            <article class="employee-identifier-block__secondary-item" role="listitem">
+              <p class="employee-identifier-block__type">{{ identifier.typeCode }}</p>
+              <p class="employee-identifier-block__value">{{ identifier.value }}</p>
+              @if (identifier.issuingCountryCode || identifier.expirationDate) {
+                <p class="employee-identifier-block__meta">
+                  @if (identifier.issuingCountryCode) {
+                    <span>
+                      {{ texts.identifierBlockIssuingCountryLabel }}: {{ identifier.issuingCountryCode }}
+                    </span>
+                  }
+                  @if (identifier.expirationDate) {
+                    <span>{{ texts.identifierBlockExpirationDateLabel }}: {{ identifier.expirationDate }}</span>
+                  }
+                </p>
+              }
+            </article>
+          }
+        </div>
+      </section>
+    }
+  } @else {
+    <p class="employee-identifier-block__empty">{{ texts.identifierBlockEmptyMessage }}</p>
+  }
+</section>

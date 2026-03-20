@@ -1,0 +1,85 @@
+.employee-identifier-block {
+  display: grid;
+  gap: 0.52rem;
+}
+
+.employee-identifier-block__header h4 {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #1f2937;
+}
+
+.employee-identifier-block__primary-item,
+.employee-identifier-block__secondary-item {
+  display: grid;
+  gap: 0.16rem;
+  border: 1px solid #ced9e6;
+  border-radius: 0.54rem;
+  background: #ffffff;
+  padding: 0.44rem 0.5rem;
+}
+
+.employee-identifier-block__label {
+  margin: 0;
+  font-size: 0.64rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.045em;
+  color: #6b7280;
+}
+
+.employee-identifier-block__type {
+  margin: 0;
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #4f6376;
+}
+
+.employee-identifier-block__value {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: #0f172a;
+  overflow-wrap: anywhere;
+}
+
+.employee-identifier-block__meta {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.32rem;
+  font-size: 0.66rem;
+  line-height: 1.2;
+  color: #607284;
+}
+
+.employee-identifier-block__secondary {
+  display: grid;
+  gap: 0.24rem;
+  padding-top: 0.14rem;
+  border-top: 1px solid #e6edf4;
+}
+
+.employee-identifier-block__secondary h5 {
+  margin: 0;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #334155;
+}
+
+.employee-identifier-block__secondary-list {
+  display: grid;
+  gap: 0.22rem;
+}
+
+.employee-identifier-block__empty {
+  margin: 0;
+  border: 1px dashed #cad5e3;
+  border-radius: 0.52rem;
+  padding: 0.5rem 0.54rem;
+  font-size: 0.74rem;
+  color: #64748b;
+}
