@@ -34,8 +34,10 @@ import { CreateRuleEntityTypeRequest } from '../model/models';
 import { CreateRuleSystemRequest } from '../model/models';
 import { CreateWorkCenterRequest } from '../model/models';
 import { EmployeeDirectoryItemResponse } from '../model/models';
+import { EmployeeJourneyResponse } from '../model/models';
 import { EmployeeResponse } from '../model/models';
 import { IdentifierResponse } from '../model/models';
+import { JourneyErrorResponse } from '../model/models';
 import { LaborClassificationResponse } from '../model/models';
 import { PresenceResponse } from '../model/models';
 import { ReplaceContractFromDateRequest } from '../model/models';
@@ -219,6 +221,12 @@ export interface GetCostCenterByBusinessKeyRequestParams {
 }
 
 export interface GetEmployeeByBusinessKeyRequestParams {
+    ruleSystemCode: string;
+    employeeTypeCode: string;
+    employeeNumber: string;
+}
+
+export interface GetEmployeeJourneyRequestParams {
     ruleSystemCode: string;
     employeeTypeCode: string;
     employeeNumber: string;
@@ -583,6 +591,14 @@ export interface DefaultServiceInterface {
 * @param requestParameters
      */
     getEmployeeByBusinessKey(requestParameters: GetEmployeeByBusinessKeyRequestParams, extraHttpRequestParams?: any): Observable<EmployeeResponse>;
+
+    /**
+     * Get aggregated employee journey timeline (read-only view)
+     * Read-only aggregated timeline view for frontend rendering. This endpoint does not mutate data and does not replace canonical write verticals. 
+     * @endpoint get /employees/{ruleSystemCode}/{employeeTypeCode}/{employeeNumber}/journey
+* @param requestParameters
+     */
+    getEmployeeJourney(requestParameters: GetEmployeeJourneyRequestParams, extraHttpRequestParams?: any): Observable<EmployeeJourneyResponse>;
 
     /**
      * Get employee identifier by business key

@@ -1,0 +1,57 @@
+<section class="employee-journey-timeline" aria-labelledby="employee-journey-timeline-title">
+  <header class="employee-journey-timeline__header">
+    <h3 id="employee-journey-timeline-title">{{ texts.timelineTitle }}</h3>
+    <p>{{ texts.timelineSubtitle }}</p>
+    @if (journeyEmployeeLabel(); as journeyEmployeeLabel) {
+      <p class="employee-journey-timeline__employee-label">{{ journeyEmployeeLabel }}</p>
+    }
+  </header>
+
+  @if (loading()) {
+    <div class="employee-journey-timeline__loading" [attr.aria-label]="texts.timelineLoadingMessage">
+      <div class="employee-journey-timeline__loading-track"></div>
+      <div class="employee-journey-timeline__loading-track"></div>
+    </div>
+  } @else if (error()) {
+    <p class="employee-journey-timeline__error">{{ texts.timelineLoadFailedMessage }}</p>
+  } @else if (!hasEvents()) {
+    <p class="employee-journey-timeline__empty">{{ texts.timelineNoEventsMessage }}</p>
+  } @else {
+    <div class="employee-journey-timeline__tracks">
+      @for (track of timelineTracks(); track track.code) {
+        <section class="employee-journey-timeline__track" [attr.aria-label]="track.label">
+          <header class="employee-journey-timeline__track-header">
+            <h4>{{ track.label }}</h4>
+            <span>{{ texts.timelineTrackCodeLabel }}: {{ track.code }}</span>
+          </header>
+
+          <ol class="employee-journey-timeline__event-list" role="list">
+            @for (item of track.items; track item.startDate + '-' + item.label) {
+              <li class="employee-journey-timeline__event" role="listitem">
+                <span class="employee-journey-timeline__dot" aria-hidden="true"></span>
+                <p class="employee-journey-timeline__event-label">{{ item.label }}</p>
+                <p class="employee-journey-timeline__event-period">
+                  {{ buildPeriodLabel(item) }}
+                  @if (item.isCurrent) {
+                    <span class="employee-journey-timeline__current-chip">{{ texts.timelineCurrentBadgeLabel }}</span>
+                  }
+                </p>
+
+                @if (item.compactDetails.length > 0) {
+                  <ul class="employee-journey-timeline__details" role="list">
+                    @for (detail of item.compactDetails; track detail.key) {
+                      <li>
+                        <span>{{ detail.key }}</span>
+                        <strong>{{ detail.value }}</strong>
+                      </li>
+                    }
+                  </ul>
+                }
+              </li>
+            }
+          </ol>
+        </section>
+      }
+    </div>
+  }
+</section>

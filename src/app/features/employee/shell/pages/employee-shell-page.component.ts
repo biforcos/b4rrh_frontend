@@ -7,6 +7,7 @@ import { filter, startWith } from 'rxjs';
 import { PanelComponent } from '../../../../shared/ui/panel/panel.component';
 import { EmployeeDetailStore } from '../../data-access/employee-detail.store';
 import { EmployeeDirectoryStore } from '../../data-access/employee-directory.store';
+import { EmployeeJourneyStore } from '../../data-access/employee-journey.store';
 import { employeeTexts } from '../../employee.texts';
 import { EmployeeBusinessKey } from '../../models/employee-business-key.model';
 import { EmployeeDetailModel } from '../../models/employee-detail.model';
@@ -22,8 +23,8 @@ import {
   toEmployeeBusinessKey,
 } from '../../routing/employee-route-key.util';
 import { EmployeeDetailHeaderComponent } from '../components/employee-detail-header.component';
+import { EmployeeJourneyTimelineComponent } from '../components/employee-journey-timeline.component';
 import { EmployeeDetailNavComponent } from '../components/employee-detail-nav.component';
-import { EmployeeDetailTimelineComponent } from '../components/employee-detail-timeline.component';
 import { EmployeeDirectoryListComponent } from '../components/employee-directory-list.component';
 
 @Component({
@@ -35,7 +36,7 @@ import { EmployeeDirectoryListComponent } from '../components/employee-directory
     PanelComponent,
     EmployeeDirectoryListComponent,
     EmployeeDetailHeaderComponent,
-    EmployeeDetailTimelineComponent,
+    EmployeeJourneyTimelineComponent,
     EmployeeDetailNavComponent,
   ],
   templateUrl: './employee-shell-page.component.html',
@@ -46,6 +47,7 @@ export class EmployeeShellPageComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly directoryStore = inject(EmployeeDirectoryStore);
   private readonly detailStore = inject(EmployeeDetailStore);
+  private readonly journeyStore = inject(EmployeeJourneyStore);
 
   protected readonly texts = employeeTexts;
   protected readonly searchForm = new FormGroup({
@@ -57,6 +59,9 @@ export class EmployeeShellPageComponent {
   protected readonly selectedEmployeeDetail = this.detailStore.selectedEmployeeDetail;
   protected readonly loadingDetail = this.detailStore.loadingDetail;
   protected readonly detailError = this.detailStore.detailError;
+  protected readonly journey = this.journeyStore.journey;
+  protected readonly loadingJourney = this.journeyStore.loading;
+  protected readonly journeyError = this.journeyStore.error;
   protected readonly selectedEmployee = computed<EmployeeDetailModel | null>(() => {
     const activeEmployeeKey = this.activeEmployeeKey();
     if (!activeEmployeeKey) {
@@ -94,6 +99,7 @@ export class EmployeeShellPageComponent {
         this.activeEmployeeKey.set(activeEmployeeKey);
         this.activeDetailSection.set(this.resolveActiveDetailSection());
         this.detailStore.loadEmployeeDetailByBusinessKey(activeEmployeeKey);
+        this.journeyStore.loadJourneyByBusinessKey(activeEmployeeKey);
       });
   }
 

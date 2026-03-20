@@ -32,8 +32,13 @@ model/create-rule-entity-type-request.ts
 model/create-rule-system-request.ts
 model/create-work-center-request.ts
 model/employee-directory-item-response.ts
+model/employee-journey-response.ts
 model/employee-response.ts
 model/identifier-response.ts
+model/journey-employee-header.ts
+model/journey-error-response.ts
+model/journey-item-response.ts
+model/journey-track-response.ts
 model/labor-classification-response.ts
 model/models.ts
 model/presence-response.ts

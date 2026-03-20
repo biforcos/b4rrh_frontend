@@ -56,7 +56,11 @@
         </section>
 
         <section class="employee-shell__timeline-zone">
-          <app-employee-detail-timeline [employee]="employee" />
+          <app-employee-journey-timeline
+            [journey]="journey()"
+            [loading]="loadingJourney()"
+            [error]="journeyError()"
+          />
         </section>
 
         @if (activeEmployeeKey(); as activeEmployeeKey) {
