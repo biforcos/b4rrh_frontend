@@ -6,8 +6,11 @@
   @if (hasAnyData()) {
     @if (currentPresence(); as currentPresence) {
       <article class="employee-presence-block__current-item">
-        <p class="employee-presence-block__label">{{ texts.presenceBlockCurrentLabel }}</p>
-        <p class="employee-presence-block__period">{{ buildPeriodLabel(currentPresence) }}</p>
+        <p class="employee-presence-block__label">{{ resolveCurrentSectionLabel() }}</p>
+        <p class="employee-presence-block__identity">{{ buildCompanyPeriodLabel(currentPresence) }}</p>
+        <p class="employee-presence-block__period">
+          {{ texts.presenceBlockPeriodLabel }}: {{ buildPeriodLabel(currentPresence) }}
+        </p>
         <p class="employee-presence-block__meta">
           <span
             class="employee-presence-block__status-chip"
@@ -15,8 +18,6 @@
           >
             {{ resolveStatusLabel(currentPresence) }}
           </span>
-          <span>{{ texts.presenceBlockCompanyLabel }}: {{ currentPresence.companyCode }}</span>
-          <span>#{{ currentPresence.presenceNumber }}</span>
         </p>
         <p class="employee-presence-block__reason-row">
           <span>{{ texts.presenceBlockEntryReasonLabel }}: {{ currentPresence.entryReasonCode }}</span>
@@ -28,13 +29,17 @@
       </article>
     }
 
-    @if (presenceHistory().length > 0) {
-      <section class="employee-presence-block__history" [attr.aria-label]="texts.presenceBlockHistoryTitle">
-        <h5>{{ texts.presenceBlockHistoryTitle }}</h5>
+    <section class="employee-presence-block__history" [attr.aria-label]="texts.presenceBlockHistoryTitle">
+      <h5>{{ texts.presenceBlockHistoryTitle }}</h5>
+
+      @if (hasHistory()) {
         <div class="employee-presence-block__history-list" role="list">
           @for (presence of presenceHistory(); track presence.presenceNumber + '-' + presence.startDate) {
             <article class="employee-presence-block__history-item" role="listitem">
-              <p class="employee-presence-block__period">{{ buildPeriodLabel(presence) }}</p>
+              <p class="employee-presence-block__identity">{{ buildCompanyPeriodLabel(presence) }}</p>
+              <p class="employee-presence-block__period">
+                {{ texts.presenceBlockPeriodLabel }}: {{ buildPeriodLabel(presence) }}
+              </p>
               <p class="employee-presence-block__meta">
                 <span
                   class="employee-presence-block__status-chip"
@@ -42,8 +47,6 @@
                 >
                   {{ resolveStatusLabel(presence) }}
                 </span>
-                <span>{{ texts.presenceBlockCompanyLabel }}: {{ presence.companyCode }}</span>
-                <span>#{{ presence.presenceNumber }}</span>
               </p>
               <p class="employee-presence-block__reason-row">
                 <span>{{ texts.presenceBlockEntryReasonLabel }}: {{ presence.entryReasonCode }}</span>
@@ -54,8 +57,10 @@
             </article>
           }
         </div>
-      </section>
-    }
+      } @else {
+        <p class="employee-presence-block__history-empty">{{ texts.presenceBlockHistoryEmptyMessage }}</p>
+      }
+    </section>
   } @else {
     <p class="employee-presence-block__empty">{{ texts.presenceBlockEmptyMessage }}</p>
   }

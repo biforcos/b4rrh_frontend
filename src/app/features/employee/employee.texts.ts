@@ -108,17 +108,22 @@ export const employeeTexts = {
   laborPresenceBlockDescription:
     'Area conectada al vertical de presencia con capacidad de historial y estado activo.',
   presenceBlockTitle: 'Presencia',
-  presenceBlockCurrentLabel: 'Presencia principal',
+  presenceBlockCurrentLabel: 'Presencia actual',
+  presenceBlockCurrentActiveSectionLabel: 'Presencia activa',
+  presenceBlockCurrentSectionLabel: 'Presencia actual',
   presenceBlockCurrentActiveLabel: 'Presencia activa actual.',
   presenceBlockCurrentActiveMostRecentLabel:
     'Hay varias presencias activas; se muestra la mas reciente.',
   presenceBlockCurrentLatestClosedLabel:
     'No hay presencia activa; se muestra la ultima presencia registrada.',
   presenceBlockHistoryTitle: 'Historial de presencias',
+  presenceBlockHistoryEmptyMessage: 'Sin periodos anteriores registrados.',
   presenceBlockEmptyMessage: 'No hay presencias disponibles.',
   presenceLoadFailedMessage: 'No se pudo cargar la informacion de presencia.',
   presenceBlockStatusActive: 'Activa',
   presenceBlockStatusClosed: 'Cerrada',
+  presenceBlockPeriodLabel: 'Periodo',
+  presenceBlockPeriodNumberPrefix: 'periodo',
   presenceBlockOpenPeriodLabel: 'actual',
   presenceBlockCompanyLabel: 'Compania',
   presenceBlockEntryReasonLabel: 'Motivo entrada',

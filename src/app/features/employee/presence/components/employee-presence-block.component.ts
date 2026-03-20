@@ -37,6 +37,8 @@ export class EmployeePresenceBlockComponent {
     () => Boolean(this.currentPresence()) || this.presenceHistory().length > 0,
   );
 
+  protected readonly hasHistory = computed(() => this.presenceHistory().length > 0);
+
   protected buildPeriodLabel(presence: EmployeePresenceBlockItemModel): string {
     if (!presence.endDate) {
       return `${presence.startDate} - ${this.texts.presenceBlockOpenPeriodLabel}`;
@@ -57,6 +59,20 @@ export class EmployeePresenceBlockComponent {
     }
 
     return this.texts.presenceBlockCurrentLatestClosedLabel;
+  }
+
+  protected resolveCurrentSectionLabel(): string {
+    const currentKind = this.currentPresenceKind();
+
+    if (currentKind === 'active' || currentKind === 'active-most-recent') {
+      return this.texts.presenceBlockCurrentActiveSectionLabel;
+    }
+
+    return this.texts.presenceBlockCurrentSectionLabel;
+  }
+
+  protected buildCompanyPeriodLabel(presence: EmployeePresenceBlockItemModel): string {
+    return `${presence.companyCode} · ${this.texts.presenceBlockPeriodNumberPrefix} #${presence.presenceNumber}`;
   }
 
   protected resolveStatusLabel(presence: EmployeePresenceBlockItemModel): string {
