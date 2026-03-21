@@ -73,9 +73,6 @@ export class EditableSlotSectionComponent {
   protected readonly isConfirmingDelete = computed(
     () => this.displayMode() === 'confirmingDelete' && this.deletingKey() !== null,
   );
-  protected readonly isOperatingMode = computed(
-    () => this.isCreating() || this.isEditing() || this.isConfirmingDelete(),
-  );
   protected readonly hasRows = computed(() => this.rows().length > 0);
   protected readonly showEmpty = computed(() => !this.hasRows() && !this.isCreating());
   protected readonly canUseKeySelect = computed(() => this.availableKeys().length > 0);
@@ -87,7 +84,7 @@ export class EditableSlotSectionComponent {
     () => this.canCreate() && this.isManageMode() && !this.state().busy,
   );
   protected readonly showExitManageAction = computed(
-    () => (this.isManageMode() || this.isOperatingMode()) && !this.state().busy,
+    () => this.isManageMode() && !this.state().busy,
   );
   protected readonly showRowMaintenanceActions = computed(
     () => this.isManageMode() && !this.state().busy,

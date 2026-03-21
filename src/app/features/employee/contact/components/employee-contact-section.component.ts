@@ -59,9 +59,7 @@ export class EmployeeContactSectionComponent {
   readonly employeeKey = input<EmployeeBusinessKey | null>(null);
 
   private readonly contactStore = inject(EmployeeContactStore);
-  private readonly manageModeActiveState = signal(false);
-  private readonly modeState = signal<SectionMode>('view');
-  private readonly dirtyState = signal(false);
+  private readonly displayModeState = signal<SlotDisplayMode>('view');
   private readonly localErrorMessageState = signal<string | null>(null);
   private readonly editingKeyState = signal<string | null>(null);
   private readonly deletingKeyState = signal<string | null>(null);
@@ -90,33 +88,21 @@ export class EmployeeContactSectionComponent {
       .sort((left, right) => left.key.localeCompare(right.key)),
   );
   protected readonly availableKeys = computed<ReadonlyArray<SlotKeyOption<string>>>(() => []);
-  protected readonly displayMode = computed<SlotDisplayMode>(() => {
-    const mode = this.modeState();
-
-    if (mode === 'creating') {
-      return 'creating';
-    }
-
-    if (mode === 'editing') {
-      return 'editing';
-    }
-
-    if (mode === 'confirming') {
-      return 'confirmingDelete';
-    }
-
-    return this.manageModeActiveState() ? 'manage' : 'view';
-  });
+  protected readonly displayMode = this.displayModeState.asReadonly();
   protected readonly draft = this.draftState.asReadonly();
   protected readonly editingKey = this.editingKeyState.asReadonly();
   protected readonly deletingKey = this.deletingKeyState.asReadonly();
-  protected readonly sectionState = computed<SectionUiState>(() => ({
-    mode: this.modeState(),
-    dirty: this.dirtyState(),
-    busy: this.contactStore.loading() || this.contactStore.mutating(),
-    errorMessage: this.resolveErrorMessage(),
-    successMessage: this.resolveSuccessMessage(),
-  }));
+  protected readonly sectionState = computed<SectionUiState>(() => {
+    const isBusy = this.contactStore.loading() || this.contactStore.mutating();
+
+    return {
+      mode: isBusy ? 'submitting' : this.toSectionMode(this.displayModeState()),
+      dirty: false,
+      busy: isBusy,
+      errorMessage: this.resolveErrorMessage(),
+      successMessage: this.resolveSuccessMessage(),
+    };
+  });
 
   constructor() {
     effect(() => {
@@ -124,90 +110,60 @@ export class EmployeeContactSectionComponent {
 
       untracked(() => {
         this.contactStore.loadContacts(activeEmployeeKey);
-        this.resetAllUi();
+        this.enterViewMode();
       });
-    });
-
-    effect(() => {
-      if (this.contactStore.mutating()) {
-        return;
-      }
-
-      if (this.modeState() === 'submitting') {
-        this.resetOperationUi();
-      }
     });
   }
 
   protected onManageStarted(): void {
-    if (!this.canEditData()) {
+    if (!this.canStartInteraction()) {
       return;
     }
 
     this.clearInteractionFeedback();
-    this.manageModeActiveState.set(true);
-    this.resetOperationUi();
+    this.enterManageMode();
   }
 
   protected onManageExited(): void {
     this.clearInteractionFeedback();
-    this.manageModeActiveState.set(false);
-    this.resetOperationUi();
+    this.enterViewMode();
   }
 
   protected onCreateStarted(): void {
-    if (!this.canEditData()) {
+    if (!this.canStartInteraction()) {
       return;
     }
 
     this.clearInteractionFeedback();
-    this.manageModeActiveState.set(true);
-    this.modeState.set('creating');
-    this.dirtyState.set(false);
-    this.editingKeyState.set(null);
-    this.deletingKeyState.set(null);
-    this.draftState.set(emptyDraft);
+    this.enterCreateMode();
   }
 
   protected onEditStarted(contactTypeCode: string): void {
-    if (!this.canEditData()) {
+    if (!this.canStartInteraction()) {
       return;
     }
 
-    const row = this.rows().find((item) => item.key === contactTypeCode);
+    const row = this.findRowByKey(contactTypeCode);
     if (!row) {
       return;
     }
 
     this.clearInteractionFeedback();
-    this.manageModeActiveState.set(true);
-    this.modeState.set('editing');
-    this.dirtyState.set(false);
-    this.editingKeyState.set(row.key);
-    this.deletingKeyState.set(null);
-    this.draftState.set({
-      key: row.key,
-      value: row.value,
-    });
+    this.enterEditMode(row);
   }
 
   protected onDeleteRequested(contactTypeCode: string): void {
-    if (!this.canEditData()) {
+    if (!this.canStartInteraction()) {
       return;
     }
 
-    const row = this.rows().find((item) => item.key === contactTypeCode);
+    const row = this.findRowByKey(contactTypeCode);
     if (!row) {
       return;
     }
 
     this.clearInteractionFeedback();
-    this.manageModeActiveState.set(true);
-    this.modeState.set('confirming');
-    this.dirtyState.set(false);
-    this.editingKeyState.set(null);
-    this.deletingKeyState.set(row.key);
-    this.draftState.set(emptyDraft);
+    this.enterDeleteConfirmMode(row.key);
   }
 
   protected onDeleteConfirmed(contactTypeCode: string): void {
@@ -216,15 +172,14 @@ export class EmployeeContactSectionComponent {
       return;
     }
 
-    this.modeState.set('submitting');
-    this.localErrorMessageState.set(null);
+    this.clearLocalError();
+    this.enterManageMode();
     this.contactStore.deleteContact(activeEmployeeKey, contactTypeCode);
   }
 
   protected onCancelled(): void {
     this.clearInteractionFeedback();
-    this.manageModeActiveState.set(true);
-    this.resetOperationUi();
+    this.enterManageMode();
   }
 
   protected onDraftKeyChanged(contactTypeCode: string | null): void {
@@ -232,9 +187,7 @@ export class EmployeeContactSectionComponent {
       ...draft,
       key: contactTypeCode,
     }));
-    this.contactStore.clearFeedback();
-    this.dirtyState.set(true);
-    this.localErrorMessageState.set(null);
+    this.clearInteractionFeedback();
   }
 
   protected onDraftValueChanged(contactValue: string): void {
@@ -242,9 +195,7 @@ export class EmployeeContactSectionComponent {
       ...draft,
       value: contactValue,
     }));
-    this.contactStore.clearFeedback();
-    this.dirtyState.set(true);
-    this.localErrorMessageState.set(null);
+    this.clearInteractionFeedback();
   }
 
   protected onCreateSubmitted(draft: SlotDraft<string>): void {
@@ -253,25 +204,19 @@ export class EmployeeContactSectionComponent {
       return;
     }
 
-    const normalizedDraft = {
-      key: draft.key?.trim() ?? null,
-      value: draft.value.trim(),
-    };
-    if (!normalizedDraft.key || !normalizedDraft.value) {
+    if (!draft.key) {
       return;
     }
 
-    const isDuplicateType = this.rows().some((row) => row.key === normalizedDraft.key);
+    const isDuplicateType = this.rows().some((row) => row.key === draft.key);
     if (isDuplicateType) {
       this.localErrorMessageState.set(this.texts.contactsSectionDuplicateTypeMessage);
       return;
     }
 
-    this.modeState.set('submitting');
-    this.dirtyState.set(false);
-    this.localErrorMessageState.set(null);
-    this.draftState.set(normalizedDraft);
-    this.contactStore.createContact(activeEmployeeKey, normalizedDraft);
+    this.clearLocalError();
+    this.enterManageMode();
+    this.contactStore.createContact(activeEmployeeKey, draft);
   }
 
   protected onEditSubmitted(submission: SlotEditSubmission<string>): void {
@@ -280,24 +225,12 @@ export class EmployeeContactSectionComponent {
       return;
     }
 
-    const normalizedValue = submission.value.trim();
-    if (!normalizedValue) {
-      return;
-    }
-
-    const normalizedDraft: SlotDraft<string> = {
-      key: submission.key,
-      value: normalizedValue,
-    };
-
-    this.modeState.set('submitting');
-    this.dirtyState.set(false);
-    this.localErrorMessageState.set(null);
-    this.draftState.set(normalizedDraft);
-    this.contactStore.updateContact(activeEmployeeKey, submission.key, normalizedDraft);
+    this.clearLocalError();
+    this.enterManageMode();
+    this.contactStore.updateContact(activeEmployeeKey, submission.key, submission);
   }
 
-  private canEditData(): boolean {
+  private canStartInteraction(): boolean {
     const activeEmployeeKey = this.employeeKey();
     if (!activeEmployeeKey) {
       return false;
@@ -306,23 +239,73 @@ export class EmployeeContactSectionComponent {
     return !this.contactStore.mutating();
   }
 
-  private clearInteractionFeedback(): void {
-    this.contactStore.clearFeedback();
-    this.localErrorMessageState.set(null);
+  private findRowByKey(contactTypeCode: string): SlotRowViewModel<string> | null {
+    return this.rows().find((row) => row.key === contactTypeCode) ?? null;
   }
 
-  private resetOperationUi(): void {
-    this.modeState.set('view');
-    this.dirtyState.set(false);
-    this.localErrorMessageState.set(null);
+  private enterViewMode(): void {
+    this.displayModeState.set('view');
+    this.resetOperationContext();
+  }
+
+  private enterManageMode(): void {
+    this.displayModeState.set('manage');
+    this.resetOperationContext();
+  }
+
+  private enterCreateMode(): void {
+    this.displayModeState.set('creating');
     this.editingKeyState.set(null);
     this.deletingKeyState.set(null);
     this.draftState.set(emptyDraft);
   }
 
-  private resetAllUi(): void {
-    this.manageModeActiveState.set(false);
-    this.resetOperationUi();
+  private enterEditMode(row: SlotRowViewModel<string>): void {
+    this.displayModeState.set('editing');
+    this.editingKeyState.set(row.key);
+    this.deletingKeyState.set(null);
+    this.draftState.set({
+      key: row.key,
+      value: row.value,
+    });
+  }
+
+  private enterDeleteConfirmMode(contactTypeCode: string): void {
+    this.displayModeState.set('confirmingDelete');
+    this.editingKeyState.set(null);
+    this.deletingKeyState.set(contactTypeCode);
+    this.draftState.set(emptyDraft);
+  }
+
+  private clearInteractionFeedback(): void {
+    this.contactStore.clearFeedback();
+    this.clearLocalError();
+  }
+
+  private clearLocalError(): void {
+    this.localErrorMessageState.set(null);
+  }
+
+  private resetOperationContext(): void {
+    this.editingKeyState.set(null);
+    this.deletingKeyState.set(null);
+    this.draftState.set(emptyDraft);
+  }
+
+  private toSectionMode(displayMode: SlotDisplayMode): SectionMode {
+    if (displayMode === 'creating') {
+      return 'creating';
+    }
+
+    if (displayMode === 'editing') {
+      return 'editing';
+    }
+
+    if (displayMode === 'confirmingDelete') {
+      return 'confirming';
+    }
+
+    return 'view';
   }
 
   private resolveErrorMessage(): string | null {

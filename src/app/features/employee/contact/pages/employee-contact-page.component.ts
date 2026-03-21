@@ -8,10 +8,6 @@ import {
   EmployeeAddressBlockItemModel,
   EmployeeAddressBlockModel,
 } from '../components/employee-address-block.component';
-import {
-  EmployeeContactBlockComponent,
-  EmployeeContactBlockModel,
-} from '../components/employee-contact-block.component';
 import { EmployeeContactSectionComponent } from '../components/employee-contact-section.component';
 import {
   EmployeeIdentifierBlockComponent,
@@ -23,7 +19,6 @@ import { EmployeeContactStore } from '../../data-access/employee-contact.store';
 import { EmployeeIdentifierStore } from '../../data-access/employee-identifier.store';
 import { employeeTexts } from '../../employee.texts';
 import { EmployeeAddressModel } from '../../models/employee-address.model';
-import { EmployeeContactModel } from '../../models/employee-contact.model';
 import { EmployeeIdentifierModel } from '../../models/employee-identifier.model';
 import { readEmployeeBusinessKeyFromParamMap } from '../../routing/employee-route-key.util';
 
@@ -32,7 +27,6 @@ import { readEmployeeBusinessKeyFromParamMap } from '../../routing/employee-rout
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     EmployeeContactSectionComponent,
-    EmployeeContactBlockComponent,
     EmployeeAddressBlockComponent,
     EmployeeIdentifierBlockComponent,
   ],
@@ -64,9 +58,6 @@ export class EmployeeContactPageComponent {
   protected readonly loadingPersonals = computed(
     () => this.loadingContacts() || this.loadingAddresses() || this.loadingIdentifiers(),
   );
-  protected readonly contactBlockModel = computed<EmployeeContactBlockModel>(() =>
-    this.toContactBlockModel(this.contacts()),
-  );
   protected readonly addressBlockModel = computed<EmployeeAddressBlockModel>(() =>
     this.toAddressBlockModel(this.addresses()),
   );
@@ -79,29 +70,6 @@ export class EmployeeContactPageComponent {
       this.employeeAddressStore.loadAddressesByBusinessKey(this.activeEmployeeKey());
       this.employeeIdentifierStore.loadIdentifiersByBusinessKey(this.activeEmployeeKey());
     });
-  }
-
-  private toContactBlockModel(contacts: ReadonlyArray<EmployeeContactModel>): EmployeeContactBlockModel {
-    const phoneContacts = contacts.filter((contact) => contact.type === 'phone');
-    const emailContacts = contacts.filter((contact) => contact.type === 'email');
-    const otherContacts = contacts.filter((contact) => contact.type === 'other');
-
-    const primaryPhone = phoneContacts[0]?.value ?? null;
-    const primaryEmail = emailContacts[0]?.value ?? null;
-
-    return {
-      primaryPhone,
-      primaryEmail,
-      secondaryContacts: [
-        ...phoneContacts.slice(primaryPhone ? 1 : 0),
-        ...emailContacts.slice(primaryEmail ? 1 : 0),
-        ...otherContacts,
-      ].map((contact) => ({
-        type: contact.type,
-        label: contact.label,
-        value: contact.value,
-      })),
-    };
   }
 
   private toAddressBlockModel(addresses: ReadonlyArray<EmployeeAddressModel>): EmployeeAddressBlockModel {
