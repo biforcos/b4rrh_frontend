@@ -7,12 +7,12 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { JourneyEventResponse } from './journey-event-response';
 import { JourneyEmployeeHeader } from './journey-employee-header';
+import { JourneyTrackResponse } from './journey-track-response';
 
 
-export interface EmployeeJourneyResponse { 
+export interface EmployeeJourneyTracksResponse { 
     employee: JourneyEmployeeHeader;
-    events: Array<JourneyEventResponse>;
+    tracks: Array<JourneyTrackResponse>;
 }
 

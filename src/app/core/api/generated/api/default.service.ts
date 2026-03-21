@@ -65,6 +65,8 @@ import { EmployeeDirectoryItemResponse } from '../model/employee-directory-item-
 // @ts-ignore
 import { EmployeeJourneyResponse } from '../model/employee-journey-response';
 // @ts-ignore
+import { EmployeeJourneyTracksResponse } from '../model/employee-journey-tracks-response';
+// @ts-ignore
 import { EmployeeResponse } from '../model/employee-response';
 // @ts-ignore
 import { IdentifierResponse } from '../model/identifier-response';
@@ -129,6 +131,7 @@ import {
     GetCostCenterByBusinessKeyRequestParams,
     GetEmployeeByBusinessKeyRequestParams,
     GetEmployeeJourneyRequestParams,
+    GetEmployeeJourneyV2RequestParams,
     GetIdentifierByBusinessKeyRequestParams,
     GetLaborClassificationByBusinessKeyRequestParams,
     GetPresenceByBusinessKeyRequestParams,
@@ -2057,9 +2060,9 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public getEmployeeJourney(requestParameters: GetEmployeeJourneyRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<EmployeeJourneyResponse>;
-    public getEmployeeJourney(requestParameters: GetEmployeeJourneyRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<EmployeeJourneyResponse>>;
-    public getEmployeeJourney(requestParameters: GetEmployeeJourneyRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<EmployeeJourneyResponse>>;
+    public getEmployeeJourney(requestParameters: GetEmployeeJourneyRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<EmployeeJourneyTracksResponse>;
+    public getEmployeeJourney(requestParameters: GetEmployeeJourneyRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<EmployeeJourneyTracksResponse>>;
+    public getEmployeeJourney(requestParameters: GetEmployeeJourneyRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<EmployeeJourneyTracksResponse>>;
     public getEmployeeJourney(requestParameters: GetEmployeeJourneyRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         const ruleSystemCode = requestParameters?.ruleSystemCode;
         if (ruleSystemCode === null || ruleSystemCode === undefined) {
@@ -2100,6 +2103,72 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
         }
 
         let localVarPath = `/employees/${this.configuration.encodeParam({name: "ruleSystemCode", value: ruleSystemCode, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/${this.configuration.encodeParam({name: "employeeTypeCode", value: employeeTypeCode, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/${this.configuration.encodeParam({name: "employeeNumber", value: employeeNumber, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/journey`;
+        const { basePath, withCredentials } = this.configuration;
+        return this.httpClient.request<EmployeeJourneyTracksResponse>('get', `${basePath}${localVarPath}`,
+            {
+                context: localVarHttpContext,
+                responseType: <any>responseType_,
+                ...(withCredentials ? { withCredentials } : {}),
+                headers: localVarHeaders,
+                observe: observe,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * Get employee journey timeline as chronological events (read-only view)
+     * Read-only event-based timeline for employee lifecycle visualization. This endpoint does not mutate data and does not replace canonical write verticals. 
+     * @endpoint get /employees/{ruleSystemCode}/{employeeTypeCode}/{employeeNumber}/journey-v2
+     * @param requestParameters
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     * @param options additional options
+     */
+    public getEmployeeJourneyV2(requestParameters: GetEmployeeJourneyV2RequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<EmployeeJourneyResponse>;
+    public getEmployeeJourneyV2(requestParameters: GetEmployeeJourneyV2RequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<EmployeeJourneyResponse>>;
+    public getEmployeeJourneyV2(requestParameters: GetEmployeeJourneyV2RequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<EmployeeJourneyResponse>>;
+    public getEmployeeJourneyV2(requestParameters: GetEmployeeJourneyV2RequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        const ruleSystemCode = requestParameters?.ruleSystemCode;
+        if (ruleSystemCode === null || ruleSystemCode === undefined) {
+            throw new Error('Required parameter ruleSystemCode was null or undefined when calling getEmployeeJourneyV2.');
+        }
+        const employeeTypeCode = requestParameters?.employeeTypeCode;
+        if (employeeTypeCode === null || employeeTypeCode === undefined) {
+            throw new Error('Required parameter employeeTypeCode was null or undefined when calling getEmployeeJourneyV2.');
+        }
+        const employeeNumber = requestParameters?.employeeNumber;
+        if (employeeNumber === null || employeeNumber === undefined) {
+            throw new Error('Required parameter employeeNumber was null or undefined when calling getEmployeeJourneyV2.');
+        }
+
+        let localVarHeaders = this.defaultHeaders;
+
+        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
+            'application/json'
+        ]);
+        if (localVarHttpHeaderAcceptSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+        }
+
+        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+        const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+
+        let responseType_: 'text' | 'json' | 'blob' = 'json';
+        if (localVarHttpHeaderAcceptSelected) {
+            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+                responseType_ = 'text';
+            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+                responseType_ = 'json';
+            } else {
+                responseType_ = 'blob';
+            }
+        }
+
+        let localVarPath = `/employees/${this.configuration.encodeParam({name: "ruleSystemCode", value: ruleSystemCode, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/${this.configuration.encodeParam({name: "employeeTypeCode", value: employeeTypeCode, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/${this.configuration.encodeParam({name: "employeeNumber", value: employeeNumber, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/journey-v2`;
         const { basePath, withCredentials } = this.configuration;
         return this.httpClient.request<EmployeeJourneyResponse>('get', `${basePath}${localVarPath}`,
             {

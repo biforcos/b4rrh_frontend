@@ -1,8 +1,8 @@
 import {
+  EmployeeJourneyApiEventModel,
+  EmployeeJourneyApiEventStatus,
   EmployeeJourneyApiHeaderModel,
   EmployeeJourneyApiModel,
-  EmployeeJourneyApiTrackItemModel,
-  EmployeeJourneyApiTrackModel,
 } from '../clients/employee-journey-read.client';
 
 export interface EmployeeJourneyReadHeaderModel {
@@ -12,23 +12,22 @@ export interface EmployeeJourneyReadHeaderModel {
   displayName: string | null;
 }
 
-export interface EmployeeJourneyReadTrackItemModel {
-  startDate: string;
-  endDate: string | null;
-  label: string;
-  details: Readonly<Record<string, unknown>>;
-  isCurrent: boolean;
-}
+export type EmployeeJourneyReadEventStatus = 'completed' | 'current' | 'future';
 
-export interface EmployeeJourneyReadTrackModel {
-  code: string;
-  label: string;
-  items: ReadonlyArray<EmployeeJourneyReadTrackItemModel>;
+export interface EmployeeJourneyReadEventModel {
+  eventDate: string;
+  eventType: string;
+  trackCode: string;
+  title: string;
+  subtitle: string | null;
+  status: EmployeeJourneyReadEventStatus;
+  isCurrent: boolean;
+  details: Readonly<Record<string, unknown>> | null;
 }
 
 export interface EmployeeJourneyReadModel {
   employee: EmployeeJourneyReadHeaderModel;
-  tracks: ReadonlyArray<EmployeeJourneyReadTrackModel>;
+  events: ReadonlyArray<EmployeeJourneyReadEventModel>;
 }
 
 export function mapEmployeeJourneyApiToReadModel(
@@ -39,14 +38,13 @@ export function mapEmployeeJourneyApiToReadModel(
     return null;
   }
 
-  const tracks = source.tracks
-    .map((track) => mapEmployeeJourneyTrackApiToReadModel(track))
-    .filter((track): track is EmployeeJourneyReadTrackModel => track !== null)
-    .sort((left, right) => compareJourneyTrackRecency(left, right));
+  const events = source.events
+    .map((event) => mapEmployeeJourneyEventApiToReadModel(event))
+    .filter((event): event is EmployeeJourneyReadEventModel => event !== null);
 
   return {
     employee,
-    tracks,
+    events,
   };
 }
 
@@ -69,91 +67,55 @@ function mapEmployeeJourneyHeaderApiToReadModel(
   };
 }
 
-function mapEmployeeJourneyTrackApiToReadModel(
-  source: EmployeeJourneyApiTrackModel,
-): EmployeeJourneyReadTrackModel | null {
-  const code = source.trackCode.trim();
-  const label = source.trackLabel.trim();
+function mapEmployeeJourneyEventApiToReadModel(
+  source: EmployeeJourneyApiEventModel,
+): EmployeeJourneyReadEventModel | null {
+  const eventDate = source.eventDate.trim();
+  const eventType = source.eventType.trim();
+  const trackCode = source.trackCode.trim();
+  const title = source.title.trim();
+  const status = normalizeStatus(source.status);
 
-  if (!code || !label) {
-    return null;
-  }
-
-  const items = source.items
-    .map((item) => mapEmployeeJourneyTrackItemApiToReadModel(item))
-    .filter((item): item is EmployeeJourneyReadTrackItemModel => item !== null)
-    .sort((left, right) => compareJourneyItemRecency(left, right));
-
-  if (items.length === 0) {
+  if (!eventDate || !eventType || !trackCode || !title || !status) {
     return null;
   }
 
   return {
-    code,
-    label,
-    items,
-  };
-}
-
-function mapEmployeeJourneyTrackItemApiToReadModel(
-  source: EmployeeJourneyApiTrackItemModel,
-): EmployeeJourneyReadTrackItemModel | null {
-  const startDate = source.startDate.trim();
-  const label = source.label.trim();
-
-  if (!startDate || !label) {
-    return null;
-  }
-
-  const endDate = normalizeOptionalString(source.endDate);
-
-  return {
-    startDate,
-    endDate,
-    label,
+    eventDate,
+    eventType,
+    trackCode,
+    title,
+    subtitle: normalizeOptionalString(source.subtitle),
+    status,
+    isCurrent: source.isCurrent,
     details: normalizeDetails(source.details),
-    isCurrent: endDate === null,
   };
 }
 
-function compareJourneyTrackRecency(
-  left: EmployeeJourneyReadTrackModel,
-  right: EmployeeJourneyReadTrackModel,
-): number {
-  const leftMostRecentItem = left.items[0];
-  const rightMostRecentItem = right.items[0];
+function normalizeStatus(value: EmployeeJourneyApiEventStatus): EmployeeJourneyReadEventStatus | null {
+  const normalizedValue = value.trim().toLowerCase();
 
-  const eventRecencyOrder = compareJourneyItemRecency(leftMostRecentItem, rightMostRecentItem);
-  if (eventRecencyOrder !== 0) {
-    return eventRecencyOrder;
+  if (normalizedValue === 'completed' || normalizedValue === 'current' || normalizedValue === 'future') {
+    return normalizedValue;
   }
 
-  return left.label.localeCompare(right.label);
+  return null;
 }
 
-function compareJourneyItemRecency(
-  left: EmployeeJourneyReadTrackItemModel,
-  right: EmployeeJourneyReadTrackItemModel,
-): number {
-  const startDateOrder = right.startDate.localeCompare(left.startDate);
-  if (startDateOrder !== 0) {
-    return startDateOrder;
+function normalizeDetails(
+  value: Readonly<Record<string, unknown>> | null,
+): Readonly<Record<string, unknown>> | null {
+  if (!value) {
+    return null;
   }
 
-  const leftEndDate = left.endDate ?? '9999-12-31';
-  const rightEndDate = right.endDate ?? '9999-12-31';
-  const endDateOrder = rightEndDate.localeCompare(leftEndDate);
-  if (endDateOrder !== 0) {
-    return endDateOrder;
-  }
-
-  return left.label.localeCompare(right.label);
-}
-
-function normalizeDetails(value: Readonly<Record<string, unknown>>): Readonly<Record<string, unknown>> {
   const entries = Object.entries(value)
     .map(([key, entryValue]) => [key.trim(), entryValue] as const)
     .filter(([key]) => key.length > 0);
+
+  if (entries.length === 0) {
+    return null;
+  }
 
   return Object.fromEntries(entries) as Readonly<Record<string, unknown>>;
 }

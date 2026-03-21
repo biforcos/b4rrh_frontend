@@ -35,6 +35,7 @@ import { CreateRuleSystemRequest } from '../model/models';
 import { CreateWorkCenterRequest } from '../model/models';
 import { EmployeeDirectoryItemResponse } from '../model/models';
 import { EmployeeJourneyResponse } from '../model/models';
+import { EmployeeJourneyTracksResponse } from '../model/models';
 import { EmployeeResponse } from '../model/models';
 import { IdentifierResponse } from '../model/models';
 import { JourneyErrorResponse } from '../model/models';
@@ -227,6 +228,12 @@ export interface GetEmployeeByBusinessKeyRequestParams {
 }
 
 export interface GetEmployeeJourneyRequestParams {
+    ruleSystemCode: string;
+    employeeTypeCode: string;
+    employeeNumber: string;
+}
+
+export interface GetEmployeeJourneyV2RequestParams {
     ruleSystemCode: string;
     employeeTypeCode: string;
     employeeNumber: string;
@@ -598,7 +605,15 @@ export interface DefaultServiceInterface {
      * @endpoint get /employees/{ruleSystemCode}/{employeeTypeCode}/{employeeNumber}/journey
 * @param requestParameters
      */
-    getEmployeeJourney(requestParameters: GetEmployeeJourneyRequestParams, extraHttpRequestParams?: any): Observable<EmployeeJourneyResponse>;
+    getEmployeeJourney(requestParameters: GetEmployeeJourneyRequestParams, extraHttpRequestParams?: any): Observable<EmployeeJourneyTracksResponse>;
+
+    /**
+     * Get employee journey timeline as chronological events (read-only view)
+     * Read-only event-based timeline for employee lifecycle visualization. This endpoint does not mutate data and does not replace canonical write verticals. 
+     * @endpoint get /employees/{ruleSystemCode}/{employeeTypeCode}/{employeeNumber}/journey-v2
+* @param requestParameters
+     */
+    getEmployeeJourneyV2(requestParameters: GetEmployeeJourneyV2RequestParams, extraHttpRequestParams?: any): Observable<EmployeeJourneyResponse>;
 
     /**
      * Get employee identifier by business key

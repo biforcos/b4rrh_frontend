@@ -18,21 +18,18 @@ const employeeJourneyFixture: EmployeeJourneyModel = {
     employeeNumber: '00012345',
     displayName: 'Alex Martin',
   },
-  tracks: [
+  events: [
     {
-      code: 'CONTRACT',
-      label: 'Contrato',
-      items: [
-        {
-          startDate: '2024-01-01',
-          endDate: null,
-          label: 'Contrato indefinido',
-          details: {
-            contractCode: 'IND',
-          },
-          isCurrent: true,
-        },
-      ],
+      eventDate: '2024-01-01',
+      eventType: 'CONTRACT_START',
+      trackCode: 'CONTRACT',
+      title: 'Contrato indefinido',
+      subtitle: 'Inicio contractual',
+      status: 'current',
+      isCurrent: true,
+      details: {
+        contractCode: 'IND',
+      },
     },
   ],
 };
@@ -65,11 +62,11 @@ describe('EmployeeJourneyStore', () => {
     expect(store.error()).toBeNull();
   });
 
-  it('keeps empty tracks when backend returns empty journey', () => {
+  it('keeps empty events when backend returns empty journey', () => {
     readGatewayMock.readEmployeeJourneyByBusinessKey.mockReturnValue(
       of({
         employee: employeeJourneyFixture.employee,
-        tracks: [],
+        events: [],
       }),
     );
 
@@ -77,7 +74,7 @@ describe('EmployeeJourneyStore', () => {
 
     expect(store.journey()).toEqual({
       employee: employeeJourneyFixture.employee,
-      tracks: [],
+      events: [],
     });
     expect(store.loading()).toBe(false);
     expect(store.error()).toBeNull();

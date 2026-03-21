@@ -9,49 +9,75 @@
 
   @if (loading()) {
     <div class="employee-journey-timeline__loading" [attr.aria-label]="texts.timelineLoadingMessage">
-      <div class="employee-journey-timeline__loading-track"></div>
-      <div class="employee-journey-timeline__loading-track"></div>
+      <div class="employee-journey-timeline__loading-row"></div>
+      <div class="employee-journey-timeline__loading-row"></div>
+      <div class="employee-journey-timeline__loading-row"></div>
     </div>
   } @else if (error()) {
     <p class="employee-journey-timeline__error">{{ texts.timelineLoadFailedMessage }}</p>
   } @else if (!hasEvents()) {
     <p class="employee-journey-timeline__empty">{{ texts.timelineNoEventsMessage }}</p>
   } @else {
-    <div class="employee-journey-timeline__tracks">
-      @for (track of timelineTracks(); track track.code) {
-        <section class="employee-journey-timeline__track" [attr.aria-label]="track.label">
-          <header class="employee-journey-timeline__track-header">
-            <h4>{{ track.label }}</h4>
-            <span>{{ texts.timelineTrackCodeLabel }}: {{ track.code }}</span>
-          </header>
+    <ol class="employee-journey-timeline__day-list" role="list">
+      @for (groupedEvent of groupedTimelineEvents(); track trackGroupedEventBy($index, groupedEvent)) {
+        <li
+          class="employee-journey-timeline__day"
+          role="listitem"
+          [class.employee-journey-timeline__day--current]="groupedEvent.hasCurrentEvent"
+          [class.employee-journey-timeline__day--future]="!groupedEvent.hasCurrentEvent && groupedEvent.hasFutureEvent"
+        >
+          <span class="employee-journey-timeline__dot" aria-hidden="true"></span>
 
-          <ol class="employee-journey-timeline__event-list" role="list">
-            @for (item of track.items; track item.startDate + '-' + item.label) {
-              <li class="employee-journey-timeline__event" role="listitem">
-                <span class="employee-journey-timeline__dot" aria-hidden="true"></span>
-                <p class="employee-journey-timeline__event-label">{{ item.label }}</p>
-                <p class="employee-journey-timeline__event-period">
-                  {{ buildPeriodLabel(item) }}
-                  @if (item.isCurrent) {
-                    <span class="employee-journey-timeline__current-chip">{{ texts.timelineCurrentBadgeLabel }}</span>
-                  }
-                </p>
+          <p class="employee-journey-timeline__day-date">{{ groupedEvent.eventDate }}</p>
 
-                @if (item.compactDetails.length > 0) {
-                  <ul class="employee-journey-timeline__details" role="list">
-                    @for (detail of item.compactDetails; track detail.key) {
-                      <li>
-                        <span>{{ detail.key }}</span>
-                        <strong>{{ detail.value }}</strong>
-                      </li>
-                    }
-                  </ul>
-                }
-              </li>
+          <div class="employee-journey-timeline__day-content">
+            <div class="employee-journey-timeline__primary-row">
+              <p class="employee-journey-timeline__primary-title">{{ groupedEvent.primaryEvent.title }}</p>
+
+              <span
+                class="employee-journey-timeline__status-chip"
+                [class.employee-journey-timeline__status-chip--current]="groupedEvent.primaryEvent.status === 'current'"
+                [class.employee-journey-timeline__status-chip--future]="groupedEvent.primaryEvent.status === 'future'"
+              >
+                {{ resolveStatusLabel(groupedEvent.primaryEvent.status) }}
+              </span>
+            </div>
+
+            @if (groupedEvent.primaryEvent.subtitle) {
+              <p class="employee-journey-timeline__primary-subtitle">{{ groupedEvent.primaryEvent.subtitle }}</p>
             }
-          </ol>
-        </section>
+
+            @if (groupedEvent.primaryDetails.length > 0) {
+              <ul class="employee-journey-timeline__primary-details" role="list">
+                @for (detail of groupedEvent.primaryDetails; track detail.key + '-' + detail.value) {
+                  <li>
+                    <span>{{ detail.key }}</span>
+                    <strong>{{ detail.value }}</strong>
+                  </li>
+                }
+              </ul>
+            }
+
+            @if (groupedEvent.secondaryEvents.length > 0) {
+              <section class="employee-journey-timeline__secondary" [attr.aria-label]="texts.timelineSecondaryContextLabel">
+                <p class="employee-journey-timeline__secondary-title">{{ texts.timelineSecondaryContextLabel }}</p>
+                <ul class="employee-journey-timeline__secondary-list" role="list">
+                  @for (secondaryEvent of groupedEvent.secondaryEvents; track secondaryEvent.id) {
+                    <li>
+                      <span class="employee-journey-timeline__secondary-event-title">{{ secondaryEvent.title }}</span>
+                      @if (secondaryEvent.subtitle) {
+                        <span class="employee-journey-timeline__secondary-event-subtitle">
+                          {{ secondaryEvent.subtitle }}
+                        </span>
+                      }
+                    </li>
+                  }
+                </ul>
+              </section>
+            }
+          </div>
+        </li>
       }
-    </div>
+    </ol>
   }
 </section>

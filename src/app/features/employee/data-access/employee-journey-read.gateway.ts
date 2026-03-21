@@ -3,17 +3,15 @@ import { Observable, map } from 'rxjs';
 
 import { EmployeeJourneyReadClient } from '../../../core/api/clients/employee-journey-read.client';
 import {
+  EmployeeJourneyReadEventModel,
   EmployeeJourneyReadModel,
-  EmployeeJourneyReadTrackItemModel,
-  EmployeeJourneyReadTrackModel,
   mapEmployeeJourneyApiToReadModel,
 } from '../../../core/api/mappers/employee-journey.mapper';
 import { EmployeeBusinessKey } from '../models/employee-business-key.model';
 import {
+  EmployeeJourneyEventModel,
   EmployeeJourneyHeaderModel,
   EmployeeJourneyModel,
-  EmployeeJourneyTrackItemModel,
-  EmployeeJourneyTrackModel,
 } from '../models/employee-journey.model';
 
 @Injectable({
@@ -39,7 +37,7 @@ export class EmployeeJourneyReadGateway {
   private toEmployeeJourneyModel(source: EmployeeJourneyReadModel): EmployeeJourneyModel {
     return {
       employee: this.toEmployeeJourneyHeaderModel(source.employee),
-      tracks: source.tracks.map((track) => this.toEmployeeJourneyTrackModel(track)),
+      events: source.events.map((event) => this.toEmployeeJourneyEventModel(event)),
     };
   }
 
@@ -52,23 +50,16 @@ export class EmployeeJourneyReadGateway {
     };
   }
 
-  private toEmployeeJourneyTrackModel(source: EmployeeJourneyReadTrackModel): EmployeeJourneyTrackModel {
+  private toEmployeeJourneyEventModel(source: EmployeeJourneyReadEventModel): EmployeeJourneyEventModel {
     return {
-      code: source.code,
-      label: source.label,
-      items: source.items.map((item) => this.toEmployeeJourneyTrackItemModel(item)),
-    };
-  }
-
-  private toEmployeeJourneyTrackItemModel(
-    source: EmployeeJourneyReadTrackItemModel,
-  ): EmployeeJourneyTrackItemModel {
-    return {
-      startDate: source.startDate,
-      endDate: source.endDate,
-      label: source.label,
-      details: source.details,
+      eventDate: source.eventDate,
+      eventType: source.eventType,
+      trackCode: source.trackCode,
+      title: source.title,
+      subtitle: source.subtitle,
+      status: source.status,
       isCurrent: source.isCurrent,
+      details: source.details,
     };
   }
 
@@ -80,7 +71,7 @@ export class EmployeeJourneyReadGateway {
         employeeNumber: key.employeeNumber.trim(),
         displayName: null,
       },
-      tracks: [],
+      events: [],
     };
   }
 }

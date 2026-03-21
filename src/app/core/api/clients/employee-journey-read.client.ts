@@ -5,8 +5,7 @@ import { DefaultService } from '../generated/api/default.service';
 import {
   EmployeeJourneyResponse,
   JourneyEmployeeHeader,
-  JourneyItemResponse,
-  JourneyTrackResponse,
+  JourneyEventResponse,
 } from '../generated/model/models';
 import { EmployeeBusinessKeyApiQuery } from './employee-read.client';
 
@@ -17,22 +16,22 @@ export interface EmployeeJourneyApiHeaderModel {
   displayName: string | null;
 }
 
-export interface EmployeeJourneyApiTrackItemModel {
-  startDate: string;
-  endDate: string | null;
-  label: string;
-  details: Readonly<Record<string, unknown>>;
-}
+export type EmployeeJourneyApiEventStatus = 'completed' | 'current' | 'future';
 
-export interface EmployeeJourneyApiTrackModel {
+export interface EmployeeJourneyApiEventModel {
+  eventDate: string;
+  eventType: string;
   trackCode: string;
-  trackLabel: string;
-  items: ReadonlyArray<EmployeeJourneyApiTrackItemModel>;
+  title: string;
+  subtitle: string | null;
+  status: EmployeeJourneyApiEventStatus;
+  isCurrent: boolean;
+  details: Readonly<Record<string, unknown>> | null;
 }
 
 export interface EmployeeJourneyApiModel {
   employee: EmployeeJourneyApiHeaderModel;
-  tracks: ReadonlyArray<EmployeeJourneyApiTrackModel>;
+  events: ReadonlyArray<EmployeeJourneyApiEventModel>;
 }
 
 @Injectable({
@@ -45,7 +44,7 @@ export class EmployeeJourneyReadClient {
     const normalizedKey = this.normalizeKey(key);
 
     return this.api
-      .getEmployeeJourney(normalizedKey)
+      .getEmployeeJourneyV2(normalizedKey)
       .pipe(map((journey) => this.toEmployeeJourneyApiModel(journey)));
   }
 
@@ -60,7 +59,7 @@ export class EmployeeJourneyReadClient {
   private toEmployeeJourneyApiModel(source: EmployeeJourneyResponse): EmployeeJourneyApiModel {
     return {
       employee: this.toEmployeeJourneyApiHeaderModel(source.employee),
-      tracks: source.tracks.map((track) => this.toEmployeeJourneyApiTrackModel(track)),
+      events: source.events.map((event) => this.toEmployeeJourneyApiEventModel(event)),
     };
   }
 
@@ -73,21 +72,27 @@ export class EmployeeJourneyReadClient {
     };
   }
 
-  private toEmployeeJourneyApiTrackModel(source: JourneyTrackResponse): EmployeeJourneyApiTrackModel {
+  private toEmployeeJourneyApiEventModel(source: JourneyEventResponse): EmployeeJourneyApiEventModel {
     return {
-      trackCode: source.trackCode,
-      trackLabel: source.trackLabel,
-      items: source.items.map((item) => this.toEmployeeJourneyApiTrackItemModel(item)),
+      eventDate: source.eventDate,
+      eventType: String(source.eventType),
+      trackCode: String(source.trackCode),
+      title: source.title,
+      subtitle: this.normalizeOptionalString(source.subtitle),
+      status: this.normalizeStatus(source.status),
+      isCurrent: source.isCurrent,
+      details: this.toReadonlyUnknownRecord(source.details),
     };
   }
 
-  private toEmployeeJourneyApiTrackItemModel(source: JourneyItemResponse): EmployeeJourneyApiTrackItemModel {
-    return {
-      startDate: source.startDate,
-      endDate: this.normalizeOptionalString(source.endDate),
-      label: source.label,
-      details: this.toReadonlyUnknownRecord(source.details),
-    };
+  private normalizeStatus(value: string): EmployeeJourneyApiEventStatus {
+    const normalizedValue = value.trim().toLowerCase();
+
+    if (normalizedValue === 'current' || normalizedValue === 'future') {
+      return normalizedValue;
+    }
+
+    return 'completed';
   }
 
   private normalizeOptionalString(value: string | null | undefined): string | null {
@@ -97,11 +102,16 @@ export class EmployeeJourneyReadClient {
 
   private toReadonlyUnknownRecord(
     value: Record<string, unknown> | null | undefined,
-  ): Readonly<Record<string, unknown>> {
+  ): Readonly<Record<string, unknown>> | null {
     if (!value || typeof value !== 'object') {
-      return {};
+      return null;
     }
 
-    return Object.fromEntries(Object.entries(value)) as Readonly<Record<string, unknown>>;
+    const entries = Object.entries(value);
+    if (entries.length === 0) {
+      return null;
+    }
+
+    return Object.fromEntries(entries) as Readonly<Record<string, unknown>>;
   }
 }

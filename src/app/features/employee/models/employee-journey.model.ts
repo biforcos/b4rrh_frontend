@@ -5,21 +5,20 @@ export interface EmployeeJourneyHeaderModel {
   displayName: string | null;
 }
 
-export interface EmployeeJourneyTrackItemModel {
-  startDate: string;
-  endDate: string | null;
-  label: string;
-  details: Readonly<Record<string, unknown>>;
-  isCurrent: boolean;
-}
+export type EmployeeJourneyEventStatus = 'completed' | 'current' | 'future';
 
-export interface EmployeeJourneyTrackModel {
-  code: string;
-  label: string;
-  items: ReadonlyArray<EmployeeJourneyTrackItemModel>;
+export interface EmployeeJourneyEventModel {
+  eventDate: string;
+  eventType: string;
+  trackCode: string;
+  title: string;
+  subtitle: string | null;
+  status: EmployeeJourneyEventStatus;
+  isCurrent: boolean;
+  details: Readonly<Record<string, unknown>> | null;
 }
 
 export interface EmployeeJourneyModel {
   employee: EmployeeJourneyHeaderModel;
-  tracks: ReadonlyArray<EmployeeJourneyTrackModel>;
+  events: ReadonlyArray<EmployeeJourneyEventModel>;
 }
