@@ -1,0 +1,24 @@
+<div class="rule-entity-list">
+  <table>
+    <thead>
+      <tr>
+        <th>{{ texts.listCodeHeader }}</th>
+        <th>{{ texts.listNameHeader }}</th>
+        <th>{{ texts.listActiveHeader }}</th>
+        <th>{{ texts.listStartDateHeader }}</th>
+        <th>{{ texts.listEndDateHeader }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (item of items(); track item.code) {
+        <tr>
+          <td>{{ item.code }}</td>
+          <td>{{ item.name }}</td>
+          <td>{{ item.active ? texts.activeYes : texts.activeNo }}</td>
+          <td>{{ item.startDate }}</td>
+          <td>{{ item.endDate ?? '-' }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

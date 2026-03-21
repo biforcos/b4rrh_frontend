@@ -1,0 +1,31 @@
+:host {
+  display: block;
+}
+
+.rule-entity-list {
+  overflow: auto;
+  border: 1px solid #d8e2ee;
+  border-radius: 0.62rem;
+}
+
+.rule-entity-list table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 36rem;
+}
+
+.rule-entity-list th,
+.rule-entity-list td {
+  text-align: left;
+  border-bottom: 1px solid #e8eef5;
+  padding: 0.5rem 0.56rem;
+  font-size: 0.78rem;
+}
+
+.rule-entity-list th {
+  color: #526173;
+  font-size: 0.71rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: #f7fbff;
+}

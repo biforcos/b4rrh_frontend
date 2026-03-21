@@ -1,0 +1,15 @@
+<div class="rule-entity-type-list" role="list" aria-label="Rule entity types">
+  @for (item of items(); track item.code) {
+    <button
+      type="button"
+      role="listitem"
+      class="rule-entity-type-list__item"
+      [class.rule-entity-type-list__item--selected]="selectedCode() === item.code"
+      [disabled]="disabled()"
+      (click)="select(item.code)"
+    >
+      <span class="rule-entity-type-list__code">{{ item.code }}</span>
+      <span class="rule-entity-type-list__name">{{ item.name }}</span>
+    </button>
+  }
+</div>

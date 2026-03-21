@@ -58,15 +58,7 @@ export const routes: Routes = [
 			},
 			{
 				path: 'organizacion/catalogos',
-				loadComponent: () =>
-					import('./core/layout/pages/section-placeholder-page.component').then(
-						(m) => m.SectionPlaceholderPageComponent,
-					),
-				data: {
-					title: 'Catalogos',
-					description:
-						'Seccion base para futuros catalogos funcionales de la aplicacion.',
-				},
+				loadChildren: () => import('./rulesystem/catalog/catalog.routes').then((m) => m.catalogRoutes),
 			},
 			{
 				path: 'configuracion/rule-systems',

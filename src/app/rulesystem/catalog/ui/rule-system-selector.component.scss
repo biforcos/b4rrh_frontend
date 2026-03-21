@@ -1,0 +1,28 @@
+:host {
+  display: block;
+}
+
+.rule-system-selector {
+  display: grid;
+  gap: 0.28rem;
+}
+
+.rule-system-selector span {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.rule-system-selector select {
+  min-height: 2.15rem;
+  border-radius: 0.52rem;
+  border: 1px solid var(--border-strong);
+  background: #ffffff;
+  color: var(--text-primary);
+  padding: 0 0.55rem;
+}
+
+.rule-system-selector select:focus-visible {
+  outline: 2px solid #93c5fd;
+  outline-offset: 1px;
+}

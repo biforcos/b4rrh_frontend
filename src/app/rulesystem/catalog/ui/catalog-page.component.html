@@ -1,0 +1,77 @@
+<section class="catalog-page">
+  <header class="catalog-page__header">
+    <h2>{{ texts.pageTitle }}</h2>
+    <p>{{ texts.pageSubtitle }}</p>
+  </header>
+
+  <section class="catalog-page__selector-zone">
+    @if (loadingRuleSystems()) {
+      <p class="catalog-page__feedback catalog-page__feedback--loading">{{ texts.loadingRuleSystems }}</p>
+    }
+    <app-rule-system-selector
+      [ruleSystems]="ruleSystems()"
+      [selectedCode]="selectedRuleSystemCode()"
+      [disabled]="loadingRuleSystems()"
+      (selectionChanged)="onRuleSystemChanged($event)"
+    />
+  </section>
+
+  @if (errorMessage()) {
+    <p class="catalog-page__feedback catalog-page__feedback--error">{{ errorMessage() }}</p>
+  }
+
+  @if (successMessage()) {
+    <p class="catalog-page__feedback catalog-page__feedback--success">{{ successMessage() }}</p>
+  }
+
+  <section class="catalog-page__main-grid">
+    <aside class="catalog-page__panel catalog-page__panel--types">
+      <h3>{{ texts.typePanelTitle }}</h3>
+      @if (loadingRuleEntityTypes()) {
+        <p class="catalog-page__feedback catalog-page__feedback--loading">{{ texts.loadingRuleEntityTypes }}</p>
+      } @else {
+        <app-rule-entity-type-list
+          [items]="ruleEntityTypes()"
+          [selectedCode]="selectedRuleEntityTypeCode()"
+          [disabled]="loadingRuleEntityTypes()"
+          (selected)="onRuleEntityTypeSelected($event)"
+        />
+      }
+    </aside>
+
+    <section class="catalog-page__panel catalog-page__panel--entities">
+      <header class="catalog-page__panel-header">
+        <h3>{{ texts.entityPanelTitle }}</h3>
+        <p>{{ texts.entityPanelSubtitle }}</p>
+      </header>
+
+      @if (!selectedRuleSystemCode()) {
+        <p class="catalog-page__empty">{{ texts.emptyNoRuleSystem }}</p>
+      } @else if (!selectedRuleEntityTypeCode()) {
+        <p class="catalog-page__empty">{{ texts.emptyNoType }}</p>
+      } @else if (loadingRuleEntities()) {
+        <p class="catalog-page__feedback catalog-page__feedback--loading">{{ texts.loadingRuleEntities }}</p>
+      } @else if (ruleEntities().length === 0) {
+        <p class="catalog-page__empty">{{ texts.emptyNoEntities }}</p>
+      } @else {
+        <app-rule-entity-list [items]="ruleEntities()" />
+      }
+
+      @if (hasContext()) {
+        <section class="catalog-page__create-zone">
+          <header class="catalog-page__panel-header">
+            <h3>{{ texts.createPanelTitle }}</h3>
+            <p>{{ texts.createPanelSubtitle }}</p>
+          </header>
+
+          <app-create-rule-entity-form
+            [creating]="creating()"
+            [resetToken]="createResetToken()"
+            (submitRequested)="createEntity($event)"
+            (interactionStarted)="clearFeedback()"
+          />
+        </section>
+      }
+    </section>
+  </section>
+</section>

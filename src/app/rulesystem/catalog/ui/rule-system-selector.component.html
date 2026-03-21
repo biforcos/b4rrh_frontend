@@ -1,0 +1,13 @@
+<label class="rule-system-selector">
+  <span>{{ texts.selectorLabel }}</span>
+  <select
+    [value]="selectedCode() ?? ''"
+    [disabled]="disabled()"
+    (change)="onSelectionChange($event)"
+  >
+    <option value="">{{ texts.selectorPlaceholder }}</option>
+    @for (item of ruleSystems(); track item.code) {
+      <option [value]="item.code">{{ item.code }} · {{ item.name }}</option>
+    }
+  </select>
+</label>
