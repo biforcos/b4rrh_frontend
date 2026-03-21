@@ -44,7 +44,7 @@
     @if (hasRows()) {
       <ul class="temporal-section__rows" role="list">
         @for (row of rows(); track trackRowByKey($index, row)) {
-          <li class="temporal-section__row">
+          <li class="temporal-section__row" [class.temporal-section__row--current]="row.isCurrent === true">
             @if (isRowCloseConfirming(row)) {
               <div class="temporal-section__confirm-close">
                 <p>{{ texts().confirmCloseMessage }}</p>

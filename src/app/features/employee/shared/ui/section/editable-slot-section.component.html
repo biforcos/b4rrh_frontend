@@ -61,7 +61,12 @@
     @if (hasRows()) {
       <ul class="editable-slot-section__rows" role="list">
         @for (row of rows(); track trackRowByKey($index, row)) {
-          <li class="editable-slot-section__row" [class.editable-slot-section__row--readonly]="isRowReadonly(row)">
+          <li
+            class="editable-slot-section__row"
+            [class.editable-slot-section__row--readonly]="isRowReadonly(row)"
+            [class.editable-slot-section__row--editing]="isRowEditing(row)"
+            [class.editable-slot-section__row--confirming-delete]="isRowDeleteConfirming(row)"
+          >
             @if (isRowEditing(row)) {
               <div class="editable-slot-section__fields">
                 <div class="editable-slot-section__readonly-field">

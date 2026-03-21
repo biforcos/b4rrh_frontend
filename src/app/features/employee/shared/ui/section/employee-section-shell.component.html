@@ -1,13 +1,13 @@
 <section class="employee-section-shell" [attr.data-mode]="state().mode">
   <header class="employee-section-shell__header">
     <div class="employee-section-shell__heading">
-      <h3>{{ title() }}</h3>
-      @if (subtitle()) {
-        <p>{{ subtitle() }}</p>
+      <h3 class="employee-section-shell__title">{{ title() }}</h3>
+      @if (hasSubtitle()) {
+        <p class="employee-section-shell__subtitle">{{ subtitle() }}</p>
       }
     </div>
 
-    <div class="employee-section-shell__actions">
+    <div class="employee-section-shell__header-actions">
       <ng-content select="[sectionShellHeaderActions]"></ng-content>
     </div>
   </header>
@@ -16,18 +16,22 @@
     <ng-content></ng-content>
   </div>
 
-  @if (showFooter()) {
+  @if (hasFooterState()) {
     <footer class="employee-section-shell__footer" role="status" aria-live="polite">
-      @if (state().busy) {
-        <p class="employee-section-shell__busy">{{ texts.sectionShellBusyMessage }}</p>
+      @if (showBusy()) {
+        <p class="employee-section-shell__status employee-section-shell__status--busy">Procesando cambios...</p>
       }
 
-      @if (state().errorMessage; as errorMessage) {
-        <p class="employee-section-shell__error">{{ errorMessage }}</p>
+      @if (showError()) {
+        <p class="employee-section-shell__status employee-section-shell__status--error">
+          {{ state().errorMessage }}
+        </p>
       }
 
-      @if (state().successMessage; as successMessage) {
-        <p class="employee-section-shell__success">{{ successMessage }}</p>
+      @if (showSuccess()) {
+        <p class="employee-section-shell__status employee-section-shell__status--success">
+          {{ state().successMessage }}
+        </p>
       }
     </footer>
   }

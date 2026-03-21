@@ -194,6 +194,13 @@ export interface DeleteIdentifierByBusinessKeyRequestParams {
     identifierTypeCode: string;
 }
 
+export interface DeleteRuleEntityByBusinessKeyRequestParams {
+    ruleSystemCode: string;
+    ruleEntityTypeCode: string;
+    code: string;
+    startDate: string;
+}
+
 export interface GetAddressByBusinessKeyRequestParams {
     ruleSystemCode: string;
     employeeTypeCode: string;
@@ -572,6 +579,14 @@ export interface DefaultServiceInterface {
 * @param requestParameters
      */
     deleteIdentifierByBusinessKey(requestParameters: DeleteIdentifierByBusinessKeyRequestParams, extraHttpRequestParams?: any): Observable<{}>;
+
+    /**
+     * Delete rule entity by functional business key
+     * Delete is allowed only when the target rule entity exists and is not referenced by business resources. This operation is business-key only and does not use technical identifiers. 
+     * @endpoint delete /rule-entities/{ruleSystemCode}/{ruleEntityTypeCode}/{code}/{startDate}
+* @param requestParameters
+     */
+    deleteRuleEntityByBusinessKey(requestParameters: DeleteRuleEntityByBusinessKeyRequestParams, extraHttpRequestParams?: any): Observable<{}>;
 
     /**
      * Get employee address by business key

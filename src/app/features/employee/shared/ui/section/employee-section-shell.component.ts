@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
-import { employeeTexts } from '../../../employee.texts';
 import { SectionUiState } from './section-ui-state.model';
 
 @Component({
@@ -14,9 +13,20 @@ export class EmployeeSectionShellComponent {
   readonly subtitle = input<string | null>(null);
   readonly state = input.required<SectionUiState>();
 
-  protected readonly texts = employeeTexts;
-  protected readonly showFooter = computed(() => {
-    const state = this.state();
-    return state.busy || Boolean(state.errorMessage) || Boolean(state.successMessage);
+  protected readonly hasSubtitle = computed(() => {
+    const subtitle = this.subtitle()?.trim() ?? '';
+    return subtitle.length > 0;
   });
+  protected readonly showBusy = computed(() => this.state().busy);
+  protected readonly showError = computed(() => {
+    const errorMessage = this.state().errorMessage?.trim() ?? '';
+    return errorMessage.length > 0;
+  });
+  protected readonly showSuccess = computed(() => {
+    const successMessage = this.state().successMessage?.trim() ?? '';
+    return successMessage.length > 0;
+  });
+  protected readonly hasFooterState = computed(
+    () => this.showBusy() || this.showError() || this.showSuccess(),
+  );
 }

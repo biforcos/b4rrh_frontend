@@ -14,7 +14,7 @@ export interface SectionUiState {
   successMessage: string | null;
 }
 
-export interface SectionActionContract<KeyType> {
+export interface SectionActionContract<KeyType = string> {
   startCreate(): void;
   startEdit(key: KeyType): void;
   requestDelete(key: KeyType): void;

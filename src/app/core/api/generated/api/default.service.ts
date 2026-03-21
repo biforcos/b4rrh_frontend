@@ -129,6 +129,7 @@ import {
     CreateWorkCenterByBusinessKeyRequestParams,
     DeleteContactByBusinessKeyRequestParams,
     DeleteIdentifierByBusinessKeyRequestParams,
+    DeleteRuleEntityByBusinessKeyRequestParams,
     GetAddressByBusinessKeyRequestParams,
     GetContactByBusinessKeyRequestParams,
     GetContractByBusinessKeyRequestParams,
@@ -1698,6 +1699,75 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
         }
 
         let localVarPath = `/employees/${this.configuration.encodeParam({name: "ruleSystemCode", value: ruleSystemCode, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/${this.configuration.encodeParam({name: "employeeTypeCode", value: employeeTypeCode, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/${this.configuration.encodeParam({name: "employeeNumber", value: employeeNumber, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/identifiers/${this.configuration.encodeParam({name: "identifierTypeCode", value: identifierTypeCode, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}`;
+        const { basePath, withCredentials } = this.configuration;
+        return this.httpClient.request<any>('delete', `${basePath}${localVarPath}`,
+            {
+                context: localVarHttpContext,
+                responseType: <any>responseType_,
+                ...(withCredentials ? { withCredentials } : {}),
+                headers: localVarHeaders,
+                observe: observe,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * Delete rule entity by functional business key
+     * Delete is allowed only when the target rule entity exists and is not referenced by business resources. This operation is business-key only and does not use technical identifiers. 
+     * @endpoint delete /rule-entities/{ruleSystemCode}/{ruleEntityTypeCode}/{code}/{startDate}
+     * @param requestParameters
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     * @param options additional options
+     */
+    public deleteRuleEntityByBusinessKey(requestParameters: DeleteRuleEntityByBusinessKeyRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any>;
+    public deleteRuleEntityByBusinessKey(requestParameters: DeleteRuleEntityByBusinessKeyRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<any>>;
+    public deleteRuleEntityByBusinessKey(requestParameters: DeleteRuleEntityByBusinessKeyRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<any>>;
+    public deleteRuleEntityByBusinessKey(requestParameters: DeleteRuleEntityByBusinessKeyRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: undefined, context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        const ruleSystemCode = requestParameters?.ruleSystemCode;
+        if (ruleSystemCode === null || ruleSystemCode === undefined) {
+            throw new Error('Required parameter ruleSystemCode was null or undefined when calling deleteRuleEntityByBusinessKey.');
+        }
+        const ruleEntityTypeCode = requestParameters?.ruleEntityTypeCode;
+        if (ruleEntityTypeCode === null || ruleEntityTypeCode === undefined) {
+            throw new Error('Required parameter ruleEntityTypeCode was null or undefined when calling deleteRuleEntityByBusinessKey.');
+        }
+        const code = requestParameters?.code;
+        if (code === null || code === undefined) {
+            throw new Error('Required parameter code was null or undefined when calling deleteRuleEntityByBusinessKey.');
+        }
+        const startDate = requestParameters?.startDate;
+        if (startDate === null || startDate === undefined) {
+            throw new Error('Required parameter startDate was null or undefined when calling deleteRuleEntityByBusinessKey.');
+        }
+
+        let localVarHeaders = this.defaultHeaders;
+
+        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
+        ]);
+        if (localVarHttpHeaderAcceptSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+        }
+
+        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+        const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+
+        let responseType_: 'text' | 'json' | 'blob' = 'json';
+        if (localVarHttpHeaderAcceptSelected) {
+            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+                responseType_ = 'text';
+            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+                responseType_ = 'json';
+            } else {
+                responseType_ = 'blob';
+            }
+        }
+
+        let localVarPath = `/rule-entities/${this.configuration.encodeParam({name: "ruleSystemCode", value: ruleSystemCode, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/${this.configuration.encodeParam({name: "ruleEntityTypeCode", value: ruleEntityTypeCode, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/${this.configuration.encodeParam({name: "code", value: code, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/${this.configuration.encodeParam({name: "startDate", value: startDate, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: "date"})}`;
         const { basePath, withCredentials } = this.configuration;
         return this.httpClient.request<any>('delete', `${basePath}${localVarPath}`,
             {
