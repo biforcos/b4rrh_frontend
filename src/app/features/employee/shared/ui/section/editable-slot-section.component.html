@@ -1,0 +1,106 @@
+<app-employee-section-shell [title]="title()" [subtitle]="subtitle()" [state]="state()">
+  <div sectionShellHeaderActions class="editable-slot-section__header-actions">
+    @if (showAddAction()) {
+      <button type="button" (click)="onCreateStarted()">{{ texts().addAction }}</button>
+    }
+
+    @if (showCancelAction()) {
+      <button type="button" class="editable-slot-section__cancel-action" (click)="onCancelled()">
+        {{ texts().cancelAction }}
+      </button>
+    }
+  </div>
+
+  <div class="editable-slot-section__body">
+    @if (showEmpty()) {
+      <p class="editable-slot-section__empty">{{ texts().emptyMessage }}</p>
+    }
+
+    @if (isCreating()) {
+      <article class="editable-slot-section__row editable-slot-section__row--draft">
+        <div class="editable-slot-section__fields">
+          <label>
+            <span>{{ texts().keyFieldLabel }}</span>
+            @if (canUseKeySelect()) {
+              <select [value]="draft().key ?? ''" (change)="onDraftKeySelect($event)">
+                <option value="">{{ texts().keyFieldLabel }}</option>
+                @for (option of availableKeys(); track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </select>
+            } @else {
+              <input type="text" [value]="draft().key ?? ''" (input)="onDraftKeyInput($event)" />
+            }
+          </label>
+
+          <label>
+            <span>{{ texts().valueFieldLabel }}</span>
+            <input type="text" [value]="draft().value" (input)="onDraftValueInput($event)" />
+          </label>
+        </div>
+
+        <div class="editable-slot-section__row-actions">
+          <button type="button" [disabled]="!isDraftValid() || state().busy" (click)="onCreateSubmitted()">
+            {{ texts().saveCreateAction }}
+          </button>
+        </div>
+      </article>
+    }
+
+    @if (hasRows()) {
+      <ul class="editable-slot-section__rows" role="list">
+        @for (row of rows(); track trackRowByKey($index, row)) {
+          <li class="editable-slot-section__row" [class.editable-slot-section__row--readonly]="isRowReadonly(row)">
+            @if (isRowEditing(row)) {
+              <div class="editable-slot-section__fields">
+                <div class="editable-slot-section__readonly-field">
+                  <span>{{ texts().keyFieldLabel }}</span>
+                  <strong>{{ row.keyLabel }}</strong>
+                </div>
+
+                <label>
+                  <span>{{ texts().valueFieldLabel }}</span>
+                  <input type="text" [value]="draft().value" (input)="onDraftValueInput($event)" />
+                </label>
+              </div>
+
+              <div class="editable-slot-section__row-actions">
+                <button type="button" [disabled]="!isEditDraftValid() || state().busy" (click)="onEditSubmitted(row.key)">
+                  {{ texts().saveEditAction }}
+                </button>
+              </div>
+            } @else if (isRowDeleteConfirming(row)) {
+              <div class="editable-slot-section__delete-confirm">
+                <p>{{ texts().confirmDeleteMessage }}</p>
+                <div class="editable-slot-section__row-actions">
+                  <button type="button" class="editable-slot-section__danger-action" (click)="onDeleteConfirmed(row.key)">
+                    {{ texts().confirmDeleteAction }}
+                  </button>
+                </div>
+              </div>
+            } @else {
+              <div class="editable-slot-section__summary">
+                <p class="editable-slot-section__key">{{ row.keyLabel }}</p>
+                <p class="editable-slot-section__value">{{ row.value }}</p>
+              </div>
+
+              @if (isViewMode() && !isRowReadonly(row) && (canEdit() || canDelete())) {
+                <div class="editable-slot-section__row-actions">
+                  @if (canEdit()) {
+                    <button type="button" (click)="onEditStarted(row.key)">{{ texts().editAction }}</button>
+                  }
+
+                  @if (canDelete()) {
+                    <button type="button" class="editable-slot-section__danger-action" (click)="onDeleteRequested(row.key)">
+                      {{ texts().deleteAction }}
+                    </button>
+                  }
+                </div>
+              }
+            }
+          </li>
+        }
+      </ul>
+    }
+  </div>
+</app-employee-section-shell>
