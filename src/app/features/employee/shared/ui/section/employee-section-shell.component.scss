@@ -41,6 +41,10 @@
   justify-content: flex-end;
 }
 
+.employee-section-shell__actions:empty {
+  display: none;
+}
+
 .employee-section-shell__actions button {
   border: 1px solid #cbd8e6;
   border-radius: 999px;

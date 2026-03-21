@@ -2,17 +2,7 @@ import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 
 import { employeeTexts } from '../../../employee.texts';
 import { EmployeeSectionShellComponent } from './employee-section-shell.component';
-import { SectionCapabilities } from './section-capabilities.model';
 import { SectionActionContract, SectionUiState } from './section-ui-state.model';
-
-const demoCapabilities: SectionCapabilities = {
-  canCreate: true,
-  canEdit: true,
-  canDelete: false,
-  canClose: false,
-  canCorrect: false,
-  canLaunchWorkflow: false,
-};
 
 const initialUiState: SectionUiState = {
   mode: 'view',
@@ -30,12 +20,21 @@ const initialUiState: SectionUiState = {
     <app-employee-section-shell
       [title]="texts.sectionDemoTitle"
       [subtitle]="texts.sectionDemoSubtitle"
-      [capabilities]="capabilities"
       [state]="uiState()"
-      (createClicked)="startCreate()"
-      (editClicked)="startEdit(demoBusinessKey)"
-      (cancelClicked)="cancel()"
     >
+      <div sectionShellHeaderActions class="employee-section-demo__header-actions">
+        @if (uiState().mode === 'view' && !uiState().busy) {
+          <button type="button" (click)="startCreate()">{{ texts.sectionShellCreateAction }}</button>
+          <button type="button" (click)="startEdit(demoBusinessKey)">{{ texts.sectionShellEditAction }}</button>
+        }
+
+        @if ((uiState().mode === 'editing' || uiState().mode === 'creating' || uiState().mode === 'confirming') && !uiState().busy) {
+          <button type="button" class="employee-section-demo__cancel-action" (click)="cancel()">
+            {{ texts.sectionShellCancelAction }}
+          </button>
+        }
+      </div>
+
       <div class="employee-section-demo__content">
         @if (uiState().mode === 'view') {
           <p>{{ texts.sectionDemoViewMessage }}</p>
@@ -59,6 +58,34 @@ const initialUiState: SectionUiState = {
     </app-employee-section-shell>
   `,
   styles: `
+    .employee-section-demo__header-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.24rem;
+    }
+
+    .employee-section-demo__header-actions button {
+      border: 1px solid #cbd8e6;
+      border-radius: 999px;
+      background: #f8fbff;
+      color: #29435d;
+      font-size: 0.64rem;
+      font-weight: 600;
+      line-height: 1;
+      padding: 0.21rem 0.5rem;
+      cursor: pointer;
+    }
+
+    .employee-section-demo__header-actions button:hover {
+      background: #eef4fa;
+    }
+
+    .employee-section-demo__cancel-action {
+      border-color: #d6dfe8;
+      background: #fbfcfe;
+      color: #4f6479;
+    }
+
     .employee-section-demo__content {
       display: grid;
       gap: 0.3rem;
@@ -87,7 +114,6 @@ const initialUiState: SectionUiState = {
 })
 export class EmployeeSectionDemoComponent implements SectionActionContract<string> {
   protected readonly texts = employeeTexts;
-  protected readonly capabilities = demoCapabilities;
   protected readonly demoBusinessKey = 'DEMO-BUSINESS-KEY';
   protected readonly uiState = signal<SectionUiState>(initialUiState);
 

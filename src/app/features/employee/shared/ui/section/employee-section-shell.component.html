@@ -8,19 +8,7 @@
     </div>
 
     <div class="employee-section-shell__actions">
-      @if (showCreateAction()) {
-        <button type="button" (click)="onCreateClicked()">{{ texts.sectionShellCreateAction }}</button>
-      }
-
-      @if (showEditAction()) {
-        <button type="button" (click)="onEditClicked()">{{ texts.sectionShellEditAction }}</button>
-      }
-
-      @if (showCancelAction()) {
-        <button type="button" class="employee-section-shell__cancel-action" (click)="onCancelClicked()">
-          {{ texts.sectionShellCancelAction }}
-        </button>
-      }
+      <ng-content select="[sectionShellHeaderActions]"></ng-content>
     </div>
   </header>
 
