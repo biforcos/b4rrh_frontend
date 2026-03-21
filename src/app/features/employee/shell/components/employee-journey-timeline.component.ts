@@ -9,14 +9,13 @@ import {
 } from '../../models/employee-journey.model';
 
 interface JourneyDetailEntryViewModel {
-  key: string;
-  value: string;
+  id: string;
+  text: string;
 }
 
 interface GroupedJourneySecondaryEventViewModel {
   id: string;
-  title: string;
-  subtitle: string | null;
+  summary: string;
 }
 
 interface GroupedJourneyEventViewModel {
@@ -32,6 +31,12 @@ const trackPriorityByCode: Readonly<Record<string, number>> = {
   PRESENCE: 0,
   CONTRACT: 1,
   LABOR_CLASSIFICATION: 2,
+};
+
+const secondaryTrackLabelByCode: Readonly<Record<string, string>> = {
+  PRESENCE: 'Presencia',
+  CONTRACT: 'Contrato',
+  LABOR_CLASSIFICATION: 'Clasificacion',
 };
 
 @Component({
@@ -50,18 +55,6 @@ export class EmployeeJourneyTimelineComponent {
     this.groupEventsByDate(this.journey()?.events ?? []),
   );
   protected readonly hasEvents = computed(() => this.groupedTimelineEvents().length > 0);
-  protected readonly journeyEmployeeLabel = computed(() => {
-    const employee = this.journey()?.employee;
-    if (!employee) {
-      return null;
-    }
-
-    if (employee.displayName) {
-      return employee.displayName;
-    }
-
-    return `${employee.ruleSystemCode} / ${employee.employeeTypeCode} / ${employee.employeeNumber}`;
-  });
 
   protected resolveStatusLabel(status: EmployeeJourneyEventStatus): string {
     if (status === 'current') {
@@ -139,64 +132,130 @@ export class EmployeeJourneyTimelineComponent {
   ): GroupedJourneySecondaryEventViewModel {
     return {
       id: `${eventDate}-${index}-${event.eventType}-${event.title}`,
-      title: event.title,
-      subtitle: event.subtitle,
+      summary: this.toSecondarySummary(event),
     };
   }
 
   private toCompactDetails(event: EmployeeJourneyEventModel): ReadonlyArray<JourneyDetailEntryViewModel> {
-    if (!event.details) {
+    if (!this.isPresenceTrack(event.trackCode)) {
       return [];
     }
 
-    return Object.entries(event.details)
-      .filter(([key]) => !this.isLowValueDetailKey(key))
-      .map(([key, value]) => this.toDetailEntry(key, value))
-      .filter((entry): entry is JourneyDetailEntryViewModel => entry !== null)
-      .slice(0, 2);
+    const summary = this.toPresenceContextSummary(event.details, event.subtitle);
+    if (!summary) {
+      return [];
+    }
+
+    return [
+      {
+        id: `${event.eventDate}-${event.eventType}-presence-context`,
+        text: summary,
+      },
+    ];
   }
 
-  private isLowValueDetailKey(value: string): boolean {
-    const normalizedValue = value.trim().toLowerCase();
-    return (
-      normalizedValue === 'eventdate' ||
-      normalizedValue === 'eventtype' ||
-      normalizedValue === 'trackcode' ||
-      normalizedValue === 'title' ||
-      normalizedValue === 'subtitle' ||
-      normalizedValue === 'status' ||
-      normalizedValue === 'iscurrent'
-    );
+  private toSecondarySummary(event: EmployeeJourneyEventModel): string {
+    const trackLabel = this.toSecondaryTrackLabel(event.trackCode);
+    const value = this.toSecondaryTrackValue(event);
+
+    if (!value) {
+      return trackLabel;
+    }
+
+    return `${trackLabel}: ${value}`;
   }
 
-  private toDetailEntry(key: string, value: unknown): JourneyDetailEntryViewModel | null {
-    const normalizedKey = key.trim();
-    if (!normalizedKey) {
+  private toSecondaryTrackValue(event: EmployeeJourneyEventModel): string | null {
+    const normalizedSubtitle = this.normalizeNarrativeValue(event.subtitle);
+    if (normalizedSubtitle) {
+      return normalizedSubtitle;
+    }
+
+    const details = event.details;
+    if (!details) {
       return null;
     }
 
-    const displayValue = this.toDisplayableValue(value);
-    if (!displayValue) {
-      return null;
+    if (this.isContractTrack(event.trackCode)) {
+      return this.toPairedSummary(details, 'contractCode', 'contractSubtypeCode');
     }
 
-    return {
-      key: this.toDisplayableKey(normalizedKey),
-      value: displayValue,
-    };
+    if (this.isLaborClassificationTrack(event.trackCode)) {
+      return this.toPairedSummary(details, 'agreementCode', 'agreementCategoryCode');
+    }
+
+    if (this.isPresenceTrack(event.trackCode)) {
+      return this.toPresenceContextSummary(details, null);
+    }
+
+    return null;
   }
 
-  private toDisplayableKey(value: string): string {
-    const normalizedValue = value
-      .replace(/[_-]+/g, ' ')
-      .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
-      .trim();
+  private toSecondaryTrackLabel(trackCode: string): string {
+    const normalizedTrackCode = trackCode.trim().toUpperCase();
+    return secondaryTrackLabelByCode[normalizedTrackCode] ?? 'Evento';
+  }
 
+  private toPresenceContextSummary(
+    details: Readonly<Record<string, unknown>> | null,
+    fallbackSubtitle: string | null,
+  ): string | null {
+    if (!details) {
+      return this.normalizeNarrativeValue(fallbackSubtitle);
+    }
+
+    const companyCode = this.toDisplayableValue(details['companyCode']);
+    const presenceNumber = this.toDisplayableValue(details['presenceNumber']);
+
+    if (companyCode && presenceNumber) {
+      return `${companyCode} · periodo #${presenceNumber}`;
+    }
+
+    if (companyCode) {
+      return companyCode;
+    }
+
+    if (presenceNumber) {
+      return `periodo #${presenceNumber}`;
+    }
+
+    return this.normalizeNarrativeValue(fallbackSubtitle);
+  }
+
+  private toPairedSummary(
+    details: Readonly<Record<string, unknown>>,
+    firstKey: string,
+    secondKey: string,
+  ): string | null {
+    const firstValue = this.toDisplayableValue(details[firstKey]);
+    const secondValue = this.toDisplayableValue(details[secondKey]);
+
+    if (firstValue && secondValue) {
+      return `${firstValue} / ${secondValue}`;
+    }
+
+    return firstValue ?? secondValue;
+  }
+
+  private normalizeNarrativeValue(value: string | null | undefined): string | null {
+    const normalizedValue = value?.trim() ?? '';
     if (!normalizedValue) {
-      return value;
+      return null;
     }
 
-    return normalizedValue.charAt(0).toUpperCase() + normalizedValue.slice(1);
+    return normalizedValue.replace(/\bperiod\s*#/gi, 'periodo #');
+  }
+
+  private isPresenceTrack(trackCode: string): boolean {
+    return trackCode.trim().toUpperCase() === 'PRESENCE';
+  }
+
+  private isContractTrack(trackCode: string): boolean {
+    return trackCode.trim().toUpperCase() === 'CONTRACT';
+  }
+
+  private isLaborClassificationTrack(trackCode: string): boolean {
+    return trackCode.trim().toUpperCase() === 'LABOR_CLASSIFICATION';
   }
 
   private toDisplayableValue(value: unknown): string | null {

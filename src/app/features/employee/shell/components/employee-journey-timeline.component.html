@@ -1,11 +1,5 @@
 <section class="employee-journey-timeline" aria-labelledby="employee-journey-timeline-title">
-  <header class="employee-journey-timeline__header">
-    <h3 id="employee-journey-timeline-title">{{ texts.timelineTitle }}</h3>
-    <p>{{ texts.timelineSubtitle }}</p>
-    @if (journeyEmployeeLabel(); as journeyEmployeeLabel) {
-      <p class="employee-journey-timeline__employee-label">{{ journeyEmployeeLabel }}</p>
-    }
-  </header>
+  <h2 id="employee-journey-timeline-title" class="employee-journey-timeline__title">{{ texts.timelineTitle }}</h2>
 
   @if (loading()) {
     <div class="employee-journey-timeline__loading" [attr.aria-label]="texts.timelineLoadingMessage">
@@ -49,31 +43,18 @@
 
             @if (groupedEvent.primaryDetails.length > 0) {
               <ul class="employee-journey-timeline__primary-details" role="list">
-                @for (detail of groupedEvent.primaryDetails; track detail.key + '-' + detail.value) {
-                  <li>
-                    <span>{{ detail.key }}</span>
-                    <strong>{{ detail.value }}</strong>
-                  </li>
+                @for (detail of groupedEvent.primaryDetails; track detail.id) {
+                  <li>{{ detail.text }}</li>
                 }
               </ul>
             }
 
             @if (groupedEvent.secondaryEvents.length > 0) {
-              <section class="employee-journey-timeline__secondary" [attr.aria-label]="texts.timelineSecondaryContextLabel">
-                <p class="employee-journey-timeline__secondary-title">{{ texts.timelineSecondaryContextLabel }}</p>
-                <ul class="employee-journey-timeline__secondary-list" role="list">
-                  @for (secondaryEvent of groupedEvent.secondaryEvents; track secondaryEvent.id) {
-                    <li>
-                      <span class="employee-journey-timeline__secondary-event-title">{{ secondaryEvent.title }}</span>
-                      @if (secondaryEvent.subtitle) {
-                        <span class="employee-journey-timeline__secondary-event-subtitle">
-                          {{ secondaryEvent.subtitle }}
-                        </span>
-                      }
-                    </li>
-                  }
-                </ul>
-              </section>
+              <ul class="employee-journey-timeline__secondary-list" role="list">
+                @for (secondaryEvent of groupedEvent.secondaryEvents; track secondaryEvent.id) {
+                  <li>{{ secondaryEvent.summary }}</li>
+                }
+              </ul>
             }
           </div>
         </li>
