@@ -111,6 +111,7 @@
 }
 
 .app-shell__nav-link {
+  position: relative;
   display: block;
   text-decoration: none;
   color: #1f3346;
@@ -128,10 +129,21 @@
 }
 
 .app-shell__nav-link--active {
-  color: #0f2740;
-  border-color: #b8cde0;
-  background: #e8f1fb;
+  color: #0b233a;
+  border-color: #9eb9d2;
+  background: #e1ecf8;
   font-weight: 700;
+}
+
+.app-shell__nav-link--active::before {
+  content: '';
+  position: absolute;
+  top: 0.18rem;
+  bottom: 0.18rem;
+  left: -0.32rem;
+  width: 3px;
+  border-radius: 2px;
+  background: #5a7b9a;
 }
 
 .app-shell__main {
