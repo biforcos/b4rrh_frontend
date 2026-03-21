@@ -70,15 +70,8 @@ export const routes: Routes = [
 			},
 			{
 				path: 'configuracion/rule-systems',
-				loadComponent: () =>
-					import('./core/layout/pages/section-placeholder-page.component').then(
-						(m) => m.SectionPlaceholderPageComponent,
-					),
-				data: {
-					title: 'Rule systems',
-					description:
-						'Seccion base para evolucionar la administracion de rule systems.',
-				},
+				loadChildren: () =>
+					import('./rulesystem/rule-system/rule-system.routes').then((m) => m.ruleSystemRoutes),
 			},
 			{
 				path: 'employees',

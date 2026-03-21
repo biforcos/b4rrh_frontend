@@ -1,0 +1,67 @@
+<section class="rule-system-list-page">
+  <header class="rule-system-list-page__header">
+    <div>
+      <h2>{{ texts.listTitle }}</h2>
+      <p>{{ texts.listSubtitle }}</p>
+    </div>
+
+    <button type="button" (click)="openCreate()">{{ texts.listCreateAction }}</button>
+  </header>
+
+  @if (loading()) {
+    <p class="rule-system-list-page__feedback rule-system-list-page__feedback--loading">
+      {{ texts.listLoadingMessage }}
+    </p>
+  }
+
+  @if (error()) {
+    <p class="rule-system-list-page__feedback rule-system-list-page__feedback--error">
+      {{ error() || texts.listRequestFailedMessage }}
+    </p>
+  }
+
+  @if (!loading() && items().length === 0) {
+    <p class="rule-system-list-page__feedback rule-system-list-page__feedback--empty">
+      {{ texts.listEmptyMessage }}
+    </p>
+  }
+
+  @if (items().length > 0) {
+    <div class="rule-system-list-page__table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>{{ texts.listCodeHeader }}</th>
+            <th>{{ texts.listNameHeader }}</th>
+            <th>{{ texts.listCountryHeader }}</th>
+            <th>{{ texts.listActiveHeader }}</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of items(); track item.code) {
+            <tr>
+              <td>
+                <button type="button" class="rule-system-list-page__link-button" (click)="openDetail(item.code)">
+                  {{ item.code }}
+                </button>
+              </td>
+              <td>{{ item.name }}</td>
+              <td>{{ item.countryCode }}</td>
+              <td>
+                <span class="rule-system-list-page__status" [class.rule-system-list-page__status--inactive]="!item.active">
+                  {{ item.active ? texts.activeLabel : texts.inactiveLabel }}
+                </span>
+              </td>
+              <td>
+                <button type="button" class="rule-system-list-page__open-button" (click)="openDetail(item.code)">
+                  {{ texts.listOpenAction }}
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

@@ -1,0 +1,31 @@
+<section class="rule-system-detail-page">
+  <header class="rule-system-detail-page__header">
+    <h2>{{ pageTitle() }}</h2>
+    <p>{{ pageSubtitle() }}</p>
+  </header>
+
+  @if (mode() === 'edit' && loading()) {
+    <p class="rule-system-detail-page__feedback rule-system-detail-page__feedback--loading">
+      {{ texts.editLoadingMessage }}
+    </p>
+  }
+
+  @if (mode() === 'edit' && error()) {
+    <p class="rule-system-detail-page__feedback rule-system-detail-page__feedback--error">
+      {{ error() || texts.editRequestFailedMessage }}
+    </p>
+  }
+
+  @if (mode() === 'create' || selected()) {
+    <app-rule-system-form
+      [mode]="mode()"
+      [initialValue]="formInitialValue()"
+      [saving]="saving()"
+      [errorMessage]="error()"
+      [successMessage]="successMessage()"
+      (submitRequested)="submit($event)"
+      (cancelRequested)="cancel()"
+      (interactionStarted)="clearMessages()"
+    />
+  }
+</section>

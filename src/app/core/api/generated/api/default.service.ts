@@ -99,6 +99,8 @@ import { UpdateIdentifierRequest } from '../model/update-identifier-request';
 // @ts-ignore
 import { UpdateLaborClassificationRequest } from '../model/update-labor-classification-request';
 // @ts-ignore
+import { UpdateRuleSystemRequest } from '../model/update-rule-system-request';
+// @ts-ignore
 import { WorkCenterResponse } from '../model/work-center-response';
 
 // @ts-ignore
@@ -157,7 +159,8 @@ import {
     UpdateCostCenterByBusinessKeyRequestParams,
     UpdateEmployeeByBusinessKeyRequestParams,
     UpdateIdentifierByBusinessKeyRequestParams,
-    UpdateLaborClassificationByBusinessKeyRequestParams
+    UpdateLaborClassificationByBusinessKeyRequestParams,
+    UpdateRuleSystemByCodeRequestParams
 } from './default.serviceInterface';
 
 
@@ -4059,6 +4062,78 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
             {
                 context: localVarHttpContext,
                 body: updateLaborClassificationRequest,
+                responseType: <any>responseType_,
+                ...(withCredentials ? { withCredentials } : {}),
+                headers: localVarHeaders,
+                observe: observe,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * Update rule system by code
+     * Updates mutable fields for an existing rule system. Domain rules for V1: - &#x60;ruleSystemCode&#x60; is immutable and used only as business key path parameter. - &#x60;countryCode&#x60; is informational metadata and does not drive behavior. - &#x60;active&#x60; only toggles state; no cascades are triggered and reads remain allowed. - No delete operation for rule systems in V1. 
+     * @endpoint put /rule-systems/{ruleSystemCode}
+     * @param requestParameters
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     * @param options additional options
+     */
+    public updateRuleSystemByCode(requestParameters: UpdateRuleSystemByCodeRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<RuleSystemResponse>;
+    public updateRuleSystemByCode(requestParameters: UpdateRuleSystemByCodeRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<RuleSystemResponse>>;
+    public updateRuleSystemByCode(requestParameters: UpdateRuleSystemByCodeRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<RuleSystemResponse>>;
+    public updateRuleSystemByCode(requestParameters: UpdateRuleSystemByCodeRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        const ruleSystemCode = requestParameters?.ruleSystemCode;
+        if (ruleSystemCode === null || ruleSystemCode === undefined) {
+            throw new Error('Required parameter ruleSystemCode was null or undefined when calling updateRuleSystemByCode.');
+        }
+        const updateRuleSystemRequest = requestParameters?.updateRuleSystemRequest;
+        if (updateRuleSystemRequest === null || updateRuleSystemRequest === undefined) {
+            throw new Error('Required parameter updateRuleSystemRequest was null or undefined when calling updateRuleSystemByCode.');
+        }
+
+        let localVarHeaders = this.defaultHeaders;
+
+        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
+            'application/json'
+        ]);
+        if (localVarHttpHeaderAcceptSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+        }
+
+        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+        const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Content-Type', httpContentTypeSelected);
+        }
+
+        let responseType_: 'text' | 'json' | 'blob' = 'json';
+        if (localVarHttpHeaderAcceptSelected) {
+            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+                responseType_ = 'text';
+            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+                responseType_ = 'json';
+            } else {
+                responseType_ = 'blob';
+            }
+        }
+
+        let localVarPath = `/rule-systems/${this.configuration.encodeParam({name: "ruleSystemCode", value: ruleSystemCode, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}`;
+        const { basePath, withCredentials } = this.configuration;
+        return this.httpClient.request<RuleSystemResponse>('put', `${basePath}${localVarPath}`,
+            {
+                context: localVarHttpContext,
+                body: updateRuleSystemRequest,
                 responseType: <any>responseType_,
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,

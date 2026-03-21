@@ -1,0 +1,86 @@
+<form class="rule-system-form" [formGroup]="form" (ngSubmit)="submit()">
+  <label class="rule-system-form__field">
+    <span>{{ texts.formCodeLabel }}</span>
+    <input
+      type="text"
+      formControlName="code"
+      maxlength="5"
+      autocomplete="off"
+      (input)="notifyInteraction()"
+    />
+    @if (isEditMode()) {
+      <small>{{ texts.formCodeHelp }}</small>
+    }
+    @if (form.controls.code.touched && form.controls.code.hasError('required')) {
+      <small class="rule-system-form__error">{{ texts.formCodeRequiredMessage }}</small>
+    }
+    @if (form.controls.code.touched && form.controls.code.hasError('maxlength')) {
+      <small class="rule-system-form__error">{{ texts.formCodeMaxLengthMessage }}</small>
+    }
+  </label>
+
+  <label class="rule-system-form__field">
+    <span>{{ texts.formNameLabel }}</span>
+    <input
+      type="text"
+      formControlName="name"
+      maxlength="100"
+      autocomplete="off"
+      (input)="notifyInteraction()"
+    />
+    @if (form.controls.name.touched && form.controls.name.hasError('required')) {
+      <small class="rule-system-form__error">{{ texts.formNameRequiredMessage }}</small>
+    }
+    @if (form.controls.name.touched && form.controls.name.hasError('maxlength')) {
+      <small class="rule-system-form__error">{{ texts.formNameMaxLengthMessage }}</small>
+    }
+  </label>
+
+  <label class="rule-system-form__field">
+    <span>{{ texts.formCountryCodeLabel }}</span>
+    <input
+      type="text"
+      formControlName="countryCode"
+      maxlength="3"
+      autocomplete="off"
+      (input)="notifyInteraction()"
+    />
+    @if (form.controls.countryCode.touched && form.controls.countryCode.hasError('required')) {
+      <small class="rule-system-form__error">{{ texts.formCountryRequiredMessage }}</small>
+    }
+    @if (
+      form.controls.countryCode.touched &&
+      (form.controls.countryCode.hasError('minlength') || form.controls.countryCode.hasError('maxlength'))
+    ) {
+      <small class="rule-system-form__error">{{ texts.formCountryLengthMessage }}</small>
+    }
+  </label>
+
+  @if (isEditMode()) {
+    <label class="rule-system-form__checkbox-field">
+      <input type="checkbox" formControlName="active" (change)="notifyInteraction()" />
+      <span>{{ texts.formActiveLabel }}</span>
+    </label>
+  }
+
+  @if (errorMessage()) {
+    <p class="rule-system-form__feedback rule-system-form__feedback--error">{{ errorMessage() }}</p>
+  }
+
+  @if (successMessage()) {
+    <p class="rule-system-form__feedback rule-system-form__feedback--success">{{ successMessage() }}</p>
+  }
+
+  <div class="rule-system-form__actions">
+    <button type="button" (click)="cancel()" [disabled]="saving()">{{ texts.formCancelAction }}</button>
+    <button type="submit" [disabled]="saving()">
+      @if (saving()) {
+        {{ texts.saveBusyMessage }}
+      } @else if (isEditMode()) {
+        {{ texts.formSaveEditAction }}
+      } @else {
+        {{ texts.formSaveCreateAction }}
+      }
+    </button>
+  </div>
+</form>

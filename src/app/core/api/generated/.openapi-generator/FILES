@@ -58,6 +58,7 @@ model/update-cost-center-request.ts
 model/update-employee-request.ts
 model/update-identifier-request.ts
 model/update-labor-classification-request.ts
+model/update-rule-system-request.ts
 model/work-center-response.ts
 param.ts
 provide-api.ts

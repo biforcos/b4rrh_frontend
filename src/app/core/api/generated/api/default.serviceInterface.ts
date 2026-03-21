@@ -52,6 +52,7 @@ import { UpdateCostCenterRequest } from '../model/models';
 import { UpdateEmployeeRequest } from '../model/models';
 import { UpdateIdentifierRequest } from '../model/models';
 import { UpdateLaborClassificationRequest } from '../model/models';
+import { UpdateRuleSystemRequest } from '../model/models';
 import { WorkCenterResponse } from '../model/models';
 
 
@@ -400,6 +401,11 @@ export interface UpdateLaborClassificationByBusinessKeyRequestParams {
     employeeNumber: string;
     startDate: string;
     updateLaborClassificationRequest: UpdateLaborClassificationRequest;
+}
+
+export interface UpdateRuleSystemByCodeRequestParams {
+    ruleSystemCode: string;
+    updateRuleSystemRequest: UpdateRuleSystemRequest;
 }
 
 
@@ -828,5 +834,13 @@ export interface DefaultServiceInterface {
 * @param requestParameters
      */
     updateLaborClassificationByBusinessKey(requestParameters: UpdateLaborClassificationByBusinessKeyRequestParams, extraHttpRequestParams?: any): Observable<LaborClassificationResponse>;
+
+    /**
+     * Update rule system by code
+     * Updates mutable fields for an existing rule system. Domain rules for V1: - &#x60;ruleSystemCode&#x60; is immutable and used only as business key path parameter. - &#x60;countryCode&#x60; is informational metadata and does not drive behavior. - &#x60;active&#x60; only toggles state; no cascades are triggered and reads remain allowed. - No delete operation for rule systems in V1. 
+     * @endpoint put /rule-systems/{ruleSystemCode}
+* @param requestParameters
+     */
+    updateRuleSystemByCode(requestParameters: UpdateRuleSystemByCodeRequestParams, extraHttpRequestParams?: any): Observable<RuleSystemResponse>;
 
 }

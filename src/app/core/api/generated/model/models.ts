@@ -46,4 +46,5 @@ export * from './update-cost-center-request';
 export * from './update-employee-request';
 export * from './update-identifier-request';
 export * from './update-labor-classification-request';
+export * from './update-rule-system-request';
 export * from './work-center-response';
