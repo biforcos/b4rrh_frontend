@@ -31,6 +31,11 @@ export class EmployeeContactStore {
   readonly error = this.errorState.asReadonly();
   readonly success = this.successState.asReadonly();
 
+  clearFeedback(): void {
+    this.errorState.set(null);
+    this.successState.set(null);
+  }
+
   loadContacts(key: EmployeeBusinessKey | null): void {
     this.loadContactsByBusinessKey(key);
   }

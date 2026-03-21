@@ -163,4 +163,21 @@ describe('EmployeeContactStore', () => {
     expect(store.error()).toBe('request-failed');
     expect(store.mutating()).toBe(false);
   });
+
+  it('clears success and error feedback without touching contacts data', () => {
+    store.loadContacts(employeeBusinessKey);
+    store.createContact(employeeBusinessKey, {
+      key: 'PHONE',
+      value: '+34 610000000',
+    });
+
+    expect(store.success()).toBe('created');
+    expect(store.contacts()).toEqual(contactsFixture);
+
+    store.clearFeedback();
+
+    expect(store.success()).toBeNull();
+    expect(store.error()).toBeNull();
+    expect(store.contacts()).toEqual(contactsFixture);
+  });
 });

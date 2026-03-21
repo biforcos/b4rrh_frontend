@@ -29,6 +29,24 @@
   color: #4f6479 !important;
 }
 
+.editable-slot-section__manage-action {
+  border-color: #cad8e8 !important;
+  background: #f7fbff !important;
+  color: #29415b !important;
+}
+
+.editable-slot-section__add-action {
+  border-color: #bfd4e9 !important;
+  background: #eef6ff !important;
+  color: #2b4965 !important;
+}
+
+.editable-slot-section__exit-manage-action {
+  border-color: #d2dce7 !important;
+  background: #fafcff !important;
+  color: #4d6278 !important;
+}
+
 .editable-slot-section__danger-action {
   border-color: #e0c4c4 !important;
   background: #fff7f7 !important;
@@ -137,6 +155,10 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.24rem;
+}
+
+.editable-slot-section__summary + .editable-slot-section__row-actions button {
+  opacity: 0.9;
 }
 
 .editable-slot-section__delete-confirm {

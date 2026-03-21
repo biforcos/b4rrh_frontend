@@ -80,20 +80,30 @@
 
 .employee-section-shell__footer p {
   margin: 0;
-  font-size: 0.66rem;
+  border-radius: 0.42rem;
+  border: 1px solid transparent;
+  font-size: 0.67rem;
+  font-weight: 600;
   line-height: 1.25;
+  padding: 0.26rem 0.36rem;
 }
 
 .employee-section-shell__busy {
-  color: #556d83;
+  border-color: #d6e0ea;
+  background: #f4f7fa;
+  color: #475f75;
 }
 
 .employee-section-shell__error {
-  color: #8a2e2e;
+  border-color: #e3c2c2;
+  background: #fef3f3;
+  color: #7f1d1d;
 }
 
 .employee-section-shell__success {
-  color: #205a3c;
+  border-color: #c6decf;
+  background: #f2fbf5;
+  color: #1f5a3b;
 }
 
 @media (max-width: 900px) {

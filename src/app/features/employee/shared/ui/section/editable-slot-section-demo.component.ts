@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/c
 import { employeeTexts } from '../../../employee.texts';
 import {
   SlotDraft,
+  SlotDisplayMode,
   SlotEditSubmission,
   SlotKeyOption,
   SlotRowViewModel,
@@ -52,6 +53,7 @@ const initialDraft: SlotDraft<string> = {
       [title]="texts.slotDemoTitle"
       [subtitle]="texts.slotDemoSubtitle"
       [state]="uiState()"
+      [displayMode]="displayMode()"
       [rows]="rows()"
       [texts]="slotTexts"
       [draft]="draft()"
@@ -61,6 +63,8 @@ const initialDraft: SlotDraft<string> = {
       [canCreate]="true"
       [canEdit]="true"
       [canDelete]="true"
+      (manageStarted)="startManage()"
+      (manageExited)="exitManage()"
       (createStarted)="startCreate()"
       (editStarted)="startEdit($event)"
       (deleteRequested)="requestDelete($event)"
@@ -76,6 +80,8 @@ const initialDraft: SlotDraft<string> = {
 export class EditableSlotSectionDemoComponent implements SectionActionContract<string> {
   protected readonly texts = employeeTexts;
   protected readonly slotTexts: SlotSectionTexts = {
+    manageAction: employeeTexts.slotManageAction,
+    exitManageAction: employeeTexts.slotExitManageAction,
     addAction: employeeTexts.slotAddAction,
     editAction: employeeTexts.slotEditAction,
     deleteAction: employeeTexts.slotDeleteAction,
@@ -90,16 +96,50 @@ export class EditableSlotSectionDemoComponent implements SectionActionContract<s
   };
   protected readonly rows = signal<ReadonlyArray<SlotRowViewModel<string>>>(initialRows);
   protected readonly uiState = signal<SectionUiState>(initialUiState);
+  protected readonly manageModeActive = signal(false);
   protected readonly draft = signal<SlotDraft<string>>(initialDraft);
   protected readonly editingKey = signal<string | null>(null);
   protected readonly deletingKey = signal<string | null>(null);
+  protected readonly displayMode = computed<SlotDisplayMode>(() => {
+    const mode = this.uiState().mode;
+
+    if (mode === 'creating') {
+      return 'creating';
+    }
+
+    if (mode === 'editing') {
+      return 'editing';
+    }
+
+    if (mode === 'confirming') {
+      return 'confirmingDelete';
+    }
+
+    return this.manageModeActive() ? 'manage' : 'view';
+  });
   protected readonly availableKeys = computed(() => {
     const usedKeys = new Set(this.rows().map((row) => row.key));
     return slotKeyOptions.filter((option) => !usedKeys.has(option.value));
   });
 
+  startManage(): void {
+    this.manageModeActive.set(true);
+    this.uiState.update((state) => ({
+      ...state,
+      mode: 'view',
+      dirty: false,
+      errorMessage: null,
+      successMessage: null,
+    }));
+  }
+
+  exitManage(): void {
+    this.manageModeActive.set(false);
+    this.cancel();
+  }
+
   startCreate(): void {
-    if (this.uiState().mode !== 'view') {
+    if (this.uiState().mode !== 'view' || !this.manageModeActive()) {
       return;
     }
 
@@ -119,7 +159,7 @@ export class EditableSlotSectionDemoComponent implements SectionActionContract<s
   }
 
   startEdit(key: string): void {
-    if (this.uiState().mode !== 'view') {
+    if (this.uiState().mode !== 'view' || !this.manageModeActive()) {
       return;
     }
 
@@ -144,7 +184,7 @@ export class EditableSlotSectionDemoComponent implements SectionActionContract<s
   }
 
   requestDelete(key: string): void {
-    if (this.uiState().mode !== 'view') {
+    if (this.uiState().mode !== 'view' || !this.manageModeActive()) {
       return;
     }
 

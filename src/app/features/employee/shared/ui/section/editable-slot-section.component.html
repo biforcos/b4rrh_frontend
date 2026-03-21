@@ -1,12 +1,20 @@
 <app-employee-section-shell [title]="title()" [subtitle]="subtitle()" [state]="state()">
   <div sectionShellHeaderActions class="editable-slot-section__header-actions">
-    @if (showAddAction()) {
-      <button type="button" (click)="onCreateStarted()">{{ texts().addAction }}</button>
+    @if (showManageAction()) {
+      <button type="button" class="editable-slot-section__manage-action" (click)="onManageStarted()">
+        {{ texts().manageAction }}
+      </button>
     }
 
-    @if (showCancelAction()) {
-      <button type="button" class="editable-slot-section__cancel-action" (click)="onCancelled()">
-        {{ texts().cancelAction }}
+    @if (showAddAction()) {
+      <button type="button" class="editable-slot-section__add-action" (click)="onCreateStarted()">
+        {{ texts().addAction }}
+      </button>
+    }
+
+    @if (showExitManageAction()) {
+      <button type="button" class="editable-slot-section__exit-manage-action" (click)="onManageExited()">
+        {{ texts().exitManageAction }}
       </button>
     }
   </div>
@@ -43,6 +51,9 @@
           <button type="button" [disabled]="!isDraftValid() || state().busy" (click)="onCreateSubmitted()">
             {{ texts().saveCreateAction }}
           </button>
+          <button type="button" class="editable-slot-section__cancel-action" (click)="onCancelled()">
+            {{ texts().cancelAction }}
+          </button>
         </div>
       </article>
     }
@@ -68,6 +79,9 @@
                 <button type="button" [disabled]="!isEditDraftValid() || state().busy" (click)="onEditSubmitted(row.key)">
                   {{ texts().saveEditAction }}
                 </button>
+                <button type="button" class="editable-slot-section__cancel-action" (click)="onCancelled()">
+                  {{ texts().cancelAction }}
+                </button>
               </div>
             } @else if (isRowDeleteConfirming(row)) {
               <div class="editable-slot-section__delete-confirm">
@@ -75,6 +89,9 @@
                 <div class="editable-slot-section__row-actions">
                   <button type="button" class="editable-slot-section__danger-action" (click)="onDeleteConfirmed(row.key)">
                     {{ texts().confirmDeleteAction }}
+                  </button>
+                  <button type="button" class="editable-slot-section__cancel-action" (click)="onCancelled()">
+                    {{ texts().cancelAction }}
                   </button>
                 </div>
               </div>
@@ -84,7 +101,7 @@
                 <p class="editable-slot-section__value">{{ row.value }}</p>
               </div>
 
-              @if (isViewMode() && !isRowReadonly(row) && (canEdit() || canDelete())) {
+              @if (showRowMaintenanceActions() && !isRowReadonly(row) && (canEdit() || canDelete())) {
                 <div class="editable-slot-section__row-actions">
                   @if (canEdit()) {
                     <button type="button" (click)="onEditStarted(row.key)">{{ texts().editAction }}</button>

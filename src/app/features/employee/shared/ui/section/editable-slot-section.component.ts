@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, computed, input, output } from '@an
 import { EmployeeSectionShellComponent } from './employee-section-shell.component';
 import {
   SlotDraft,
+  SlotDisplayMode,
   SlotEditSubmission,
   SlotKeyOption,
   SlotRowViewModel,
@@ -11,6 +12,8 @@ import {
 import { SectionUiState } from './section-ui-state.model';
 
 const emptyTexts: SlotSectionTexts = {
+  manageAction: 'Manage',
+  exitManageAction: 'Done',
   addAction: 'Add',
   editAction: 'Edit',
   deleteAction: 'Delete',
@@ -40,6 +43,7 @@ export class EditableSlotSectionComponent {
   readonly title = input.required<string>();
   readonly subtitle = input<string | null>(null);
   readonly state = input.required<SectionUiState>();
+  readonly displayMode = input<SlotDisplayMode>('view');
   readonly rows = input<ReadonlyArray<SlotRowViewModel<string>>>([]);
   readonly texts = input<SlotSectionTexts>(emptyTexts);
   readonly draft = input<SlotDraft<string>>(emptyDraft);
@@ -50,6 +54,8 @@ export class EditableSlotSectionComponent {
   readonly canEdit = input(false);
   readonly canDelete = input(false);
 
+  readonly manageStarted = output<void>();
+  readonly manageExited = output<void>();
   readonly createStarted = output<void>();
   readonly editStarted = output<string>();
   readonly deleteRequested = output<string>();
@@ -60,20 +66,32 @@ export class EditableSlotSectionComponent {
   readonly createSubmitted = output<SlotDraft<string>>();
   readonly editSubmitted = output<SlotEditSubmission<string>>();
 
-  protected readonly isViewMode = computed(() => this.state().mode === 'view' && !this.state().busy);
-  protected readonly isCreating = computed(() => this.state().mode === 'creating');
-  protected readonly isEditing = computed(() => this.state().mode === 'editing' && this.editingKey() !== null);
+  protected readonly isViewMode = computed(() => this.displayMode() === 'view');
+  protected readonly isManageMode = computed(() => this.displayMode() === 'manage');
+  protected readonly isCreating = computed(() => this.displayMode() === 'creating');
+  protected readonly isEditing = computed(() => this.displayMode() === 'editing' && this.editingKey() !== null);
   protected readonly isConfirmingDelete = computed(
-    () => this.state().mode === 'confirming' && this.deletingKey() !== null,
+    () => this.displayMode() === 'confirmingDelete' && this.deletingKey() !== null,
+  );
+  protected readonly isOperatingMode = computed(
+    () => this.isCreating() || this.isEditing() || this.isConfirmingDelete(),
   );
   protected readonly hasRows = computed(() => this.rows().length > 0);
   protected readonly showEmpty = computed(() => !this.hasRows() && !this.isCreating());
   protected readonly canUseKeySelect = computed(() => this.availableKeys().length > 0);
-  protected readonly showAddAction = computed(() => this.canCreate() && this.isViewMode());
-  protected readonly showCancelAction = computed(() => {
-    const mode = this.state().mode;
-    return (mode === 'creating' || mode === 'editing' || mode === 'confirming') && !this.state().busy;
-  });
+  protected readonly canManage = computed(() => this.canCreate() || this.canEdit() || this.canDelete());
+  protected readonly showManageAction = computed(
+    () => this.isViewMode() && this.canManage() && !this.state().busy,
+  );
+  protected readonly showAddAction = computed(
+    () => this.canCreate() && this.isManageMode() && !this.state().busy,
+  );
+  protected readonly showExitManageAction = computed(
+    () => (this.isManageMode() || this.isOperatingMode()) && !this.state().busy,
+  );
+  protected readonly showRowMaintenanceActions = computed(
+    () => this.isManageMode() && !this.state().busy,
+  );
   protected readonly isDraftValid = computed(() => {
     const draft = this.draft();
     const hasValidKey = this.normalizeKey(draft.key) !== null;
@@ -100,6 +118,14 @@ export class EditableSlotSectionComponent {
 
   protected onCreateStarted(): void {
     this.createStarted.emit();
+  }
+
+  protected onManageStarted(): void {
+    this.manageStarted.emit();
+  }
+
+  protected onManageExited(): void {
+    this.manageExited.emit();
   }
 
   protected onEditStarted(rowKey: string): void {

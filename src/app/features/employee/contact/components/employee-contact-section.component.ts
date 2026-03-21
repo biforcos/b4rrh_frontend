@@ -9,6 +9,7 @@ import {
 } from '../../shared/ui/section/editable-slot-section.component';
 import {
   SlotDraft,
+  SlotDisplayMode,
   SlotEditSubmission,
   SlotKeyOption,
   SlotSectionTexts,
@@ -28,8 +29,9 @@ const emptyDraft: SlotDraft<string> = {
   template: `
     <app-editable-slot-section
       [title]="texts.contactsSectionTitle"
-      [subtitle]="texts.contactsSectionSubtitle"
+      [subtitle]="null"
       [state]="sectionState()"
+      [displayMode]="displayMode()"
       [rows]="rows()"
       [texts]="slotTexts"
       [draft]="draft()"
@@ -39,6 +41,8 @@ const emptyDraft: SlotDraft<string> = {
       [canCreate]="true"
       [canEdit]="true"
       [canDelete]="true"
+      (manageStarted)="onManageStarted()"
+      (manageExited)="onManageExited()"
       (createStarted)="onCreateStarted()"
       (editStarted)="onEditStarted($event)"
       (deleteRequested)="onDeleteRequested($event)"
@@ -55,6 +59,7 @@ export class EmployeeContactSectionComponent {
   readonly employeeKey = input<EmployeeBusinessKey | null>(null);
 
   private readonly contactStore = inject(EmployeeContactStore);
+  private readonly manageModeActiveState = signal(false);
   private readonly modeState = signal<SectionMode>('view');
   private readonly dirtyState = signal(false);
   private readonly localErrorMessageState = signal<string | null>(null);
@@ -64,6 +69,8 @@ export class EmployeeContactSectionComponent {
 
   protected readonly texts = employeeTexts;
   protected readonly slotTexts: SlotSectionTexts = {
+    manageAction: this.texts.contactsSectionManageAction,
+    exitManageAction: this.texts.contactsSectionExitManageAction,
     addAction: this.texts.contactsSectionAddAction,
     editAction: this.texts.contactsSectionEditAction,
     deleteAction: this.texts.contactsSectionDeleteAction,
@@ -83,6 +90,23 @@ export class EmployeeContactSectionComponent {
       .sort((left, right) => left.key.localeCompare(right.key)),
   );
   protected readonly availableKeys = computed<ReadonlyArray<SlotKeyOption<string>>>(() => []);
+  protected readonly displayMode = computed<SlotDisplayMode>(() => {
+    const mode = this.modeState();
+
+    if (mode === 'creating') {
+      return 'creating';
+    }
+
+    if (mode === 'editing') {
+      return 'editing';
+    }
+
+    if (mode === 'confirming') {
+      return 'confirmingDelete';
+    }
+
+    return this.manageModeActiveState() ? 'manage' : 'view';
+  });
   protected readonly draft = this.draftState.asReadonly();
   protected readonly editingKey = this.editingKeyState.asReadonly();
   protected readonly deletingKey = this.deletingKeyState.asReadonly();
@@ -100,7 +124,7 @@ export class EmployeeContactSectionComponent {
 
       untracked(() => {
         this.contactStore.loadContacts(activeEmployeeKey);
-        this.resetLocalUi();
+        this.resetAllUi();
       });
     });
 
@@ -110,9 +134,25 @@ export class EmployeeContactSectionComponent {
       }
 
       if (this.modeState() === 'submitting') {
-        this.resetLocalUi();
+        this.resetOperationUi();
       }
     });
+  }
+
+  protected onManageStarted(): void {
+    if (!this.canEditData()) {
+      return;
+    }
+
+    this.clearInteractionFeedback();
+    this.manageModeActiveState.set(true);
+    this.resetOperationUi();
+  }
+
+  protected onManageExited(): void {
+    this.clearInteractionFeedback();
+    this.manageModeActiveState.set(false);
+    this.resetOperationUi();
   }
 
   protected onCreateStarted(): void {
@@ -120,7 +160,8 @@ export class EmployeeContactSectionComponent {
       return;
     }
 
-    this.localErrorMessageState.set(null);
+    this.clearInteractionFeedback();
+    this.manageModeActiveState.set(true);
     this.modeState.set('creating');
     this.dirtyState.set(false);
     this.editingKeyState.set(null);
@@ -138,7 +179,8 @@ export class EmployeeContactSectionComponent {
       return;
     }
 
-    this.localErrorMessageState.set(null);
+    this.clearInteractionFeedback();
+    this.manageModeActiveState.set(true);
     this.modeState.set('editing');
     this.dirtyState.set(false);
     this.editingKeyState.set(row.key);
@@ -159,7 +201,8 @@ export class EmployeeContactSectionComponent {
       return;
     }
 
-    this.localErrorMessageState.set(null);
+    this.clearInteractionFeedback();
+    this.manageModeActiveState.set(true);
     this.modeState.set('confirming');
     this.dirtyState.set(false);
     this.editingKeyState.set(null);
@@ -179,7 +222,9 @@ export class EmployeeContactSectionComponent {
   }
 
   protected onCancelled(): void {
-    this.resetLocalUi();
+    this.clearInteractionFeedback();
+    this.manageModeActiveState.set(true);
+    this.resetOperationUi();
   }
 
   protected onDraftKeyChanged(contactTypeCode: string | null): void {
@@ -187,6 +232,7 @@ export class EmployeeContactSectionComponent {
       ...draft,
       key: contactTypeCode,
     }));
+    this.contactStore.clearFeedback();
     this.dirtyState.set(true);
     this.localErrorMessageState.set(null);
   }
@@ -196,6 +242,7 @@ export class EmployeeContactSectionComponent {
       ...draft,
       value: contactValue,
     }));
+    this.contactStore.clearFeedback();
     this.dirtyState.set(true);
     this.localErrorMessageState.set(null);
   }
@@ -259,13 +306,23 @@ export class EmployeeContactSectionComponent {
     return !this.contactStore.mutating();
   }
 
-  private resetLocalUi(): void {
+  private clearInteractionFeedback(): void {
+    this.contactStore.clearFeedback();
+    this.localErrorMessageState.set(null);
+  }
+
+  private resetOperationUi(): void {
     this.modeState.set('view');
     this.dirtyState.set(false);
     this.localErrorMessageState.set(null);
     this.editingKeyState.set(null);
     this.deletingKeyState.set(null);
     this.draftState.set(emptyDraft);
+  }
+
+  private resetAllUi(): void {
+    this.manageModeActiveState.set(false);
+    this.resetOperationUi();
   }
 
   private resolveErrorMessage(): string | null {

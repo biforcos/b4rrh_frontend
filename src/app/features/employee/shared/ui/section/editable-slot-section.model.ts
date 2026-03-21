@@ -21,7 +21,11 @@ export interface SlotEditSubmission<KeyType = string> {
   value: string;
 }
 
+export type SlotDisplayMode = 'view' | 'manage' | 'creating' | 'editing' | 'confirmingDelete';
+
 export interface SlotSectionTexts {
+  manageAction: string;
+  exitManageAction: string;
   addAction: string;
   editAction: string;
   deleteAction: string;
