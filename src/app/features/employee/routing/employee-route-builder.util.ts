@@ -4,7 +4,7 @@ import { employeeRouteParamNames, toEmployeeBusinessKey } from './employee-route
 export const employeeRouteSections = ['overview', 'contact', 'presence'] as const;
 export type EmployeeRouteSection = (typeof employeeRouteSections)[number];
 
-export const employeeRouteBaseSegment = 'employees';
+export const employeeRouteBaseSegment = 'personas/empleados';
 
 export function buildEmployeeDetailRouteCommands(
   key: EmployeeBusinessKey,

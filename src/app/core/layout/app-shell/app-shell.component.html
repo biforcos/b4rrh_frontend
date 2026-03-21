@@ -10,7 +10,31 @@
     <span class="app-shell__environment">{{ texts.environmentLabel }}</span>
   </header>
 
-  <main class="app-shell__main">
-    <router-outlet />
-  </main>
+  <div class="app-shell__workspace">
+    <aside class="app-shell__sidebar" [attr.aria-label]="texts.navigationAriaLabel">
+      <nav class="app-shell__nav">
+        @for (group of navGroups; track group.label) {
+          <section class="app-shell__nav-group">
+            <h2>{{ group.label }}</h2>
+            <div class="app-shell__nav-list">
+              @for (item of group.items; track item.route) {
+                <a
+                  [routerLink]="item.route"
+                  routerLinkActive="app-shell__nav-link--active"
+                  [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+                  class="app-shell__nav-link"
+                >
+                  {{ item.label }}
+                </a>
+              }
+            </div>
+          </section>
+        }
+      </nav>
+    </aside>
+
+    <main class="app-shell__main" aria-live="polite">
+      <router-outlet />
+    </main>
+  </div>
 </div>

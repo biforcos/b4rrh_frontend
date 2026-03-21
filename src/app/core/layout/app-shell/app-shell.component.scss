@@ -66,14 +66,112 @@
   padding: 0.3rem 0.7rem;
 }
 
+.app-shell__workspace {
+  display: grid;
+  grid-template-columns: 16.5rem minmax(0, 1fr);
+  min-height: 0;
+}
+
+.app-shell__sidebar {
+  min-height: 0;
+  border-right: 1px solid var(--border-subtle);
+  background: linear-gradient(180deg, #f9fbfe 0%, #f4f8fc 100%);
+  padding: 0.9rem 0.72rem;
+}
+
+.app-shell__nav {
+  position: sticky;
+  top: 0.9rem;
+  display: grid;
+  gap: 0.7rem;
+  max-height: calc(100dvh - 7.2rem);
+  overflow: auto;
+  padding-right: 0.2rem;
+}
+
+.app-shell__nav-group {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.app-shell__nav-group h2 {
+  margin: 0;
+  padding: 0 0.34rem;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.app-shell__nav-list {
+  display: grid;
+  gap: 0.12rem;
+}
+
+.app-shell__nav-link {
+  display: block;
+  text-decoration: none;
+  color: #1f3346;
+  font-size: 0.84rem;
+  font-weight: 500;
+  line-height: 1.25;
+  padding: 0.46rem 0.56rem;
+  border-radius: 0.48rem;
+  border: 1px solid transparent;
+}
+
+.app-shell__nav-link:hover {
+  border-color: #d4deea;
+  background: #f2f7fc;
+}
+
+.app-shell__nav-link--active {
+  color: #0f2740;
+  border-color: #b8cde0;
+  background: #e8f1fb;
+  font-weight: 700;
+}
+
 .app-shell__main {
   min-height: 0;
-  padding: 1rem 1.25rem 1.25rem;
+  padding: 1rem 1.3rem 1.3rem;
 }
 
 @media (max-width: 700px) {
   .app-shell__header {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .app-shell__workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .app-shell__sidebar {
+    border-right: 0;
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 0.55rem 0.5rem;
+  }
+
+  .app-shell__nav {
+    position: static;
+    max-height: none;
+  }
+
+  .app-shell__nav-group {
+    gap: 0.22rem;
+  }
+
+  .app-shell__nav-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.26rem;
+  }
+
+  .app-shell__nav-link {
+    font-size: 0.78rem;
+    padding: 0.35rem 0.5rem;
   }
 }

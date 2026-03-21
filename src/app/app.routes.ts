@@ -9,16 +9,90 @@ export const routes: Routes = [
 			{
 				path: '',
 				pathMatch: 'full',
-				redirectTo: 'employees',
+				redirectTo: 'inicio',
+			},
+			{
+				path: 'inicio',
+				loadComponent: () =>
+					import('./core/layout/pages/app-home-page.component').then((m) => m.AppHomePageComponent),
+			},
+			{
+				path: 'personas/empleados',
+				loadChildren: () => import('./features/employee/employee.routes').then((m) => m.employeeRoutes),
+			},
+			{
+				path: 'organizacion/empresas',
+				loadComponent: () =>
+					import('./core/layout/pages/section-placeholder-page.component').then(
+						(m) => m.SectionPlaceholderPageComponent,
+					),
+				data: {
+					title: 'Empresas',
+					description:
+						'Seccion base preparada para integrar mantenimiento y consulta de empresas.',
+				},
+			},
+			{
+				path: 'organizacion/centros-trabajo',
+				loadComponent: () =>
+					import('./core/layout/pages/section-placeholder-page.component').then(
+						(m) => m.SectionPlaceholderPageComponent,
+					),
+				data: {
+					title: 'Centros de trabajo',
+					description:
+						'Seccion base preparada para gestionar centros de trabajo por estructura organizativa.',
+				},
+			},
+			{
+				path: 'organizacion/centros-coste',
+				loadComponent: () =>
+					import('./core/layout/pages/section-placeholder-page.component').then(
+						(m) => m.SectionPlaceholderPageComponent,
+					),
+				data: {
+					title: 'Centros de coste',
+					description:
+						'Seccion base preparada para mantenimiento de centros de coste y su disponibilidad.',
+				},
+			},
+			{
+				path: 'organizacion/catalogos',
+				loadComponent: () =>
+					import('./core/layout/pages/section-placeholder-page.component').then(
+						(m) => m.SectionPlaceholderPageComponent,
+					),
+				data: {
+					title: 'Catalogos',
+					description:
+						'Seccion base para futuros catalogos funcionales de la aplicacion.',
+				},
+			},
+			{
+				path: 'configuracion/rule-systems',
+				loadComponent: () =>
+					import('./core/layout/pages/section-placeholder-page.component').then(
+						(m) => m.SectionPlaceholderPageComponent,
+					),
+				data: {
+					title: 'Rule systems',
+					description:
+						'Seccion base para evolucionar la administracion de rule systems.',
+				},
 			},
 			{
 				path: 'employees',
-				loadChildren: () => import('./features/employee/employee.routes').then((m) => m.employeeRoutes),
+				pathMatch: 'full',
+				redirectTo: 'personas/empleados',
+			},
+			{
+				path: '**',
+				redirectTo: 'inicio',
 			},
 		],
 	},
 	{
 		path: '**',
-		redirectTo: 'employees',
+		redirectTo: 'inicio',
 	},
 ];
