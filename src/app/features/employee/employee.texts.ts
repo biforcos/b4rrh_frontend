@@ -39,6 +39,11 @@ export const employeeTexts = {
   navRoutingHint:
     'Resumen, Personales y Laborales ya navegan sobre los verticales activos. Organizativos y Nomina quedan preparados.',
   timelineTitle: 'Journey',
+  timelineEventsSingularLabel: 'evento',
+  timelineEventsPluralLabel: 'eventos',
+  timelineLastEventLabel: 'Ultimo',
+  timelineExpandActionLabel: 'Expandir journey',
+  timelineCollapseActionLabel: 'Contraer journey',
   timelineStatusCompletedLabel: 'Completado',
   timelineStatusCurrentLabel: 'Actual',
   timelineStatusFutureLabel: 'Futuro',

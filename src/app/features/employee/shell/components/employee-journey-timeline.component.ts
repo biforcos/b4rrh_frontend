@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
 
 import { EmployeeJourneyErrorCode } from '../../data-access/employee-journey.store';
 import { employeeTexts } from '../../employee.texts';
@@ -49,12 +49,45 @@ export class EmployeeJourneyTimelineComponent {
   readonly journey = input<EmployeeJourneyModel | null>(null);
   readonly loading = input(false);
   readonly error = input<EmployeeJourneyErrorCode | null>(null);
+  protected readonly isExpanded = signal(false);
 
   protected readonly texts = employeeTexts;
   protected readonly groupedTimelineEvents = computed<ReadonlyArray<GroupedJourneyEventViewModel>>(() =>
     this.groupEventsByDate(this.journey()?.events ?? []),
   );
+  protected readonly collapsedSummary = computed(() => {
+    if (this.loading()) {
+      return this.texts.timelineLoadingMessage;
+    }
+
+    if (this.error()) {
+      return this.texts.timelineLoadFailedMessage;
+    }
+
+    const totalEvents = this.journey()?.events.length ?? 0;
+    if (totalEvents === 0) {
+      return this.texts.timelineNoEventsMessage;
+    }
+
+    const groupedEvents = this.groupedTimelineEvents();
+    const latestGroupedEvent = groupedEvents[groupedEvents.length - 1];
+    const eventsLabel =
+      totalEvents === 1 ? this.texts.timelineEventsSingularLabel : this.texts.timelineEventsPluralLabel;
+
+    if (!latestGroupedEvent) {
+      return `${totalEvents} ${eventsLabel}`;
+    }
+
+    return `${totalEvents} ${eventsLabel} · ${this.texts.timelineLastEventLabel}: ${latestGroupedEvent.primaryEvent.title} (${latestGroupedEvent.eventDate})`;
+  });
+  protected readonly toggleAriaLabel = computed(() =>
+    this.isExpanded() ? this.texts.timelineCollapseActionLabel : this.texts.timelineExpandActionLabel,
+  );
   protected readonly hasEvents = computed(() => this.groupedTimelineEvents().length > 0);
+
+  protected toggle(): void {
+    this.isExpanded.update((value) => !value);
+  }
 
   protected resolveStatusLabel(status: EmployeeJourneyEventStatus): string {
     if (status === 'current') {
