@@ -55,6 +55,7 @@ model/rule-system-response.ts
 model/update-contact-request.ts
 model/update-contract-request.ts
 model/update-cost-center-request.ts
+model/update-employee-request.ts
 model/update-identifier-request.ts
 model/update-labor-classification-request.ts
 model/work-center-response.ts

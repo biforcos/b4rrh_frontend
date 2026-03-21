@@ -93,6 +93,8 @@ import { UpdateContractRequest } from '../model/update-contract-request';
 // @ts-ignore
 import { UpdateCostCenterRequest } from '../model/update-cost-center-request';
 // @ts-ignore
+import { UpdateEmployeeRequest } from '../model/update-employee-request';
+// @ts-ignore
 import { UpdateIdentifierRequest } from '../model/update-identifier-request';
 // @ts-ignore
 import { UpdateLaborClassificationRequest } from '../model/update-labor-classification-request';
@@ -153,6 +155,7 @@ import {
     UpdateContactByBusinessKeyRequestParams,
     UpdateContractByBusinessKeyRequestParams,
     UpdateCostCenterByBusinessKeyRequestParams,
+    UpdateEmployeeByBusinessKeyRequestParams,
     UpdateIdentifierByBusinessKeyRequestParams,
     UpdateLaborClassificationByBusinessKeyRequestParams
 } from './default.serviceInterface';
@@ -3811,6 +3814,85 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
             {
                 context: localVarHttpContext,
                 body: updateCostCenterRequest,
+                responseType: <any>responseType_,
+                ...(withCredentials ? { withCredentials } : {}),
+                headers: localVarHeaders,
+                observe: observe,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * Update employee core identity fields by business key
+     * @endpoint put /employees/{ruleSystemCode}/{employeeTypeCode}/{employeeNumber}
+     * @param requestParameters
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     * @param options additional options
+     */
+    public updateEmployeeByBusinessKey(requestParameters: UpdateEmployeeByBusinessKeyRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<EmployeeResponse>;
+    public updateEmployeeByBusinessKey(requestParameters: UpdateEmployeeByBusinessKeyRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<EmployeeResponse>>;
+    public updateEmployeeByBusinessKey(requestParameters: UpdateEmployeeByBusinessKeyRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<EmployeeResponse>>;
+    public updateEmployeeByBusinessKey(requestParameters: UpdateEmployeeByBusinessKeyRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        const ruleSystemCode = requestParameters?.ruleSystemCode;
+        if (ruleSystemCode === null || ruleSystemCode === undefined) {
+            throw new Error('Required parameter ruleSystemCode was null or undefined when calling updateEmployeeByBusinessKey.');
+        }
+        const employeeTypeCode = requestParameters?.employeeTypeCode;
+        if (employeeTypeCode === null || employeeTypeCode === undefined) {
+            throw new Error('Required parameter employeeTypeCode was null or undefined when calling updateEmployeeByBusinessKey.');
+        }
+        const employeeNumber = requestParameters?.employeeNumber;
+        if (employeeNumber === null || employeeNumber === undefined) {
+            throw new Error('Required parameter employeeNumber was null or undefined when calling updateEmployeeByBusinessKey.');
+        }
+        const updateEmployeeRequest = requestParameters?.updateEmployeeRequest;
+        if (updateEmployeeRequest === null || updateEmployeeRequest === undefined) {
+            throw new Error('Required parameter updateEmployeeRequest was null or undefined when calling updateEmployeeByBusinessKey.');
+        }
+
+        let localVarHeaders = this.defaultHeaders;
+
+        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
+            'application/json'
+        ]);
+        if (localVarHttpHeaderAcceptSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+        }
+
+        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+        const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Content-Type', httpContentTypeSelected);
+        }
+
+        let responseType_: 'text' | 'json' | 'blob' = 'json';
+        if (localVarHttpHeaderAcceptSelected) {
+            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+                responseType_ = 'text';
+            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+                responseType_ = 'json';
+            } else {
+                responseType_ = 'blob';
+            }
+        }
+
+        let localVarPath = `/employees/${this.configuration.encodeParam({name: "ruleSystemCode", value: ruleSystemCode, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/${this.configuration.encodeParam({name: "employeeTypeCode", value: employeeTypeCode, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/${this.configuration.encodeParam({name: "employeeNumber", value: employeeNumber, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}`;
+        const { basePath, withCredentials } = this.configuration;
+        return this.httpClient.request<EmployeeResponse>('put', `${basePath}${localVarPath}`,
+            {
+                context: localVarHttpContext,
+                body: updateEmployeeRequest,
                 responseType: <any>responseType_,
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,

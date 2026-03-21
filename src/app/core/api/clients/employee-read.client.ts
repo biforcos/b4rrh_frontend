@@ -6,6 +6,7 @@ import { DefaultService } from '../generated/api/default.service';
 import {
   EmployeeDirectoryItemResponse,
   EmployeeResponse,
+  UpdateEmployeeRequest,
 } from '../generated/model/models';
 
 export interface EmployeeBusinessKeyApiQuery {
@@ -62,12 +63,36 @@ export class EmployeeReadClient {
     );
   }
 
+  updateEmployeeByBusinessKey(
+    key: EmployeeBusinessKeyApiQuery,
+    request: UpdateEmployeeRequest,
+  ): Observable<EmployeeReadApiModel> {
+    const normalizedKey = this.normalizeKey(key);
+
+    return this.api
+      .updateEmployeeByBusinessKey({
+        ...normalizedKey,
+        updateEmployeeRequest: {
+          firstName: request.firstName.trim(),
+          lastName1: request.lastName1.trim(),
+          lastName2: this.normalizeOptionalValue(request.lastName2),
+          preferredName: this.normalizeOptionalValue(request.preferredName),
+        },
+      })
+      .pipe(map((employee) => this.toEmployeeReadApiModel(employee)));
+  }
+
   private normalizeKey(key: EmployeeBusinessKeyApiQuery): EmployeeBusinessKeyApiQuery {
     return {
       ruleSystemCode: key.ruleSystemCode.trim(),
       employeeTypeCode: key.employeeTypeCode.trim(),
       employeeNumber: key.employeeNumber.trim(),
     };
+  }
+
+  private normalizeOptionalValue(value: string | null | undefined): string | null {
+    const normalizedValue = value?.trim() ?? '';
+    return normalizedValue.length > 0 ? normalizedValue : null;
   }
 
   private toEmployeeDirectoryApiModel(source: EmployeeDirectoryItemResponse): EmployeeDirectoryApiModel {

@@ -52,7 +52,14 @@
 
       @if (selectedEmployee(); as employee) {
         <section class="employee-shell__identity-zone">
-          <app-employee-detail-header [employee]="employee" />
+          <app-employee-detail-header
+            [employee]="employee"
+            [updating]="mutatingEmployeeDetail()"
+            [updateError]="employeeDetailMutationError() === 'request-failed'"
+            [updateSuccess]="employeeDetailMutationSuccess() === 'updated'"
+            (updateRequested)="updateEmployeeCoreIdentity($event)"
+            (editInteractionStarted)="clearEmployeeCoreIdentityFeedback()"
+          />
         </section>
 
         <section class="employee-shell__timeline-zone">

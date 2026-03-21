@@ -43,6 +43,7 @@ export * from './rule-system-response';
 export * from './update-contact-request';
 export * from './update-contract-request';
 export * from './update-cost-center-request';
+export * from './update-employee-request';
 export * from './update-identifier-request';
 export * from './update-labor-classification-request';
 export * from './work-center-response';

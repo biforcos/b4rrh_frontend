@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 
 import { EmployeeDetailModel } from '../models/employee-detail.model';
+import { EmployeeDetailGateway } from './employee-detail.gateway';
 import { EmployeeDetailReadGateway } from './employee-detail-read.gateway';
 import { EmployeeDetailStore } from './employee-detail.store';
 
@@ -30,14 +31,23 @@ describe('EmployeeDetailStore', () => {
   let readGatewayMock: {
     readEmployeeDetailByBusinessKey: ReturnType<typeof vi.fn>;
   };
+  let detailGatewayMock: {
+    updateEmployeeCoreIdentity: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(() => {
     readGatewayMock = {
       readEmployeeDetailByBusinessKey: vi.fn().mockReturnValue(of(employeeDetailFixture)),
     };
+    detailGatewayMock = {
+      updateEmployeeCoreIdentity: vi.fn().mockReturnValue(of(undefined)),
+    };
 
     TestBed.configureTestingModule({
-      providers: [{ provide: EmployeeDetailReadGateway, useValue: readGatewayMock }],
+      providers: [
+        { provide: EmployeeDetailReadGateway, useValue: readGatewayMock },
+        { provide: EmployeeDetailGateway, useValue: detailGatewayMock },
+      ],
     });
 
     store = TestBed.inject(EmployeeDetailStore);
@@ -91,5 +101,58 @@ describe('EmployeeDetailStore', () => {
     store.loadEmployeeDetailByBusinessKey(employeeBusinessKey);
 
     expect(readGatewayMock.readEmployeeDetailByBusinessKey).toHaveBeenCalledTimes(1);
+  });
+
+  it('updates employee core identity and forces detail reload after success', () => {
+    store.loadEmployeeDetailByBusinessKey(employeeBusinessKey);
+
+    store.updateEmployeeCoreIdentity(employeeBusinessKey, {
+      firstName: 'Lidia',
+      lastName1: 'Lopez',
+      lastName2: '',
+      preferredName: 'Lidia Lopez',
+    });
+
+    expect(detailGatewayMock.updateEmployeeCoreIdentity).toHaveBeenCalledTimes(1);
+    expect(readGatewayMock.readEmployeeDetailByBusinessKey).toHaveBeenCalledTimes(2);
+    expect(store.mutating()).toBe(false);
+    expect(store.mutationError()).toBeNull();
+    expect(store.mutationSuccess()).toBe('updated');
+  });
+
+  it('sets mutation error when employee core identity update fails', () => {
+    detailGatewayMock.updateEmployeeCoreIdentity.mockReturnValue(
+      throwError(() => new Error('backend unavailable')),
+    );
+
+    store.updateEmployeeCoreIdentity(employeeBusinessKey, {
+      firstName: 'Lidia',
+      lastName1: 'Lopez',
+      lastName2: '',
+      preferredName: '',
+    });
+
+    expect(store.mutating()).toBe(false);
+    expect(store.mutationError()).toBe('request-failed');
+    expect(store.mutationSuccess()).toBeNull();
+  });
+
+  it('clears mutation feedback without touching selected detail', () => {
+    store.loadEmployeeDetailByBusinessKey(employeeBusinessKey);
+    store.updateEmployeeCoreIdentity(employeeBusinessKey, {
+      firstName: 'Lidia',
+      lastName1: 'Lopez',
+      lastName2: '',
+      preferredName: '',
+    });
+
+    expect(store.selectedEmployeeDetail()).toEqual(employeeDetailFixture);
+    expect(store.mutationSuccess()).toBe('updated');
+
+    store.clearMutationFeedback();
+
+    expect(store.selectedEmployeeDetail()).toEqual(employeeDetailFixture);
+    expect(store.mutationError()).toBeNull();
+    expect(store.mutationSuccess()).toBeNull();
   });
 });

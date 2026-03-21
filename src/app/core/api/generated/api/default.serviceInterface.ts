@@ -49,6 +49,7 @@ import { RuleSystemResponse } from '../model/models';
 import { UpdateContactRequest } from '../model/models';
 import { UpdateContractRequest } from '../model/models';
 import { UpdateCostCenterRequest } from '../model/models';
+import { UpdateEmployeeRequest } from '../model/models';
 import { UpdateIdentifierRequest } from '../model/models';
 import { UpdateLaborClassificationRequest } from '../model/models';
 import { WorkCenterResponse } from '../model/models';
@@ -376,6 +377,13 @@ export interface UpdateCostCenterByBusinessKeyRequestParams {
     costCenterCode: string;
     startDate: string;
     updateCostCenterRequest: UpdateCostCenterRequest;
+}
+
+export interface UpdateEmployeeByBusinessKeyRequestParams {
+    ruleSystemCode: string;
+    employeeTypeCode: string;
+    employeeNumber: string;
+    updateEmployeeRequest: UpdateEmployeeRequest;
 }
 
 export interface UpdateIdentifierByBusinessKeyRequestParams {
@@ -796,6 +804,14 @@ export interface DefaultServiceInterface {
 * @param requestParameters
      */
     updateCostCenterByBusinessKey(requestParameters: UpdateCostCenterByBusinessKeyRequestParams, extraHttpRequestParams?: any): Observable<CostCenterResponse>;
+
+    /**
+     * Update employee core identity fields by business key
+     * 
+     * @endpoint put /employees/{ruleSystemCode}/{employeeTypeCode}/{employeeNumber}
+* @param requestParameters
+     */
+    updateEmployeeByBusinessKey(requestParameters: UpdateEmployeeByBusinessKeyRequestParams, extraHttpRequestParams?: any): Observable<EmployeeResponse>;
 
     /**
      * Update employee identifier

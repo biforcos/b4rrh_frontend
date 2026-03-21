@@ -1,7 +1,17 @@
 <header class="employee-detail-header" aria-label="Employee detail header">
   <div class="employee-detail-header__identity-row">
     <div class="employee-detail-header__identity-main">
-      <h2>{{ employee().displayName }}</h2>
+      <div class="employee-detail-header__name-row">
+        <h2>{{ employee().displayName }}</h2>
+        <button
+          type="button"
+          class="employee-detail-header__edit-trigger"
+          [disabled]="updating()"
+          (click)="openIdentityEditor()"
+        >
+          {{ texts.detailHeaderEditAction }}
+        </button>
+      </div>
 
       <div class="employee-detail-header__keyline" [attr.aria-label]="texts.currentEmployeeKeyLabel">
         <span class="employee-detail-header__identity-chip employee-detail-header__identity-chip--primary">
@@ -16,6 +26,59 @@
       <span class="employee-detail-header__avatar-initials">{{ avatarInitials() }}</span>
     </div>
   </div>
+
+  @if (editingIdentity()) {
+    <section class="employee-detail-header__edit-popover" (click)="$event.stopPropagation()">
+      <h3>{{ texts.detailHeaderEditPopoverTitle }}</h3>
+
+      <form class="employee-detail-header__edit-form" [formGroup]="identityForm" (ngSubmit)="submitIdentityUpdate()">
+        <label>
+          <span>{{ texts.detailHeaderFirstNameLabel }}</span>
+          <input type="text" formControlName="firstName" autocomplete="off" />
+        </label>
+
+        <label>
+          <span>{{ texts.detailHeaderLastName1Label }}</span>
+          <input type="text" formControlName="lastName1" autocomplete="off" />
+        </label>
+
+        <label>
+          <span>{{ texts.detailHeaderLastName2Label }}</span>
+          <input type="text" formControlName="lastName2" autocomplete="off" />
+        </label>
+
+        <label>
+          <span>{{ texts.detailHeaderPreferredNameLabel }}</span>
+          <input type="text" formControlName="preferredName" autocomplete="off" />
+        </label>
+
+        @if (updateError()) {
+          <p class="employee-detail-header__edit-feedback employee-detail-header__edit-feedback--error">
+            {{ texts.detailHeaderUpdateErrorMessage }}
+          </p>
+        }
+
+        @if (updateSuccess()) {
+          <p class="employee-detail-header__edit-feedback employee-detail-header__edit-feedback--success">
+            {{ texts.detailHeaderUpdateSuccessMessage }}
+          </p>
+        }
+
+        <div class="employee-detail-header__edit-actions">
+          <button type="button" (click)="cancelIdentityEditor()" [disabled]="updating()">
+            {{ texts.detailHeaderCancelAction }}
+          </button>
+          <button type="submit" [disabled]="identityForm.invalid || updating()">
+            @if (updating()) {
+              {{ texts.sectionShellBusyMessage }}
+            } @else {
+              {{ texts.detailHeaderSaveAction }}
+            }
+          </button>
+        </div>
+      </form>
+    </section>
+  }
 
   <dl class="employee-detail-header__meta-row">
     <div class="employee-detail-header__meta-item">

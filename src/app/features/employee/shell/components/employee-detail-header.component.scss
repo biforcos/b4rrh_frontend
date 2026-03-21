@@ -17,11 +17,35 @@
   min-width: 0;
 }
 
+.employee-detail-header__name-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
 .employee-detail-header h2 {
   margin: 0;
   font-size: 1.3rem;
   line-height: 1.14;
   color: var(--text-primary);
+}
+
+.employee-detail-header__edit-trigger {
+  border: 1px solid #c7d3e1;
+  border-radius: 999px;
+  background: #f8fbff;
+  color: #2d4357;
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1;
+  padding: 0.26rem 0.52rem;
+  cursor: pointer;
+}
+
+.employee-detail-header__edit-trigger:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
 }
 
 .employee-detail-header__keyline {
@@ -78,6 +102,95 @@
   gap: 1rem;
   margin: 0;
   padding-top: 0.24rem;
+}
+
+.employee-detail-header__edit-popover {
+  margin-top: 0.3rem;
+  border: 1px solid #d7e2ee;
+  border-radius: 0.75rem;
+  background: #fbfdff;
+  padding: 0.7rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.employee-detail-header__edit-popover h3 {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #334155;
+}
+
+.employee-detail-header__edit-form {
+  display: grid;
+  gap: 0.46rem;
+}
+
+.employee-detail-header__edit-form label {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.employee-detail-header__edit-form label span {
+  font-size: 0.66rem;
+  color: #475569;
+  font-weight: 600;
+}
+
+.employee-detail-header__edit-form input {
+  width: 100%;
+  border: 1px solid #cdd8e6;
+  border-radius: 0.46rem;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 0.78rem;
+  padding: 0.38rem 0.48rem;
+}
+
+.employee-detail-header__edit-form input:focus {
+  outline: 2px solid #b6cee8;
+  outline-offset: 0;
+  border-color: #9ebede;
+}
+
+.employee-detail-header__edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.42rem;
+}
+
+.employee-detail-header__edit-actions button {
+  border: 1px solid #c4d2e2;
+  border-radius: 0.46rem;
+  background: #f5f9fe;
+  color: #23384a;
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1;
+  padding: 0.34rem 0.56rem;
+  cursor: pointer;
+}
+
+.employee-detail-header__edit-actions button[type='submit'] {
+  border-color: #8db2d8;
+  background: #e8f2fb;
+}
+
+.employee-detail-header__edit-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.employee-detail-header__edit-feedback {
+  margin: 0;
+  font-size: 0.7rem;
+}
+
+.employee-detail-header__edit-feedback--error {
+  color: #a31228;
+}
+
+.employee-detail-header__edit-feedback--success {
+  color: #166534;
 }
 
 .employee-detail-header__meta-item {
