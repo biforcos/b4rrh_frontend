@@ -3,6 +3,8 @@ export interface SlotRowViewModel<KeyType = string> {
   keyLabel: string;
   value: string;
   valueLabel?: string | null;
+  secondaryText?: string | null;
+  badges?: ReadonlyArray<string>;
   isReadonly?: boolean;
 }
 

@@ -83,7 +83,12 @@ export class EmployeeIdentifierSectionComponent {
   protected readonly rows = computed<ReadonlyArray<SlotRowViewModel<string>>>(() =>
     this.identifierStore
       .identifiers()
-      .map((identifier) => mapEmployeeIdentifierModelToSlotRow(identifier))
+      .map((identifier) =>
+        mapEmployeeIdentifierModelToSlotRow(identifier, {
+          primaryBadge: this.texts.identifiersSectionPrimaryBadge,
+          expirationPrefix: this.texts.identifiersSectionExpirationPrefix,
+        }),
+      )
       .sort((left, right) => left.key.localeCompare(right.key)),
   );
   protected readonly availableKeys = computed<ReadonlyArray<SlotKeyOption<string>>>(() => []);

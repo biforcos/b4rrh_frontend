@@ -3,8 +3,14 @@ import { EmployeeIdentifierApiModel } from '../../../core/api/clients/employee-i
 import { EmployeeIdentifierModel } from '../models/employee-identifier.model';
 import { SlotDraft, SlotRowViewModel } from '../shared/ui/section/editable-slot-section.model';
 
+export interface EmployeeIdentifierRowTexts {
+  primaryBadge: string;
+  expirationPrefix: string;
+}
+
 export function mapEmployeeIdentifierApiToSlotRow(
   source: EmployeeIdentifierApiModel,
+  texts?: EmployeeIdentifierRowTexts,
 ): SlotRowViewModel<string> {
   const identifierTypeCode = source.identifierTypeCode.trim().toUpperCase();
   const identifierValue = source.identifierValue.trim();
@@ -14,11 +20,14 @@ export function mapEmployeeIdentifierApiToSlotRow(
     keyLabel: identifierTypeCode,
     value: identifierValue,
     valueLabel: null,
+    secondaryText: buildSecondaryText(source, texts),
+    badges: buildBadges(source, texts),
   };
 }
 
 export function mapEmployeeIdentifierModelToSlotRow(
   source: EmployeeIdentifierModel,
+  texts: EmployeeIdentifierRowTexts,
 ): SlotRowViewModel<string> {
   return mapEmployeeIdentifierApiToSlotRow({
     identifierTypeCode: source.typeCode,
@@ -26,7 +35,31 @@ export function mapEmployeeIdentifierModelToSlotRow(
     issuingCountryCode: source.issuingCountryCode,
     expirationDate: source.expirationDate,
     isPrimary: source.isPrimary,
-  });
+  }, texts);
+}
+
+function buildSecondaryText(
+  source: EmployeeIdentifierApiModel,
+  texts?: EmployeeIdentifierRowTexts,
+): string | null {
+  const issuingCountryCode = normalizeOptionalCountryCode(source.issuingCountryCode);
+  const expirationDate = normalizeOptionalValue(source.expirationDate);
+  const expirationSegment = expirationDate && texts ? `${texts.expirationPrefix}: ${expirationDate}` : expirationDate;
+
+  const segments = [issuingCountryCode, expirationSegment].filter((segment): segment is string => Boolean(segment));
+
+  return segments.length > 0 ? segments.join(' · ') : null;
+}
+
+function buildBadges(
+  source: EmployeeIdentifierApiModel,
+  texts?: EmployeeIdentifierRowTexts,
+): ReadonlyArray<string> {
+  if (!texts || source.isPrimary !== true) {
+    return [];
+  }
+
+  return [texts.primaryBadge];
 }
 
 export function mapSlotDraftToCreateIdentifierRequest(draft: SlotDraft<string>): CreateIdentifierRequest {

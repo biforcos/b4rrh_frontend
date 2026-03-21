@@ -154,6 +154,8 @@ export const employeeTexts = {
   identifiersSectionRequestFailedMessage:
     'No se pudo procesar la operacion de identificadores. Reintenta.',
   identifiersSectionDuplicateTypeMessage: 'Ya existe un identificador para ese tipo.',
+  identifiersSectionPrimaryBadge: 'Principal',
+  identifiersSectionExpirationPrefix: 'Caduca',
   identifiersSectionCreateSuccessMessage: 'Identificador creado correctamente.',
   identifiersSectionEditSuccessMessage: 'Identificador actualizado correctamente.',
   identifiersSectionDeleteSuccessMessage: 'Identificador eliminado correctamente.',

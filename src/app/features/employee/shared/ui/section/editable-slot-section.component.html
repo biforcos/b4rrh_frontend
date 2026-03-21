@@ -99,6 +99,18 @@
               <div class="editable-slot-section__summary">
                 <p class="editable-slot-section__key">{{ row.keyLabel }}</p>
                 <p class="editable-slot-section__value">{{ row.value }}</p>
+
+                @if (row.secondaryText) {
+                  <p class="editable-slot-section__secondary">{{ row.secondaryText }}</p>
+                }
+
+                @if (row.badges && row.badges.length > 0) {
+                  <ul class="editable-slot-section__badges" role="list" aria-label="Row metadata badges">
+                    @for (badge of row.badges; track $index) {
+                      <li class="editable-slot-section__badge">{{ badge }}</li>
+                    }
+                  </ul>
+                }
               </div>
 
               @if (showRowMaintenanceActions() && !isRowReadonly(row) && (canEdit() || canDelete())) {
