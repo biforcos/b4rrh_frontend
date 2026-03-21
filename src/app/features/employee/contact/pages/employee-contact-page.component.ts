@@ -12,6 +12,7 @@ import {
   EmployeeContactBlockComponent,
   EmployeeContactBlockModel,
 } from '../components/employee-contact-block.component';
+import { EmployeeContactSectionComponent } from '../components/employee-contact-section.component';
 import {
   EmployeeIdentifierBlockComponent,
   EmployeeIdentifierBlockItemModel,
@@ -29,7 +30,12 @@ import { readEmployeeBusinessKeyFromParamMap } from '../../routing/employee-rout
 @Component({
   selector: 'app-employee-contact-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [EmployeeContactBlockComponent, EmployeeAddressBlockComponent, EmployeeIdentifierBlockComponent],
+  imports: [
+    EmployeeContactSectionComponent,
+    EmployeeContactBlockComponent,
+    EmployeeAddressBlockComponent,
+    EmployeeIdentifierBlockComponent,
+  ],
   templateUrl: './employee-contact-page.component.html',
   styleUrl: './employee-contact-page.component.scss',
 })
@@ -70,7 +76,6 @@ export class EmployeeContactPageComponent {
 
   constructor() {
     effect(() => {
-      this.employeeContactStore.loadContactsByBusinessKey(this.activeEmployeeKey());
       this.employeeAddressStore.loadAddressesByBusinessKey(this.activeEmployeeKey());
       this.employeeIdentifierStore.loadIdentifiersByBusinessKey(this.activeEmployeeKey());
     });

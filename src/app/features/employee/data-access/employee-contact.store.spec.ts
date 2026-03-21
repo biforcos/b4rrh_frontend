@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 
 import { EmployeeContactModel } from '../models/employee-contact.model';
+import { EmployeeContactGateway } from './employee-contact.gateway';
 import { EmployeeContactReadGateway } from './employee-contact-read.gateway';
 import { EmployeeContactStore } from './employee-contact.store';
 
@@ -12,8 +13,20 @@ const employeeBusinessKey = {
 } as const;
 
 const contactsFixture: ReadonlyArray<EmployeeContactModel> = [
-  { type: 'phone', label: 'MOBILE', value: '+34 600000001' },
-  { type: 'email', label: 'EMAIL', value: 'user@b4rrhh.local' },
+  {
+    contactTypeCode: 'MOBILE',
+    contactValue: '+34 600000001',
+    type: 'phone',
+    label: 'MOBILE',
+    value: '+34 600000001',
+  },
+  {
+    contactTypeCode: 'EMAIL',
+    contactValue: 'user@b4rrhh.local',
+    type: 'email',
+    label: 'EMAIL',
+    value: 'user@b4rrhh.local',
+  },
 ];
 
 describe('EmployeeContactStore', () => {
@@ -21,14 +34,27 @@ describe('EmployeeContactStore', () => {
   let readGatewayMock: {
     readEmployeeContactsByBusinessKey: ReturnType<typeof vi.fn>;
   };
+  let gatewayMock: {
+    createContact: ReturnType<typeof vi.fn>;
+    updateContact: ReturnType<typeof vi.fn>;
+    deleteContact: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(() => {
     readGatewayMock = {
       readEmployeeContactsByBusinessKey: vi.fn().mockReturnValue(of(contactsFixture)),
     };
+    gatewayMock = {
+      createContact: vi.fn().mockReturnValue(of(undefined)),
+      updateContact: vi.fn().mockReturnValue(of(undefined)),
+      deleteContact: vi.fn().mockReturnValue(of(undefined)),
+    };
 
     TestBed.configureTestingModule({
-      providers: [{ provide: EmployeeContactReadGateway, useValue: readGatewayMock }],
+      providers: [
+        { provide: EmployeeContactReadGateway, useValue: readGatewayMock },
+        { provide: EmployeeContactGateway, useValue: gatewayMock },
+      ],
     });
 
     store = TestBed.inject(EmployeeContactStore);
@@ -82,5 +108,59 @@ describe('EmployeeContactStore', () => {
     store.loadContactsByBusinessKey(employeeBusinessKey);
 
     expect(readGatewayMock.readEmployeeContactsByBusinessKey).toHaveBeenCalledTimes(1);
+  });
+
+  it('creates contact and forces reload from backend after success', () => {
+    store.loadContacts(employeeBusinessKey);
+
+    store.createContact(employeeBusinessKey, {
+      key: 'PHONE',
+      value: '+34 610000000',
+    });
+
+    expect(gatewayMock.createContact).toHaveBeenCalledWith(employeeBusinessKey, {
+      key: 'PHONE',
+      value: '+34 610000000',
+    });
+    expect(readGatewayMock.readEmployeeContactsByBusinessKey).toHaveBeenCalledTimes(2);
+    expect(store.success()).toBe('created');
+  });
+
+  it('updates contact and forces reload from backend after success', () => {
+    store.loadContacts(employeeBusinessKey);
+
+    store.updateContact(employeeBusinessKey, 'EMAIL', {
+      key: 'EMAIL',
+      value: 'new@b4rrhh.local',
+    });
+
+    expect(gatewayMock.updateContact).toHaveBeenCalledWith(employeeBusinessKey, 'EMAIL', {
+      key: 'EMAIL',
+      value: 'new@b4rrhh.local',
+    });
+    expect(readGatewayMock.readEmployeeContactsByBusinessKey).toHaveBeenCalledTimes(2);
+    expect(store.success()).toBe('updated');
+  });
+
+  it('deletes contact and forces reload from backend after success', () => {
+    store.loadContacts(employeeBusinessKey);
+
+    store.deleteContact(employeeBusinessKey, 'EMAIL');
+
+    expect(gatewayMock.deleteContact).toHaveBeenCalledWith(employeeBusinessKey, 'EMAIL');
+    expect(readGatewayMock.readEmployeeContactsByBusinessKey).toHaveBeenCalledTimes(2);
+    expect(store.success()).toBe('deleted');
+  });
+
+  it('sets request-failed error when create contact fails', () => {
+    gatewayMock.createContact.mockReturnValue(throwError(() => new Error('backend unavailable')));
+
+    store.createContact(employeeBusinessKey, {
+      key: 'PHONE',
+      value: '+34 610000000',
+    });
+
+    expect(store.error()).toBe('request-failed');
+    expect(store.mutating()).toBe(false);
   });
 });

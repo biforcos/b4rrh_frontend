@@ -19,6 +19,10 @@
 
   <div class="employee-area__modules">
     <section class="employee-area__module">
+      <app-employee-contact-section [employeeKey]="activeEmployeeKey()" />
+    </section>
+
+    <section class="employee-area__module">
       <app-employee-contact-block [contact]="contactBlockModel()" />
     </section>
 

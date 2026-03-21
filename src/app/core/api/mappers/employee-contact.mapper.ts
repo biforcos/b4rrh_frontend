@@ -3,6 +3,8 @@ import { EmployeeContactApiModel } from '../clients/employee-contact-read.client
 export type EmployeeContactReadType = 'phone' | 'email' | 'other';
 
 export interface EmployeeContactReadModel {
+  contactTypeCode: string;
+  contactValue: string;
   type: EmployeeContactReadType;
   label: string | null;
   value: string;
@@ -20,10 +22,13 @@ export function mapEmployeeContactApiToReadModel(
     return null;
   }
 
-  const normalizedTypeCode = source.contactTypeCode.trim().toUpperCase();
+  const normalizedTypeCode = source.contactTypeCode.trim();
+  const normalizedTypeCodeForDetection = normalizedTypeCode.toUpperCase();
 
   return {
-    type: resolveContactType(normalizedTypeCode, normalizedValue),
+    contactTypeCode: normalizedTypeCode,
+    contactValue: normalizedValue,
+    type: resolveContactType(normalizedTypeCodeForDetection, normalizedValue),
     label: normalizedTypeCode.length > 0 ? normalizedTypeCode : null,
     value: normalizedValue,
   };
