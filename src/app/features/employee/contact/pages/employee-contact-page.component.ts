@@ -1,20 +1,15 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { map } from 'rxjs';
 
-import {
-  EmployeeAddressBlockComponent,
-  EmployeeAddressBlockItemModel,
-  EmployeeAddressBlockModel,
-} from '../components/employee-address-block.component';
+import { EmployeeAddressSectionComponent } from '../components/employee-address-section.component';
 import { EmployeeContactSectionComponent } from '../components/employee-contact-section.component';
 import { EmployeeIdentifierSectionComponent } from '../components/employee-identifier-section.component';
 import { EmployeeAddressStore } from '../../data-access/employee-address.store';
 import { EmployeeContactStore } from '../../data-access/employee-contact.store';
 import { EmployeeIdentifierStore } from '../../data-access/employee-identifier.store';
 import { employeeTexts } from '../../employee.texts';
-import { EmployeeAddressModel } from '../../models/employee-address.model';
 import { readEmployeeBusinessKeyFromParamMap } from '../../routing/employee-route-key.util';
 
 @Component({
@@ -22,7 +17,7 @@ import { readEmployeeBusinessKeyFromParamMap } from '../../routing/employee-rout
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     EmployeeContactSectionComponent,
-    EmployeeAddressBlockComponent,
+    EmployeeAddressSectionComponent,
     EmployeeIdentifierSectionComponent,
   ],
   templateUrl: './employee-contact-page.component.html',
@@ -44,7 +39,6 @@ export class EmployeeContactPageComponent {
   protected readonly contacts = this.employeeContactStore.contacts;
   protected readonly loadingContacts = this.employeeContactStore.loading;
   protected readonly contactsError = this.employeeContactStore.error;
-  protected readonly addresses = this.employeeAddressStore.addresses;
   protected readonly loadingAddresses = this.employeeAddressStore.loading;
   protected readonly addressesError = this.employeeAddressStore.error;
   protected readonly loadingIdentifiers = this.employeeIdentifierStore.loading;
@@ -52,68 +46,4 @@ export class EmployeeContactPageComponent {
   protected readonly loadingPersonals = computed(
     () => this.loadingContacts() || this.loadingAddresses() || this.loadingIdentifiers(),
   );
-  protected readonly addressBlockModel = computed<EmployeeAddressBlockModel>(() =>
-    this.toAddressBlockModel(this.addresses()),
-  );
-
-  constructor() {
-    effect(() => {
-      this.employeeAddressStore.loadAddressesByBusinessKey(this.activeEmployeeKey());
-    });
-  }
-
-  private toAddressBlockModel(addresses: ReadonlyArray<EmployeeAddressModel>): EmployeeAddressBlockModel {
-    const sortedAddresses = [...addresses].sort((left, right) => this.compareAddressOrder(left, right));
-
-    const primaryAddress = sortedAddresses[0] ?? null;
-
-    return {
-      primaryAddress: primaryAddress ? this.toAddressBlockItemModel(primaryAddress) : null,
-      secondaryAddresses: sortedAddresses.slice(1).map((address) => this.toAddressBlockItemModel(address)),
-    };
-  }
-
-  private compareAddressOrder(left: EmployeeAddressModel, right: EmployeeAddressModel): number {
-    if (left.isActive !== right.isActive) {
-      return left.isActive ? -1 : 1;
-    }
-
-    const startDateOrder = right.startDate.localeCompare(left.startDate);
-    if (startDateOrder !== 0) {
-      return startDateOrder;
-    }
-
-    return left.addressNumber - right.addressNumber;
-  }
-
-  private toAddressBlockItemModel(address: EmployeeAddressModel): EmployeeAddressBlockItemModel {
-    return {
-      typeLabel: address.addressTypeCode,
-      street: address.street,
-      locality: this.buildAddressLocality(address),
-      validity: this.buildAddressValidityLabel(address),
-      isActive: address.isActive,
-    };
-  }
-
-  private buildAddressLocality(address: EmployeeAddressModel): string {
-    return [address.postalCode, address.city, address.regionCode, address.countryCode]
-      .filter((value) => Boolean(value))
-      .join(' · ');
-  }
-
-  private buildAddressValidityLabel(address: EmployeeAddressModel): string | null {
-    const startDate = address.startDate.trim();
-    const endDate = address.endDate?.trim() ?? '';
-
-    if (!startDate && !endDate) {
-      return null;
-    }
-
-    if (!endDate) {
-      return startDate;
-    }
-
-    return `${startDate} - ${endDate}`;
-  }
 }

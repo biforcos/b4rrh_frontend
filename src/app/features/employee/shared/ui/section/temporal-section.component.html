@@ -1,0 +1,101 @@
+<app-employee-section-shell [title]="title()" [subtitle]="subtitle()" [state]="state()">
+  <div sectionShellHeaderActions class="temporal-section__header-actions">
+    @if (showManageAction()) {
+      <button type="button" class="temporal-section__manage-action" (click)="onManageStarted()">
+        {{ texts().manageAction }}
+      </button>
+    }
+
+    @if (showAddAction()) {
+      <button type="button" class="temporal-section__add-action" (click)="onCreateStarted()">
+        {{ texts().addAction }}
+      </button>
+    }
+
+    @if (showExitManageAction()) {
+      <button type="button" class="temporal-section__exit-manage-action" (click)="onManageExited()">
+        {{ texts().exitManageAction }}
+      </button>
+    }
+  </div>
+
+  <div class="temporal-section__body">
+    @if (showEmpty()) {
+      <p class="temporal-section__empty">{{ texts().emptyMessage }}</p>
+    }
+
+    @if (isCreating()) {
+      <article class="temporal-section__row temporal-section__row--draft">
+        <div class="temporal-section__create-form">
+          <ng-content select="[temporalCreateForm]"></ng-content>
+        </div>
+
+        <div class="temporal-section__row-actions">
+          <button type="button" [disabled]="!createSubmitEnabled() || state().busy" (click)="onCreateSubmitted()">
+            {{ texts().saveCreateAction }}
+          </button>
+          <button type="button" class="temporal-section__cancel-action" (click)="onCancelled()">
+            {{ texts().cancelAction }}
+          </button>
+        </div>
+      </article>
+    }
+
+    @if (hasRows()) {
+      <ul class="temporal-section__rows" role="list">
+        @for (row of rows(); track trackRowByKey($index, row)) {
+          <li class="temporal-section__row">
+            @if (isRowCloseConfirming(row)) {
+              <div class="temporal-section__confirm-close">
+                <p>{{ texts().confirmCloseMessage }}</p>
+                <div class="temporal-section__row-actions">
+                  <button type="button" class="temporal-section__danger-action" (click)="onCloseConfirmed(row.key)">
+                    {{ texts().confirmCloseAction }}
+                  </button>
+                  <button type="button" class="temporal-section__cancel-action" (click)="onCancelled()">
+                    {{ texts().cancelAction }}
+                  </button>
+                </div>
+              </div>
+            } @else {
+              <div class="temporal-section__summary">
+                <p class="temporal-section__title">{{ row.title }}</p>
+
+                @if (row.subtitle) {
+                  <p class="temporal-section__subtitle">{{ row.subtitle }}</p>
+                }
+
+                @if (row.detailText) {
+                  <p class="temporal-section__detail">{{ row.detailText }}</p>
+                }
+
+                <div class="temporal-section__meta">
+                  @if (row.periodText) {
+                    <span class="temporal-section__period">{{ row.periodText }}</span>
+                  }
+
+                  @if (row.statusLabel) {
+                    <span
+                      class="temporal-section__status"
+                      [class.temporal-section__status--current]="row.isCurrent === true"
+                    >
+                      {{ row.statusLabel }}
+                    </span>
+                  }
+                </div>
+              </div>
+
+              @if (showRowCloseAction() && row.closeable === true) {
+                <div class="temporal-section__row-actions">
+                  <button type="button" class="temporal-section__danger-action" (click)="onCloseRequested(row.key)">
+                    {{ texts().closeAction }}
+                  </button>
+                </div>
+              }
+            }
+          </li>
+        }
+      </ul>
+    }
+  </div>
+</app-employee-section-shell>
