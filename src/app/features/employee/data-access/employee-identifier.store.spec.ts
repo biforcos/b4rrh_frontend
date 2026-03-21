@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 
 import { EmployeeIdentifierModel } from '../models/employee-identifier.model';
+import { EmployeeIdentifierGateway } from './employee-identifier.gateway';
 import { EmployeeIdentifierReadGateway } from './employee-identifier-read.gateway';
 import { EmployeeIdentifierStore } from './employee-identifier.store';
 
@@ -33,14 +34,27 @@ describe('EmployeeIdentifierStore', () => {
   let readGatewayMock: {
     readEmployeeIdentifiersByBusinessKey: ReturnType<typeof vi.fn>;
   };
+  let gatewayMock: {
+    createIdentifier: ReturnType<typeof vi.fn>;
+    updateIdentifier: ReturnType<typeof vi.fn>;
+    deleteIdentifier: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(() => {
     readGatewayMock = {
       readEmployeeIdentifiersByBusinessKey: vi.fn().mockReturnValue(of(identifiersFixture)),
     };
+    gatewayMock = {
+      createIdentifier: vi.fn().mockReturnValue(of(undefined)),
+      updateIdentifier: vi.fn().mockReturnValue(of(undefined)),
+      deleteIdentifier: vi.fn().mockReturnValue(of(undefined)),
+    };
 
     TestBed.configureTestingModule({
-      providers: [{ provide: EmployeeIdentifierReadGateway, useValue: readGatewayMock }],
+      providers: [
+        { provide: EmployeeIdentifierReadGateway, useValue: readGatewayMock },
+        { provide: EmployeeIdentifierGateway, useValue: gatewayMock },
+      ],
     });
 
     store = TestBed.inject(EmployeeIdentifierStore);
@@ -94,5 +108,86 @@ describe('EmployeeIdentifierStore', () => {
     store.loadIdentifiersByBusinessKey(employeeBusinessKey);
 
     expect(readGatewayMock.readEmployeeIdentifiersByBusinessKey).toHaveBeenCalledTimes(1);
+  });
+
+  it('creates identifier and forces reload from backend after success', () => {
+    store.loadIdentifiers(employeeBusinessKey);
+
+    store.createIdentifier(employeeBusinessKey, {
+      key: 'NIF',
+      value: '12345678A',
+    });
+
+    expect(gatewayMock.createIdentifier).toHaveBeenCalledWith(employeeBusinessKey, {
+      key: 'NIF',
+      value: '12345678A',
+    });
+    expect(readGatewayMock.readEmployeeIdentifiersByBusinessKey).toHaveBeenCalledTimes(2);
+    expect(store.success()).toBe('created');
+  });
+
+  it('updates identifier and forces reload from backend after success', () => {
+    store.loadIdentifiers(employeeBusinessKey);
+
+    store.updateIdentifier(
+      employeeBusinessKey,
+      'NIF',
+      {
+        key: 'NIF',
+        value: '87654321Z',
+      },
+      identifiersFixture[0],
+    );
+
+    expect(gatewayMock.updateIdentifier).toHaveBeenCalledWith(
+      employeeBusinessKey,
+      'NIF',
+      {
+        key: 'NIF',
+        value: '87654321Z',
+      },
+      identifiersFixture[0],
+    );
+    expect(readGatewayMock.readEmployeeIdentifiersByBusinessKey).toHaveBeenCalledTimes(2);
+    expect(store.success()).toBe('updated');
+  });
+
+  it('deletes identifier and forces reload from backend after success', () => {
+    store.loadIdentifiers(employeeBusinessKey);
+
+    store.deleteIdentifier(employeeBusinessKey, 'PASSPORT');
+
+    expect(gatewayMock.deleteIdentifier).toHaveBeenCalledWith(employeeBusinessKey, 'PASSPORT');
+    expect(readGatewayMock.readEmployeeIdentifiersByBusinessKey).toHaveBeenCalledTimes(2);
+    expect(store.success()).toBe('deleted');
+  });
+
+  it('sets request-failed error when create identifier fails', () => {
+    gatewayMock.createIdentifier.mockReturnValue(throwError(() => new Error('backend unavailable')));
+
+    store.createIdentifier(employeeBusinessKey, {
+      key: 'NIF',
+      value: '12345678A',
+    });
+
+    expect(store.error()).toBe('request-failed');
+    expect(store.mutating()).toBe(false);
+  });
+
+  it('clears success and error feedback without touching identifier data', () => {
+    store.loadIdentifiers(employeeBusinessKey);
+    store.createIdentifier(employeeBusinessKey, {
+      key: 'NIF',
+      value: '12345678A',
+    });
+
+    expect(store.success()).toBe('created');
+    expect(store.identifiers()).toEqual(identifiersFixture);
+
+    store.clearFeedback();
+
+    expect(store.success()).toBeNull();
+    expect(store.error()).toBeNull();
+    expect(store.identifiers()).toEqual(identifiersFixture);
   });
 });
