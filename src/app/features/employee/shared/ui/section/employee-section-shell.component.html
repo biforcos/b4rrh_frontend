@@ -1,0 +1,46 @@
+<section class="employee-section-shell" [attr.data-mode]="state().mode">
+  <header class="employee-section-shell__header">
+    <div class="employee-section-shell__heading">
+      <h3>{{ title() }}</h3>
+      @if (subtitle()) {
+        <p>{{ subtitle() }}</p>
+      }
+    </div>
+
+    <div class="employee-section-shell__actions">
+      @if (showCreateAction()) {
+        <button type="button" (click)="onCreateClicked()">{{ texts.sectionShellCreateAction }}</button>
+      }
+
+      @if (showEditAction()) {
+        <button type="button" (click)="onEditClicked()">{{ texts.sectionShellEditAction }}</button>
+      }
+
+      @if (showCancelAction()) {
+        <button type="button" class="employee-section-shell__cancel-action" (click)="onCancelClicked()">
+          {{ texts.sectionShellCancelAction }}
+        </button>
+      }
+    </div>
+  </header>
+
+  <div class="employee-section-shell__body">
+    <ng-content></ng-content>
+  </div>
+
+  @if (showFooter()) {
+    <footer class="employee-section-shell__footer" role="status" aria-live="polite">
+      @if (state().busy) {
+        <p class="employee-section-shell__busy">{{ texts.sectionShellBusyMessage }}</p>
+      }
+
+      @if (state().errorMessage; as errorMessage) {
+        <p class="employee-section-shell__error">{{ errorMessage }}</p>
+      }
+
+      @if (state().successMessage; as successMessage) {
+        <p class="employee-section-shell__success">{{ successMessage }}</p>
+      }
+    </footer>
+  }
+</section>
