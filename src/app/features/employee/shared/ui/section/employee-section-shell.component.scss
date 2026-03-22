@@ -9,6 +9,7 @@
 
 .employee-section-shell__header {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
   justify-content: space-between;
   gap: 0.75rem;
@@ -17,6 +18,8 @@
 .employee-section-shell__heading {
   display: grid;
   gap: 0.2rem;
+  flex: 1 1 18rem;
+  min-width: 0;
 }
 
 .employee-section-shell__title {
@@ -39,6 +42,7 @@
   flex-wrap: wrap;
   gap: 0.3rem;
   justify-content: flex-end;
+  flex: 0 0 auto;
 }
 
 .employee-section-shell__header-actions:empty {
