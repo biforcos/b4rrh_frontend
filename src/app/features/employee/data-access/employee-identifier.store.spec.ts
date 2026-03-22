@@ -116,11 +116,17 @@ describe('EmployeeIdentifierStore', () => {
     store.createIdentifier(employeeBusinessKey, {
       key: 'NIF',
       value: '12345678A',
+      issuingCountryCode: 'ESP',
+      expirationDate: '',
+      isPrimary: true,
     });
 
     expect(gatewayMock.createIdentifier).toHaveBeenCalledWith(employeeBusinessKey, {
       key: 'NIF',
       value: '12345678A',
+      issuingCountryCode: 'ESP',
+      expirationDate: '',
+      isPrimary: true,
     });
     expect(readGatewayMock.readEmployeeIdentifiersByBusinessKey).toHaveBeenCalledTimes(2);
     expect(store.success()).toBe('created');
@@ -135,8 +141,10 @@ describe('EmployeeIdentifierStore', () => {
       {
         key: 'NIF',
         value: '87654321Z',
+        issuingCountryCode: 'ESP',
+        expirationDate: '',
+        isPrimary: true,
       },
-      identifiersFixture[0],
     );
 
     expect(gatewayMock.updateIdentifier).toHaveBeenCalledWith(
@@ -145,8 +153,10 @@ describe('EmployeeIdentifierStore', () => {
       {
         key: 'NIF',
         value: '87654321Z',
+        issuingCountryCode: 'ESP',
+        expirationDate: '',
+        isPrimary: true,
       },
-      identifiersFixture[0],
     );
     expect(readGatewayMock.readEmployeeIdentifiersByBusinessKey).toHaveBeenCalledTimes(2);
     expect(store.success()).toBe('updated');
@@ -168,6 +178,9 @@ describe('EmployeeIdentifierStore', () => {
     store.createIdentifier(employeeBusinessKey, {
       key: 'NIF',
       value: '12345678A',
+      issuingCountryCode: 'ESP',
+      expirationDate: '',
+      isPrimary: true,
     });
 
     expect(store.error()).toBe('request-failed');
@@ -179,6 +192,9 @@ describe('EmployeeIdentifierStore', () => {
     store.createIdentifier(employeeBusinessKey, {
       key: 'NIF',
       value: '12345678A',
+      issuingCountryCode: 'ESP',
+      expirationDate: '',
+      isPrimary: true,
     });
 
     expect(store.success()).toBe('created');
