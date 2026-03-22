@@ -9,6 +9,7 @@ import { EmployeeBusinessKeyApiQuery } from './employee-read.client';
 export interface EmployeePresenceApiModel {
   presenceNumber: number;
   companyCode: string;
+  companyName?: string | null;
   entryReasonCode: string;
   exitReasonCode: string | null;
   startDate: string;
@@ -50,6 +51,7 @@ export class EmployeePresenceReadClient {
     return {
       presenceNumber: source.presenceNumber,
       companyCode: source.companyCode,
+      companyName: source.companyName ?? null,
       entryReasonCode: source.entryReasonCode,
       exitReasonCode: source.exitReasonCode ?? null,
       startDate: source.startDate,

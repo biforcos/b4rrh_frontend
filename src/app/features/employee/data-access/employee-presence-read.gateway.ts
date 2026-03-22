@@ -32,6 +32,7 @@ export class EmployeePresenceReadGateway {
     return {
       presenceNumber: source.presenceNumber,
       companyCode: source.companyCode,
+      companyName: source.companyName ?? null,
       entryReasonCode: source.entryReasonCode,
       exitReasonCode: source.exitReasonCode,
       startDate: source.startDate,

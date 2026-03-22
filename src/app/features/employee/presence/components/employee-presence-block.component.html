@@ -7,7 +7,13 @@
     @if (currentPresence(); as currentPresence) {
       <article class="employee-presence-block__current-item">
         <p class="employee-presence-block__label">{{ resolveCurrentSectionLabel() }}</p>
-        <p class="employee-presence-block__identity">{{ buildCompanyPeriodLabel(currentPresence) }}</p>
+        <p class="employee-presence-block__identity">
+          <span>{{ resolveCompanyLabel(currentPresence) }}</span>
+          @if (resolveCompanyCodeSecondary(currentPresence); as companyCodeSecondary) {
+            <span class="employee-presence-block__identity-secondary"> · {{ companyCodeSecondary }}</span>
+          }
+          <span> · {{ texts.presenceBlockPeriodNumberPrefix }} #{{ currentPresence.presenceNumber }}</span>
+        </p>
         <p class="employee-presence-block__period">
           {{ texts.presenceBlockPeriodLabel }}: {{ buildPeriodLabel(currentPresence) }}
         </p>
@@ -36,7 +42,13 @@
         <div class="employee-presence-block__history-list" role="list">
           @for (presence of presenceHistory(); track presence.presenceNumber + '-' + presence.startDate) {
             <article class="employee-presence-block__history-item" role="listitem">
-              <p class="employee-presence-block__identity">{{ buildCompanyPeriodLabel(presence) }}</p>
+              <p class="employee-presence-block__identity">
+                <span>{{ resolveCompanyLabel(presence) }}</span>
+                @if (resolveCompanyCodeSecondary(presence); as companyCodeSecondary) {
+                  <span class="employee-presence-block__identity-secondary"> · {{ companyCodeSecondary }}</span>
+                }
+                <span> · {{ texts.presenceBlockPeriodNumberPrefix }} #{{ presence.presenceNumber }}</span>
+              </p>
               <p class="employee-presence-block__period">
                 {{ texts.presenceBlockPeriodLabel }}: {{ buildPeriodLabel(presence) }}
               </p>

@@ -3,6 +3,7 @@ import { EmployeePresenceApiModel } from '../clients/employee-presence-read.clie
 export interface EmployeePresenceReadModel {
   presenceNumber: number;
   companyCode: string;
+  companyName?: string | null;
   entryReasonCode: string;
   exitReasonCode: string | null;
   startDate: string;
@@ -26,6 +27,7 @@ export function mapEmployeePresenceApiToReadModel(
   return {
     presenceNumber: source.presenceNumber,
     companyCode,
+    companyName: normalizeOptionalValue(source.companyName),
     entryReasonCode,
     exitReasonCode: normalizeOptionalValue(source.exitReasonCode),
     startDate,

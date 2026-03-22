@@ -104,6 +104,7 @@ export class EmployeePresencePageComponent {
     return {
       presenceNumber: presence.presenceNumber,
       companyCode: presence.companyCode,
+      companyName: presence.companyName ?? null,
       entryReasonCode: presence.entryReasonCode,
       exitReasonCode: presence.exitReasonCode,
       startDate: presence.startDate,

@@ -12,6 +12,10 @@
 export interface PresenceResponse { 
     presenceNumber: number;
     companyCode: string;
+    /**
+     * Optional display name from COMPANY rule entities in the employee ruleSystemCode catalog.
+     */
+    companyName?: string | null;
     entryReasonCode: string;
     exitReasonCode?: string | null;
     startDate: string;

@@ -1,10 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
 import { employeeTexts } from '../../employee.texts';
+import { getCatalogDisplay } from '../../shared/utils/catalog-display.util';
 
 export interface EmployeePresenceBlockItemModel {
   presenceNumber: number;
   companyCode: string;
+  companyName?: string | null;
   entryReasonCode: string;
   exitReasonCode: string | null;
   startDate: string;
@@ -71,8 +73,12 @@ export class EmployeePresenceBlockComponent {
     return this.texts.presenceBlockCurrentSectionLabel;
   }
 
-  protected buildCompanyPeriodLabel(presence: EmployeePresenceBlockItemModel): string {
-    return `${presence.companyCode} · ${this.texts.presenceBlockPeriodNumberPrefix} #${presence.presenceNumber}`;
+  protected resolveCompanyLabel(presence: EmployeePresenceBlockItemModel): string {
+    return getCatalogDisplay(presence.companyName, presence.companyCode).label;
+  }
+
+  protected resolveCompanyCodeSecondary(presence: EmployeePresenceBlockItemModel): string | undefined {
+    return getCatalogDisplay(presence.companyName, presence.companyCode).code;
   }
 
   protected resolveStatusLabel(presence: EmployeePresenceBlockItemModel): string {
