@@ -169,6 +169,8 @@ export const employeeTexts = {
   identifiersSectionCreateSuccessMessage: 'Identificador creado correctamente.',
   identifiersSectionEditSuccessMessage: 'Identificador actualizado correctamente.',
   identifiersSectionDeleteSuccessMessage: 'Identificador eliminado correctamente.',
+  identifiersSectionSubtitle:
+    'Gestiona los identificadores funcionales del empleado. Algunos incluyen pais emisor, caducidad o marca principal.',
   personalLoadingMessage: 'Cargando datos personales...',
   contactLoadingMessage: 'Cargando informacion de contacto...',
   contactLoadFailedMessage: 'No se pudo cargar la informacion de contacto.',

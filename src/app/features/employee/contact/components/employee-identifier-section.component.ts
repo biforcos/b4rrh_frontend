@@ -25,34 +25,7 @@ const emptyDraft: SlotDraft<string> = {
   selector: 'app-employee-identifier-section',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [EditableSlotSectionComponent],
-  template: `
-    <app-editable-slot-section
-      [title]="texts.identifiersSectionTitle"
-      [subtitle]="null"
-      [state]="sectionState()"
-      [displayMode]="displayMode()"
-      [rows]="rows()"
-      [texts]="slotTexts"
-      [draft]="draft()"
-      [editingKey]="editingKey()"
-      [deletingKey]="deletingKey()"
-      [availableKeys]="availableKeys()"
-      [canCreate]="true"
-      [canEdit]="true"
-      [canDelete]="true"
-      (manageStarted)="onManageStarted()"
-      (manageExited)="onManageExited()"
-      (createStarted)="onCreateStarted()"
-      (editStarted)="onEditStarted($event)"
-      (deleteRequested)="onDeleteRequested($event)"
-      (deleteConfirmed)="onDeleteConfirmed($event)"
-      (cancelled)="onCancelled()"
-      (draftKeyChanged)="onDraftKeyChanged($event)"
-      (draftValueChanged)="onDraftValueChanged($event)"
-      (createSubmitted)="onCreateSubmitted($event)"
-      (editSubmitted)="onEditSubmitted($event)"
-    />
-  `,
+  templateUrl: './employee-identifier-section.component.html',
 })
 export class EmployeeIdentifierSectionComponent {
   readonly employeeKey = input<EmployeeBusinessKey | null>(null);
@@ -65,6 +38,7 @@ export class EmployeeIdentifierSectionComponent {
   private readonly draftState = signal<SlotDraft<string>>(emptyDraft);
 
   protected readonly texts = employeeTexts;
+  protected readonly sectionSubtitle = this.texts.identifiersSectionSubtitle;
   protected readonly slotTexts: SlotSectionTexts = {
     manageAction: this.texts.identifiersSectionManageAction,
     exitManageAction: this.texts.identifiersSectionExitManageAction,
@@ -101,7 +75,7 @@ export class EmployeeIdentifierSectionComponent {
 
     return {
       mode: isBusy ? 'submitting' : this.toSectionMode(this.displayModeState()),
-      dirty: false,
+      dirty: this.displayModeState() === 'creating' || this.displayModeState() === 'editing',
       busy: isBusy,
       errorMessage: this.resolveErrorMessage(),
       successMessage: this.resolveSuccessMessage(),
@@ -119,7 +93,7 @@ export class EmployeeIdentifierSectionComponent {
     });
   }
 
-  protected onManageStarted(): void {
+  protected startManage(): void {
     if (!this.canStartInteraction()) {
       return;
     }
@@ -128,12 +102,12 @@ export class EmployeeIdentifierSectionComponent {
     this.enterManageMode();
   }
 
-  protected onManageExited(): void {
+  protected exitManage(): void {
     this.clearInteractionFeedback();
     this.enterViewMode();
   }
 
-  protected onCreateStarted(): void {
+  protected startCreate(): void {
     if (!this.canStartInteraction()) {
       return;
     }
@@ -142,7 +116,7 @@ export class EmployeeIdentifierSectionComponent {
     this.enterCreateMode();
   }
 
-  protected onEditStarted(identifierTypeCode: string): void {
+  protected startEdit(identifierTypeCode: string): void {
     if (!this.canStartInteraction()) {
       return;
     }
@@ -156,7 +130,7 @@ export class EmployeeIdentifierSectionComponent {
     this.enterEditMode(row);
   }
 
-  protected onDeleteRequested(identifierTypeCode: string): void {
+  protected requestDelete(identifierTypeCode: string): void {
     if (!this.canStartInteraction()) {
       return;
     }
@@ -170,7 +144,7 @@ export class EmployeeIdentifierSectionComponent {
     this.enterDeleteConfirmMode(row.key);
   }
 
-  protected onDeleteConfirmed(identifierTypeCode: string): void {
+  protected confirmDelete(identifierTypeCode: string): void {
     const activeEmployeeKey = this.employeeKey();
     if (!activeEmployeeKey || this.identifierStore.mutating()) {
       return;
@@ -181,12 +155,12 @@ export class EmployeeIdentifierSectionComponent {
     this.identifierStore.deleteIdentifier(activeEmployeeKey, identifierTypeCode);
   }
 
-  protected onCancelled(): void {
+  protected cancel(): void {
     this.clearInteractionFeedback();
     this.enterManageMode();
   }
 
-  protected onDraftKeyChanged(identifierTypeCode: string | null): void {
+  protected updateDraftKey(identifierTypeCode: string | null): void {
     this.draftState.update((draft) => ({
       ...draft,
       key: identifierTypeCode,
@@ -194,7 +168,7 @@ export class EmployeeIdentifierSectionComponent {
     this.clearInteractionFeedback();
   }
 
-  protected onDraftValueChanged(identifierValue: string): void {
+  protected updateDraftValue(identifierValue: string): void {
     this.draftState.update((draft) => ({
       ...draft,
       value: identifierValue,
@@ -202,7 +176,7 @@ export class EmployeeIdentifierSectionComponent {
     this.clearInteractionFeedback();
   }
 
-  protected onCreateSubmitted(draft: SlotDraft<string>): void {
+  protected submitCreate(draft: SlotDraft<string>): void {
     const activeEmployeeKey = this.employeeKey();
     if (!activeEmployeeKey || this.identifierStore.mutating()) {
       return;
@@ -227,7 +201,7 @@ export class EmployeeIdentifierSectionComponent {
     });
   }
 
-  protected onEditSubmitted(submission: SlotEditSubmission<string>): void {
+  protected submitEdit(submission: SlotEditSubmission<string>): void {
     const activeEmployeeKey = this.employeeKey();
     if (!activeEmployeeKey || this.identifierStore.mutating()) {
       return;
