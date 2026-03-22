@@ -32,11 +32,19 @@ describe('EmployeeContractStore', () => {
   let store: EmployeeContractStore;
   let readGatewayMock: {
     readEmployeeContractsByBusinessKey: ReturnType<typeof vi.fn>;
+    replaceContractFromDate: ReturnType<typeof vi.fn>;
+    correctContractOccurrence: ReturnType<typeof vi.fn>;
+    closeContractOccurrence: ReturnType<typeof vi.fn>;
+    sortByTimelineRecency: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(() => {
     readGatewayMock = {
       readEmployeeContractsByBusinessKey: vi.fn().mockReturnValue(of(contractsFixture)),
+      replaceContractFromDate: vi.fn().mockReturnValue(of(undefined)),
+      correctContractOccurrence: vi.fn().mockReturnValue(of(undefined)),
+      closeContractOccurrence: vi.fn().mockReturnValue(of(undefined)),
+      sortByTimelineRecency: vi.fn().mockImplementation((contracts) => contracts),
     };
 
     TestBed.configureTestingModule({
@@ -94,5 +102,89 @@ describe('EmployeeContractStore', () => {
     store.loadContractsByBusinessKey(employeeBusinessKey);
 
     expect(readGatewayMock.readEmployeeContractsByBusinessKey).toHaveBeenCalledTimes(1);
+  });
+
+  it('replaces contract from date and reloads after success', () => {
+    store.loadContractsByBusinessKey(employeeBusinessKey);
+
+    store.replaceFromDate(employeeBusinessKey, {
+      effectiveDate: '2025-01-01',
+      contractCode: 'INDEFINITE',
+      contractSubtypeCode: 'PART_TIME',
+    });
+
+    expect(readGatewayMock.replaceContractFromDate).toHaveBeenCalledTimes(1);
+    expect(readGatewayMock.readEmployeeContractsByBusinessKey).toHaveBeenCalledTimes(2);
+    expect(store.success()).toBe('replaced');
+    expect(store.mutating()).toBe(false);
+  });
+
+  it('corrects an occurrence and reloads after success', () => {
+    store.loadContractsByBusinessKey(employeeBusinessKey);
+
+    store.correctOccurrence(employeeBusinessKey, '2023-01-01', {
+      contractCode: 'TEMPORARY',
+      contractSubtypeCode: 'PROJECT',
+    });
+
+    expect(readGatewayMock.correctContractOccurrence).toHaveBeenCalledWith(
+      employeeBusinessKey,
+      '2023-01-01',
+      {
+        contractCode: 'TEMPORARY',
+        contractSubtypeCode: 'PROJECT',
+      },
+    );
+    expect(readGatewayMock.readEmployeeContractsByBusinessKey).toHaveBeenCalledTimes(2);
+    expect(store.success()).toBe('corrected');
+  });
+
+  it('closes current occurrence and reloads after success', () => {
+    store.loadContractsByBusinessKey(employeeBusinessKey);
+
+    store.closeOccurrence(employeeBusinessKey, '2024-06-01', {
+      endDate: '2025-02-15',
+    });
+
+    expect(readGatewayMock.closeContractOccurrence).toHaveBeenCalledWith(employeeBusinessKey, '2024-06-01', {
+      endDate: '2025-02-15',
+    });
+    expect(readGatewayMock.readEmployeeContractsByBusinessKey).toHaveBeenCalledTimes(2);
+    expect(store.success()).toBe('closed');
+  });
+
+  it('keeps loaded context when replace fails and exposes backend message', () => {
+    store.loadContractsByBusinessKey(employeeBusinessKey);
+    readGatewayMock.replaceContractFromDate.mockReturnValue(
+      throwError(() => ({ error: { message: 'Contract relation invalid.' } })),
+    );
+
+    store.replaceFromDate(employeeBusinessKey, {
+      effectiveDate: '2025-01-01',
+      contractCode: 'INDEFINITE',
+      contractSubtypeCode: 'PART_TIME',
+    });
+
+    expect(store.error()).toBe('Contract relation invalid.');
+    expect(store.mutating()).toBe(false);
+    expect(store.selectedEmployeeKey()).toEqual(employeeBusinessKey);
+    expect(store.contracts()).toEqual(contractsFixture);
+  });
+
+  it('clears feedback without clearing loaded data', () => {
+    store.loadContractsByBusinessKey(employeeBusinessKey);
+    store.replaceFromDate(employeeBusinessKey, {
+      effectiveDate: '2025-01-01',
+      contractCode: 'INDEFINITE',
+      contractSubtypeCode: 'PART_TIME',
+    });
+
+    expect(store.success()).toBe('replaced');
+
+    store.clearFeedback();
+
+    expect(store.success()).toBeNull();
+    expect(store.error()).toBeNull();
+    expect(store.contracts()).toEqual(contractsFixture);
   });
 });

@@ -8,6 +8,14 @@ import {
 } from '../../../core/api/mappers/employee-contract.mapper';
 import { EmployeeBusinessKey } from '../models/employee-business-key.model';
 import { EmployeeContractModel } from '../models/employee-contract.model';
+import {
+  ContractCloseDraft,
+  ContractCorrectDraft,
+  ContractReplaceDraft,
+  mapContractCloseDraftToRequest,
+  mapContractCorrectDraftToRequest,
+  mapContractReplaceDraftToRequest,
+} from './employee-contract.mapper';
 
 @Injectable({
   providedIn: 'root',
@@ -26,6 +34,59 @@ export class EmployeeContractReadGateway {
           .map((contract) => this.toEmployeeContractModel(contract)),
       ),
     );
+  }
+
+  replaceContractFromDate(
+    key: EmployeeBusinessKey,
+    draft: ContractReplaceDraft,
+  ): Observable<void> {
+    return this.employeeContractReadClient
+      .replaceContractFromDateByBusinessKey(key, mapContractReplaceDraftToRequest(draft))
+      .pipe(map(() => undefined));
+  }
+
+  correctContractOccurrence(
+    key: EmployeeBusinessKey,
+    startDate: string,
+    draft: ContractCorrectDraft,
+  ): Observable<void> {
+    return this.employeeContractReadClient
+      .updateContractByBusinessKey(key, startDate, mapContractCorrectDraftToRequest(draft))
+      .pipe(map(() => undefined));
+  }
+
+  closeContractOccurrence(
+    key: EmployeeBusinessKey,
+    startDate: string,
+    draft: ContractCloseDraft,
+  ): Observable<void> {
+    return this.employeeContractReadClient
+      .closeContractByBusinessKey(key, startDate, mapContractCloseDraftToRequest(draft))
+      .pipe(map(() => undefined));
+  }
+
+  sortByTimelineRecency(
+    contracts: ReadonlyArray<EmployeeContractModel>,
+  ): ReadonlyArray<EmployeeContractModel> {
+    return [...contracts].sort((left, right) => {
+      if (left.isActive !== right.isActive) {
+        return left.isActive ? -1 : 1;
+      }
+
+      const startDateOrder = right.startDate.localeCompare(left.startDate);
+      if (startDateOrder !== 0) {
+        return startDateOrder;
+      }
+
+      const contractCodeOrder = right.contractCode.localeCompare(left.contractCode);
+      if (contractCodeOrder !== 0) {
+        return contractCodeOrder;
+      }
+
+      const leftSubtype = left.contractSubtypeCode ?? '';
+      const rightSubtype = right.contractSubtypeCode ?? '';
+      return rightSubtype.localeCompare(leftSubtype);
+    });
   }
 
   private toEmployeeContractModel(source: EmployeeContractReadModel): EmployeeContractModel {

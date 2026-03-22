@@ -1,0 +1,99 @@
+<app-temporal-section
+  [title]="texts.contractSectionTitle"
+  [subtitle]="sectionSubtitle"
+  [state]="sectionState()"
+  [displayMode]="displayMode()"
+  [rows]="rows()"
+  [texts]="sectionTexts"
+  [confirmingCloseKey]="confirmingCloseKey()"
+  [correctingKey]="correctingKey()"
+  [canCreate]="supportedActions().canReplaceFromDate"
+  [canEditCurrent]="false"
+  [canCorrect]="supportedActions().canCorrect"
+  [canClose]="supportedActions().canClose"
+  [canDelete]="supportedActions().canDelete"
+  [createSubmitEnabled]="isReplaceDraftValid()"
+  [correctSubmitEnabled]="isCorrectDraftValid()"
+  (manageStarted)="startReplaceFromDate()"
+  (manageExited)="exitManage()"
+  (createStarted)="startReplaceFromDate()"
+  (correctStarted)="startCorrect($event)"
+  (closeRequested)="requestClose($event)"
+  (closeConfirmed)="confirmClose($event)"
+  (cancelled)="cancel()"
+  (createSubmitted)="submitReplaceFromDate()"
+  (correctSubmitted)="submitCorrect($event)"
+>
+  <div temporalCreateForm class="employee-contract-section__form-grid employee-contract-section__form-grid--create">
+    <label class="employee-contract-section__field employee-contract-section__field--effective-date">
+      <span>{{ texts.contractSectionEffectiveDateLabel }}</span>
+      <input
+        type="date"
+        [value]="replaceDraft().effectiveDate"
+        (input)="updateReplaceField('effectiveDate', $any($event.target).value)"
+      />
+    </label>
+
+    <label class="employee-contract-section__field employee-contract-section__field--contract">
+      <span>{{ texts.contractSectionContractLabel }}</span>
+      <input
+        type="text"
+        [value]="replaceDraft().contractCode"
+        [placeholder]="texts.contractSectionContractPlaceholder"
+        (input)="updateReplaceField('contractCode', $any($event.target).value)"
+      />
+    </label>
+
+    <label class="employee-contract-section__field employee-contract-section__field--subtype">
+      <span>{{ texts.contractSectionSubtypeLabel }}</span>
+      <input
+        type="text"
+        [value]="replaceDraft().contractSubtypeCode"
+        [placeholder]="texts.contractSectionSubtypePlaceholder"
+        (input)="updateReplaceField('contractSubtypeCode', $any($event.target).value)"
+      />
+    </label>
+  </div>
+
+  <div temporalCorrectForm class="employee-contract-section__form-grid employee-contract-section__form-grid--correct">
+    @if (correctingOccurrence(); as correctingOccurrence) {
+      <label class="employee-contract-section__field employee-contract-section__field--start-readonly">
+        <span>{{ texts.contractSectionOccurrenceStartDateLabel }}</span>
+        <input type="text" [value]="correctingOccurrence.startDate" readonly />
+      </label>
+    }
+
+    <label class="employee-contract-section__field employee-contract-section__field--contract">
+      <span>{{ texts.contractSectionContractLabel }}</span>
+      <input
+        type="text"
+        [value]="correctDraft().contractCode"
+        [placeholder]="texts.contractSectionContractPlaceholder"
+        (input)="updateCorrectField('contractCode', $any($event.target).value)"
+      />
+    </label>
+
+    <label class="employee-contract-section__field employee-contract-section__field--subtype">
+      <span>{{ texts.contractSectionSubtypeLabel }}</span>
+      <input
+        type="text"
+        [value]="correctDraft().contractSubtypeCode"
+        [placeholder]="texts.contractSectionSubtypePlaceholder"
+        (input)="updateCorrectField('contractSubtypeCode', $any($event.target).value)"
+      />
+    </label>
+  </div>
+
+  <div temporalConfirmCloseForm class="employee-contract-section__close-form">
+    <p class="employee-contract-section__hint">{{ texts.contractSectionCloseHint }}</p>
+
+    <label class="employee-contract-section__field employee-contract-section__field--close-date">
+      <span>{{ texts.contractSectionCloseDateLabel }}</span>
+      <input
+        type="date"
+        [value]="closeDraft().endDate"
+        (input)="updateCloseField('endDate', $any($event.target).value)"
+      />
+    </label>
+  </div>
+</app-temporal-section>
