@@ -11,7 +11,9 @@ export interface EmployeePresenceApiModel {
   companyCode: string;
   companyName?: string | null;
   entryReasonCode: string;
+  entryReasonName?: string | null;
   exitReasonCode: string | null;
+  exitReasonName?: string | null;
   startDate: string;
   endDate: string | null;
 }
@@ -53,7 +55,9 @@ export class EmployeePresenceReadClient {
       companyCode: source.companyCode,
       companyName: source.companyName ?? null,
       entryReasonCode: source.entryReasonCode,
+      entryReasonName: source.entryReasonName ?? null,
       exitReasonCode: source.exitReasonCode ?? null,
+      exitReasonName: source.exitReasonName ?? null,
       startDate: source.startDate,
       endDate: source.endDate ?? null,
     };
