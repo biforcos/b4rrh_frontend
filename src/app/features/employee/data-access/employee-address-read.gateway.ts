@@ -30,6 +30,7 @@ export class EmployeeAddressReadGateway {
     return {
       addressNumber: source.addressNumber,
       addressTypeCode: source.addressTypeCode,
+      addressTypeName: source.addressTypeName ?? null,
       street: source.street,
       city: source.city,
       countryCode: source.countryCode,

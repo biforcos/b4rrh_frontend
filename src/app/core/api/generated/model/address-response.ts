@@ -12,6 +12,10 @@
 export interface AddressResponse { 
     addressNumber: number;
     addressTypeCode: string;
+    /**
+     * Optional display name from EMPLOYEE_ADDRESS_TYPE rule entities in the employee ruleSystemCode catalog.
+     */
+    addressTypeName?: string | null;
     street: string;
     city: string;
     /**

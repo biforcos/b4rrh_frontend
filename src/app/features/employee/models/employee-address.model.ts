@@ -1,6 +1,7 @@
 export interface EmployeeAddressModel {
   addressNumber: number;
   addressTypeCode: string;
+  addressTypeName?: string | null;
   street: string;
   city: string;
   countryCode: string;

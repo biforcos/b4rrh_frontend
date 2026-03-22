@@ -1,6 +1,7 @@
 import { CloseAddressRequest, CreateAddressRequest, UpdateAddressRequest } from '../../../core/api/generated/model/models';
 import { EmployeeAddressModel } from '../models/employee-address.model';
 import { TemporalRowViewModel } from '../shared/ui/section/temporal-section.model';
+import { getCatalogDisplay } from '../shared/utils/catalog-display.util';
 
 export interface AddressCreateDraft {
   addressTypeCode: string;
@@ -22,9 +23,12 @@ export function mapEmployeeAddressModelToTemporalRow(
   source: EmployeeAddressModel,
   texts: EmployeeAddressRowTexts,
 ): TemporalRowViewModel<number> {
+  const typeDisplay = getCatalogDisplay(source.addressTypeName, source.addressTypeCode);
+
   return {
     key: source.addressNumber,
-    title: source.addressTypeCode,
+    title: typeDisplay.label,
+    titleSecondary: typeDisplay.code,
     subtitle: source.street,
     detailText: buildLocality(source),
     periodText: buildPeriodText(source, texts.currentPeriodLabel),

@@ -3,6 +3,7 @@ import { EmployeeAddressApiModel } from '../clients/employee-address-read.client
 export interface EmployeeAddressReadModel {
   addressNumber: number;
   addressTypeCode: string;
+  addressTypeName?: string | null;
   street: string;
   city: string;
   countryCode: string;
@@ -29,6 +30,7 @@ export function mapEmployeeAddressApiToReadModel(
   return {
     addressNumber: source.addressNumber,
     addressTypeCode: source.addressTypeCode.trim().toUpperCase(),
+    addressTypeName: normalizeOptionalValue(source.addressTypeName),
     street,
     city,
     countryCode,

@@ -9,6 +9,7 @@ import { EmployeeBusinessKeyApiQuery } from './employee-read.client';
 export interface EmployeeAddressApiModel {
   addressNumber: number;
   addressTypeCode: string;
+  addressTypeName?: string | null;
   street: string;
   city: string;
   countryCode: string;
@@ -121,6 +122,7 @@ export class EmployeeAddressReadClient {
     return {
       addressNumber: source.addressNumber,
       addressTypeCode: source.addressTypeCode,
+      addressTypeName: source.addressTypeName ?? null,
       street: source.street,
       city: source.city,
       countryCode: source.countryCode,
