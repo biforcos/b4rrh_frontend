@@ -6,14 +6,15 @@ const rowTexts = {
   closedStatus: 'Historico',
   currentPeriodLabel: 'actual',
   periodPrefix: 'Periodo',
-  subtypePrefix: 'Subtipo',
 } as const;
 
 describe('mapContractToTemporalRow', () => {
   it('maps current occurrence as correctable/closeable and non-deletable', () => {
     const activeOccurrence: EmployeeContractModel = {
       contractCode: 'CONTRACT-A',
+      contractTypeName: 'Contrato A',
       contractSubtypeCode: 'SUB-A',
+      contractSubtypeName: 'Subtipo A',
       startDate: '2025-01-01',
       endDate: null,
       isActive: true,
@@ -21,6 +22,8 @@ describe('mapContractToTemporalRow', () => {
 
     const row = mapContractToTemporalRow(activeOccurrence, rowTexts);
 
+    expect(row.title).toBe('Contrato A · CONTRACT-A');
+    expect(row.subtitle).toBe('Subtipo A · SUB-A');
     expect(row.canCorrect).toBe(true);
     expect(row.canClose).toBe(true);
     expect(row.canDelete).toBe(false);
@@ -37,6 +40,8 @@ describe('mapContractToTemporalRow', () => {
 
     const row = mapContractToTemporalRow(historicalOccurrence, rowTexts);
 
+    expect(row.title).toBe('CONTRACT-B');
+    expect(row.subtitle).toBe('SUB-B');
     expect(row.canCorrect).toBe(true);
     expect(row.canClose).toBe(false);
     expect(row.canDelete).toBe(false);

@@ -11,7 +11,15 @@
 
 export interface ContractResponse { 
     contractCode: string;
+    /**
+     * Optional display name from CONTRACT rule entities in the employee ruleSystemCode catalog.
+     */
+    contractTypeName?: string | null;
     contractSubtypeCode: string;
+    /**
+     * Optional display name from CONTRACT_SUBTYPE rule entities in the employee ruleSystemCode catalog.
+     */
+    contractSubtypeName?: string | null;
     startDate: string;
     endDate?: string | null;
 }

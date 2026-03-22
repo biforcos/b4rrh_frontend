@@ -66,7 +66,6 @@ export class EmployeeContractSectionComponent {
     closedStatus: this.texts.contractSectionStatusClosed,
     currentPeriodLabel: this.texts.contractSectionCurrentPeriodLabel,
     periodPrefix: this.texts.contractSectionPeriodPrefix,
-    subtypePrefix: this.texts.contractSectionSubtypePrefix,
   };
 
   protected readonly rows = computed<ReadonlyArray<TemporalRowViewModel<number>>>(() =>

@@ -1,10 +1,13 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
 import { employeeTexts } from '../../employee.texts';
+import { getCatalogDisplay } from '../../shared/utils/catalog-display.util';
 
 export interface EmployeeContractBlockItemModel {
   contractCode: string;
+  contractTypeName?: string | null;
   contractSubtypeCode: string | null;
+  contractSubtypeName?: string | null;
   startDate: string;
   endDate: string | null;
   isActive: boolean;
@@ -68,12 +71,20 @@ export class EmployeeContractBlockComponent {
     return this.texts.contractBlockCurrentSectionLabel;
   }
 
-  protected buildContractIdentityLabel(contract: EmployeeContractBlockItemModel): string {
-    if (contract.contractSubtypeCode) {
-      return `${contract.contractCode} · ${contract.contractSubtypeCode}`;
-    }
+  protected resolveContractTypeLabel(contract: EmployeeContractBlockItemModel): string {
+    return getCatalogDisplay(contract.contractTypeName, contract.contractCode).label;
+  }
 
-    return contract.contractCode;
+  protected resolveContractTypeCodeSecondary(contract: EmployeeContractBlockItemModel): string | undefined {
+    return getCatalogDisplay(contract.contractTypeName, contract.contractCode).code;
+  }
+
+  protected resolveContractSubtypeLabel(contract: EmployeeContractBlockItemModel): string {
+    return getCatalogDisplay(contract.contractSubtypeName, contract.contractSubtypeCode ?? '-').label;
+  }
+
+  protected resolveContractSubtypeCodeSecondary(contract: EmployeeContractBlockItemModel): string | undefined {
+    return getCatalogDisplay(contract.contractSubtypeName, contract.contractSubtypeCode ?? '-').code;
   }
 
   protected resolveStatusLabel(contract: EmployeeContractBlockItemModel): string {

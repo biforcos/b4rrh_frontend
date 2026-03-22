@@ -7,7 +7,18 @@
     @if (currentContract(); as currentContract) {
       <article class="employee-contract-block__current-item">
         <p class="employee-contract-block__label">{{ resolveCurrentSectionLabel() }}</p>
-        <p class="employee-contract-block__identity">{{ buildContractIdentityLabel(currentContract) }}</p>
+        <p class="employee-contract-block__identity">
+          <span>{{ resolveContractTypeLabel(currentContract) }}</span>
+          @if (resolveContractTypeCodeSecondary(currentContract); as contractTypeCodeSecondary) {
+            <span class="employee-contract-block__identity-secondary"> · {{ contractTypeCodeSecondary }}</span>
+          }
+        </p>
+        <p class="employee-contract-block__identity">
+          <span>{{ resolveContractSubtypeLabel(currentContract) }}</span>
+          @if (resolveContractSubtypeCodeSecondary(currentContract); as contractSubtypeCodeSecondary) {
+            <span class="employee-contract-block__identity-secondary"> · {{ contractSubtypeCodeSecondary }}</span>
+          }
+        </p>
         <p class="employee-contract-block__period">
           {{ texts.contractBlockPeriodLabel }}: {{ buildPeriodLabel(currentContract) }}
         </p>
@@ -30,7 +41,18 @@
         <div class="employee-contract-block__history-list" role="list">
           @for (contract of contractHistory(); track contract.contractCode + '-' + contract.startDate) {
             <article class="employee-contract-block__history-item" role="listitem">
-              <p class="employee-contract-block__identity">{{ buildContractIdentityLabel(contract) }}</p>
+              <p class="employee-contract-block__identity">
+                <span>{{ resolveContractTypeLabel(contract) }}</span>
+                @if (resolveContractTypeCodeSecondary(contract); as contractTypeCodeSecondary) {
+                  <span class="employee-contract-block__identity-secondary"> · {{ contractTypeCodeSecondary }}</span>
+                }
+              </p>
+              <p class="employee-contract-block__identity">
+                <span>{{ resolveContractSubtypeLabel(contract) }}</span>
+                @if (resolveContractSubtypeCodeSecondary(contract); as contractSubtypeCodeSecondary) {
+                  <span class="employee-contract-block__identity-secondary"> · {{ contractSubtypeCodeSecondary }}</span>
+                }
+              </p>
               <p class="employee-contract-block__period">
                 {{ texts.contractBlockPeriodLabel }}: {{ buildPeriodLabel(contract) }}
               </p>

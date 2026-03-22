@@ -14,7 +14,9 @@ import { EmployeeBusinessKeyApiQuery } from './employee-read.client';
 
 export interface EmployeeContractApiModel {
   contractCode: string;
+  contractTypeName?: string | null;
   contractSubtypeCode: string;
+  contractSubtypeName?: string | null;
   startDate: string;
   endDate: string | null;
 }
@@ -132,7 +134,9 @@ export class EmployeeContractReadClient {
   private toEmployeeContractApiModel(source: ContractResponse): EmployeeContractApiModel {
     return {
       contractCode: source.contractCode,
+      contractTypeName: source.contractTypeName ?? null,
       contractSubtypeCode: source.contractSubtypeCode,
+      contractSubtypeName: source.contractSubtypeName ?? null,
       startDate: source.startDate,
       endDate: source.endDate ?? null,
     };

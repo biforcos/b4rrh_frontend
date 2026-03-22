@@ -6,6 +6,7 @@ import {
 } from '../../../core/api/generated/model/models';
 import { EmployeeContractModel } from '../models/employee-contract.model';
 import { TemporalRowViewModel } from '../shared/ui/section/temporal-section.model';
+import { getCatalogDisplay } from '../shared/utils/catalog-display.util';
 
 export interface ContractReplaceDraft {
   effectiveDate: string;
@@ -27,7 +28,6 @@ export interface EmployeeContractRowTexts {
   closedStatus: string;
   currentPeriodLabel: string;
   periodPrefix: string;
-  subtypePrefix: string;
 }
 
 export function createEmptyContractReplaceDraft(): ContractReplaceDraft {
@@ -56,11 +56,22 @@ export function mapContractToTemporalRow(
   rowTexts: EmployeeContractRowTexts,
 ): TemporalRowViewModel<number> {
   const key = Number(source.startDate.replaceAll('-', ''));
+  const contractTypeDisplay = getCatalogDisplay(source.contractTypeName, source.contractCode);
+  const contractSubtypeDisplay = getCatalogDisplay(
+    source.contractSubtypeName,
+    source.contractSubtypeCode ?? '-',
+  );
+  const title = contractTypeDisplay.code
+    ? `${contractTypeDisplay.label} · ${contractTypeDisplay.code}`
+    : contractTypeDisplay.label;
+  const subtitle = contractSubtypeDisplay.code
+    ? `${contractSubtypeDisplay.label} · ${contractSubtypeDisplay.code}`
+    : contractSubtypeDisplay.label;
 
   return {
     key,
-    title: source.contractCode,
-    subtitle: `${rowTexts.subtypePrefix}: ${source.contractSubtypeCode ?? '-'}`,
+    title,
+    subtitle,
     detailText: `${rowTexts.periodPrefix}: ${source.startDate}`,
     periodText: source.endDate
       ? `${source.startDate} - ${source.endDate}`

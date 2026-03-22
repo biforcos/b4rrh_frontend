@@ -2,7 +2,9 @@ import { EmployeeContractApiModel } from '../clients/employee-contract-read.clie
 
 export interface EmployeeContractReadModel {
   contractCode: string;
+  contractTypeName?: string | null;
   contractSubtypeCode: string | null;
+  contractSubtypeName?: string | null;
   startDate: string;
   endDate: string | null;
   isActive: boolean;
@@ -22,7 +24,9 @@ export function mapEmployeeContractApiToReadModel(
 
   return {
     contractCode,
+    contractTypeName: normalizeOptionalValue(source.contractTypeName),
     contractSubtypeCode: normalizeOptionalValue(source.contractSubtypeCode),
+    contractSubtypeName: normalizeOptionalValue(source.contractSubtypeName),
     startDate,
     endDate,
     isActive: endDate === null,

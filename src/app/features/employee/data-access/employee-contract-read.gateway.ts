@@ -92,7 +92,9 @@ export class EmployeeContractReadGateway {
   private toEmployeeContractModel(source: EmployeeContractReadModel): EmployeeContractModel {
     return {
       contractCode: source.contractCode,
+      contractTypeName: source.contractTypeName ?? null,
       contractSubtypeCode: source.contractSubtypeCode,
+      contractSubtypeName: source.contractSubtypeName ?? null,
       startDate: source.startDate,
       endDate: source.endDate,
       isActive: source.isActive,
