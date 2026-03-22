@@ -356,6 +356,76 @@ export const employeeTexts = {
   laborClassificationBlockOpenPeriodLabel: 'actual',
   laborClassificationBlockAgreementLabel: 'Convenio',
   laborClassificationBlockCategoryLabel: 'Categoria',
+  laborClassificationSectionTitle: 'Clasificacion laboral',
+  laborClassificationSectionSubtitle:
+    'Gestiona la clasificacion laboral vigente y su historico.',
+  laborClassificationSectionManageAction: 'Cambiar clasificacion desde fecha',
+  laborClassificationSectionExitManageAction: 'Salir',
+  laborClassificationSectionReplaceAction: 'Cambiar clasificacion desde fecha',
+  laborClassificationSectionCorrectAction: 'Corregir ocurrencia',
+  laborClassificationSectionCloseAction: 'Cerrar',
+  laborClassificationSectionDeleteAction: 'Eliminar',
+  laborClassificationSectionCancelAction: 'Cancelar',
+  laborClassificationSectionSaveReplaceAction: 'Guardar reemplazo',
+  laborClassificationSectionSaveCorrectAction: 'Guardar correccion',
+  laborClassificationSectionConfirmCloseMessage:
+    'Confirma el cierre de esta ocurrencia de clasificacion laboral.',
+  laborClassificationSectionConfirmCloseAction: 'Confirmar cierre',
+  laborClassificationSectionConfirmDeleteMessage:
+    'La eliminacion no esta habilitada para clasificacion laboral.',
+  laborClassificationSectionConfirmDeleteAction: 'Confirmar eliminacion',
+  laborClassificationSectionEmptyMessage: 'No hay clasificaciones laborales cargadas.',
+  laborClassificationSectionStatusActive: 'Vigente',
+  laborClassificationSectionStatusClosed: 'Historica',
+  laborClassificationSectionCurrentPeriodLabel: 'actual',
+  laborClassificationSectionPeriodPrefix: 'Periodo',
+  laborClassificationSectionCategoryPrefix: 'Categoria',
+  laborClassificationSectionReplaceHint:
+    'El reemplazo crea una nueva ocurrencia desde la fecha efectiva y ajusta la vigencia anterior segun reglas del backend.',
+  laborClassificationSectionEffectiveDateLabel: 'Fecha efectiva',
+  laborClassificationSectionAgreementLabel: 'Convenio',
+  laborClassificationSectionSelectAgreementPlaceholder: 'Selecciona un convenio',
+  laborClassificationSectionAgreementPlaceholder: 'Codigo de convenio',
+  laborClassificationSectionCategoryLabel: 'Categoria',
+  laborClassificationSectionSelectCategoryPlaceholder: 'Selecciona una categoria',
+  laborClassificationSectionCategoryPlaceholder: 'Codigo de categoria',
+  laborClassificationSectionLookupPendingHint:
+    'La seleccion asistida de convenio y categoria llegara cuando esten disponibles las maestras.',
+  laborClassificationSectionOccurrenceStartDateLabel: 'Inicio',
+  laborClassificationSectionCorrectHint:
+    'La correccion actualiza la ocurrencia seleccionada manteniendo su fecha de inicio original.',
+  laborClassificationSectionCloseHint:
+    'Indica la fecha de cierre para finalizar la ocurrencia vigente sin eliminar historial.',
+  laborClassificationSectionCloseDateLabel: 'Fecha de cierre',
+  laborClassificationSectionInvalidDataMessage:
+    'Completa los datos obligatorios para continuar con la operacion.',
+  laborClassificationSectionCloseDateInvalidMessage:
+    'La fecha de cierre debe ser igual o posterior al inicio de la ocurrencia.',
+  laborClassificationSectionOverlapMessage:
+    'La clasificacion se solapa con otra ocurrencia vigente o historica del empleado.',
+  laborClassificationSectionOutsidePresenceMessage:
+    'La clasificacion debe quedar dentro de un periodo de presencia del empleado.',
+  laborClassificationSectionIncompleteCoverageMessage:
+    'La operacion deja un hueco temporal no permitido en la cobertura de clasificacion laboral.',
+  laborClassificationSectionInvalidPeriodMessage:
+    'El periodo informado no es valido para esta operacion de clasificacion laboral.',
+  laborClassificationSectionAlreadyClosedMessage:
+    'La ocurrencia ya esta cerrada y no admite un nuevo cierre.',
+  laborClassificationSectionNotFoundMessage:
+    'No se encontro la ocurrencia seleccionada de clasificacion laboral.',
+  laborClassificationSectionAgreementNotFoundMessage:
+    'El convenio indicado no existe para el sistema de reglas activo.',
+  laborClassificationSectionAgreementCategoryNotFoundMessage:
+    'La categoria indicada no existe para el sistema de reglas activo.',
+  laborClassificationSectionAgreementCategoryRelationInvalidMessage:
+    'La categoria no pertenece al convenio seleccionado para esta fecha efectiva.',
+  laborClassificationSectionRequestFailedMessage:
+    'No se pudo procesar la operacion de clasificacion laboral. Reintenta.',
+  laborClassificationSectionCatalogRequestFailedMessage:
+    'No se pudo cargar el catalogo de convenios y categorias. Reintenta.',
+  laborClassificationSectionReplaceSuccessMessage: 'Clasificacion reemplazada correctamente.',
+  laborClassificationSectionCorrectSuccessMessage: 'Clasificacion corregida correctamente.',
+  laborClassificationSectionCloseSuccessMessage: 'Clasificacion cerrada correctamente.',
   laborFutureBlockTitle: 'Evolucion laboral',
   laborFutureBlockDescription:
     'Preparado para eventos de movilidad, cambios de categoria y transiciones de jornada.',

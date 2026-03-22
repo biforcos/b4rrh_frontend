@@ -19,6 +19,8 @@ import { OpenApiHttpParams, QueryParamStyle } from '../query.params';
 // @ts-ignore
 import { AddressResponse } from '../model/address-response';
 // @ts-ignore
+import { AgreementCategoryCatalogItemResponse } from '../model/agreement-category-catalog-item-response';
+// @ts-ignore
 import { CloseAddressRequest } from '../model/close-address-request';
 // @ts-ignore
 import { CloseContractRequest } from '../model/close-contract-request';
@@ -164,6 +166,7 @@ import {
     ListEmployeePresencesByBusinessKeyRequestParams,
     ListEmployeeWorkCentersByBusinessKeyRequestParams,
     ListEmployeesRequestParams,
+    ListLaborClassificationAgreementCategoriesRequestParams,
     ListRuleEntitiesRequestParams,
     ReplaceContractFromDateByBusinessKeyRequestParams,
     ReplaceLaborClassificationFromDateByBusinessKeyRequestParams,
@@ -3607,6 +3610,98 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
     }
 
     /**
+     * List agreement categories valid for an agreement
+     * @endpoint get /labor-classification-catalog/agreement-categories
+     * @param requestParameters
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     * @param options additional options
+     */
+    public listLaborClassificationAgreementCategories(requestParameters: ListLaborClassificationAgreementCategoriesRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<Array<AgreementCategoryCatalogItemResponse>>;
+    public listLaborClassificationAgreementCategories(requestParameters: ListLaborClassificationAgreementCategoriesRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<AgreementCategoryCatalogItemResponse>>>;
+    public listLaborClassificationAgreementCategories(requestParameters: ListLaborClassificationAgreementCategoriesRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Array<AgreementCategoryCatalogItemResponse>>>;
+    public listLaborClassificationAgreementCategories(requestParameters: ListLaborClassificationAgreementCategoriesRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        const ruleSystemCode = requestParameters?.ruleSystemCode;
+        if (ruleSystemCode === null || ruleSystemCode === undefined) {
+            throw new Error('Required parameter ruleSystemCode was null or undefined when calling listLaborClassificationAgreementCategories.');
+        }
+        const agreementCode = requestParameters?.agreementCode;
+        if (agreementCode === null || agreementCode === undefined) {
+            throw new Error('Required parameter agreementCode was null or undefined when calling listLaborClassificationAgreementCategories.');
+        }
+        const referenceDate = requestParameters?.referenceDate;
+
+        let localVarQueryParameters = new OpenApiHttpParams(this.encoder);
+
+        localVarQueryParameters = this.addToHttpParams(
+            localVarQueryParameters,
+            'ruleSystemCode',
+            <any>ruleSystemCode,
+            QueryParamStyle.Form,
+            true,
+        );
+
+
+        localVarQueryParameters = this.addToHttpParams(
+            localVarQueryParameters,
+            'agreementCode',
+            <any>agreementCode,
+            QueryParamStyle.Form,
+            true,
+        );
+
+
+        localVarQueryParameters = this.addToHttpParams(
+            localVarQueryParameters,
+            'referenceDate',
+            <any>referenceDate,
+            QueryParamStyle.Form,
+            true,
+        );
+
+
+        let localVarHeaders = this.defaultHeaders;
+
+        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
+            'application/json'
+        ]);
+        if (localVarHttpHeaderAcceptSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+        }
+
+        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+        const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+
+        let responseType_: 'text' | 'json' | 'blob' = 'json';
+        if (localVarHttpHeaderAcceptSelected) {
+            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+                responseType_ = 'text';
+            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+                responseType_ = 'json';
+            } else {
+                responseType_ = 'blob';
+            }
+        }
+
+        let localVarPath = `/labor-classification-catalog/agreement-categories`;
+        const { basePath, withCredentials } = this.configuration;
+        return this.httpClient.request<Array<AgreementCategoryCatalogItemResponse>>('get', `${basePath}${localVarPath}`,
+            {
+                context: localVarHttpContext,
+                params: localVarQueryParameters.toHttpParams(),
+                responseType: <any>responseType_,
+                ...(withCredentials ? { withCredentials } : {}),
+                headers: localVarHeaders,
+                observe: observe,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
      * List or retrieve rule entities by business filters
      * Canonical retrieval is query-based using business keys. Supported canonical combinations include: - &#x60;ruleSystemCode&#x60; - &#x60;ruleSystemCode + ruleEntityTypeCode&#x60; - &#x60;ruleSystemCode + ruleEntityTypeCode + code&#x60; 
      * @endpoint get /rule-entities
@@ -3623,6 +3718,7 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
         const ruleEntityTypeCode = requestParameters?.ruleEntityTypeCode;
         const code = requestParameters?.code;
         const active = requestParameters?.active;
+        const referenceDate = requestParameters?.referenceDate;
 
         let localVarQueryParameters = new OpenApiHttpParams(this.encoder);
 
@@ -3657,6 +3753,15 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
             localVarQueryParameters,
             'active',
             <any>active,
+            QueryParamStyle.Form,
+            true,
+        );
+
+
+        localVarQueryParameters = this.addToHttpParams(
+            localVarQueryParameters,
+            'referenceDate',
+            <any>referenceDate,
             QueryParamStyle.Form,
             true,
         );

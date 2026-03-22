@@ -32,11 +32,19 @@ describe('EmployeeLaborClassificationStore', () => {
   let store: EmployeeLaborClassificationStore;
   let readGatewayMock: {
     readEmployeeLaborClassificationsByBusinessKey: ReturnType<typeof vi.fn>;
+    replaceLaborClassificationFromDate: ReturnType<typeof vi.fn>;
+    correctLaborClassificationOccurrence: ReturnType<typeof vi.fn>;
+    closeLaborClassificationOccurrence: ReturnType<typeof vi.fn>;
+    sortByTimelineRecency: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(() => {
     readGatewayMock = {
       readEmployeeLaborClassificationsByBusinessKey: vi.fn().mockReturnValue(of(laborClassificationsFixture)),
+      replaceLaborClassificationFromDate: vi.fn().mockReturnValue(of(undefined)),
+      correctLaborClassificationOccurrence: vi.fn().mockReturnValue(of(undefined)),
+      closeLaborClassificationOccurrence: vi.fn().mockReturnValue(of(undefined)),
+      sortByTimelineRecency: vi.fn().mockImplementation((classifications) => classifications),
     };
 
     TestBed.configureTestingModule({
@@ -96,5 +104,94 @@ describe('EmployeeLaborClassificationStore', () => {
     store.loadLaborClassificationsByBusinessKey(employeeBusinessKey);
 
     expect(readGatewayMock.readEmployeeLaborClassificationsByBusinessKey).toHaveBeenCalledTimes(1);
+  });
+
+  it('replaces labor classification from date and reloads data after success', () => {
+    store.loadLaborClassificationsByBusinessKey(employeeBusinessKey);
+
+    store.replaceFromDate(employeeBusinessKey, {
+      effectiveDate: '2025-01-01',
+      agreementCode: 'AGREE-02',
+      agreementCategoryCode: 'CAT-C',
+    });
+
+    expect(readGatewayMock.replaceLaborClassificationFromDate).toHaveBeenCalledTimes(1);
+    expect(readGatewayMock.readEmployeeLaborClassificationsByBusinessKey).toHaveBeenCalledTimes(2);
+    expect(store.success()).toBe('replaced');
+    expect(store.mutating()).toBe(false);
+  });
+
+  it('corrects a historical occurrence and reloads data after success', () => {
+    store.loadLaborClassificationsByBusinessKey(employeeBusinessKey);
+
+    store.correctOccurrence(employeeBusinessKey, '2022-01-01', {
+      agreementCode: 'AGREE-01',
+      agreementCategoryCode: 'CAT-Z',
+    });
+
+    expect(readGatewayMock.correctLaborClassificationOccurrence).toHaveBeenCalledWith(
+      employeeBusinessKey,
+      '2022-01-01',
+      {
+        agreementCode: 'AGREE-01',
+        agreementCategoryCode: 'CAT-Z',
+      },
+    );
+    expect(readGatewayMock.readEmployeeLaborClassificationsByBusinessKey).toHaveBeenCalledTimes(2);
+    expect(store.success()).toBe('corrected');
+  });
+
+  it('closes current occurrence and reloads data after success', () => {
+    store.loadLaborClassificationsByBusinessKey(employeeBusinessKey);
+
+    store.closeOccurrence(employeeBusinessKey, '2024-06-01', {
+      endDate: '2025-02-15',
+    });
+
+    expect(readGatewayMock.closeLaborClassificationOccurrence).toHaveBeenCalledWith(
+      employeeBusinessKey,
+      '2024-06-01',
+      {
+        endDate: '2025-02-15',
+      },
+    );
+    expect(readGatewayMock.readEmployeeLaborClassificationsByBusinessKey).toHaveBeenCalledTimes(2);
+    expect(store.success()).toBe('closed');
+  });
+
+  it('keeps loaded context when replace fails and exposes error state', () => {
+    store.loadLaborClassificationsByBusinessKey(employeeBusinessKey);
+    readGatewayMock.replaceLaborClassificationFromDate.mockReturnValue(
+      throwError(() => new Error('backend unavailable')),
+    );
+
+    store.replaceFromDate(employeeBusinessKey, {
+      effectiveDate: '2025-01-01',
+      agreementCode: 'AGREE-02',
+      agreementCategoryCode: 'CAT-C',
+    });
+
+    expect(store.error()).toBe('request-failed');
+    expect(store.mutating()).toBe(false);
+    expect(store.selectedEmployeeKey()).toEqual(employeeBusinessKey);
+    expect(store.laborClassifications()).toEqual(laborClassificationsFixture);
+  });
+
+  it('clears success and error feedback without clearing loaded data', () => {
+    store.loadLaborClassificationsByBusinessKey(employeeBusinessKey);
+    store.replaceFromDate(employeeBusinessKey, {
+      effectiveDate: '2025-01-01',
+      agreementCode: 'AGREE-02',
+      agreementCategoryCode: 'CAT-C',
+    });
+
+    expect(store.success()).toBe('replaced');
+    expect(store.laborClassifications()).toEqual(laborClassificationsFixture);
+
+    store.clearFeedback();
+
+    expect(store.success()).toBeNull();
+    expect(store.error()).toBeNull();
+    expect(store.laborClassifications()).toEqual(laborClassificationsFixture);
   });
 });

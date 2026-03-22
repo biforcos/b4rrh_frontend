@@ -1,0 +1,99 @@
+<app-temporal-section
+  [title]="texts.laborClassificationSectionTitle"
+  [subtitle]="sectionSubtitle"
+  [state]="sectionState()"
+  [displayMode]="displayMode()"
+  [rows]="rows()"
+  [texts]="sectionTexts"
+  [confirmingCloseKey]="confirmingCloseKey()"
+  [correctingKey]="correctingKey()"
+  [canCreate]="supportedActions().canReplaceFromDate"
+  [canEditCurrent]="false"
+  [canCorrect]="supportedActions().canCorrect"
+  [canClose]="supportedActions().canClose"
+  [canDelete]="supportedActions().canDelete"
+  [createSubmitEnabled]="isReplaceDraftValid()"
+  [correctSubmitEnabled]="isCorrectDraftValid()"
+  (manageStarted)="startReplaceFromDate()"
+  (manageExited)="exitManage()"
+  (createStarted)="startReplaceFromDate()"
+  (correctStarted)="startCorrect($event)"
+  (closeRequested)="requestClose($event)"
+  (closeConfirmed)="confirmClose($event)"
+  (cancelled)="cancel()"
+  (createSubmitted)="submitReplaceFromDate()"
+  (correctSubmitted)="submitCorrect($event)"
+>
+  <div temporalCreateForm class="employee-labor-classification-section__form-grid employee-labor-classification-section__form-grid--create">
+    <label class="employee-labor-classification-section__field employee-labor-classification-section__field--effective-date">
+      <span>{{ texts.laborClassificationSectionEffectiveDateLabel }}</span>
+      <input
+        type="date"
+        [value]="replaceDraft().effectiveDate"
+        (input)="updateReplaceField('effectiveDate', $any($event.target).value)"
+      />
+    </label>
+
+    <label class="employee-labor-classification-section__field employee-labor-classification-section__field--agreement">
+      <span>{{ texts.laborClassificationSectionAgreementLabel }}</span>
+      <input
+        type="text"
+        [value]="replaceDraft().agreementCode"
+        [placeholder]="texts.laborClassificationSectionAgreementPlaceholder"
+        (input)="updateReplaceField('agreementCode', $any($event.target).value)"
+      />
+    </label>
+
+    <label class="employee-labor-classification-section__field employee-labor-classification-section__field--category">
+      <span>{{ texts.laborClassificationSectionCategoryLabel }}</span>
+      <input
+        type="text"
+        [value]="replaceDraft().agreementCategoryCode"
+        [placeholder]="texts.laborClassificationSectionCategoryPlaceholder"
+        (input)="updateReplaceField('agreementCategoryCode', $any($event.target).value)"
+      />
+    </label>
+  </div>
+
+  <div temporalCorrectForm class="employee-labor-classification-section__form-grid employee-labor-classification-section__form-grid--correct">
+    @if (correctingOccurrence(); as correctingOccurrence) {
+      <label class="employee-labor-classification-section__field employee-labor-classification-section__field--start-readonly">
+        <span>{{ texts.laborClassificationSectionOccurrenceStartDateLabel }}</span>
+        <input type="text" [value]="correctingOccurrence.startDate" readonly />
+      </label>
+    }
+
+    <label class="employee-labor-classification-section__field employee-labor-classification-section__field--agreement">
+      <span>{{ texts.laborClassificationSectionAgreementLabel }}</span>
+      <input
+        type="text"
+        [value]="correctDraft().agreementCode"
+        [placeholder]="texts.laborClassificationSectionAgreementPlaceholder"
+        (input)="updateCorrectField('agreementCode', $any($event.target).value)"
+      />
+    </label>
+
+    <label class="employee-labor-classification-section__field employee-labor-classification-section__field--category">
+      <span>{{ texts.laborClassificationSectionCategoryLabel }}</span>
+      <input
+        type="text"
+        [value]="correctDraft().agreementCategoryCode"
+        [placeholder]="texts.laborClassificationSectionCategoryPlaceholder"
+        (input)="updateCorrectField('agreementCategoryCode', $any($event.target).value)"
+      />
+    </label>
+  </div>
+
+  <div temporalConfirmCloseForm class="employee-labor-classification-section__close-form">
+    <p class="employee-labor-classification-section__hint">{{ texts.laborClassificationSectionCloseHint }}</p>
+
+    <label class="employee-labor-classification-section__field employee-labor-classification-section__field--close-date">
+      <span>{{ texts.laborClassificationSectionCloseDateLabel }}</span>
+      <input
+        type="date"
+        [value]="closeDraft().endDate"
+        (input)="updateCloseField('endDate', $any($event.target).value)"
+      />
+    </label>
+  </div>
+</app-temporal-section>

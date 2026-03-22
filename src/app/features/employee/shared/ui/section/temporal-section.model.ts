@@ -6,6 +6,9 @@ export interface TemporalRowViewModel<KeyType = number> {
   periodText?: string | null;
   statusLabel?: string | null;
   isCurrent?: boolean;
+  canCorrect?: boolean;
+  canClose?: boolean;
+  canDelete?: boolean;
   closeable?: boolean;
   deletable?: boolean;
   deleteDisabledReason?: string | null;

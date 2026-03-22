@@ -1,4 +1,5 @@
 export * from './address-response';
+export * from './agreement-category-catalog-item-response';
 export * from './close-address-request';
 export * from './close-contract-request';
 export * from './close-cost-center-request';

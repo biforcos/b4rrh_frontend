@@ -12,6 +12,7 @@ import { HttpHeaders }                                       from '@angular/comm
 import { Observable }                                        from 'rxjs';
 
 import { AddressResponse } from '../model/models';
+import { AgreementCategoryCatalogItemResponse } from '../model/models';
 import { CloseAddressRequest } from '../model/models';
 import { CloseContractRequest } from '../model/models';
 import { CloseCostCenterRequest } from '../model/models';
@@ -375,11 +376,18 @@ export interface ListEmployeesRequestParams {
     page?: number;
 }
 
+export interface ListLaborClassificationAgreementCategoriesRequestParams {
+    ruleSystemCode: string;
+    agreementCode: string;
+    referenceDate?: string;
+}
+
 export interface ListRuleEntitiesRequestParams {
     ruleSystemCode?: string;
     ruleEntityTypeCode?: string;
     code?: string;
     active?: boolean;
+    referenceDate?: string;
 }
 
 export interface ReplaceContractFromDateByBusinessKeyRequestParams {
@@ -845,6 +853,14 @@ export interface DefaultServiceInterface {
 * @param requestParameters
      */
     listEmployees(requestParameters: ListEmployeesRequestParams, extraHttpRequestParams?: any): Observable<Array<EmployeeDirectoryItemResponse>>;
+
+    /**
+     * List agreement categories valid for an agreement
+     * 
+     * @endpoint get /labor-classification-catalog/agreement-categories
+* @param requestParameters
+     */
+    listLaborClassificationAgreementCategories(requestParameters: ListLaborClassificationAgreementCategoriesRequestParams, extraHttpRequestParams?: any): Observable<Array<AgreementCategoryCatalogItemResponse>>;
 
     /**
      * List or retrieve rule entities by business filters

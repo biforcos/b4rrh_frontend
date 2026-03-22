@@ -10,6 +10,7 @@ encoder.ts
 git_push.sh
 index.ts
 model/address-response.ts
+model/agreement-category-catalog-item-response.ts
 model/close-address-request.ts
 model/close-contract-request.ts
 model/close-cost-center-request.ts
