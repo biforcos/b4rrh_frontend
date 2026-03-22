@@ -31,12 +31,12 @@ export function mapEmployeeWorkCenterModelToTemporalRow(
   source: EmployeeWorkCenterModel,
   texts: EmployeeWorkCenterRowTexts,
 ): TemporalRowViewModel<number> {
-  const title = buildTitle(source);
+  const display = buildDisplay(source);
 
   return {
     key: source.workCenterAssignmentNumber,
-    title,
-    subtitle: source.isActive ? `${texts.assignmentPrefix} ${source.workCenterAssignmentNumber}` : null,
+    title: display.title,
+    subtitle: display.subtitle,
     periodText: buildPeriodText(source.startDate, source.endDate, texts.currentPeriodLabel, texts.periodPrefix),
     statusLabel: source.isActive ? texts.currentStatus : texts.closedStatus,
     isCurrent: source.isActive,
@@ -79,13 +79,19 @@ function buildPeriodText(startDate: string, endDate: string | null, currentPerio
   return `${periodPrefix}: ${startDate} - ${endDate}`;
 }
 
-function buildTitle(source: EmployeeWorkCenterModel): string {
-  const normalizedLabel = source.workCenterLabel?.trim() ?? '';
-  if (normalizedLabel.length === 0) {
-    return source.workCenterCode;
+function buildDisplay(source: EmployeeWorkCenterModel): { title: string; subtitle: string | null } {
+  const normalizedName = source.workCenterName?.trim() ?? '';
+  if (normalizedName.length === 0) {
+    return {
+      title: source.workCenterCode,
+      subtitle: null,
+    };
   }
 
-  return `${source.workCenterCode} · ${normalizedLabel}`;
+  return {
+    title: normalizedName,
+    subtitle: source.workCenterCode,
+  };
 }
 
 function normalizeCode(value: string | null | undefined): string {

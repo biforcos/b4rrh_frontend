@@ -15,7 +15,7 @@ describe('mapEmployeeWorkCenterModelToTemporalRow', () => {
     const source: EmployeeWorkCenterModel = {
       workCenterAssignmentNumber: 10,
       workCenterCode: 'MAD-01',
-      workCenterLabel: null,
+      workCenterName: null,
       startDate: '2025-01-01',
       endDate: null,
       isActive: true,
@@ -30,13 +30,15 @@ describe('mapEmployeeWorkCenterModelToTemporalRow', () => {
     expect(row.closeable).toBe(true);
     expect(row.deletable).toBe(true);
     expect(row.deleteDisabledReason).toBeNull();
+    expect(row.title).toBe('MAD-01');
+    expect(row.subtitle).toBeNull();
   });
 
   it('disables delete with explicit reason when occurrence starts at presence start', () => {
     const source: EmployeeWorkCenterModel = {
       workCenterAssignmentNumber: 11,
       workCenterCode: 'SEV-03',
-      workCenterLabel: null,
+      workCenterName: null,
       startDate: '2025-02-01',
       endDate: null,
       isActive: true,
@@ -55,7 +57,7 @@ describe('mapEmployeeWorkCenterModelToTemporalRow', () => {
     const source: EmployeeWorkCenterModel = {
       workCenterAssignmentNumber: 9,
       workCenterCode: 'BCN-02',
-      workCenterLabel: null,
+      workCenterName: null,
       startDate: '2024-01-01',
       endDate: '2024-12-31',
       isActive: false,
@@ -69,5 +71,24 @@ describe('mapEmployeeWorkCenterModelToTemporalRow', () => {
     expect(row.isCurrent).toBe(false);
     expect(row.closeable).toBe(false);
     expect(row.deletable).toBe(true);
+  });
+
+  it('uses work center name as primary title and code as secondary subtitle', () => {
+    const source: EmployeeWorkCenterModel = {
+      workCenterAssignmentNumber: 12,
+      workCenterCode: 'ZAR-07',
+      workCenterName: 'Planta Zaragoza',
+      startDate: '2025-03-01',
+      endDate: null,
+      isActive: true,
+      canDelete: true,
+      startsAtPresenceStart: false,
+      deleteForbiddenReason: null,
+    };
+
+    const row = mapEmployeeWorkCenterModelToTemporalRow(source, rowTexts);
+
+    expect(row.title).toBe('Planta Zaragoza');
+    expect(row.subtitle).toBe('ZAR-07');
   });
 });

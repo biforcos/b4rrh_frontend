@@ -14,6 +14,7 @@ import { EmployeeBusinessKeyApiQuery } from './employee-read.client';
 export interface EmployeeWorkCenterApiModel {
   workCenterAssignmentNumber: number;
   workCenterCode: string;
+  workCenterName: string | null;
   startDate: string;
   endDate: string | null;
   canDelete?: boolean;
@@ -22,6 +23,7 @@ export interface EmployeeWorkCenterApiModel {
 }
 
 interface WorkCenterResponseWithDeleteCapabilities extends WorkCenterResponse {
+  workCenterName?: string | null;
   canDelete?: boolean;
   startsAtPresenceStart?: boolean;
   deleteForbiddenReason?: string | null;
@@ -153,6 +155,7 @@ export class EmployeeWorkCenterReadClient {
     return {
       workCenterAssignmentNumber: source.workCenterAssignmentNumber,
       workCenterCode: source.workCenterCode,
+      workCenterName: this.normalizeOptionalValue(sourceWithDeleteCapabilities.workCenterName),
       startDate: source.startDate,
       endDate: source.endDate ?? null,
       canDelete: sourceWithDeleteCapabilities.canDelete,

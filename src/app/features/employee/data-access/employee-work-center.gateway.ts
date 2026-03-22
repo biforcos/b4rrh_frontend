@@ -104,7 +104,7 @@ export class EmployeeWorkCenterGateway {
     return {
       workCenterAssignmentNumber: source.workCenterAssignmentNumber,
       workCenterCode: source.workCenterCode,
-      workCenterLabel: source.workCenterLabel,
+      workCenterName: source.workCenterName,
       startDate: source.startDate,
       endDate: source.endDate,
       isActive: source.isActive,
