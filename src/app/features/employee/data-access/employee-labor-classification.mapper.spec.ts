@@ -27,9 +27,9 @@ describe('mapLaborClassificationToTemporalRow', () => {
     expect(row.deletable).toBe(false);
     expect(row.periodText).toBe('2025-01-01 - actual');
     expect(row.title).toBe('AGREEMENT-A');
-    expect(row.titleSecondary).toBeNull();
+    expect(row.titleSecondary).toBeUndefined();
     expect(row.detailText).toBe('CAT-A');
-    expect(row.detailSecondary).toBeNull();
+    expect(row.detailSecondary).toBeUndefined();
   });
 
   it('maps historical occurrence as not closeable and non-deletable', () => {
@@ -86,6 +86,6 @@ describe('mapLaborClassificationToTemporalRow', () => {
     expect(row.title).toBe('Convenio Tecnico');
     expect(row.titleSecondary).toBe('AGR-01');
     expect(row.detailText).toBe('CAT-02');
-    expect(row.detailSecondary).toBeNull();
+    expect(row.detailSecondary).toBeUndefined();
   });
 });

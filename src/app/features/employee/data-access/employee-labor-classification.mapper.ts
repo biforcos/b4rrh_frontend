@@ -6,6 +6,7 @@ import {
 } from '../../../core/api/generated/model/models';
 import { EmployeeLaborClassificationModel } from '../models/employee-labor-classification.model';
 import { TemporalRowViewModel } from '../shared/ui/section/temporal-section.model';
+import { getCatalogDisplay } from '../shared/utils/catalog-display.util';
 
 export interface LaborClassificationReplaceDraft {
   effectiveDate: string;
@@ -55,8 +56,8 @@ export function mapLaborClassificationToTemporalRow(
   rowTexts: EmployeeLaborClassificationRowTexts,
 ): TemporalRowViewModel<number> {
   const key = Number(source.startDate.replaceAll('-', ''));
-  const agreementDisplay = resolveDisplay(source.agreementName, source.agreementCode);
-  const categoryDisplay = resolveDisplay(source.agreementCategoryName, source.agreementCategoryCode);
+  const agreementDisplay = getCatalogDisplay(source.agreementName, source.agreementCode);
+  const categoryDisplay = getCatalogDisplay(source.agreementCategoryName, source.agreementCategoryCode);
 
   return {
     key,
@@ -74,21 +75,6 @@ export function mapLaborClassificationToTemporalRow(
     canDelete: false,
     closeable: source.isActive,
     deletable: false,
-  };
-}
-
-function resolveDisplay(name: string | null | undefined, code: string): { label: string; code: string | null } {
-  const normalizedName = name?.trim() ?? '';
-  if (normalizedName.length > 0) {
-    return {
-      label: normalizedName,
-      code,
-    };
-  }
-
-  return {
-    label: code,
-    code: null,
   };
 }
 

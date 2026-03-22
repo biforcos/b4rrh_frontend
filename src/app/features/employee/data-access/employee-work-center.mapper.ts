@@ -5,6 +5,7 @@ import {
 } from '../../../core/api/generated/model/models';
 import { EmployeeWorkCenterModel } from '../models/employee-work-center.model';
 import { TemporalRowViewModel } from '../shared/ui/section/temporal-section.model';
+import { getCatalogDisplay } from '../shared/utils/catalog-display.util';
 
 export interface WorkCenterCreateDraft {
   workCenterCode: string;
@@ -80,18 +81,12 @@ function buildPeriodText(startDate: string, endDate: string | null, currentPerio
   return `${periodPrefix}: ${startDate} - ${endDate}`;
 }
 
-function buildDisplay(source: EmployeeWorkCenterModel): { title: string; code: string | null } {
-  const normalizedName = source.workCenterName?.trim() ?? '';
-  if (normalizedName.length === 0) {
-    return {
-      title: source.workCenterCode,
-      code: null,
-    };
-  }
+function buildDisplay(source: EmployeeWorkCenterModel): { title: string; code?: string } {
+  const display = getCatalogDisplay(source.workCenterName, source.workCenterCode);
 
   return {
-    title: normalizedName,
-    code: source.workCenterCode,
+    title: display.label,
+    code: display.code,
   };
 }
 
