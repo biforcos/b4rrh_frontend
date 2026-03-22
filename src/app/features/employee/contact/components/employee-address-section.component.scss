@@ -1,11 +1,11 @@
 .employee-address-section__form-grid {
   display: grid;
-  gap: 0.26rem;
+  gap: 0.22rem;
 }
 
 .employee-address-section__form-grid label {
   display: grid;
-  gap: 0.08rem;
+  gap: 0.05rem;
 }
 
 .employee-address-section__form-grid span,
@@ -20,20 +20,22 @@
   border-radius: 0.42rem;
   background: #ffffff;
   color: #1f3246;
-  font-size: 0.68rem;
+  font-size: 0.67rem;
   line-height: 1.2;
-  padding: 0.26rem 0.34rem;
+  padding: 0.22rem 0.32rem;
 }
 
 .employee-address-section__edit-hint {
   margin: 0;
-  font-size: 0.68rem;
-  color: #2f4d69;
+  font-size: 0.66rem;
+  color: #3b5874;
+  line-height: 1.3;
 }
 
 .employee-address-section__readonly-grid {
   display: grid;
-  gap: 0.18rem;
+  gap: 0.14rem;
+  margin-bottom: 0.08rem;
 }
 
 .employee-address-section__readonly-grid p {
@@ -43,6 +45,6 @@
 }
 
 .employee-address-section__readonly-grid strong {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   color: #1f3246;
 }

@@ -4,7 +4,13 @@ import { Observable, map } from 'rxjs';
 import { EmployeeAddressReadClient } from '../../../core/api/clients/employee-address-read.client';
 import { EmployeeBusinessKey } from '../models/employee-business-key.model';
 import { toEmployeeBusinessKey } from '../routing/employee-route-key.util';
-import { AddressCreateDraft, mapAddressCloseDateToRequest, mapAddressDraftToCreateAddressRequest } from './employee-address-edit.mapper';
+import {
+  AddressCreateDraft,
+  AddressEditCurrentDraft,
+  mapAddressCloseDateToRequest,
+  mapAddressDraftToCreateAddressRequest,
+  mapAddressEditCurrentDraftToUpdateAddressRequest,
+} from './employee-address-edit.mapper';
 
 @Injectable({
   providedIn: 'root',
@@ -25,6 +31,14 @@ export class EmployeeAddressGateway {
 
     return this.addressClient
       .closeAddressByBusinessKey(normalizedKey, addressNumber, mapAddressCloseDateToRequest(endDate))
+      .pipe(map(() => undefined));
+  }
+
+  updateAddress(employeeKey: EmployeeBusinessKey, addressNumber: number, draft: AddressEditCurrentDraft): Observable<void> {
+    const normalizedKey = toEmployeeBusinessKey(employeeKey);
+
+    return this.addressClient
+      .updateAddressByBusinessKey(normalizedKey, addressNumber, mapAddressEditCurrentDraftToUpdateAddressRequest(draft))
       .pipe(map(() => undefined));
   }
 }

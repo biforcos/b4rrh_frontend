@@ -105,7 +105,9 @@
               @if ((showRowEditCurrentAction() || showRowCloseAction()) && row.isCurrent === true) {
                 <div class="temporal-section__row-actions">
                   @if (showRowEditCurrentAction()) {
-                    <button type="button" (click)="onEditCurrentStarted(row.key)">{{ texts().editCurrentAction }}</button>
+                    <button type="button" class="temporal-section__edit-current-action" (click)="onEditCurrentStarted(row.key)">
+                      {{ texts().editCurrentAction }}
+                    </button>
                   }
 
                   @if (showRowCloseAction() && row.closeable === true) {

@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, map, of, throwError } from 'rxjs';
 
 import { DefaultService } from '../generated/api/default.service';
-import { AddressResponse, CloseAddressRequest, CreateAddressRequest } from '../generated/model/models';
+import { AddressResponse, CloseAddressRequest, CreateAddressRequest, UpdateAddressRequest } from '../generated/model/models';
 import { EmployeeBusinessKeyApiQuery } from './employee-read.client';
 
 export interface EmployeeAddressApiModel {
@@ -77,6 +77,28 @@ export class EmployeeAddressReadClient {
         addressNumber,
         closeAddressRequest: {
           endDate: request.endDate.trim(),
+        },
+      })
+      .pipe(map((address) => this.toEmployeeAddressApiModel(address)));
+  }
+
+  updateAddressByBusinessKey(
+    key: EmployeeBusinessKeyApiQuery,
+    addressNumber: number,
+    request: UpdateAddressRequest,
+  ): Observable<EmployeeAddressApiModel> {
+    const normalizedKey = this.normalizeKey(key);
+
+    return this.api
+      .updateAddressByBusinessKey({
+        ...normalizedKey,
+        addressNumber,
+        updateAddressRequest: {
+          street: request.street.trim(),
+          city: request.city.trim(),
+          countryCode: request.countryCode.trim().toUpperCase(),
+          postalCode: this.normalizeOptionalValue(request.postalCode),
+          regionCode: this.normalizeOptionalValue(request.regionCode),
         },
       })
       .pipe(map((address) => this.toEmployeeAddressApiModel(address)));

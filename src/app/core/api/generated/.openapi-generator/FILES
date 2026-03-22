@@ -15,9 +15,11 @@ model/close-contract-request.ts
 model/close-cost-center-request.ts
 model/close-labor-classification-request.ts
 model/close-presence-request.ts
+model/close-rule-entity-request.ts
 model/close-work-center-request.ts
 model/contact-response.ts
 model/contract-response.ts
+model/correct-rule-entity-request.ts
 model/cost-center-response.ts
 model/create-address-request.ts
 model/create-contact-request.ts
@@ -52,6 +54,7 @@ model/replace-labor-classification-from-date-request.ts
 model/rule-entity-response.ts
 model/rule-entity-type-response.ts
 model/rule-system-response.ts
+model/update-address-request.ts
 model/update-contact-request.ts
 model/update-contract-request.ts
 model/update-cost-center-request.ts

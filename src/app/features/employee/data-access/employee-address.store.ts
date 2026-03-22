@@ -4,7 +4,7 @@ import { take } from 'rxjs';
 import { EmployeeAddressModel } from '../models/employee-address.model';
 import { EmployeeBusinessKey } from '../models/employee-business-key.model';
 import { areEmployeeBusinessKeysEqual, toEmployeeBusinessKey } from '../routing/employee-route-key.util';
-import { AddressCreateDraft } from './employee-address-edit.mapper';
+import { AddressCreateDraft, AddressEditCurrentDraft } from './employee-address-edit.mapper';
 import { EmployeeAddressGateway } from './employee-address.gateway';
 import { EmployeeAddressReadGateway } from './employee-address-read.gateway';
 
@@ -21,7 +21,7 @@ export class EmployeeAddressStore {
   private readonly loadingState = signal(false);
   private readonly mutatingState = signal(false);
   private readonly errorState = signal<EmployeeAddressErrorCode | null>(null);
-  private readonly successState = signal<'created' | 'closed' | null>(null);
+  private readonly successState = signal<'created' | 'updated' | 'closed' | null>(null);
   private requestId = 0;
 
   readonly selectedEmployeeKey = this.selectedEmployeeKeyState.asReadonly();
@@ -89,6 +89,33 @@ export class EmployeeAddressStore {
         next: () => {
           this.mutatingState.set(false);
           this.successState.set('closed');
+          this.loadAddressesByBusinessKeyInternal(normalizedEmployeeKey, true);
+        },
+        error: () => {
+          this.mutatingState.set(false);
+          this.errorState.set('request-failed');
+        },
+      });
+  }
+
+  updateAddress(employeeKey: EmployeeBusinessKey, addressNumber: number, draft: AddressEditCurrentDraft): void {
+    if (this.mutatingState()) {
+      return;
+    }
+
+    const normalizedEmployeeKey = toEmployeeBusinessKey(employeeKey);
+
+    this.mutatingState.set(true);
+    this.errorState.set(null);
+    this.successState.set(null);
+
+    this.employeeAddressGateway
+      .updateAddress(normalizedEmployeeKey, addressNumber, draft)
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          this.mutatingState.set(false);
+          this.successState.set('updated');
           this.loadAddressesByBusinessKeyInternal(normalizedEmployeeKey, true);
         },
         error: () => {

@@ -29,11 +29,15 @@ import { CloseLaborClassificationRequest } from '../model/close-labor-classifica
 // @ts-ignore
 import { ClosePresenceRequest } from '../model/close-presence-request';
 // @ts-ignore
+import { CloseRuleEntityRequest } from '../model/close-rule-entity-request';
+// @ts-ignore
 import { CloseWorkCenterRequest } from '../model/close-work-center-request';
 // @ts-ignore
 import { ContactResponse } from '../model/contact-response';
 // @ts-ignore
 import { ContractResponse } from '../model/contract-response';
+// @ts-ignore
+import { CorrectRuleEntityRequest } from '../model/correct-rule-entity-request';
 // @ts-ignore
 import { CostCenterResponse } from '../model/cost-center-response';
 // @ts-ignore
@@ -87,6 +91,8 @@ import { RuleEntityTypeResponse } from '../model/rule-entity-type-response';
 // @ts-ignore
 import { RuleSystemResponse } from '../model/rule-system-response';
 // @ts-ignore
+import { UpdateAddressRequest } from '../model/update-address-request';
+// @ts-ignore
 import { UpdateContactRequest } from '../model/update-contact-request';
 // @ts-ignore
 import { UpdateContractRequest } from '../model/update-contract-request';
@@ -114,7 +120,9 @@ import {
     CloseCostCenterByBusinessKeyRequestParams,
     CloseLaborClassificationByBusinessKeyRequestParams,
     ClosePresenceByBusinessKeyRequestParams,
+    CloseRuleEntityByBusinessKeyRequestParams,
     CloseWorkCenterByBusinessKeyRequestParams,
+    CorrectRuleEntityByBusinessKeyRequestParams,
     CreateAddressByBusinessKeyRequestParams,
     CreateContactByBusinessKeyRequestParams,
     CreateContractByBusinessKeyRequestParams,
@@ -140,6 +148,7 @@ import {
     GetIdentifierByBusinessKeyRequestParams,
     GetLaborClassificationByBusinessKeyRequestParams,
     GetPresenceByBusinessKeyRequestParams,
+    GetRuleEntityByBusinessKeyRequestParams,
     GetRuleEntityTypeByCodeRequestParams,
     GetRuleSystemByCodeRequestParams,
     GetWorkCenterByBusinessKeyRequestParams,
@@ -155,6 +164,7 @@ import {
     ListRuleEntitiesRequestParams,
     ReplaceContractFromDateByBusinessKeyRequestParams,
     ReplaceLaborClassificationFromDateByBusinessKeyRequestParams,
+    UpdateAddressByBusinessKeyRequestParams,
     UpdateContactByBusinessKeyRequestParams,
     UpdateContractByBusinessKeyRequestParams,
     UpdateCostCenterByBusinessKeyRequestParams,
@@ -595,6 +605,90 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
     }
 
     /**
+     * Close rule entity occurrence validity
+     * Explicit domain action to close an existing occurrence by setting endDate. Identity fields remain immutable. 
+     * @endpoint post /rule-entities/{ruleSystemCode}/{ruleEntityTypeCode}/{code}/{startDate}/close
+     * @param requestParameters
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     * @param options additional options
+     */
+    public closeRuleEntityByBusinessKey(requestParameters: CloseRuleEntityByBusinessKeyRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<RuleEntityResponse>;
+    public closeRuleEntityByBusinessKey(requestParameters: CloseRuleEntityByBusinessKeyRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<RuleEntityResponse>>;
+    public closeRuleEntityByBusinessKey(requestParameters: CloseRuleEntityByBusinessKeyRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<RuleEntityResponse>>;
+    public closeRuleEntityByBusinessKey(requestParameters: CloseRuleEntityByBusinessKeyRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        const ruleSystemCode = requestParameters?.ruleSystemCode;
+        if (ruleSystemCode === null || ruleSystemCode === undefined) {
+            throw new Error('Required parameter ruleSystemCode was null or undefined when calling closeRuleEntityByBusinessKey.');
+        }
+        const ruleEntityTypeCode = requestParameters?.ruleEntityTypeCode;
+        if (ruleEntityTypeCode === null || ruleEntityTypeCode === undefined) {
+            throw new Error('Required parameter ruleEntityTypeCode was null or undefined when calling closeRuleEntityByBusinessKey.');
+        }
+        const code = requestParameters?.code;
+        if (code === null || code === undefined) {
+            throw new Error('Required parameter code was null or undefined when calling closeRuleEntityByBusinessKey.');
+        }
+        const startDate = requestParameters?.startDate;
+        if (startDate === null || startDate === undefined) {
+            throw new Error('Required parameter startDate was null or undefined when calling closeRuleEntityByBusinessKey.');
+        }
+        const closeRuleEntityRequest = requestParameters?.closeRuleEntityRequest;
+        if (closeRuleEntityRequest === null || closeRuleEntityRequest === undefined) {
+            throw new Error('Required parameter closeRuleEntityRequest was null or undefined when calling closeRuleEntityByBusinessKey.');
+        }
+
+        let localVarHeaders = this.defaultHeaders;
+
+        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
+            'application/json'
+        ]);
+        if (localVarHttpHeaderAcceptSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+        }
+
+        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+        const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Content-Type', httpContentTypeSelected);
+        }
+
+        let responseType_: 'text' | 'json' | 'blob' = 'json';
+        if (localVarHttpHeaderAcceptSelected) {
+            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+                responseType_ = 'text';
+            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+                responseType_ = 'json';
+            } else {
+                responseType_ = 'blob';
+            }
+        }
+
+        let localVarPath = `/rule-entities/${this.configuration.encodeParam({name: "ruleSystemCode", value: ruleSystemCode, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/${this.configuration.encodeParam({name: "ruleEntityTypeCode", value: ruleEntityTypeCode, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/${this.configuration.encodeParam({name: "code", value: code, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/${this.configuration.encodeParam({name: "startDate", value: startDate, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: "date"})}/close`;
+        const { basePath, withCredentials } = this.configuration;
+        return this.httpClient.request<RuleEntityResponse>('post', `${basePath}${localVarPath}`,
+            {
+                context: localVarHttpContext,
+                body: closeRuleEntityRequest,
+                responseType: <any>responseType_,
+                ...(withCredentials ? { withCredentials } : {}),
+                headers: localVarHeaders,
+                observe: observe,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
      * Close employee work center assignment by business key
      * @endpoint post /employees/{ruleSystemCode}/{employeeTypeCode}/{employeeNumber}/work-centers/{workCenterAssignmentNumber}/close
      * @param requestParameters
@@ -667,6 +761,90 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
             {
                 context: localVarHttpContext,
                 body: closeWorkCenterRequest,
+                responseType: <any>responseType_,
+                ...(withCredentials ? { withCredentials } : {}),
+                headers: localVarHeaders,
+                observe: observe,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * Correct existing rule entity occurrence
+     * Corrects mutable fields of the same occurrence identified by the full business key. Identity fields (ruleSystemCode, ruleEntityTypeCode, code, startDate) are immutable. This operation does not create a new occurrence. 
+     * @endpoint put /rule-entities/{ruleSystemCode}/{ruleEntityTypeCode}/{code}/{startDate}
+     * @param requestParameters
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     * @param options additional options
+     */
+    public correctRuleEntityByBusinessKey(requestParameters: CorrectRuleEntityByBusinessKeyRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<RuleEntityResponse>;
+    public correctRuleEntityByBusinessKey(requestParameters: CorrectRuleEntityByBusinessKeyRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<RuleEntityResponse>>;
+    public correctRuleEntityByBusinessKey(requestParameters: CorrectRuleEntityByBusinessKeyRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<RuleEntityResponse>>;
+    public correctRuleEntityByBusinessKey(requestParameters: CorrectRuleEntityByBusinessKeyRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        const ruleSystemCode = requestParameters?.ruleSystemCode;
+        if (ruleSystemCode === null || ruleSystemCode === undefined) {
+            throw new Error('Required parameter ruleSystemCode was null or undefined when calling correctRuleEntityByBusinessKey.');
+        }
+        const ruleEntityTypeCode = requestParameters?.ruleEntityTypeCode;
+        if (ruleEntityTypeCode === null || ruleEntityTypeCode === undefined) {
+            throw new Error('Required parameter ruleEntityTypeCode was null or undefined when calling correctRuleEntityByBusinessKey.');
+        }
+        const code = requestParameters?.code;
+        if (code === null || code === undefined) {
+            throw new Error('Required parameter code was null or undefined when calling correctRuleEntityByBusinessKey.');
+        }
+        const startDate = requestParameters?.startDate;
+        if (startDate === null || startDate === undefined) {
+            throw new Error('Required parameter startDate was null or undefined when calling correctRuleEntityByBusinessKey.');
+        }
+        const correctRuleEntityRequest = requestParameters?.correctRuleEntityRequest;
+        if (correctRuleEntityRequest === null || correctRuleEntityRequest === undefined) {
+            throw new Error('Required parameter correctRuleEntityRequest was null or undefined when calling correctRuleEntityByBusinessKey.');
+        }
+
+        let localVarHeaders = this.defaultHeaders;
+
+        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
+            'application/json'
+        ]);
+        if (localVarHttpHeaderAcceptSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+        }
+
+        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+        const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Content-Type', httpContentTypeSelected);
+        }
+
+        let responseType_: 'text' | 'json' | 'blob' = 'json';
+        if (localVarHttpHeaderAcceptSelected) {
+            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+                responseType_ = 'text';
+            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+                responseType_ = 'json';
+            } else {
+                responseType_ = 'blob';
+            }
+        }
+
+        let localVarPath = `/rule-entities/${this.configuration.encodeParam({name: "ruleSystemCode", value: ruleSystemCode, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/${this.configuration.encodeParam({name: "ruleEntityTypeCode", value: ruleEntityTypeCode, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/${this.configuration.encodeParam({name: "code", value: code, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/${this.configuration.encodeParam({name: "startDate", value: startDate, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: "date"})}`;
+        const { basePath, withCredentials } = this.configuration;
+        return this.httpClient.request<RuleEntityResponse>('put', `${basePath}${localVarPath}`,
+            {
+                context: localVarHttpContext,
+                body: correctRuleEntityRequest,
                 responseType: <any>responseType_,
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
@@ -2467,6 +2645,76 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
     }
 
     /**
+     * Get rule entity occurrence by full business key
+     * Returns the exact occurrence identified by ruleSystemCode, ruleEntityTypeCode, code and startDate.
+     * @endpoint get /rule-entities/{ruleSystemCode}/{ruleEntityTypeCode}/{code}/{startDate}
+     * @param requestParameters
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     * @param options additional options
+     */
+    public getRuleEntityByBusinessKey(requestParameters: GetRuleEntityByBusinessKeyRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<RuleEntityResponse>;
+    public getRuleEntityByBusinessKey(requestParameters: GetRuleEntityByBusinessKeyRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<RuleEntityResponse>>;
+    public getRuleEntityByBusinessKey(requestParameters: GetRuleEntityByBusinessKeyRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<RuleEntityResponse>>;
+    public getRuleEntityByBusinessKey(requestParameters: GetRuleEntityByBusinessKeyRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        const ruleSystemCode = requestParameters?.ruleSystemCode;
+        if (ruleSystemCode === null || ruleSystemCode === undefined) {
+            throw new Error('Required parameter ruleSystemCode was null or undefined when calling getRuleEntityByBusinessKey.');
+        }
+        const ruleEntityTypeCode = requestParameters?.ruleEntityTypeCode;
+        if (ruleEntityTypeCode === null || ruleEntityTypeCode === undefined) {
+            throw new Error('Required parameter ruleEntityTypeCode was null or undefined when calling getRuleEntityByBusinessKey.');
+        }
+        const code = requestParameters?.code;
+        if (code === null || code === undefined) {
+            throw new Error('Required parameter code was null or undefined when calling getRuleEntityByBusinessKey.');
+        }
+        const startDate = requestParameters?.startDate;
+        if (startDate === null || startDate === undefined) {
+            throw new Error('Required parameter startDate was null or undefined when calling getRuleEntityByBusinessKey.');
+        }
+
+        let localVarHeaders = this.defaultHeaders;
+
+        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
+            'application/json'
+        ]);
+        if (localVarHttpHeaderAcceptSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+        }
+
+        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+        const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+
+        let responseType_: 'text' | 'json' | 'blob' = 'json';
+        if (localVarHttpHeaderAcceptSelected) {
+            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+                responseType_ = 'text';
+            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+                responseType_ = 'json';
+            } else {
+                responseType_ = 'blob';
+            }
+        }
+
+        let localVarPath = `/rule-entities/${this.configuration.encodeParam({name: "ruleSystemCode", value: ruleSystemCode, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/${this.configuration.encodeParam({name: "ruleEntityTypeCode", value: ruleEntityTypeCode, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/${this.configuration.encodeParam({name: "code", value: code, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/${this.configuration.encodeParam({name: "startDate", value: startDate, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: "date"})}`;
+        const { basePath, withCredentials } = this.configuration;
+        return this.httpClient.request<RuleEntityResponse>('get', `${basePath}${localVarPath}`,
+            {
+                context: localVarHttpContext,
+                responseType: <any>responseType_,
+                ...(withCredentials ? { withCredentials } : {}),
+                headers: localVarHeaders,
+                observe: observe,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
      * Get rule entity type by code
      * @endpoint get /rule-entity-types/{ruleEntityTypeCode}
      * @param requestParameters
@@ -3634,6 +3882,90 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
             {
                 context: localVarHttpContext,
                 body: replaceLaborClassificationFromDateRequest,
+                responseType: <any>responseType_,
+                ...(withCredentials ? { withCredentials } : {}),
+                headers: localVarHeaders,
+                observe: observe,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * Correct employee address by business key
+     * Administrative correction of the same address occurrence identified by ruleSystemCode, employeeTypeCode, employeeNumber, and addressNumber. This operation does not create a new occurrence and does not mutate occurrence identity fields.
+     * @endpoint put /employees/{ruleSystemCode}/{employeeTypeCode}/{employeeNumber}/addresses/{addressNumber}
+     * @param requestParameters
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     * @param options additional options
+     */
+    public updateAddressByBusinessKey(requestParameters: UpdateAddressByBusinessKeyRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<AddressResponse>;
+    public updateAddressByBusinessKey(requestParameters: UpdateAddressByBusinessKeyRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<AddressResponse>>;
+    public updateAddressByBusinessKey(requestParameters: UpdateAddressByBusinessKeyRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<AddressResponse>>;
+    public updateAddressByBusinessKey(requestParameters: UpdateAddressByBusinessKeyRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        const ruleSystemCode = requestParameters?.ruleSystemCode;
+        if (ruleSystemCode === null || ruleSystemCode === undefined) {
+            throw new Error('Required parameter ruleSystemCode was null or undefined when calling updateAddressByBusinessKey.');
+        }
+        const employeeTypeCode = requestParameters?.employeeTypeCode;
+        if (employeeTypeCode === null || employeeTypeCode === undefined) {
+            throw new Error('Required parameter employeeTypeCode was null or undefined when calling updateAddressByBusinessKey.');
+        }
+        const employeeNumber = requestParameters?.employeeNumber;
+        if (employeeNumber === null || employeeNumber === undefined) {
+            throw new Error('Required parameter employeeNumber was null or undefined when calling updateAddressByBusinessKey.');
+        }
+        const addressNumber = requestParameters?.addressNumber;
+        if (addressNumber === null || addressNumber === undefined) {
+            throw new Error('Required parameter addressNumber was null or undefined when calling updateAddressByBusinessKey.');
+        }
+        const updateAddressRequest = requestParameters?.updateAddressRequest;
+        if (updateAddressRequest === null || updateAddressRequest === undefined) {
+            throw new Error('Required parameter updateAddressRequest was null or undefined when calling updateAddressByBusinessKey.');
+        }
+
+        let localVarHeaders = this.defaultHeaders;
+
+        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
+            'application/json'
+        ]);
+        if (localVarHttpHeaderAcceptSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+        }
+
+        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+        const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Content-Type', httpContentTypeSelected);
+        }
+
+        let responseType_: 'text' | 'json' | 'blob' = 'json';
+        if (localVarHttpHeaderAcceptSelected) {
+            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+                responseType_ = 'text';
+            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+                responseType_ = 'json';
+            } else {
+                responseType_ = 'blob';
+            }
+        }
+
+        let localVarPath = `/employees/${this.configuration.encodeParam({name: "ruleSystemCode", value: ruleSystemCode, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/${this.configuration.encodeParam({name: "employeeTypeCode", value: employeeTypeCode, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/${this.configuration.encodeParam({name: "employeeNumber", value: employeeNumber, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/addresses/${this.configuration.encodeParam({name: "addressNumber", value: addressNumber, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int32"})}`;
+        const { basePath, withCredentials } = this.configuration;
+        return this.httpClient.request<AddressResponse>('put', `${basePath}${localVarPath}`,
+            {
+                context: localVarHttpContext,
+                body: updateAddressRequest,
                 responseType: <any>responseType_,
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,

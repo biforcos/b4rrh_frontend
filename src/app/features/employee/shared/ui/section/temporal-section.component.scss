@@ -51,9 +51,9 @@
 }
 
 .temporal-section__danger-action {
-  border-color: #e0c4c4 !important;
-  background: #fff7f7 !important;
-  color: #7d3030 !important;
+  border-color: #d8c6cf !important;
+  background: #fffafb !important;
+  color: #6f4654 !important;
 }
 
 .temporal-section__body {
@@ -90,9 +90,14 @@
 }
 
 .temporal-section__row--current {
-  border-color: #b8cde1;
-  background: #f3f8fe;
-  box-shadow: inset 3px 0 0 #7f9fbd;
+  border-color: #b3c8dd;
+  background: #f9fcff;
+  box-shadow: inset 3px 0 0 #7899b7;
+}
+
+.temporal-section__row:not(.temporal-section__row--current):not(.temporal-section__row--draft):not(.temporal-section__row--editing-current) {
+  border-color: #e1e8f0;
+  background: #fdfefe;
 }
 
 .temporal-section__row--draft {
@@ -102,7 +107,7 @@
 
 .temporal-section__row--editing-current {
   border-color: #aac8e4;
-  background: #eff6ff;
+  background: #f4f9ff;
   box-shadow: inset 3px 0 0 #5f88b0;
 }
 
@@ -152,9 +157,15 @@
 }
 
 .temporal-section__status--current {
-  border-color: #bbd6ec;
-  background: #ecf6ff;
+  border-color: #c3d8ea;
+  background: #f1f8ff;
   color: #274560;
+}
+
+.temporal-section__edit-current-action {
+  border-color: #c7d8e8 !important;
+  background: #f3f8fe !important;
+  color: #2c4a66 !important;
 }
 
 .temporal-section__create-form {

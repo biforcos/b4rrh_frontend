@@ -1,4 +1,4 @@
-import { CloseAddressRequest, CreateAddressRequest } from '../../../core/api/generated/model/models';
+import { CloseAddressRequest, CreateAddressRequest, UpdateAddressRequest } from '../../../core/api/generated/model/models';
 import { EmployeeAddressModel } from '../models/employee-address.model';
 import { TemporalRowViewModel } from '../shared/ui/section/temporal-section.model';
 
@@ -51,6 +51,24 @@ export function mapAddressCloseDateToRequest(endDate: string): CloseAddressReque
   return {
     endDate: normalizeRequiredValue(endDate),
   };
+}
+
+export function mapAddressEditCurrentDraftToUpdateAddressRequest(draft: AddressEditCurrentDraft): UpdateAddressRequest {
+  return {
+    street: normalizeRequiredValue(draft.street),
+    city: normalizeRequiredValue(draft.city),
+    countryCode: normalizeCode(draft.countryCode),
+    postalCode: normalizeOptionalValue(draft.postalCode),
+    regionCode: normalizeOptionalValue(draft.regionCode),
+  };
+}
+
+export interface AddressEditCurrentDraft {
+  street: string;
+  city: string;
+  countryCode: string;
+  postalCode: string;
+  regionCode: string;
 }
 
 function buildLocality(source: EmployeeAddressModel): string | null {

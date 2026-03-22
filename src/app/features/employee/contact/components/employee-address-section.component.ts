@@ -1,20 +1,16 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
 
-import { AddressCreateDraft, mapEmployeeAddressModelToTemporalRow } from '../../data-access/employee-address-edit.mapper';
+import {
+  AddressCreateDraft,
+  AddressEditCurrentDraft,
+  mapEmployeeAddressModelToTemporalRow,
+} from '../../data-access/employee-address-edit.mapper';
 import { EmployeeAddressStore } from '../../data-access/employee-address.store';
 import { employeeTexts } from '../../employee.texts';
 import { EmployeeBusinessKey } from '../../models/employee-business-key.model';
 import { TemporalSectionComponent } from '../../shared/ui/section/temporal-section.component';
 import { TemporalDisplayMode, TemporalRowViewModel, TemporalSectionTexts } from '../../shared/ui/section/temporal-section.model';
 import { SectionMode, SectionUiState } from '../../shared/ui/section/section-ui-state.model';
-
-interface AddressEditCurrentDraft {
-  street: string;
-  city: string;
-  countryCode: string;
-  postalCode: string;
-  regionCode: string;
-}
 
 const emptyDraft: AddressCreateDraft = {
   addressTypeCode: '',
@@ -215,11 +211,14 @@ export class EmployeeAddressSectionComponent {
 
   protected submitEditCurrent(): void {
     const activeEmployeeKey = this.employeeKey();
-    if (!activeEmployeeKey || this.addressStore.mutating() || !this.isEditCurrentDraftValid()) {
+    const editingAddressNumber = this.editingCurrentKeyState();
+    if (!activeEmployeeKey || editingAddressNumber === null || this.addressStore.mutating() || !this.isEditCurrentDraftValid()) {
       return;
     }
 
-    this.localErrorMessageState.set(this.texts.addressesSectionEditCurrentUnavailableMessage);
+    this.clearLocalError();
+    this.enterManageMode();
+    this.addressStore.updateAddress(activeEmployeeKey, editingAddressNumber, this.editCurrentDraftState());
   }
 
   protected updateCreateDraftAddressTypeCode(event: Event): void {
@@ -405,6 +404,10 @@ export class EmployeeAddressSectionComponent {
 
     if (successCode === 'created') {
       return this.texts.addressesSectionCreateSuccessMessage;
+    }
+
+    if (successCode === 'updated') {
+      return this.texts.addressesSectionEditCurrentSuccessMessage;
     }
 
     if (successCode === 'closed') {

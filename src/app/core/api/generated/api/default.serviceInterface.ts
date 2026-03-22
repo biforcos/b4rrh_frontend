@@ -17,9 +17,11 @@ import { CloseContractRequest } from '../model/models';
 import { CloseCostCenterRequest } from '../model/models';
 import { CloseLaborClassificationRequest } from '../model/models';
 import { ClosePresenceRequest } from '../model/models';
+import { CloseRuleEntityRequest } from '../model/models';
 import { CloseWorkCenterRequest } from '../model/models';
 import { ContactResponse } from '../model/models';
 import { ContractResponse } from '../model/models';
+import { CorrectRuleEntityRequest } from '../model/models';
 import { CostCenterResponse } from '../model/models';
 import { CreateAddressRequest } from '../model/models';
 import { CreateContactRequest } from '../model/models';
@@ -46,6 +48,7 @@ import { ReplaceLaborClassificationFromDateRequest } from '../model/models';
 import { RuleEntityResponse } from '../model/models';
 import { RuleEntityTypeResponse } from '../model/models';
 import { RuleSystemResponse } from '../model/models';
+import { UpdateAddressRequest } from '../model/models';
 import { UpdateContactRequest } from '../model/models';
 import { UpdateContractRequest } from '../model/models';
 import { UpdateCostCenterRequest } from '../model/models';
@@ -100,12 +103,28 @@ export interface ClosePresenceByBusinessKeyRequestParams {
     closePresenceRequest: ClosePresenceRequest;
 }
 
+export interface CloseRuleEntityByBusinessKeyRequestParams {
+    ruleSystemCode: string;
+    ruleEntityTypeCode: string;
+    code: string;
+    startDate: string;
+    closeRuleEntityRequest: CloseRuleEntityRequest;
+}
+
 export interface CloseWorkCenterByBusinessKeyRequestParams {
     ruleSystemCode: string;
     employeeTypeCode: string;
     employeeNumber: string;
     workCenterAssignmentNumber: number;
     closeWorkCenterRequest: CloseWorkCenterRequest;
+}
+
+export interface CorrectRuleEntityByBusinessKeyRequestParams {
+    ruleSystemCode: string;
+    ruleEntityTypeCode: string;
+    code: string;
+    startDate: string;
+    correctRuleEntityRequest: CorrectRuleEntityRequest;
 }
 
 export interface CreateAddressByBusinessKeyRequestParams {
@@ -269,6 +288,13 @@ export interface GetPresenceByBusinessKeyRequestParams {
     presenceNumber: number;
 }
 
+export interface GetRuleEntityByBusinessKeyRequestParams {
+    ruleSystemCode: string;
+    ruleEntityTypeCode: string;
+    code: string;
+    startDate: string;
+}
+
 export interface GetRuleEntityTypeByCodeRequestParams {
     ruleEntityTypeCode: string;
 }
@@ -360,6 +386,14 @@ export interface ReplaceLaborClassificationFromDateByBusinessKeyRequestParams {
     employeeTypeCode: string;
     employeeNumber: string;
     replaceLaborClassificationFromDateRequest: ReplaceLaborClassificationFromDateRequest;
+}
+
+export interface UpdateAddressByBusinessKeyRequestParams {
+    ruleSystemCode: string;
+    employeeTypeCode: string;
+    employeeNumber: string;
+    addressNumber: number;
+    updateAddressRequest: UpdateAddressRequest;
 }
 
 export interface UpdateContactByBusinessKeyRequestParams {
@@ -461,12 +495,28 @@ export interface DefaultServiceInterface {
     closePresenceByBusinessKey(requestParameters: ClosePresenceByBusinessKeyRequestParams, extraHttpRequestParams?: any): Observable<PresenceResponse>;
 
     /**
+     * Close rule entity occurrence validity
+     * Explicit domain action to close an existing occurrence by setting endDate. Identity fields remain immutable. 
+     * @endpoint post /rule-entities/{ruleSystemCode}/{ruleEntityTypeCode}/{code}/{startDate}/close
+* @param requestParameters
+     */
+    closeRuleEntityByBusinessKey(requestParameters: CloseRuleEntityByBusinessKeyRequestParams, extraHttpRequestParams?: any): Observable<RuleEntityResponse>;
+
+    /**
      * Close employee work center assignment by business key
      * 
      * @endpoint post /employees/{ruleSystemCode}/{employeeTypeCode}/{employeeNumber}/work-centers/{workCenterAssignmentNumber}/close
 * @param requestParameters
      */
     closeWorkCenterByBusinessKey(requestParameters: CloseWorkCenterByBusinessKeyRequestParams, extraHttpRequestParams?: any): Observable<WorkCenterResponse>;
+
+    /**
+     * Correct existing rule entity occurrence
+     * Corrects mutable fields of the same occurrence identified by the full business key. Identity fields (ruleSystemCode, ruleEntityTypeCode, code, startDate) are immutable. This operation does not create a new occurrence. 
+     * @endpoint put /rule-entities/{ruleSystemCode}/{ruleEntityTypeCode}/{code}/{startDate}
+* @param requestParameters
+     */
+    correctRuleEntityByBusinessKey(requestParameters: CorrectRuleEntityByBusinessKeyRequestParams, extraHttpRequestParams?: any): Observable<RuleEntityResponse>;
 
     /**
      * Create employee address by business key
@@ -669,6 +719,14 @@ export interface DefaultServiceInterface {
     getPresenceByBusinessKey(requestParameters: GetPresenceByBusinessKeyRequestParams, extraHttpRequestParams?: any): Observable<PresenceResponse>;
 
     /**
+     * Get rule entity occurrence by full business key
+     * Returns the exact occurrence identified by ruleSystemCode, ruleEntityTypeCode, code and startDate.
+     * @endpoint get /rule-entities/{ruleSystemCode}/{ruleEntityTypeCode}/{code}/{startDate}
+* @param requestParameters
+     */
+    getRuleEntityByBusinessKey(requestParameters: GetRuleEntityByBusinessKeyRequestParams, extraHttpRequestParams?: any): Observable<RuleEntityResponse>;
+
+    /**
      * Get rule entity type by code
      * 
      * @endpoint get /rule-entity-types/{ruleEntityTypeCode}
@@ -801,6 +859,14 @@ export interface DefaultServiceInterface {
 * @param requestParameters
      */
     replaceLaborClassificationFromDateByBusinessKey(requestParameters: ReplaceLaborClassificationFromDateByBusinessKeyRequestParams, extraHttpRequestParams?: any): Observable<LaborClassificationResponse>;
+
+    /**
+     * Correct employee address by business key
+     * Administrative correction of the same address occurrence identified by ruleSystemCode, employeeTypeCode, employeeNumber, and addressNumber. This operation does not create a new occurrence and does not mutate occurrence identity fields.
+     * @endpoint put /employees/{ruleSystemCode}/{employeeTypeCode}/{employeeNumber}/addresses/{addressNumber}
+* @param requestParameters
+     */
+    updateAddressByBusinessKey(requestParameters: UpdateAddressByBusinessKeyRequestParams, extraHttpRequestParams?: any): Observable<AddressResponse>;
 
     /**
      * Update employee contact

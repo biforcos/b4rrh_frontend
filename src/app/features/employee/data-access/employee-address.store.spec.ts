@@ -34,6 +34,7 @@ describe('EmployeeAddressStore', () => {
   };
   let gatewayMock: {
     createAddress: ReturnType<typeof vi.fn>;
+    updateAddress: ReturnType<typeof vi.fn>;
     closeAddress: ReturnType<typeof vi.fn>;
   };
 
@@ -43,6 +44,7 @@ describe('EmployeeAddressStore', () => {
     };
     gatewayMock = {
       createAddress: vi.fn().mockReturnValue(of(undefined)),
+      updateAddress: vi.fn().mockReturnValue(of(undefined)),
       closeAddress: vi.fn().mockReturnValue(of(undefined)),
     };
 
@@ -132,6 +134,28 @@ describe('EmployeeAddressStore', () => {
     expect(gatewayMock.closeAddress).toHaveBeenCalledWith(employeeBusinessKey, 1, '2026-01-31');
     expect(readGatewayMock.readEmployeeAddressesByBusinessKey).toHaveBeenCalledTimes(2);
     expect(store.success()).toBe('closed');
+  });
+
+  it('updates address and forces reload from backend after success', () => {
+    store.loadAddresses(employeeBusinessKey);
+
+    store.updateAddress(employeeBusinessKey, 1, {
+      street: 'Calle Nueva 20',
+      city: 'Madrid',
+      countryCode: 'ESP',
+      postalCode: '28009',
+      regionCode: 'M',
+    });
+
+    expect(gatewayMock.updateAddress).toHaveBeenCalledWith(employeeBusinessKey, 1, {
+      street: 'Calle Nueva 20',
+      city: 'Madrid',
+      countryCode: 'ESP',
+      postalCode: '28009',
+      regionCode: 'M',
+    });
+    expect(readGatewayMock.readEmployeeAddressesByBusinessKey).toHaveBeenCalledTimes(2);
+    expect(store.success()).toBe('updated');
   });
 
   it('sets request-failed error when create address fails', () => {

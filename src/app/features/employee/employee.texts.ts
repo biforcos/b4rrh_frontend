@@ -196,12 +196,11 @@ export const employeeTexts = {
   addressesSectionEmptyMessage: 'No hay direcciones cargadas.',
   addressesSectionRequestFailedMessage: 'No se pudo procesar la operacion de direcciones. Reintenta.',
   addressesSectionCreateSuccessMessage: 'Direccion creada correctamente.',
+  addressesSectionEditCurrentSuccessMessage: 'Direccion corregida correctamente.',
   addressesSectionCloseSuccessMessage: 'Direccion cerrada correctamente.',
   addressesSectionEditCurrentHint: 'Corrigiendo la direccion vigente del empleado.',
-  addressesSectionEditCurrentUnavailableMessage:
-    'No se pudo guardar la correccion de la direccion actual con el contrato API disponible.',
   addressesSectionSubtitle:
-    'Mantiene la direccion vigente y el historico de residencias. Puedes agregar una nueva o cerrar la actual.',
+    'Mantiene la direccion vigente y el historico de residencias. Puedes corregir la actual, agregar una nueva o cerrar la vigente.',
   addressesSectionCurrentStatus: 'Actual',
   addressesSectionClosedStatus: 'Cerrada',
   addressesSectionCurrentPeriodLabel: 'actual',
