@@ -21,11 +21,9 @@ import {
   EmployeePresenceBlockModel,
   EmployeePresenceCurrentKind,
 } from '../components/employee-presence-block.component';
-import { EmployeeWorkCenterSectionComponent } from '../components/employee-work-center-section.component';
 import { EmployeeLaborClassificationStore } from '../../data-access/employee-labor-classification.store';
 import { EmployeeContractStore } from '../../data-access/employee-contract.store';
 import { EmployeePresenceStore } from '../../data-access/employee-presence.store';
-import { EmployeeWorkCenterStore } from '../../data-access/employee-work-center.store';
 import { EmployeeContractModel } from '../../models/employee-contract.model';
 import { EmployeeLaborClassificationModel } from '../../models/employee-labor-classification.model';
 import { employeeTexts } from '../../employee.texts';
@@ -39,7 +37,6 @@ import { readEmployeeBusinessKeyFromParamMap } from '../../routing/employee-rout
     EmployeePresenceBlockComponent,
     EmployeeContractBlockComponent,
     EmployeeLaborClassificationBlockComponent,
-    EmployeeWorkCenterSectionComponent,
   ],
   templateUrl: './employee-presence-page.component.html',
   styleUrl: './employee-presence-page.component.scss',
@@ -49,7 +46,6 @@ export class EmployeePresencePageComponent {
   private readonly employeeContractStore = inject(EmployeeContractStore);
   private readonly route = inject(ActivatedRoute);
   private readonly employeePresenceStore = inject(EmployeePresenceStore);
-  private readonly employeeWorkCenterStore = inject(EmployeeWorkCenterStore);
 
   protected readonly texts = employeeTexts;
   protected readonly activeEmployeeKey = toSignal(
@@ -67,14 +63,11 @@ export class EmployeePresencePageComponent {
   protected readonly laborClassifications = this.employeeLaborClassificationStore.laborClassifications;
   protected readonly loadingLaborClassifications = this.employeeLaborClassificationStore.loading;
   protected readonly laborClassificationsError = this.employeeLaborClassificationStore.error;
-  protected readonly loadingWorkCenters = this.employeeWorkCenterStore.loading;
-  protected readonly workCentersError = this.employeeWorkCenterStore.error;
   protected readonly laborAreaLoading = computed(
     () =>
       this.loadingPresences() ||
       this.loadingContracts() ||
-      this.loadingLaborClassifications() ||
-      this.loadingWorkCenters(),
+      this.loadingLaborClassifications(),
   );
   protected readonly presenceBlockModel = computed<EmployeePresenceBlockModel>(() =>
     this.toPresenceBlockModel(this.presences()),

@@ -32,6 +32,13 @@ export const employeeRoutes: Routes = [
           ),
       },
       {
+        path: buildEmployeeDetailRoutePath('organization'),
+        loadComponent: () =>
+          import('./organization/pages/employee-organization-page.component').then(
+            (m) => m.EmployeeOrganizationPageComponent,
+          ),
+      },
+      {
         path: buildEmployeeKeyRoutePath(),
         pathMatch: 'full',
         redirectTo: buildEmployeeDetailRoutePath('contact'),

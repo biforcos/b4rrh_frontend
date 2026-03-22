@@ -26,10 +26,13 @@ const routedDetailAreas = [
     section: 'presence',
     label: employeeTexts.laborAreaLabel,
   },
+  {
+    section: 'organization',
+    label: employeeTexts.organizationalAreaLabel,
+  },
 ] as const satisfies ReadonlyArray<DetailAreaLink>;
 
 const disabledDetailAreas = [
-  { label: employeeTexts.organizationalAreaLabel },
   { label: employeeTexts.payrollAreaLabel },
 ] as const satisfies ReadonlyArray<DisabledDetailAreaLink>;
 

@@ -1,0 +1,31 @@
+<section class="employee-area" [attr.aria-label]="texts.organizationalAreaLabel">
+  <div class="employee-area__state-stack">
+    @if (organizationAreaLoading()) {
+      <p class="employee-area__state">{{ texts.organizationLoadingMessage }}</p>
+    }
+
+    @if (workCentersError() === 'request-failed') {
+      <p class="employee-area__state employee-area__state--error">
+        {{ texts.workCenterSectionLoadFailedMessage }}
+      </p>
+    }
+  </div>
+
+  <div class="employee-area__modules">
+    <section class="employee-area__module">
+      <app-employee-work-center-section [employeeKey]="activeEmployeeKey()" />
+    </section>
+
+    <section class="employee-area__module employee-area__module--future" aria-live="polite">
+      <h3>{{ texts.organizationFutureTitle }}</h3>
+      <p>{{ texts.organizationFutureDescription }}</p>
+      <ul>
+        <li>{{ texts.organizationCostCenterAreaLabel }}</li>
+        <li>{{ texts.organizationAssignmentAreaLabel }}</li>
+        <li>{{ texts.organizationLocationAreaLabel }}</li>
+        <li>{{ texts.organizationDepartmentAreaLabel }}</li>
+        <li>{{ texts.organizationManagerAreaLabel }}</li>
+      </ul>
+    </section>
+  </div>
+</section>

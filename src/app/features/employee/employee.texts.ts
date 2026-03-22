@@ -44,10 +44,15 @@ export const employeeTexts = {
   personalAreaLabel: 'Personales',
   laborAreaLabel: 'Laborales',
   organizationalAreaLabel: 'Organizativos',
+  organizationCostCenterAreaLabel: 'Cost center',
+  organizationAssignmentAreaLabel: 'Assignment',
+  organizationLocationAreaLabel: 'Location',
+  organizationDepartmentAreaLabel: 'Department',
+  organizationManagerAreaLabel: 'Manager',
   payrollAreaLabel: 'Nomina',
   areaDisabledLabel: 'Disponible en siguiente iteracion',
   navRoutingHint:
-    'Resumen, Personales y Laborales ya navegan sobre los verticales activos. Organizativos y Nomina quedan preparados.',
+    'Personales, Laborales y Organizativos ya navegan sobre verticales activos. Nomina queda preparada.',
   timelineTitle: 'Journey',
   timelineEventsSingularLabel: 'evento',
   timelineEventsPluralLabel: 'eventos',
@@ -284,6 +289,10 @@ export const employeeTexts = {
   laborAreaTitle: 'Laborales',
   laborAreaSubtitle: 'Bloques vinculados a presencia, condicion contractual y clasificacion laboral.',
   laborLoadingMessage: 'Cargando datos laborales...',
+  organizationLoadingMessage: 'Cargando datos organizativos...',
+  organizationFutureTitle: 'Proximas asignaciones organizativas',
+  organizationFutureDescription:
+    'Este bloque prepara la incorporacion progresiva de cost center, assignment y otras asignaciones organizativas.',
   laborPresenceBlockTitle: 'Presence',
   laborPresenceBlockDescription:
     'Area conectada al vertical de presencia con capacidad de historial y estado activo.',
