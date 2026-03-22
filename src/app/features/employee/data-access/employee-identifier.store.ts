@@ -4,7 +4,7 @@ import { take } from 'rxjs';
 import { EmployeeIdentifierModel } from '../models/employee-identifier.model';
 import { EmployeeBusinessKey } from '../models/employee-business-key.model';
 import { areEmployeeBusinessKeysEqual, toEmployeeBusinessKey } from '../routing/employee-route-key.util';
-import { SlotDraft } from '../shared/ui/section/editable-slot-section.model';
+import { IdentifierDraft } from './employee-identifier-edit.mapper';
 import { EmployeeIdentifierGateway } from './employee-identifier.gateway';
 import { EmployeeIdentifierReadGateway } from './employee-identifier-read.gateway';
 
@@ -44,7 +44,7 @@ export class EmployeeIdentifierStore {
     this.loadIdentifiersByBusinessKeyInternal(key, false);
   }
 
-  createIdentifier(employeeKey: EmployeeBusinessKey, draft: SlotDraft<string>): void {
+  createIdentifier(employeeKey: EmployeeBusinessKey, draft: IdentifierDraft): void {
     if (this.mutatingState()) {
       return;
     }
@@ -74,8 +74,7 @@ export class EmployeeIdentifierStore {
   updateIdentifier(
     employeeKey: EmployeeBusinessKey,
     identifierTypeCode: string,
-    draft: SlotDraft<string>,
-    source: EmployeeIdentifierModel,
+    draft: IdentifierDraft,
   ): void {
     if (this.mutatingState()) {
       return;
@@ -88,7 +87,7 @@ export class EmployeeIdentifierStore {
     this.successState.set(null);
 
     this.employeeIdentifierGateway
-      .updateIdentifier(normalizedEmployeeKey, identifierTypeCode, draft, source)
+      .updateIdentifier(normalizedEmployeeKey, identifierTypeCode, draft)
       .pipe(take(1))
       .subscribe({
         next: () => {

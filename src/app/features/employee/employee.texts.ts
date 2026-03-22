@@ -161,6 +161,9 @@ export const employeeTexts = {
   identifiersSectionEmptyMessage: 'No hay identificadores cargados.',
   identifiersSectionKeyFieldLabel: 'Tipo de identificador',
   identifiersSectionValueFieldLabel: 'Valor del identificador',
+  identifiersSectionIssuingCountryLabel: 'Pais emisor',
+  identifiersSectionExpirationDateLabel: 'Fecha de caducidad',
+  identifiersSectionIsPrimaryLabel: 'Identificador principal',
   identifiersSectionRequestFailedMessage:
     'No se pudo procesar la operacion de identificadores. Reintenta.',
   identifiersSectionDuplicateTypeMessage: 'Ya existe un identificador para ese tipo.',

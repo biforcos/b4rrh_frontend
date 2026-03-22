@@ -1,6 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
 
-import { mapEmployeeIdentifierModelToSlotRow } from '../../data-access/employee-identifier-edit.mapper';
+import {
+  IdentifierDraft,
+  createEmptyIdentifierDraft,
+  mapEmployeeIdentifierModelToSlotRow,
+} from '../../data-access/employee-identifier-edit.mapper';
 import { EmployeeIdentifierStore } from '../../data-access/employee-identifier.store';
 import { employeeTexts } from '../../employee.texts';
 import { EmployeeBusinessKey } from '../../models/employee-business-key.model';
@@ -9,25 +13,18 @@ import { EditableSlotSectionComponent } from '../../shared/ui/section/editable-s
 import {
   SlotDraft,
   SlotDisplayMode,
-  SlotEditSubmission,
   SlotKeyOption,
   SlotRowViewModel,
   SlotSectionTexts,
 } from '../../shared/ui/section/editable-slot-section.model';
 import { SectionMode, SectionUiState } from '../../shared/ui/section/section-ui-state.model';
 
-function createEmptyIdentifierDraft(): SlotDraft<string> {
-  return {
-    key: null,
-    value: '',
-  };
-}
-
 @Component({
   selector: 'app-employee-identifier-section',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [EditableSlotSectionComponent],
   templateUrl: './employee-identifier-section.component.html',
+  styleUrl: './employee-identifier-section.component.scss',
 })
 export class EmployeeIdentifierSectionComponent {
   readonly employeeKey = input<EmployeeBusinessKey | null>(null);
@@ -37,7 +34,7 @@ export class EmployeeIdentifierSectionComponent {
   private readonly localErrorMessageState = signal<string | null>(null);
   private readonly editingKeyState = signal<string | null>(null);
   private readonly deletingKeyState = signal<string | null>(null);
-  private readonly draftState = signal<SlotDraft<string>>(createEmptyIdentifierDraft());
+  private readonly draftState = signal<IdentifierDraft>(createEmptyIdentifierDraft());
 
   protected readonly texts = employeeTexts;
   protected readonly sectionSubtitle = this.texts.identifiersSectionSubtitle;
@@ -70,6 +67,14 @@ export class EmployeeIdentifierSectionComponent {
   protected readonly availableKeys = computed<ReadonlyArray<SlotKeyOption<string>>>(() => []);
   protected readonly displayMode = this.displayModeState.asReadonly();
   protected readonly draft = this.draftState.asReadonly();
+  protected readonly slotDraft = computed<SlotDraft<string>>(() => {
+    const draft = this.draftState();
+
+    return {
+      key: draft.key,
+      value: draft.value,
+    };
+  });
   protected readonly editingKey = this.editingKeyState.asReadonly();
   protected readonly deletingKey = this.deletingKeyState.asReadonly();
   protected readonly sectionState = computed<SectionUiState>(() => {
@@ -178,12 +183,37 @@ export class EmployeeIdentifierSectionComponent {
     this.clearInteractionFeedback();
   }
 
-  protected submitCreate(draft: SlotDraft<string>): void {
+  protected updateDraftIssuingCountryCode(issuingCountryCode: string): void {
+    this.draftState.update((draft) => ({
+      ...draft,
+      issuingCountryCode,
+    }));
+    this.clearInteractionFeedback();
+  }
+
+  protected updateDraftExpirationDate(expirationDate: string): void {
+    this.draftState.update((draft) => ({
+      ...draft,
+      expirationDate,
+    }));
+    this.clearInteractionFeedback();
+  }
+
+  protected updateDraftIsPrimary(isPrimary: boolean): void {
+    this.draftState.update((draft) => ({
+      ...draft,
+      isPrimary,
+    }));
+    this.clearInteractionFeedback();
+  }
+
+  protected submitCreate(): void {
     const activeEmployeeKey = this.employeeKey();
     if (!activeEmployeeKey || this.identifierStore.mutating()) {
       return;
     }
 
+    const draft = this.draftState();
     const normalizedTypeCode = this.normalizeIdentifierTypeCode(draft.key);
     if (!normalizedTypeCode) {
       return;
@@ -198,25 +228,34 @@ export class EmployeeIdentifierSectionComponent {
     this.clearLocalError();
     this.enterManageMode();
     this.identifierStore.createIdentifier(activeEmployeeKey, {
+      ...draft,
       key: normalizedTypeCode,
-      value: draft.value,
     });
   }
 
-  protected submitEdit(submission: SlotEditSubmission<string>): void {
+  protected submitEdit(): void {
     const activeEmployeeKey = this.employeeKey();
     if (!activeEmployeeKey || this.identifierStore.mutating()) {
       return;
     }
 
-    const sourceIdentifier = this.findIdentifierByTypeCode(submission.key);
+    const draft = this.draftState();
+    const normalizedTypeCode = this.normalizeIdentifierTypeCode(draft.key);
+    if (!normalizedTypeCode) {
+      return;
+    }
+
+    const sourceIdentifier = this.findIdentifierByTypeCode(normalizedTypeCode);
     if (!sourceIdentifier) {
       return;
     }
 
     this.clearLocalError();
     this.enterManageMode();
-    this.identifierStore.updateIdentifier(activeEmployeeKey, submission.key, submission, sourceIdentifier);
+    this.identifierStore.updateIdentifier(activeEmployeeKey, normalizedTypeCode, {
+      ...draft,
+      key: normalizedTypeCode,
+    });
   }
 
   private canStartInteraction(): boolean {
@@ -260,12 +299,20 @@ export class EmployeeIdentifierSectionComponent {
   }
 
   private enterEditMode(row: SlotRowViewModel<string>): void {
+    const sourceIdentifier = this.findIdentifierByTypeCode(row.key);
+    if (!sourceIdentifier) {
+      return;
+    }
+
     this.displayModeState.set('editing');
     this.editingKeyState.set(row.key);
     this.deletingKeyState.set(null);
     this.draftState.set({
-      key: row.key,
-      value: row.value,
+      key: sourceIdentifier.typeCode,
+      value: sourceIdentifier.value,
+      issuingCountryCode: sourceIdentifier.issuingCountryCode ?? '',
+      expirationDate: sourceIdentifier.expirationDate ?? '',
+      isPrimary: sourceIdentifier.isPrimary,
     });
   }
 

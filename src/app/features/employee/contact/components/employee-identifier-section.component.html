@@ -5,7 +5,7 @@
   [displayMode]="displayMode()"
   [rows]="rows()"
   [texts]="slotTexts"
-  [draft]="draft()"
+  [draft]="slotDraft()"
   [editingKey]="editingKey()"
   [deletingKey]="deletingKey()"
   [availableKeys]="availableKeys()"
@@ -19,8 +19,88 @@
   (deleteRequested)="requestDelete($event)"
   (deleteConfirmed)="confirmDelete($event)"
   (cancelled)="cancel()"
-  (draftKeyChanged)="updateDraftKey($event)"
-  (draftValueChanged)="updateDraftValue($event)"
-  (createSubmitted)="submitCreate($event)"
-  (editSubmitted)="submitEdit($event)"
-/>
+  (createSubmitted)="submitCreate()"
+  (editSubmitted)="submitEdit()"
+>
+  <ng-template #slotCreateForm slotCreateForm>
+    <div class="employee-identifier-section__form-grid">
+      <label>
+        <span>{{ texts.identifiersSectionKeyFieldLabel }}</span>
+        <input type="text" [value]="draft().key ?? ''" (input)="updateDraftKey($any($event.target).value)" />
+      </label>
+
+      <label>
+        <span>{{ texts.identifiersSectionValueFieldLabel }}</span>
+        <input type="text" [value]="draft().value" (input)="updateDraftValue($any($event.target).value)" />
+      </label>
+
+      <label>
+        <span>{{ texts.identifiersSectionIssuingCountryLabel }}</span>
+        <input
+          type="text"
+          [value]="draft().issuingCountryCode"
+          (input)="updateDraftIssuingCountryCode($any($event.target).value)"
+        />
+      </label>
+
+      <label>
+        <span>{{ texts.identifiersSectionExpirationDateLabel }}</span>
+        <input
+          type="date"
+          [value]="draft().expirationDate"
+          (input)="updateDraftExpirationDate($any($event.target).value)"
+        />
+      </label>
+
+      <label class="employee-identifier-section__checkbox-field">
+        <input
+          type="checkbox"
+          [checked]="draft().isPrimary"
+          (change)="updateDraftIsPrimary($any($event.target).checked)"
+        />
+        <span>{{ texts.identifiersSectionIsPrimaryLabel }}</span>
+      </label>
+    </div>
+  </ng-template>
+
+  <ng-template #slotEditForm slotEditForm>
+    <div class="employee-identifier-section__form-grid">
+      <div class="employee-identifier-section__readonly-field">
+        <span>{{ texts.identifiersSectionKeyFieldLabel }}</span>
+        <strong>{{ draft().key }}</strong>
+      </div>
+
+      <label>
+        <span>{{ texts.identifiersSectionValueFieldLabel }}</span>
+        <input type="text" [value]="draft().value" (input)="updateDraftValue($any($event.target).value)" />
+      </label>
+
+      <label>
+        <span>{{ texts.identifiersSectionIssuingCountryLabel }}</span>
+        <input
+          type="text"
+          [value]="draft().issuingCountryCode"
+          (input)="updateDraftIssuingCountryCode($any($event.target).value)"
+        />
+      </label>
+
+      <label>
+        <span>{{ texts.identifiersSectionExpirationDateLabel }}</span>
+        <input
+          type="date"
+          [value]="draft().expirationDate"
+          (input)="updateDraftExpirationDate($any($event.target).value)"
+        />
+      </label>
+
+      <label class="employee-identifier-section__checkbox-field">
+        <input
+          type="checkbox"
+          [checked]="draft().isPrimary"
+          (change)="updateDraftIsPrimary($any($event.target).checked)"
+        />
+        <span>{{ texts.identifiersSectionIsPrimaryLabel }}</span>
+      </label>
+    </div>
+  </ng-template>
+</app-editable-slot-section>

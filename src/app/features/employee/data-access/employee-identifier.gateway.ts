@@ -3,12 +3,11 @@ import { Observable, map } from 'rxjs';
 
 import { EmployeeIdentifierReadClient } from '../../../core/api/clients/employee-identifier-read.client';
 import { EmployeeBusinessKey } from '../models/employee-business-key.model';
-import { EmployeeIdentifierModel } from '../models/employee-identifier.model';
 import { toEmployeeBusinessKey } from '../routing/employee-route-key.util';
-import { SlotDraft } from '../shared/ui/section/editable-slot-section.model';
 import {
-  mapSlotDraftToCreateIdentifierRequest,
-  mapSlotDraftToUpdateIdentifierRequest,
+  IdentifierDraft,
+  mapIdentifierDraftToCreateIdentifierRequest,
+  mapIdentifierDraftToUpdateIdentifierRequest,
 } from './employee-identifier-edit.mapper';
 
 @Injectable({
@@ -17,19 +16,18 @@ import {
 export class EmployeeIdentifierGateway {
   private readonly identifierClient = inject(EmployeeIdentifierReadClient);
 
-  createIdentifier(employeeKey: EmployeeBusinessKey, draft: SlotDraft<string>): Observable<void> {
+  createIdentifier(employeeKey: EmployeeBusinessKey, draft: IdentifierDraft): Observable<void> {
     const normalizedKey = toEmployeeBusinessKey(employeeKey);
 
     return this.identifierClient
-      .createIdentifierByBusinessKey(normalizedKey, mapSlotDraftToCreateIdentifierRequest(draft))
+      .createIdentifierByBusinessKey(normalizedKey, mapIdentifierDraftToCreateIdentifierRequest(draft))
       .pipe(map(() => undefined));
   }
 
   updateIdentifier(
     employeeKey: EmployeeBusinessKey,
     identifierTypeCode: string,
-    draft: SlotDraft<string>,
-    source: EmployeeIdentifierModel,
+    draft: IdentifierDraft,
   ): Observable<void> {
     const normalizedKey = toEmployeeBusinessKey(employeeKey);
 
@@ -37,7 +35,7 @@ export class EmployeeIdentifierGateway {
       .updateIdentifierByBusinessKey(
         normalizedKey,
         identifierTypeCode.trim().toUpperCase(),
-        mapSlotDraftToUpdateIdentifierRequest(draft, source),
+        mapIdentifierDraftToUpdateIdentifierRequest(draft),
       )
       .pipe(map(() => undefined));
   }

@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
+import { ChangeDetectionStrategy, Component, TemplateRef, computed, contentChild, input, output } from '@angular/core';
 
 import { EmployeeSectionShellComponent } from './employee-section-shell.component';
 import {
@@ -35,7 +36,7 @@ const emptyDraft: SlotDraft<string> = {
 @Component({
   selector: 'app-editable-slot-section',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [EmployeeSectionShellComponent],
+  imports: [EmployeeSectionShellComponent, NgTemplateOutlet],
   templateUrl: './editable-slot-section.component.html',
   styleUrl: './editable-slot-section.component.scss',
 })
@@ -53,6 +54,8 @@ export class EditableSlotSectionComponent {
   readonly canCreate = input(false);
   readonly canEdit = input(false);
   readonly canDelete = input(false);
+  readonly createSubmitEnabled = input<boolean | null>(null);
+  readonly editSubmitEnabled = input<boolean | null>(null);
 
   readonly manageStarted = output<void>();
   readonly manageExited = output<void>();
@@ -65,6 +68,9 @@ export class EditableSlotSectionComponent {
   readonly draftValueChanged = output<string>();
   readonly createSubmitted = output<SlotDraft<string>>();
   readonly editSubmitted = output<SlotEditSubmission<string>>();
+
+  protected readonly customCreateFormTemplate = contentChild<TemplateRef<unknown>>('slotCreateForm');
+  protected readonly customEditFormTemplate = contentChild<TemplateRef<unknown>>('slotEditForm');
 
   protected readonly isViewMode = computed(() => this.displayMode() === 'view');
   protected readonly isManageMode = computed(() => this.displayMode() === 'manage');
@@ -96,6 +102,14 @@ export class EditableSlotSectionComponent {
     return hasValidKey && hasValidValue;
   });
   protected readonly isEditDraftValid = computed(() => this.normalizeValue(this.draft().value).length > 0);
+  protected readonly hasCustomCreateForm = computed(() => this.customCreateFormTemplate() !== undefined);
+  protected readonly hasCustomEditForm = computed(() => this.customEditFormTemplate() !== undefined);
+  protected readonly resolvedCreateSubmitEnabled = computed(
+    () => this.createSubmitEnabled() ?? this.isDraftValid(),
+  );
+  protected readonly resolvedEditSubmitEnabled = computed(
+    () => this.editSubmitEnabled() ?? this.isEditDraftValid(),
+  );
 
   protected trackRowByKey(_index: number, row: SlotRowViewModel<string>): string {
     return row.key;
@@ -169,7 +183,7 @@ export class EditableSlotSectionComponent {
   }
 
   protected onCreateSubmitted(): void {
-    if (!this.isDraftValid() || this.state().busy) {
+    if (!this.resolvedCreateSubmitEnabled() || this.state().busy) {
       return;
     }
 
@@ -180,7 +194,7 @@ export class EditableSlotSectionComponent {
   }
 
   protected onEditSubmitted(rowKey: string): void {
-    if (!this.isEditDraftValid() || this.state().busy) {
+    if (!this.resolvedEditSubmitEnabled() || this.state().busy) {
       return;
     }
 

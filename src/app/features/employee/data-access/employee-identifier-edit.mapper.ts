@@ -1,7 +1,25 @@
 import { CreateIdentifierRequest, UpdateIdentifierRequest } from '../../../core/api/generated/model/models';
 import { EmployeeIdentifierApiModel } from '../../../core/api/clients/employee-identifier-read.client';
 import { EmployeeIdentifierModel } from '../models/employee-identifier.model';
-import { SlotDraft, SlotRowViewModel } from '../shared/ui/section/editable-slot-section.model';
+import { SlotRowViewModel } from '../shared/ui/section/editable-slot-section.model';
+
+export interface IdentifierDraft {
+  key: string | null;
+  value: string;
+  issuingCountryCode: string;
+  expirationDate: string;
+  isPrimary: boolean;
+}
+
+export function createEmptyIdentifierDraft(): IdentifierDraft {
+  return {
+    key: null,
+    value: '',
+    issuingCountryCode: '',
+    expirationDate: '',
+    isPrimary: false,
+  };
+}
 
 export interface EmployeeIdentifierRowTexts {
   primaryBadge: string;
@@ -62,22 +80,22 @@ function buildBadges(
   return [texts.primaryBadge];
 }
 
-export function mapSlotDraftToCreateIdentifierRequest(draft: SlotDraft<string>): CreateIdentifierRequest {
+export function mapIdentifierDraftToCreateIdentifierRequest(draft: IdentifierDraft): CreateIdentifierRequest {
   return {
     identifierTypeCode: normalizeIdentifierTypeCode(draft.key),
     identifierValue: normalizeValue(draft.value),
+    issuingCountryCode: normalizeOptionalCountryCode(draft.issuingCountryCode),
+    expirationDate: normalizeOptionalValue(draft.expirationDate),
+    isPrimary: draft.isPrimary,
   };
 }
 
-export function mapSlotDraftToUpdateIdentifierRequest(
-  draft: SlotDraft<string>,
-  source: EmployeeIdentifierModel,
-): UpdateIdentifierRequest {
+export function mapIdentifierDraftToUpdateIdentifierRequest(draft: IdentifierDraft): UpdateIdentifierRequest {
   return {
     identifierValue: normalizeValue(draft.value),
-    issuingCountryCode: normalizeOptionalCountryCode(source.issuingCountryCode),
-    expirationDate: normalizeOptionalValue(source.expirationDate),
-    isPrimary: source.isPrimary,
+    issuingCountryCode: normalizeOptionalCountryCode(draft.issuingCountryCode),
+    expirationDate: normalizeOptionalValue(draft.expirationDate),
+    isPrimary: draft.isPrimary,
   };
 }
 

@@ -1,0 +1,48 @@
+.employee-identifier-section__form-grid {
+  display: grid;
+  gap: 0.22rem;
+}
+
+.employee-identifier-section__form-grid label {
+  display: grid;
+  gap: 0.05rem;
+}
+
+.employee-identifier-section__form-grid span,
+.employee-identifier-section__readonly-field span {
+  font-size: 0.62rem;
+  line-height: 1.2;
+  color: #5f7386;
+}
+
+.employee-identifier-section__form-grid input[type='text'],
+.employee-identifier-section__form-grid input[type='date'] {
+  border: 1px solid #cedae7;
+  border-radius: 0.42rem;
+  background: #ffffff;
+  color: #1f3246;
+  font-size: 0.67rem;
+  line-height: 1.2;
+  padding: 0.22rem 0.32rem;
+}
+
+.employee-identifier-section__checkbox-field {
+  display: flex !important;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.employee-identifier-section__checkbox-field span {
+  font-size: 0.66rem;
+  color: #3c546b;
+}
+
+.employee-identifier-section__readonly-field {
+  display: grid;
+  gap: 0.06rem;
+}
+
+.employee-identifier-section__readonly-field strong {
+  font-size: 0.7rem;
+  color: #1f3246;
+}

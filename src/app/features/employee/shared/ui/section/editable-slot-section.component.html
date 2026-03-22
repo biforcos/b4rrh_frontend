@@ -26,29 +26,35 @@
 
     @if (isCreating()) {
       <article class="editable-slot-section__row editable-slot-section__row--draft">
-        <div class="editable-slot-section__fields">
-          <label>
-            <span>{{ texts().keyFieldLabel }}</span>
-            @if (canUseKeySelect()) {
-              <select [value]="draft().key ?? ''" (change)="onDraftKeySelect($event)">
-                <option value="">{{ texts().keyFieldLabel }}</option>
-                @for (option of availableKeys(); track option.value) {
-                  <option [value]="option.value">{{ option.label }}</option>
-                }
-              </select>
-            } @else {
-              <input type="text" [value]="draft().key ?? ''" (input)="onDraftKeyInput($event)" />
-            }
-          </label>
+        @if (hasCustomCreateForm()) {
+          <div class="editable-slot-section__fields editable-slot-section__fields--custom">
+            <ng-container [ngTemplateOutlet]="customCreateFormTemplate()!"></ng-container>
+          </div>
+        } @else {
+          <div class="editable-slot-section__fields">
+            <label>
+              <span>{{ texts().keyFieldLabel }}</span>
+              @if (canUseKeySelect()) {
+                <select [value]="draft().key ?? ''" (change)="onDraftKeySelect($event)">
+                  <option value="">{{ texts().keyFieldLabel }}</option>
+                  @for (option of availableKeys(); track option.value) {
+                    <option [value]="option.value">{{ option.label }}</option>
+                  }
+                </select>
+              } @else {
+                <input type="text" [value]="draft().key ?? ''" (input)="onDraftKeyInput($event)" />
+              }
+            </label>
 
-          <label>
-            <span>{{ texts().valueFieldLabel }}</span>
-            <input type="text" [value]="draft().value" (input)="onDraftValueInput($event)" />
-          </label>
-        </div>
+            <label>
+              <span>{{ texts().valueFieldLabel }}</span>
+              <input type="text" [value]="draft().value" (input)="onDraftValueInput($event)" />
+            </label>
+          </div>
+        }
 
         <div class="editable-slot-section__row-actions">
-          <button type="button" [disabled]="!isDraftValid() || state().busy" (click)="onCreateSubmitted()">
+          <button type="button" [disabled]="!resolvedCreateSubmitEnabled() || state().busy" (click)="onCreateSubmitted()">
             {{ texts().saveCreateAction }}
           </button>
           <button type="button" class="editable-slot-section__cancel-action" (click)="onCancelled()">
@@ -68,20 +74,26 @@
             [class.editable-slot-section__row--confirming-delete]="isRowDeleteConfirming(row)"
           >
             @if (isRowEditing(row)) {
-              <div class="editable-slot-section__fields">
-                <div class="editable-slot-section__readonly-field">
-                  <span>{{ texts().keyFieldLabel }}</span>
-                  <strong>{{ row.keyLabel }}</strong>
+              @if (hasCustomEditForm()) {
+                <div class="editable-slot-section__fields editable-slot-section__fields--custom">
+                  <ng-container [ngTemplateOutlet]="customEditFormTemplate()!"></ng-container>
                 </div>
+              } @else {
+                <div class="editable-slot-section__fields">
+                  <div class="editable-slot-section__readonly-field">
+                    <span>{{ texts().keyFieldLabel }}</span>
+                    <strong>{{ row.keyLabel }}</strong>
+                  </div>
 
-                <label>
-                  <span>{{ texts().valueFieldLabel }}</span>
-                  <input type="text" [value]="draft().value" (input)="onDraftValueInput($event)" />
-                </label>
-              </div>
+                  <label>
+                    <span>{{ texts().valueFieldLabel }}</span>
+                    <input type="text" [value]="draft().value" (input)="onDraftValueInput($event)" />
+                  </label>
+                </div>
+              }
 
               <div class="editable-slot-section__row-actions">
-                <button type="button" [disabled]="!isEditDraftValid() || state().busy" (click)="onEditSubmitted(row.key)">
+                <button type="button" [disabled]="!resolvedEditSubmitEnabled() || state().busy" (click)="onEditSubmitted(row.key)">
                   {{ texts().saveEditAction }}
                 </button>
                 <button type="button" class="editable-slot-section__cancel-action" (click)="onCancelled()">
