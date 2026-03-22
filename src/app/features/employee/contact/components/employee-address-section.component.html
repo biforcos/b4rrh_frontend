@@ -25,37 +25,37 @@
   <div temporalCreateForm class="employee-address-section__form-grid">
     <label>
       <span>{{ texts.addressesSectionTypeLabel }}</span>
-      <input type="text" [value]="createDraft().addressTypeCode" (input)="updateCreateDraftAddressTypeCode($event)" />
+      <input type="text" [value]="createDraft().addressTypeCode" (input)="updateCreateField('addressTypeCode', $any($event.target).value)" />
     </label>
 
     <label>
       <span>{{ texts.addressesSectionStreetLabel }}</span>
-      <input type="text" [value]="createDraft().street" (input)="updateCreateDraftStreet($event)" />
+      <input type="text" [value]="createDraft().street" (input)="updateCreateField('street', $any($event.target).value)" />
     </label>
 
     <label>
       <span>{{ texts.addressesSectionCityLabel }}</span>
-      <input type="text" [value]="createDraft().city" (input)="updateCreateDraftCity($event)" />
+      <input type="text" [value]="createDraft().city" (input)="updateCreateField('city', $any($event.target).value)" />
     </label>
 
     <label>
       <span>{{ texts.addressesSectionCountryLabel }}</span>
-      <input type="text" [value]="createDraft().countryCode" (input)="updateCreateDraftCountryCode($event)" />
+      <input type="text" [value]="createDraft().countryCode" (input)="updateCreateField('countryCode', $any($event.target).value)" />
     </label>
 
     <label>
       <span>{{ texts.addressesSectionStartDateLabel }}</span>
-      <input type="date" [value]="createDraft().startDate" (input)="updateCreateDraftStartDate($event)" />
+      <input type="date" [value]="createDraft().startDate" (input)="updateCreateField('startDate', $any($event.target).value)" />
     </label>
 
     <label>
       <span>{{ texts.addressesSectionPostalCodeLabel }}</span>
-      <input type="text" [value]="createDraft().postalCode" (input)="updateCreateDraftPostalCode($event)" />
+      <input type="text" [value]="createDraft().postalCode" (input)="updateCreateField('postalCode', $any($event.target).value)" />
     </label>
 
     <label>
       <span>{{ texts.addressesSectionRegionLabel }}</span>
-      <input type="text" [value]="createDraft().regionCode" (input)="updateCreateDraftRegionCode($event)" />
+      <input type="text" [value]="createDraft().regionCode" (input)="updateCreateField('regionCode', $any($event.target).value)" />
     </label>
   </div>
 
@@ -76,27 +76,27 @@
 
     <label>
       <span>{{ texts.addressesSectionStreetLabel }}</span>
-      <input type="text" [value]="editCurrentDraft().street" (input)="updateEditCurrentDraftStreet($event)" />
+      <input type="text" [value]="editCurrentDraft().street" (input)="updateEditCurrentField('street', $any($event.target).value)" />
     </label>
 
     <label>
       <span>{{ texts.addressesSectionCityLabel }}</span>
-      <input type="text" [value]="editCurrentDraft().city" (input)="updateEditCurrentDraftCity($event)" />
+      <input type="text" [value]="editCurrentDraft().city" (input)="updateEditCurrentField('city', $any($event.target).value)" />
     </label>
 
     <label>
       <span>{{ texts.addressesSectionCountryLabel }}</span>
-      <input type="text" [value]="editCurrentDraft().countryCode" (input)="updateEditCurrentDraftCountryCode($event)" />
+      <input type="text" [value]="editCurrentDraft().countryCode" (input)="updateEditCurrentField('countryCode', $any($event.target).value)" />
     </label>
 
     <label>
       <span>{{ texts.addressesSectionPostalCodeLabel }}</span>
-      <input type="text" [value]="editCurrentDraft().postalCode" (input)="updateEditCurrentDraftPostalCode($event)" />
+      <input type="text" [value]="editCurrentDraft().postalCode" (input)="updateEditCurrentField('postalCode', $any($event.target).value)" />
     </label>
 
     <label>
       <span>{{ texts.addressesSectionRegionLabel }}</span>
-      <input type="text" [value]="editCurrentDraft().regionCode" (input)="updateEditCurrentDraftRegionCode($event)" />
+      <input type="text" [value]="editCurrentDraft().regionCode" (input)="updateEditCurrentField('regionCode', $any($event.target).value)" />
     </label>
   </div>
 </app-temporal-section>

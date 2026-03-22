@@ -189,8 +189,8 @@ export class EmployeeAddressSectionComponent {
     }
 
     this.clearLocalError();
-    this.enterManageMode();
     this.addressStore.closeAddress(activeEmployeeKey, addressNumber, this.currentBusinessDate());
+    this.enterManageMode();
   }
 
   protected cancel(): void {
@@ -204,94 +204,44 @@ export class EmployeeAddressSectionComponent {
       return;
     }
 
+    const draft = this.createDraftState();
     this.clearLocalError();
+    this.addressStore.createAddress(activeEmployeeKey, draft);
     this.enterManageMode();
-    this.addressStore.createAddress(activeEmployeeKey, this.createDraftState());
   }
 
   protected submitEditCurrent(): void {
     const activeEmployeeKey = this.employeeKey();
     const editingAddressNumber = this.editingCurrentKeyState();
-    if (!activeEmployeeKey || editingAddressNumber === null || this.addressStore.mutating() || !this.isEditCurrentDraftValid()) {
+    if (
+      !activeEmployeeKey ||
+      editingAddressNumber === null ||
+      this.addressStore.mutating() ||
+      !this.isEditCurrentDraftValid()
+    ) {
       return;
     }
 
+    const draft = this.editCurrentDraftState();
     this.clearLocalError();
+    this.addressStore.updateAddress(activeEmployeeKey, editingAddressNumber, draft);
     this.enterManageMode();
-    this.addressStore.updateAddress(activeEmployeeKey, editingAddressNumber, this.editCurrentDraftState());
   }
 
-  protected updateCreateDraftAddressTypeCode(event: Event): void {
-    this.updateDraftField('addressTypeCode', this.readInputValue(event));
-  }
-
-  protected updateCreateDraftStreet(event: Event): void {
-    this.updateDraftField('street', this.readInputValue(event));
-  }
-
-  protected updateCreateDraftCity(event: Event): void {
-    this.updateDraftField('city', this.readInputValue(event));
-  }
-
-  protected updateCreateDraftCountryCode(event: Event): void {
-    this.updateDraftField('countryCode', this.readInputValue(event));
-  }
-
-  protected updateCreateDraftPostalCode(event: Event): void {
-    this.updateDraftField('postalCode', this.readInputValue(event));
-  }
-
-  protected updateCreateDraftRegionCode(event: Event): void {
-    this.updateDraftField('regionCode', this.readInputValue(event));
-  }
-
-  protected updateCreateDraftStartDate(event: Event): void {
-    this.updateDraftField('startDate', this.readInputValue(event));
-  }
-
-  protected updateEditCurrentDraftStreet(event: Event): void {
-    this.updateEditCurrentDraftField('street', this.readInputValue(event));
-  }
-
-  protected updateEditCurrentDraftCity(event: Event): void {
-    this.updateEditCurrentDraftField('city', this.readInputValue(event));
-  }
-
-  protected updateEditCurrentDraftCountryCode(event: Event): void {
-    this.updateEditCurrentDraftField('countryCode', this.readInputValue(event));
-  }
-
-  protected updateEditCurrentDraftPostalCode(event: Event): void {
-    this.updateEditCurrentDraftField('postalCode', this.readInputValue(event));
-  }
-
-  protected updateEditCurrentDraftRegionCode(event: Event): void {
-    this.updateEditCurrentDraftField('regionCode', this.readInputValue(event));
-  }
-
-  private updateDraftField(field: keyof AddressCreateDraft, value: string): void {
-    this.createDraftState.update((draft) => ({
-      ...draft,
+  protected updateCreateField(field: keyof AddressCreateDraft, value: string): void {
+    this.createDraftState.set({
+      ...this.createDraftState(),
       [field]: value,
-    }));
+    });
     this.clearInteractionFeedback();
   }
 
-  private updateEditCurrentDraftField(field: keyof AddressEditCurrentDraft, value: string): void {
-    this.editCurrentDraftState.update((draft) => ({
-      ...draft,
+  protected updateEditCurrentField(field: keyof AddressEditCurrentDraft, value: string): void {
+    this.editCurrentDraftState.set({
+      ...this.editCurrentDraftState(),
       [field]: value,
-    }));
+    });
     this.clearInteractionFeedback();
-  }
-
-  private readInputValue(event: Event): string {
-    const target = event.target;
-    if (!(target instanceof HTMLInputElement)) {
-      return '';
-    }
-
-    return target.value;
   }
 
   private canStartInteraction(): boolean {
