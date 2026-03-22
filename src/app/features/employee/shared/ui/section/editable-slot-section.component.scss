@@ -39,9 +39,10 @@
 }
 
 .editable-slot-section__add-action {
-  border-color: #bfd4e9 !important;
-  background: #eef6ff !important;
-  color: #2b4965 !important;
+  border-color: #9ebedf !important;
+  background: #e6f1fc !important;
+  color: #1f4365 !important;
+  font-weight: 700 !important;
 }
 
 .editable-slot-section__exit-manage-action {
@@ -87,6 +88,12 @@
   padding: 0.52rem 0.58rem;
   display: grid;
   gap: 0.36rem;
+  transition: border-color 120ms ease, background-color 120ms ease, box-shadow 120ms ease;
+}
+
+.editable-slot-section__row:hover {
+  border-color: #c7d7e8;
+  background: #fbfdff;
 }
 
 .editable-slot-section__row--draft {
@@ -100,8 +107,9 @@
 }
 
 .editable-slot-section__row--editing {
-  border-color: #bdd2e6;
-  background: #f4f9ff;
+  border-color: #9fbdd9;
+  background: #edf5fe;
+  box-shadow: inset 3px 0 0 #6f93b6;
 }
 
 .editable-slot-section__row--confirming-delete {
@@ -117,17 +125,22 @@
 .editable-slot-section__key,
 .editable-slot-section__value {
   margin: 0;
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   line-height: 1.3;
 }
 
 .editable-slot-section__key {
+  font-size: 0.66rem;
   font-weight: 700;
-  color: #203348;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #61758a;
 }
 
 .editable-slot-section__value {
-  color: #4f6478;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #24394f;
 }
 
 .editable-slot-section__secondary {

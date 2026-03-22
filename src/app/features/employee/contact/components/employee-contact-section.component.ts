@@ -17,6 +17,14 @@ import {
 } from '../../shared/ui/section/editable-slot-section.model';
 import { SectionMode, SectionUiState } from '../../shared/ui/section/section-ui-state.model';
 
+const contactTypeOptions: ReadonlyArray<SlotKeyOption<string>> = [
+  { value: 'EMAIL', label: 'Email' },
+  { value: 'PHONE', label: 'Telefono' },
+  { value: 'MOBILE', label: 'Movil' },
+];
+
+const sectionSubtitle = 'Un contacto por tipo. El tipo no se puede modificar una vez creado.';
+
 const emptyDraft: SlotDraft<string> = {
   key: null,
   value: '',
@@ -26,34 +34,7 @@ const emptyDraft: SlotDraft<string> = {
   selector: 'app-employee-contact-section',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [EditableSlotSectionComponent],
-  template: `
-    <app-editable-slot-section
-      [title]="texts.contactsSectionTitle"
-      [subtitle]="null"
-      [state]="sectionState()"
-      [displayMode]="displayMode()"
-      [rows]="rows()"
-      [texts]="slotTexts"
-      [draft]="draft()"
-      [editingKey]="editingKey()"
-      [deletingKey]="deletingKey()"
-      [availableKeys]="availableKeys()"
-      [canCreate]="true"
-      [canEdit]="true"
-      [canDelete]="true"
-      (manageStarted)="onManageStarted()"
-      (manageExited)="onManageExited()"
-      (createStarted)="onCreateStarted()"
-      (editStarted)="onEditStarted($event)"
-      (deleteRequested)="onDeleteRequested($event)"
-      (deleteConfirmed)="onDeleteConfirmed($event)"
-      (cancelled)="onCancelled()"
-      (draftKeyChanged)="onDraftKeyChanged($event)"
-      (draftValueChanged)="onDraftValueChanged($event)"
-      (createSubmitted)="onCreateSubmitted($event)"
-      (editSubmitted)="onEditSubmitted($event)"
-    />
-  `,
+  templateUrl: './employee-contact-section.component.html',
 })
 export class EmployeeContactSectionComponent {
   readonly employeeKey = input<EmployeeBusinessKey | null>(null);
@@ -67,27 +48,32 @@ export class EmployeeContactSectionComponent {
 
   protected readonly texts = employeeTexts;
   protected readonly slotTexts: SlotSectionTexts = {
-    manageAction: this.texts.contactsSectionManageAction,
-    exitManageAction: this.texts.contactsSectionExitManageAction,
-    addAction: this.texts.contactsSectionAddAction,
+    manageAction: 'Gestionar contactos',
+    exitManageAction: 'Salir',
+    addAction: 'Agregar contacto',
     editAction: this.texts.contactsSectionEditAction,
     deleteAction: this.texts.contactsSectionDeleteAction,
     cancelAction: this.texts.contactsSectionCancelAction,
-    saveCreateAction: this.texts.contactsSectionSaveCreateAction,
-    saveEditAction: this.texts.contactsSectionSaveEditAction,
+    saveCreateAction: 'Guardar',
+    saveEditAction: 'Guardar',
     confirmDeleteMessage: this.texts.contactsSectionConfirmDeleteMessage,
     confirmDeleteAction: this.texts.contactsSectionConfirmDeleteAction,
     emptyMessage: this.texts.contactsSectionEmptyMessage,
     keyFieldLabel: this.texts.contactsSectionKeyFieldLabel,
     valueFieldLabel: this.texts.contactsSectionValueFieldLabel,
   };
+  protected readonly sectionSubtitle = sectionSubtitle;
   protected readonly rows = computed<ReadonlyArray<SlotRowViewModel<string>>>(() =>
     this.contactStore
       .contacts()
       .map((contact) => mapEmployeeContactModelToSlotRow(contact))
       .sort((left, right) => left.key.localeCompare(right.key)),
   );
-  protected readonly availableKeys = computed<ReadonlyArray<SlotKeyOption<string>>>(() => []);
+  protected readonly availableKeys = computed<ReadonlyArray<SlotKeyOption<string>>>(() => {
+    const usedKeys = new Set(this.rows().map((row) => row.key.trim().toUpperCase()));
+
+    return contactTypeOptions.filter((option) => !usedKeys.has(option.value));
+  });
   protected readonly displayMode = this.displayModeState.asReadonly();
   protected readonly draft = this.draftState.asReadonly();
   protected readonly editingKey = this.editingKeyState.asReadonly();
@@ -97,7 +83,7 @@ export class EmployeeContactSectionComponent {
 
     return {
       mode: isBusy ? 'submitting' : this.toSectionMode(this.displayModeState()),
-      dirty: false,
+      dirty: this.displayModeState() === 'creating' || this.displayModeState() === 'editing',
       busy: isBusy,
       errorMessage: this.resolveErrorMessage(),
       successMessage: this.resolveSuccessMessage(),
@@ -115,7 +101,7 @@ export class EmployeeContactSectionComponent {
     });
   }
 
-  protected onManageStarted(): void {
+  protected startManage(): void {
     if (!this.canStartInteraction()) {
       return;
     }
@@ -124,12 +110,12 @@ export class EmployeeContactSectionComponent {
     this.enterManageMode();
   }
 
-  protected onManageExited(): void {
+  protected exitManage(): void {
     this.clearInteractionFeedback();
     this.enterViewMode();
   }
 
-  protected onCreateStarted(): void {
+  protected startCreate(): void {
     if (!this.canStartInteraction()) {
       return;
     }
@@ -138,7 +124,7 @@ export class EmployeeContactSectionComponent {
     this.enterCreateMode();
   }
 
-  protected onEditStarted(contactTypeCode: string): void {
+  protected startEdit(contactTypeCode: string): void {
     if (!this.canStartInteraction()) {
       return;
     }
@@ -152,7 +138,7 @@ export class EmployeeContactSectionComponent {
     this.enterEditMode(row);
   }
 
-  protected onDeleteRequested(contactTypeCode: string): void {
+  protected requestDelete(contactTypeCode: string): void {
     if (!this.canStartInteraction()) {
       return;
     }
@@ -166,7 +152,7 @@ export class EmployeeContactSectionComponent {
     this.enterDeleteConfirmMode(row.key);
   }
 
-  protected onDeleteConfirmed(contactTypeCode: string): void {
+  protected confirmDelete(contactTypeCode: string): void {
     const activeEmployeeKey = this.employeeKey();
     if (!activeEmployeeKey || this.contactStore.mutating()) {
       return;
@@ -177,12 +163,12 @@ export class EmployeeContactSectionComponent {
     this.contactStore.deleteContact(activeEmployeeKey, contactTypeCode);
   }
 
-  protected onCancelled(): void {
+  protected cancel(): void {
     this.clearInteractionFeedback();
     this.enterManageMode();
   }
 
-  protected onDraftKeyChanged(contactTypeCode: string | null): void {
+  protected updateDraftKey(contactTypeCode: string | null): void {
     this.draftState.update((draft) => ({
       ...draft,
       key: contactTypeCode,
@@ -190,7 +176,7 @@ export class EmployeeContactSectionComponent {
     this.clearInteractionFeedback();
   }
 
-  protected onDraftValueChanged(contactValue: string): void {
+  protected updateDraftValue(contactValue: string): void {
     this.draftState.update((draft) => ({
       ...draft,
       value: contactValue,
@@ -198,7 +184,7 @@ export class EmployeeContactSectionComponent {
     this.clearInteractionFeedback();
   }
 
-  protected onCreateSubmitted(draft: SlotDraft<string>): void {
+  protected submitCreate(draft: SlotDraft<string>): void {
     const activeEmployeeKey = this.employeeKey();
     if (!activeEmployeeKey || this.contactStore.mutating()) {
       return;
@@ -219,7 +205,7 @@ export class EmployeeContactSectionComponent {
     this.contactStore.createContact(activeEmployeeKey, draft);
   }
 
-  protected onEditSubmitted(submission: SlotEditSubmission<string>): void {
+  protected submitEdit(submission: SlotEditSubmission<string>): void {
     const activeEmployeeKey = this.employeeKey();
     if (!activeEmployeeKey || this.contactStore.mutating()) {
       return;
