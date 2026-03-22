@@ -416,6 +416,7 @@ export const employeeTexts = {
   laborClassificationSectionCurrentPeriodLabel: 'actual',
   laborClassificationSectionPeriodPrefix: 'Periodo',
   laborClassificationSectionCategoryPrefix: 'Categoria',
+  laborClassificationSectionCodePrefix: 'Codigo',
   laborClassificationSectionReplaceHint:
     'El reemplazo crea una nueva ocurrencia desde la fecha efectiva y ajusta la vigencia anterior segun reglas del backend.',
   laborClassificationSectionEffectiveDateLabel: 'Fecha efectiva',

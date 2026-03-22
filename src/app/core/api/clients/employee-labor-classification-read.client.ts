@@ -14,9 +14,16 @@ import { EmployeeBusinessKeyApiQuery } from './employee-read.client';
 
 export interface EmployeeLaborClassificationApiModel {
   agreementCode: string;
+  agreementName: string | null;
   agreementCategoryCode: string;
+  agreementCategoryName: string | null;
   startDate: string;
   endDate: string | null;
+}
+
+interface LaborClassificationResponseWithNames extends LaborClassificationResponse {
+  agreementName?: string | null;
+  agreementCategoryName?: string | null;
 }
 
 @Injectable({
@@ -136,9 +143,13 @@ export class EmployeeLaborClassificationReadClient {
   private toEmployeeLaborClassificationApiModel(
     source: LaborClassificationResponse,
   ): EmployeeLaborClassificationApiModel {
+    const sourceWithNames = source as LaborClassificationResponseWithNames;
+
     return {
       agreementCode: source.agreementCode,
+      agreementName: this.normalizeOptionalValue(sourceWithNames.agreementName),
       agreementCategoryCode: source.agreementCategoryCode,
+      agreementCategoryName: this.normalizeOptionalValue(sourceWithNames.agreementCategoryName),
       startDate: source.startDate,
       endDate: source.endDate ?? null,
     };

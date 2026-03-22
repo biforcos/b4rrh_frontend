@@ -72,7 +72,9 @@ export class EmployeeLaborClassificationSectionComponent {
     closedStatus: this.texts.laborClassificationSectionStatusClosed,
     currentPeriodLabel: this.texts.laborClassificationSectionCurrentPeriodLabel,
     periodPrefix: this.texts.laborClassificationSectionPeriodPrefix,
+    agreementPrefix: this.texts.laborClassificationSectionAgreementLabel,
     categoryPrefix: this.texts.laborClassificationSectionCategoryPrefix,
+    codePrefix: this.texts.laborClassificationSectionCodePrefix,
   };
 
   protected readonly rows = computed<ReadonlyArray<TemporalRowViewModel<number>>>(() =>

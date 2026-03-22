@@ -6,14 +6,18 @@ const rowTexts = {
   closedStatus: 'Historica',
   currentPeriodLabel: 'actual',
   periodPrefix: 'Periodo',
+  agreementPrefix: 'Convenio',
   categoryPrefix: 'Categoria',
+  codePrefix: 'Codigo',
 } as const;
 
 describe('mapLaborClassificationToTemporalRow', () => {
   it('maps current occurrence as closeable and non-deletable', () => {
     const activeOccurrence: EmployeeLaborClassificationModel = {
       agreementCode: 'AGREEMENT-A',
+      agreementName: null,
       agreementCategoryCode: 'CAT-A',
+      agreementCategoryName: null,
       startDate: '2025-01-01',
       endDate: null,
       isActive: true,
@@ -25,12 +29,17 @@ describe('mapLaborClassificationToTemporalRow', () => {
     expect(row.closeable).toBe(true);
     expect(row.deletable).toBe(false);
     expect(row.periodText).toBe('2025-01-01 - actual');
+    expect(row.title).toBe('Convenio: AGREEMENT-A');
+    expect(row.subtitle).toBeNull();
+    expect(row.detailText).toBe('Categoria: CAT-A');
   });
 
   it('maps historical occurrence as not closeable and non-deletable', () => {
     const historicalOccurrence: EmployeeLaborClassificationModel = {
       agreementCode: 'AGREEMENT-A',
+      agreementName: null,
       agreementCategoryCode: 'CAT-B',
+      agreementCategoryName: null,
       startDate: '2024-01-01',
       endDate: '2024-12-31',
       isActive: false,
@@ -42,5 +51,41 @@ describe('mapLaborClassificationToTemporalRow', () => {
     expect(row.closeable).toBe(false);
     expect(row.deletable).toBe(false);
     expect(row.periodText).toBe('2024-01-01 - 2024-12-31');
+  });
+
+  it('shows agreement and category names as primary with code as secondary when both labels are present', () => {
+    const occurrence: EmployeeLaborClassificationModel = {
+      agreementCode: 'AGR-01',
+      agreementName: 'Convenio Tecnico',
+      agreementCategoryCode: 'CAT-02',
+      agreementCategoryName: 'Tecnico Nivel 2',
+      startDate: '2025-01-01',
+      endDate: null,
+      isActive: true,
+    };
+
+    const row = mapLaborClassificationToTemporalRow(occurrence, rowTexts);
+
+    expect(row.title).toBe('Convenio: Convenio Tecnico');
+    expect(row.subtitle).toBe('Codigo: AGR-01');
+    expect(row.detailText).toBe('Categoria: Tecnico Nivel 2 · Codigo: CAT-02');
+  });
+
+  it('falls back to category code when category label is missing and keeps agreement label', () => {
+    const occurrence: EmployeeLaborClassificationModel = {
+      agreementCode: 'AGR-01',
+      agreementName: 'Convenio Tecnico',
+      agreementCategoryCode: 'CAT-02',
+      agreementCategoryName: null,
+      startDate: '2025-01-01',
+      endDate: null,
+      isActive: true,
+    };
+
+    const row = mapLaborClassificationToTemporalRow(occurrence, rowTexts);
+
+    expect(row.title).toBe('Convenio: Convenio Tecnico');
+    expect(row.subtitle).toBe('Codigo: AGR-01');
+    expect(row.detailText).toBe('Categoria: CAT-02');
   });
 });

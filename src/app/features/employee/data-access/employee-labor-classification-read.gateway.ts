@@ -95,7 +95,9 @@ export class EmployeeLaborClassificationReadGateway {
   ): EmployeeLaborClassificationModel {
     return {
       agreementCode: source.agreementCode,
+      agreementName: source.agreementName,
       agreementCategoryCode: source.agreementCategoryCode,
+      agreementCategoryName: source.agreementCategoryName,
       startDate: source.startDate,
       endDate: source.endDate,
       isActive: source.isActive,

@@ -75,14 +75,18 @@ describe('EmployeeLaborClassificationSectionComponent', () => {
     laborStore.laborClassificationsState.set([
       {
         agreementCode: 'CONV-A',
+        agreementName: null,
         agreementCategoryCode: 'CAT-A',
+        agreementCategoryName: null,
         startDate: '2025-01-01',
         endDate: null,
         isActive: true,
       },
       {
         agreementCode: 'CONV-B',
+        agreementName: null,
         agreementCategoryCode: 'CAT-B',
+        agreementCategoryName: null,
         startDate: '2024-01-01',
         endDate: '2024-12-31',
         isActive: false,
@@ -104,14 +108,18 @@ describe('EmployeeLaborClassificationSectionComponent', () => {
     laborStore.laborClassificationsState.set([
       {
         agreementCode: 'CONV-A',
+        agreementName: null,
         agreementCategoryCode: 'CAT-A',
+        agreementCategoryName: null,
         startDate: '2025-01-01',
         endDate: null,
         isActive: true,
       },
       {
         agreementCode: 'CONV-B',
+        agreementName: null,
         agreementCategoryCode: 'CAT-B',
+        agreementCategoryName: null,
         startDate: '2024-01-01',
         endDate: '2024-12-31',
         isActive: false,
@@ -146,7 +154,9 @@ describe('EmployeeLaborClassificationSectionComponent', () => {
     laborStore.laborClassificationsState.set([
       {
         agreementCode: 'CONV-A',
+        agreementName: null,
         agreementCategoryCode: 'CAT-A',
+        agreementCategoryName: null,
         startDate: '2025-01-01',
         endDate: null,
         isActive: true,
@@ -173,6 +183,54 @@ describe('EmployeeLaborClassificationSectionComponent', () => {
 
     const sectionState = (component as unknown as { sectionState: () => { errorMessage: string | null } }).sectionState();
     expect(sectionState.errorMessage).toBe(employeeTexts.laborClassificationSectionAgreementCategoryRelationInvalidMessage);
+  });
+
+  it('renders names as primary values and falls back to code per field when names are missing', () => {
+    laborStore.laborClassificationsState.set([
+      {
+        agreementCode: 'AGR-A',
+        agreementName: 'Convenio A',
+        agreementCategoryCode: 'CAT-A',
+        agreementCategoryName: 'Categoria A',
+        startDate: '2025-01-01',
+        endDate: null,
+        isActive: true,
+      },
+      {
+        agreementCode: 'AGR-B',
+        agreementName: 'Convenio B',
+        agreementCategoryCode: 'CAT-B',
+        agreementCategoryName: null,
+        startDate: '2024-01-01',
+        endDate: '2024-12-31',
+        isActive: false,
+      },
+      {
+        agreementCode: 'AGR-C',
+        agreementName: null,
+        agreementCategoryCode: 'CAT-C',
+        agreementCategoryName: null,
+        startDate: '2023-01-01',
+        endDate: '2023-12-31',
+        isActive: false,
+      },
+    ]);
+
+    fixture.componentRef.setInput('employeeBusinessKey', employeeBusinessKey);
+    fixture.detectChanges();
+
+    const root = fixture.nativeElement as HTMLElement;
+    const content = root.textContent ?? '';
+
+    expect(content).toContain('Convenio: Convenio A');
+    expect(content).toContain('Codigo: AGR-A');
+    expect(content).toContain('Categoria: Categoria A · Codigo: CAT-A');
+
+    expect(content).toContain('Convenio: Convenio B');
+    expect(content).toContain('Categoria: CAT-B');
+
+    expect(content).toContain('Convenio: AGR-C');
+    expect(content).toContain('Categoria: CAT-C');
   });
 
   function clickByText(text: string): void {
@@ -213,7 +271,7 @@ describe('EmployeeLaborClassificationSectionComponent', () => {
     const rowItems = Array.from(root.querySelectorAll('li.temporal-section__row'));
     const row = rowItems.find((candidate) => {
       const title = candidate.querySelector('.temporal-section__title')?.textContent?.trim() ?? '';
-      return title === rowTitle;
+      return title.includes(rowTitle);
     }) as HTMLElement | undefined;
 
     expect(row).toBeDefined();

@@ -27,7 +27,9 @@ export interface EmployeeLaborClassificationRowTexts {
   closedStatus: string;
   currentPeriodLabel: string;
   periodPrefix: string;
+  agreementPrefix: string;
   categoryPrefix: string;
+  codePrefix: string;
 }
 
 export function createEmptyLaborClassificationReplaceDraft(): LaborClassificationReplaceDraft {
@@ -56,12 +58,16 @@ export function mapLaborClassificationToTemporalRow(
   rowTexts: EmployeeLaborClassificationRowTexts,
 ): TemporalRowViewModel<number> {
   const key = Number(source.startDate.replaceAll('-', ''));
+  const agreementDisplay = resolveDisplay(source.agreementName, source.agreementCode);
+  const categoryDisplay = resolveDisplay(source.agreementCategoryName, source.agreementCategoryCode);
 
   return {
     key,
-    title: source.agreementCode,
-    subtitle: `${rowTexts.categoryPrefix}: ${source.agreementCategoryCode}`,
-    detailText: `${rowTexts.periodPrefix}: ${source.startDate}`,
+    title: `${rowTexts.agreementPrefix}: ${agreementDisplay.label}`,
+    subtitle: agreementDisplay.code ? `${rowTexts.codePrefix}: ${agreementDisplay.code}` : null,
+    detailText: categoryDisplay.code
+      ? `${rowTexts.categoryPrefix}: ${categoryDisplay.label} · ${rowTexts.codePrefix}: ${categoryDisplay.code}`
+      : `${rowTexts.categoryPrefix}: ${categoryDisplay.label}`,
     periodText: source.endDate
       ? `${source.startDate} - ${source.endDate}`
       : `${source.startDate} - ${rowTexts.currentPeriodLabel}`,
@@ -72,6 +78,21 @@ export function mapLaborClassificationToTemporalRow(
     canDelete: false,
     closeable: source.isActive,
     deletable: false,
+  };
+}
+
+function resolveDisplay(name: string | null | undefined, code: string): { label: string; code: string | null } {
+  const normalizedName = name?.trim() ?? '';
+  if (normalizedName.length > 0) {
+    return {
+      label: normalizedName,
+      code,
+    };
+  }
+
+  return {
+    label: code,
+    code: null,
   };
 }
 

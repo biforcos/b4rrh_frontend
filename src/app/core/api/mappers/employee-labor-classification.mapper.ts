@@ -2,7 +2,9 @@ import { EmployeeLaborClassificationApiModel } from '../clients/employee-labor-c
 
 export interface EmployeeLaborClassificationReadModel {
   agreementCode: string;
+  agreementName: string | null;
   agreementCategoryCode: string;
+  agreementCategoryName: string | null;
   startDate: string;
   endDate: string | null;
   isActive: boolean;
@@ -23,7 +25,9 @@ export function mapEmployeeLaborClassificationApiToReadModel(
 
   return {
     agreementCode,
+    agreementName: normalizeOptionalValue(source.agreementName),
     agreementCategoryCode,
+    agreementCategoryName: normalizeOptionalValue(source.agreementCategoryName),
     startDate,
     endDate,
     isActive: endDate === null,
