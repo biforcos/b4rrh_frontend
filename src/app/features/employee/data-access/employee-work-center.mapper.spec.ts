@@ -31,7 +31,7 @@ describe('mapEmployeeWorkCenterModelToTemporalRow', () => {
     expect(row.deletable).toBe(true);
     expect(row.deleteDisabledReason).toBeNull();
     expect(row.title).toBe('MAD-01');
-    expect(row.subtitle).toBeNull();
+    expect(row.titleSecondary).toBeNull();
   });
 
   it('disables delete with explicit reason when occurrence starts at presence start', () => {
@@ -89,6 +89,6 @@ describe('mapEmployeeWorkCenterModelToTemporalRow', () => {
     const row = mapEmployeeWorkCenterModelToTemporalRow(source, rowTexts);
 
     expect(row.title).toBe('Planta Zaragoza');
-    expect(row.subtitle).toBe('ZAR-07');
+    expect(row.titleSecondary).toBe('ZAR-07');
   });
 });

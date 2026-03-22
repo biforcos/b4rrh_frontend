@@ -36,7 +36,8 @@ export function mapEmployeeWorkCenterModelToTemporalRow(
   return {
     key: source.workCenterAssignmentNumber,
     title: display.title,
-    subtitle: display.subtitle,
+    titleSecondary: display.code,
+    subtitle: null,
     periodText: buildPeriodText(source.startDate, source.endDate, texts.currentPeriodLabel, texts.periodPrefix),
     statusLabel: source.isActive ? texts.currentStatus : texts.closedStatus,
     isCurrent: source.isActive,
@@ -79,18 +80,18 @@ function buildPeriodText(startDate: string, endDate: string | null, currentPerio
   return `${periodPrefix}: ${startDate} - ${endDate}`;
 }
 
-function buildDisplay(source: EmployeeWorkCenterModel): { title: string; subtitle: string | null } {
+function buildDisplay(source: EmployeeWorkCenterModel): { title: string; code: string | null } {
   const normalizedName = source.workCenterName?.trim() ?? '';
   if (normalizedName.length === 0) {
     return {
       title: source.workCenterCode,
-      subtitle: null,
+      code: null,
     };
   }
 
   return {
     title: normalizedName,
-    subtitle: source.workCenterCode,
+    code: source.workCenterCode,
   };
 }
 

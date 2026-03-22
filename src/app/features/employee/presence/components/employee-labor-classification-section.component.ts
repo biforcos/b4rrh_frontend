@@ -74,7 +74,6 @@ export class EmployeeLaborClassificationSectionComponent {
     periodPrefix: this.texts.laborClassificationSectionPeriodPrefix,
     agreementPrefix: this.texts.laborClassificationSectionAgreementLabel,
     categoryPrefix: this.texts.laborClassificationSectionCategoryPrefix,
-    codePrefix: this.texts.laborClassificationSectionCodePrefix,
   };
 
   protected readonly rows = computed<ReadonlyArray<TemporalRowViewModel<number>>>(() =>

@@ -1,8 +1,10 @@
 export interface TemporalRowViewModel<KeyType = number> {
   key: KeyType;
   title: string;
+  titleSecondary?: string | null;
   subtitle?: string | null;
   detailText?: string | null;
+  detailSecondary?: string | null;
   periodText?: string | null;
   statusLabel?: string | null;
   isCurrent?: boolean;

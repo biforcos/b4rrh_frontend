@@ -8,7 +8,6 @@ const rowTexts = {
   periodPrefix: 'Periodo',
   agreementPrefix: 'Convenio',
   categoryPrefix: 'Categoria',
-  codePrefix: 'Codigo',
 } as const;
 
 describe('mapLaborClassificationToTemporalRow', () => {
@@ -30,8 +29,9 @@ describe('mapLaborClassificationToTemporalRow', () => {
     expect(row.deletable).toBe(false);
     expect(row.periodText).toBe('2025-01-01 - actual');
     expect(row.title).toBe('Convenio: AGREEMENT-A');
-    expect(row.subtitle).toBeNull();
+    expect(row.titleSecondary).toBeNull();
     expect(row.detailText).toBe('Categoria: CAT-A');
+    expect(row.detailSecondary).toBeNull();
   });
 
   it('maps historical occurrence as not closeable and non-deletable', () => {
@@ -67,8 +67,9 @@ describe('mapLaborClassificationToTemporalRow', () => {
     const row = mapLaborClassificationToTemporalRow(occurrence, rowTexts);
 
     expect(row.title).toBe('Convenio: Convenio Tecnico');
-    expect(row.subtitle).toBe('Codigo: AGR-01');
-    expect(row.detailText).toBe('Categoria: Tecnico Nivel 2 · Codigo: CAT-02');
+    expect(row.titleSecondary).toBe('AGR-01');
+    expect(row.detailText).toBe('Categoria: Tecnico Nivel 2');
+    expect(row.detailSecondary).toBe('CAT-02');
   });
 
   it('falls back to category code when category label is missing and keeps agreement label', () => {
@@ -85,7 +86,8 @@ describe('mapLaborClassificationToTemporalRow', () => {
     const row = mapLaborClassificationToTemporalRow(occurrence, rowTexts);
 
     expect(row.title).toBe('Convenio: Convenio Tecnico');
-    expect(row.subtitle).toBe('Codigo: AGR-01');
+    expect(row.titleSecondary).toBe('AGR-01');
     expect(row.detailText).toBe('Categoria: CAT-02');
+    expect(row.detailSecondary).toBeNull();
   });
 });

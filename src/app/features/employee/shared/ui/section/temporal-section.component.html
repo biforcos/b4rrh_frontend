@@ -103,14 +103,26 @@
               </div>
             } @else {
               <div class="temporal-section__summary">
-                <p class="temporal-section__title">{{ row.title }}</p>
+                <p class="temporal-section__title">
+                  {{ row.title }}
+                  @if (row.titleSecondary) {
+                    <span class="temporal-section__inline-separator"> · </span>
+                    <span class="temporal-section__title-secondary">{{ row.titleSecondary }}</span>
+                  }
+                </p>
 
                 @if (row.subtitle) {
                   <p class="temporal-section__subtitle">{{ row.subtitle }}</p>
                 }
 
                 @if (row.detailText) {
-                  <p class="temporal-section__detail">{{ row.detailText }}</p>
+                  <p class="temporal-section__detail">
+                    {{ row.detailText }}
+                    @if (row.detailSecondary) {
+                      <span class="temporal-section__inline-separator"> · </span>
+                      <span class="temporal-section__detail-secondary">{{ row.detailSecondary }}</span>
+                    }
+                  </p>
                 }
 
                 <div class="temporal-section__meta">
