@@ -21,6 +21,12 @@ export interface EmployeeWorkCenterApiModel {
   deleteForbiddenReason?: string | null;
 }
 
+interface WorkCenterResponseWithDeleteCapabilities extends WorkCenterResponse {
+  canDelete?: boolean;
+  startsAtPresenceStart?: boolean;
+  deleteForbiddenReason?: string | null;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -142,14 +148,16 @@ export class EmployeeWorkCenterReadClient {
   }
 
   private toEmployeeWorkCenterApiModel(source: WorkCenterResponse): EmployeeWorkCenterApiModel {
+    const sourceWithDeleteCapabilities = source as WorkCenterResponseWithDeleteCapabilities;
+
     return {
       workCenterAssignmentNumber: source.workCenterAssignmentNumber,
       workCenterCode: source.workCenterCode,
       startDate: source.startDate,
       endDate: source.endDate ?? null,
-      canDelete: source.canDelete,
-      startsAtPresenceStart: source.startsAtPresenceStart,
-      deleteForbiddenReason: source.deleteForbiddenReason ?? null,
+      canDelete: sourceWithDeleteCapabilities.canDelete,
+      startsAtPresenceStart: sourceWithDeleteCapabilities.startsAtPresenceStart,
+      deleteForbiddenReason: sourceWithDeleteCapabilities.deleteForbiddenReason ?? null,
     };
   }
 }
