@@ -25,6 +25,12 @@
   padding: 0.22rem 0.32rem;
 }
 
+.employee-address-section__form-grid input:focus-visible {
+  outline: none;
+  border-color: #7ea6cc;
+  box-shadow: 0 0 0 2px rgba(126, 166, 204, 0.2);
+}
+
 .employee-address-section__edit-hint {
   margin: 0;
   font-size: 0.66rem;

@@ -52,9 +52,9 @@
 }
 
 .editable-slot-section__danger-action {
-  border-color: #e0c4c4 !important;
-  background: #fff7f7 !important;
-  color: #7d3030 !important;
+  border-color: #d8c6cf !important;
+  background: #fffafb !important;
+  color: #6f4654 !important;
 }
 
 .editable-slot-section__body {
@@ -177,12 +177,12 @@
 .editable-slot-section__fields label,
 .editable-slot-section__readonly-field {
   display: grid;
-  gap: 0.08rem;
+  gap: 0.05rem;
 }
 
 .editable-slot-section__fields span,
 .editable-slot-section__readonly-field span {
-  font-size: 0.68rem;
+  font-size: 0.62rem;
   line-height: 1.2;
   color: #5f7386;
 }
@@ -199,9 +199,16 @@
   border-radius: 0.42rem;
   background: #ffffff;
   color: #1f3246;
-  font-size: 0.76rem;
+  font-size: 0.67rem;
   line-height: 1.2;
-  padding: 0.34rem 0.42rem;
+  padding: 0.22rem 0.32rem;
+}
+
+.editable-slot-section__fields input:focus-visible,
+.editable-slot-section__fields select:focus-visible {
+  outline: none;
+  border-color: #7ea6cc;
+  box-shadow: 0 0 0 2px rgba(126, 166, 204, 0.2);
 }
 
 .editable-slot-section__row-actions {
