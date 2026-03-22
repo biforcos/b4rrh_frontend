@@ -230,6 +230,18 @@ export const employeeTexts = {
   workCenterSectionEmptyMessage: 'No hay asignaciones de centro de trabajo cargadas.',
   workCenterSectionRequestFailedMessage:
     'No se pudo procesar la operacion de centro de trabajo. Reintenta.',
+  workCenterSectionOverlapMessage:
+    'La asignacion se solapa con otra ocurrencia vigente o historica para este empleado.',
+  workCenterSectionOutsidePresenceMessage:
+    'El periodo de centro de trabajo debe estar dentro de un periodo de presencia del empleado.',
+  workCenterSectionCatalogNotFoundMessage:
+    'El centro de trabajo indicado no existe en el catalogo disponible.',
+  workCenterSectionNotFoundMessage:
+    'No se encontro la asignacion seleccionada de centro de trabajo.',
+  workCenterSectionAlreadyClosedMessage:
+    'La asignacion ya esta cerrada y no admite un nuevo cierre.',
+  workCenterSectionFunctionalInvalidPeriodMessage:
+    'El periodo informado no es valido para esta operacion de centro de trabajo.',
   workCenterSectionLoadFailedMessage:
     'No se pudo cargar la informacion de centro de trabajo.',
   workCenterSectionCreateSuccessMessage: 'Asignacion creada correctamente.',

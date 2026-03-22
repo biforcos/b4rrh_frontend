@@ -120,4 +120,42 @@ describe('EmployeeWorkCenterStore', () => {
     expect(store.workCenters()).toEqual(workCentersFixture);
     expect(store.mutating()).toBe(false);
   });
+
+  it('maps known functional backend code on mutation failure', () => {
+    gatewayMock.closeWorkCenter.mockReturnValue(
+      throwError(() => ({
+        error: {
+          code: 'WORK_CENTER_OUTSIDE_PRESENCE',
+        },
+      })),
+    );
+
+    store.loadWorkCenters(employeeBusinessKey);
+    store.closeWorkCenter(employeeBusinessKey, 10, '2023-01-01');
+
+    expect(store.error()).toBe('WORK_CENTER_OUTSIDE_PRESENCE');
+    expect(store.workCenters()).toEqual(workCentersFixture);
+    expect(store.mutating()).toBe(false);
+  });
+
+  it('falls back to request-failed for unknown backend functional code', () => {
+    gatewayMock.createWorkCenter.mockReturnValue(
+      throwError(() => ({
+        error: {
+          code: 'SOME_UNKNOWN_CODE',
+        },
+      })),
+    );
+
+    store.loadWorkCenters(employeeBusinessKey);
+    store.createWorkCenter(employeeBusinessKey, {
+      workCenterCode: 'VAL-03',
+      startDate: '2026-01-01',
+      endDate: '',
+    });
+
+    expect(store.error()).toBe('request-failed');
+    expect(store.workCenters()).toEqual(workCentersFixture);
+    expect(store.mutating()).toBe(false);
+  });
 });

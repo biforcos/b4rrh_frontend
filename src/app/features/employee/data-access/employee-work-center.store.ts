@@ -4,10 +4,9 @@ import { take } from 'rxjs';
 import { EmployeeBusinessKey } from '../models/employee-business-key.model';
 import { EmployeeWorkCenterModel } from '../models/employee-work-center.model';
 import { areEmployeeBusinessKeysEqual, toEmployeeBusinessKey } from '../routing/employee-route-key.util';
+import { EmployeeWorkCenterErrorCode, mapEmployeeWorkCenterErrorCode } from './employee-work-center-error.mapper';
 import { WorkCenterCorrectDraft, WorkCenterCreateDraft } from './employee-work-center.mapper';
 import { EmployeeWorkCenterGateway } from './employee-work-center.gateway';
-
-export type EmployeeWorkCenterErrorCode = 'request-failed';
 
 @Injectable({
   providedIn: 'root',
@@ -58,9 +57,9 @@ export class EmployeeWorkCenterStore {
           this.successState.set('created');
           this.loadWorkCentersByBusinessKeyInternal(normalizedEmployeeKey, true);
         },
-        error: () => {
+        error: (error) => {
           this.mutatingState.set(false);
-          this.errorState.set('request-failed');
+          this.errorState.set(mapEmployeeWorkCenterErrorCode(error));
         },
       });
   }
@@ -85,9 +84,9 @@ export class EmployeeWorkCenterStore {
           this.successState.set('closed');
           this.loadWorkCentersByBusinessKeyInternal(normalizedEmployeeKey, true);
         },
-        error: () => {
+        error: (error) => {
           this.mutatingState.set(false);
-          this.errorState.set('request-failed');
+          this.errorState.set(mapEmployeeWorkCenterErrorCode(error));
         },
       });
   }
@@ -116,9 +115,9 @@ export class EmployeeWorkCenterStore {
           this.successState.set('corrected');
           this.loadWorkCentersByBusinessKeyInternal(normalizedEmployeeKey, true);
         },
-        error: () => {
+        error: (error) => {
           this.mutatingState.set(false);
-          this.errorState.set('request-failed');
+          this.errorState.set(mapEmployeeWorkCenterErrorCode(error));
         },
       });
   }
@@ -162,13 +161,13 @@ export class EmployeeWorkCenterStore {
           this.workCentersState.set(workCenters);
           this.loadingState.set(false);
         },
-        error: () => {
+        error: (error) => {
           if (requestId !== this.requestId) {
             return;
           }
 
           this.loadingState.set(false);
-          this.errorState.set('request-failed');
+          this.errorState.set(mapEmployeeWorkCenterErrorCode(error));
         },
       });
   }
