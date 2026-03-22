@@ -226,11 +226,11 @@ export class EmployeeIdentifierSectionComponent {
     }
 
     this.clearLocalError();
-    this.enterManageMode();
     this.identifierStore.createIdentifier(activeEmployeeKey, {
       ...draft,
       key: normalizedTypeCode,
     });
+    this.enterManageMode();
   }
 
   protected submitEdit(): void {
@@ -245,17 +245,16 @@ export class EmployeeIdentifierSectionComponent {
       return;
     }
 
-    const sourceIdentifier = this.findIdentifierByTypeCode(normalizedTypeCode);
-    if (!sourceIdentifier) {
+    if (!this.findIdentifierByTypeCode(normalizedTypeCode)) {
       return;
     }
 
     this.clearLocalError();
-    this.enterManageMode();
     this.identifierStore.updateIdentifier(activeEmployeeKey, normalizedTypeCode, {
       ...draft,
       key: normalizedTypeCode,
     });
+    this.enterManageMode();
   }
 
   private canStartInteraction(): boolean {
