@@ -25,10 +25,12 @@ const contactTypeOptions: ReadonlyArray<SlotKeyOption<string>> = [
 
 const sectionSubtitle = 'Un contacto por tipo. El tipo no se puede modificar una vez creado.';
 
-const emptyDraft: SlotDraft<string> = {
-  key: null,
-  value: '',
-};
+function createEmptyContactDraft(): SlotDraft<string> {
+  return {
+    key: null,
+    value: '',
+  };
+}
 
 @Component({
   selector: 'app-employee-contact-section',
@@ -44,7 +46,7 @@ export class EmployeeContactSectionComponent {
   private readonly localErrorMessageState = signal<string | null>(null);
   private readonly editingKeyState = signal<string | null>(null);
   private readonly deletingKeyState = signal<string | null>(null);
-  private readonly draftState = signal<SlotDraft<string>>(emptyDraft);
+  private readonly draftState = signal<SlotDraft<string>>(createEmptyContactDraft());
 
   protected readonly texts = employeeTexts;
   protected readonly slotTexts: SlotSectionTexts = {
@@ -243,7 +245,7 @@ export class EmployeeContactSectionComponent {
     this.displayModeState.set('creating');
     this.editingKeyState.set(null);
     this.deletingKeyState.set(null);
-    this.draftState.set(emptyDraft);
+    this.draftState.set(createEmptyContactDraft());
   }
 
   private enterEditMode(row: SlotRowViewModel<string>): void {
@@ -260,7 +262,7 @@ export class EmployeeContactSectionComponent {
     this.displayModeState.set('confirmingDelete');
     this.editingKeyState.set(null);
     this.deletingKeyState.set(contactTypeCode);
-    this.draftState.set(emptyDraft);
+    this.draftState.set(createEmptyContactDraft());
   }
 
   private clearInteractionFeedback(): void {
@@ -275,7 +277,7 @@ export class EmployeeContactSectionComponent {
   private resetOperationContext(): void {
     this.editingKeyState.set(null);
     this.deletingKeyState.set(null);
-    this.draftState.set(emptyDraft);
+    this.draftState.set(createEmptyContactDraft());
   }
 
   private toSectionMode(displayMode: SlotDisplayMode): SectionMode {

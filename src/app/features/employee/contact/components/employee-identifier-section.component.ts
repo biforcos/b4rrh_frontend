@@ -16,10 +16,12 @@ import {
 } from '../../shared/ui/section/editable-slot-section.model';
 import { SectionMode, SectionUiState } from '../../shared/ui/section/section-ui-state.model';
 
-const emptyDraft: SlotDraft<string> = {
-  key: null,
-  value: '',
-};
+function createEmptyIdentifierDraft(): SlotDraft<string> {
+  return {
+    key: null,
+    value: '',
+  };
+}
 
 @Component({
   selector: 'app-employee-identifier-section',
@@ -35,7 +37,7 @@ export class EmployeeIdentifierSectionComponent {
   private readonly localErrorMessageState = signal<string | null>(null);
   private readonly editingKeyState = signal<string | null>(null);
   private readonly deletingKeyState = signal<string | null>(null);
-  private readonly draftState = signal<SlotDraft<string>>(emptyDraft);
+  private readonly draftState = signal<SlotDraft<string>>(createEmptyIdentifierDraft());
 
   protected readonly texts = employeeTexts;
   protected readonly sectionSubtitle = this.texts.identifiersSectionSubtitle;
@@ -254,7 +256,7 @@ export class EmployeeIdentifierSectionComponent {
     this.displayModeState.set('creating');
     this.editingKeyState.set(null);
     this.deletingKeyState.set(null);
-    this.draftState.set(emptyDraft);
+    this.draftState.set(createEmptyIdentifierDraft());
   }
 
   private enterEditMode(row: SlotRowViewModel<string>): void {
@@ -271,7 +273,7 @@ export class EmployeeIdentifierSectionComponent {
     this.displayModeState.set('confirmingDelete');
     this.editingKeyState.set(null);
     this.deletingKeyState.set(identifierTypeCode);
-    this.draftState.set(emptyDraft);
+    this.draftState.set(createEmptyIdentifierDraft());
   }
 
   private clearInteractionFeedback(): void {
@@ -286,7 +288,7 @@ export class EmployeeIdentifierSectionComponent {
   private resetOperationContext(): void {
     this.editingKeyState.set(null);
     this.deletingKeyState.set(null);
-    this.draftState.set(emptyDraft);
+    this.draftState.set(createEmptyIdentifierDraft());
   }
 
   private toSectionMode(displayMode: SlotDisplayMode): SectionMode {

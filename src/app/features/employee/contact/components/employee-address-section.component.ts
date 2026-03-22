@@ -12,15 +12,27 @@ import { TemporalSectionComponent } from '../../shared/ui/section/temporal-secti
 import { TemporalDisplayMode, TemporalRowViewModel, TemporalSectionTexts } from '../../shared/ui/section/temporal-section.model';
 import { SectionMode, SectionUiState } from '../../shared/ui/section/section-ui-state.model';
 
-const emptyDraft: AddressCreateDraft = {
-  addressTypeCode: '',
-  street: '',
-  city: '',
-  countryCode: '',
-  postalCode: '',
-  regionCode: '',
-  startDate: '',
-};
+function createEmptyAddressCreateDraft(): AddressCreateDraft {
+  return {
+    addressTypeCode: '',
+    street: '',
+    city: '',
+    countryCode: '',
+    postalCode: '',
+    regionCode: '',
+    startDate: '',
+  };
+}
+
+function createEmptyAddressEditCurrentDraft(): AddressEditCurrentDraft {
+  return {
+    street: '',
+    city: '',
+    countryCode: '',
+    postalCode: '',
+    regionCode: '',
+  };
+}
 
 @Component({
   selector: 'app-employee-address-section',
@@ -37,14 +49,8 @@ export class EmployeeAddressSectionComponent {
   private readonly localErrorMessageState = signal<string | null>(null);
   private readonly confirmingCloseKeyState = signal<number | null>(null);
   private readonly editingCurrentKeyState = signal<number | null>(null);
-  private readonly createDraftState = signal<AddressCreateDraft>(emptyDraft);
-  private readonly editCurrentDraftState = signal<AddressEditCurrentDraft>({
-    street: '',
-    city: '',
-    countryCode: '',
-    postalCode: '',
-    regionCode: '',
-  });
+  private readonly createDraftState = signal<AddressCreateDraft>(createEmptyAddressCreateDraft());
+  private readonly editCurrentDraftState = signal<AddressEditCurrentDraft>(createEmptyAddressEditCurrentDraft());
 
   protected readonly texts = employeeTexts;
   protected readonly sectionSubtitle = this.texts.addressesSectionSubtitle;
@@ -267,21 +273,15 @@ export class EmployeeAddressSectionComponent {
     this.displayModeState.set('creating');
     this.editingCurrentKeyState.set(null);
     this.confirmingCloseKeyState.set(null);
-    this.createDraftState.set(emptyDraft);
-    this.editCurrentDraftState.set({
-      street: '',
-      city: '',
-      countryCode: '',
-      postalCode: '',
-      regionCode: '',
-    });
+    this.createDraftState.set(createEmptyAddressCreateDraft());
+    this.editCurrentDraftState.set(createEmptyAddressEditCurrentDraft());
   }
 
   private enterEditingCurrentMode(addressNumber: number, draft: AddressEditCurrentDraft): void {
     this.displayModeState.set('editingCurrent');
     this.editingCurrentKeyState.set(addressNumber);
     this.confirmingCloseKeyState.set(null);
-    this.createDraftState.set(emptyDraft);
+    this.createDraftState.set(createEmptyAddressCreateDraft());
     this.editCurrentDraftState.set(draft);
   }
 
@@ -289,14 +289,8 @@ export class EmployeeAddressSectionComponent {
     this.displayModeState.set('confirmingClose');
     this.editingCurrentKeyState.set(null);
     this.confirmingCloseKeyState.set(addressNumber);
-    this.createDraftState.set(emptyDraft);
-    this.editCurrentDraftState.set({
-      street: '',
-      city: '',
-      countryCode: '',
-      postalCode: '',
-      regionCode: '',
-    });
+    this.createDraftState.set(createEmptyAddressCreateDraft());
+    this.editCurrentDraftState.set(createEmptyAddressEditCurrentDraft());
   }
 
   private clearInteractionFeedback(): void {
@@ -311,14 +305,8 @@ export class EmployeeAddressSectionComponent {
   private resetOperationContext(): void {
     this.editingCurrentKeyState.set(null);
     this.confirmingCloseKeyState.set(null);
-    this.createDraftState.set(emptyDraft);
-    this.editCurrentDraftState.set({
-      street: '',
-      city: '',
-      countryCode: '',
-      postalCode: '',
-      regionCode: '',
-    });
+    this.createDraftState.set(createEmptyAddressCreateDraft());
+    this.editCurrentDraftState.set(createEmptyAddressEditCurrentDraft());
   }
 
   private toSectionMode(displayMode: TemporalDisplayMode): SectionMode {
