@@ -50,6 +50,8 @@
         <span>{{ texts.workCenterSectionAssignmentLabel }}</span>
         <strong>#{{ correctingRow.workCenterAssignmentNumber }}</strong>
       </div>
+
+      <p class="employee-work-center-section__hint">{{ texts.workCenterSectionCorrectionHint }}</p>
     }
 
     <label class="employee-work-center-section__field employee-work-center-section__field--code">
@@ -73,6 +75,8 @@
   </div>
 
   <div temporalConfirmCloseForm class="employee-work-center-section__close-form">
+    <p class="employee-work-center-section__hint">{{ texts.workCenterSectionCloseHint }}</p>
+
     <label class="employee-work-center-section__field employee-work-center-section__field--close-date">
       <span>{{ texts.workCenterSectionCloseDateLabel }}</span>
       <input type="date" [value]="closeEndDate()" (input)="updateCloseEndDate($any($event.target).value)" />

@@ -37,9 +37,9 @@
 .employee-work-center-section__readonly-field {
   display: grid;
   gap: 0.06rem;
-  border: 1px solid #d4dfea;
+  border: 1px solid #cbdff0;
   border-radius: 0.42rem;
-  background: #f7fbff;
+  background: #f2f8ff;
   padding: 0.24rem 0.34rem;
 }
 
@@ -52,6 +52,15 @@
   width: 100%;
   max-width: 18rem;
   margin-bottom: 0.12rem;
+  display: grid;
+  gap: 0.16rem;
+}
+
+.employee-work-center-section__hint {
+  margin: 0;
+  font-size: 0.66rem;
+  line-height: 1.3;
+  color: #3b5874;
 }
 
 .employee-work-center-section__field--start-date,

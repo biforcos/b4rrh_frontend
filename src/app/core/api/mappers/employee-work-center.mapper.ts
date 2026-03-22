@@ -3,6 +3,7 @@ import { EmployeeWorkCenterApiModel } from '../clients/employee-work-center-read
 export interface EmployeeWorkCenterReadModel {
   workCenterAssignmentNumber: number;
   workCenterCode: string;
+  workCenterLabel: string | null;
   startDate: string;
   endDate: string | null;
   isActive: boolean;
@@ -23,6 +24,7 @@ export function mapEmployeeWorkCenterApiToReadModel(
   return {
     workCenterAssignmentNumber: source.workCenterAssignmentNumber,
     workCenterCode,
+    workCenterLabel: null,
     startDate,
     endDate,
     isActive: endDate === null,

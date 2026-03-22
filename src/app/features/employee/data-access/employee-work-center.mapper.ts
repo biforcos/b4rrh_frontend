@@ -22,6 +22,7 @@ export interface EmployeeWorkCenterRowTexts {
   currentStatus: string;
   closedStatus: string;
   currentPeriodLabel: string;
+  periodPrefix: string;
   assignmentPrefix: string;
 }
 
@@ -29,11 +30,13 @@ export function mapEmployeeWorkCenterModelToTemporalRow(
   source: EmployeeWorkCenterModel,
   texts: EmployeeWorkCenterRowTexts,
 ): TemporalRowViewModel<number> {
+  const title = buildTitle(source);
+
   return {
     key: source.workCenterAssignmentNumber,
-    title: source.workCenterCode,
-    subtitle: `${texts.assignmentPrefix} ${source.workCenterAssignmentNumber}`,
-    periodText: buildPeriodText(source.startDate, source.endDate, texts.currentPeriodLabel),
+    title,
+    subtitle: source.isActive ? `${texts.assignmentPrefix} ${source.workCenterAssignmentNumber}` : null,
+    periodText: buildPeriodText(source.startDate, source.endDate, texts.currentPeriodLabel, texts.periodPrefix),
     statusLabel: source.isActive ? texts.currentStatus : texts.closedStatus,
     isCurrent: source.isActive,
     closeable: source.isActive,
@@ -62,12 +65,21 @@ export function mapWorkCenterCloseDateToRequest(endDate: string): CloseWorkCente
   };
 }
 
-function buildPeriodText(startDate: string, endDate: string | null, currentPeriodLabel: string): string {
+function buildPeriodText(startDate: string, endDate: string | null, currentPeriodLabel: string, periodPrefix: string): string {
   if (!endDate) {
-    return `${startDate} - ${currentPeriodLabel}`;
+    return `${periodPrefix}: ${startDate} - ${currentPeriodLabel}`;
   }
 
-  return `${startDate} - ${endDate}`;
+  return `${periodPrefix}: ${startDate} - ${endDate}`;
+}
+
+function buildTitle(source: EmployeeWorkCenterModel): string {
+  const normalizedLabel = source.workCenterLabel?.trim() ?? '';
+  if (normalizedLabel.length === 0) {
+    return source.workCenterCode;
+  }
+
+  return `${source.workCenterCode} · ${normalizedLabel}`;
 }
 
 function normalizeCode(value: string | null | undefined): string {

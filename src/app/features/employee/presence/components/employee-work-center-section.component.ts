@@ -69,6 +69,7 @@ export class EmployeeWorkCenterSectionComponent {
     currentStatus: this.texts.workCenterSectionCurrentStatus,
     closedStatus: this.texts.workCenterSectionClosedStatus,
     currentPeriodLabel: this.texts.workCenterSectionCurrentPeriodLabel,
+    periodPrefix: this.texts.workCenterSectionPeriodPrefix,
     assignmentPrefix: this.texts.workCenterSectionAssignmentPrefix,
   };
   protected readonly rows = computed<ReadonlyArray<TemporalRowViewModel<number>>>(() =>
