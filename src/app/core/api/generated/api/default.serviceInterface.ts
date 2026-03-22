@@ -56,6 +56,7 @@ import { UpdateEmployeeRequest } from '../model/models';
 import { UpdateIdentifierRequest } from '../model/models';
 import { UpdateLaborClassificationRequest } from '../model/models';
 import { UpdateRuleSystemRequest } from '../model/models';
+import { UpdateWorkCenterRequest } from '../model/models';
 import { WorkCenterResponse } from '../model/models';
 
 
@@ -447,6 +448,14 @@ export interface UpdateLaborClassificationByBusinessKeyRequestParams {
 export interface UpdateRuleSystemByCodeRequestParams {
     ruleSystemCode: string;
     updateRuleSystemRequest: UpdateRuleSystemRequest;
+}
+
+export interface UpdateWorkCenterByBusinessKeyRequestParams {
+    ruleSystemCode: string;
+    employeeTypeCode: string;
+    employeeNumber: string;
+    workCenterAssignmentNumber: number;
+    updateWorkCenterRequest: UpdateWorkCenterRequest;
 }
 
 
@@ -923,5 +932,13 @@ export interface DefaultServiceInterface {
 * @param requestParameters
      */
     updateRuleSystemByCode(requestParameters: UpdateRuleSystemByCodeRequestParams, extraHttpRequestParams?: any): Observable<RuleSystemResponse>;
+
+    /**
+     * Correct employee work center assignment by business key
+     * Administrative correction of an existing work center assignment occurrence. This operation corrects assignment content and dates for the same occurrence identified by business keys and does not represent a workflow transition.
+     * @endpoint put /employees/{ruleSystemCode}/{employeeTypeCode}/{employeeNumber}/work-centers/{workCenterAssignmentNumber}
+* @param requestParameters
+     */
+    updateWorkCenterByBusinessKey(requestParameters: UpdateWorkCenterByBusinessKeyRequestParams, extraHttpRequestParams?: any): Observable<WorkCenterResponse>;
 
 }

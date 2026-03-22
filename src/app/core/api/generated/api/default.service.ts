@@ -107,6 +107,8 @@ import { UpdateLaborClassificationRequest } from '../model/update-labor-classifi
 // @ts-ignore
 import { UpdateRuleSystemRequest } from '../model/update-rule-system-request';
 // @ts-ignore
+import { UpdateWorkCenterRequest } from '../model/update-work-center-request';
+// @ts-ignore
 import { WorkCenterResponse } from '../model/work-center-response';
 
 // @ts-ignore
@@ -171,7 +173,8 @@ import {
     UpdateEmployeeByBusinessKeyRequestParams,
     UpdateIdentifierByBusinessKeyRequestParams,
     UpdateLaborClassificationByBusinessKeyRequestParams,
-    UpdateRuleSystemByCodeRequestParams
+    UpdateRuleSystemByCodeRequestParams,
+    UpdateWorkCenterByBusinessKeyRequestParams
 } from './default.serviceInterface';
 
 
@@ -4536,6 +4539,90 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
             {
                 context: localVarHttpContext,
                 body: updateRuleSystemRequest,
+                responseType: <any>responseType_,
+                ...(withCredentials ? { withCredentials } : {}),
+                headers: localVarHeaders,
+                observe: observe,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * Correct employee work center assignment by business key
+     * Administrative correction of an existing work center assignment occurrence. This operation corrects assignment content and dates for the same occurrence identified by business keys and does not represent a workflow transition.
+     * @endpoint put /employees/{ruleSystemCode}/{employeeTypeCode}/{employeeNumber}/work-centers/{workCenterAssignmentNumber}
+     * @param requestParameters
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     * @param options additional options
+     */
+    public updateWorkCenterByBusinessKey(requestParameters: UpdateWorkCenterByBusinessKeyRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<WorkCenterResponse>;
+    public updateWorkCenterByBusinessKey(requestParameters: UpdateWorkCenterByBusinessKeyRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<WorkCenterResponse>>;
+    public updateWorkCenterByBusinessKey(requestParameters: UpdateWorkCenterByBusinessKeyRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<WorkCenterResponse>>;
+    public updateWorkCenterByBusinessKey(requestParameters: UpdateWorkCenterByBusinessKeyRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        const ruleSystemCode = requestParameters?.ruleSystemCode;
+        if (ruleSystemCode === null || ruleSystemCode === undefined) {
+            throw new Error('Required parameter ruleSystemCode was null or undefined when calling updateWorkCenterByBusinessKey.');
+        }
+        const employeeTypeCode = requestParameters?.employeeTypeCode;
+        if (employeeTypeCode === null || employeeTypeCode === undefined) {
+            throw new Error('Required parameter employeeTypeCode was null or undefined when calling updateWorkCenterByBusinessKey.');
+        }
+        const employeeNumber = requestParameters?.employeeNumber;
+        if (employeeNumber === null || employeeNumber === undefined) {
+            throw new Error('Required parameter employeeNumber was null or undefined when calling updateWorkCenterByBusinessKey.');
+        }
+        const workCenterAssignmentNumber = requestParameters?.workCenterAssignmentNumber;
+        if (workCenterAssignmentNumber === null || workCenterAssignmentNumber === undefined) {
+            throw new Error('Required parameter workCenterAssignmentNumber was null or undefined when calling updateWorkCenterByBusinessKey.');
+        }
+        const updateWorkCenterRequest = requestParameters?.updateWorkCenterRequest;
+        if (updateWorkCenterRequest === null || updateWorkCenterRequest === undefined) {
+            throw new Error('Required parameter updateWorkCenterRequest was null or undefined when calling updateWorkCenterByBusinessKey.');
+        }
+
+        let localVarHeaders = this.defaultHeaders;
+
+        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
+            'application/json'
+        ]);
+        if (localVarHttpHeaderAcceptSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+        }
+
+        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+        const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Content-Type', httpContentTypeSelected);
+        }
+
+        let responseType_: 'text' | 'json' | 'blob' = 'json';
+        if (localVarHttpHeaderAcceptSelected) {
+            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+                responseType_ = 'text';
+            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+                responseType_ = 'json';
+            } else {
+                responseType_ = 'blob';
+            }
+        }
+
+        let localVarPath = `/employees/${this.configuration.encodeParam({name: "ruleSystemCode", value: ruleSystemCode, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/${this.configuration.encodeParam({name: "employeeTypeCode", value: employeeTypeCode, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/${this.configuration.encodeParam({name: "employeeNumber", value: employeeNumber, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/work-centers/${this.configuration.encodeParam({name: "workCenterAssignmentNumber", value: workCenterAssignmentNumber, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int32"})}`;
+        const { basePath, withCredentials } = this.configuration;
+        return this.httpClient.request<WorkCenterResponse>('put', `${basePath}${localVarPath}`,
+            {
+                context: localVarHttpContext,
+                body: updateWorkCenterRequest,
                 responseType: <any>responseType_,
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,

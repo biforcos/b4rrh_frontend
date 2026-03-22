@@ -48,6 +48,7 @@
             class="temporal-section__row"
             [class.temporal-section__row--current]="row.isCurrent === true"
             [class.temporal-section__row--editing-current]="isRowEditingCurrent(row)"
+            [class.temporal-section__row--correcting]="isRowCorrecting(row)"
           >
             @if (isRowEditingCurrent(row)) {
               <div class="temporal-section__edit-current-form">
@@ -62,9 +63,23 @@
                   {{ texts().cancelAction }}
                 </button>
               </div>
+            } @else if (isRowCorrecting(row)) {
+              <div class="temporal-section__edit-current-form">
+                <ng-content select="[temporalCorrectForm]"></ng-content>
+              </div>
+
+              <div class="temporal-section__row-actions">
+                <button type="button" [disabled]="!correctSubmitEnabled() || state().busy" (click)="onCorrectSubmitted(row.key)">
+                  {{ texts().saveCorrectAction }}
+                </button>
+                <button type="button" class="temporal-section__cancel-action" (click)="onCancelled()">
+                  {{ texts().cancelAction }}
+                </button>
+              </div>
             } @else if (isRowCloseConfirming(row)) {
               <div class="temporal-section__confirm-close">
                 <p>{{ texts().confirmCloseMessage }}</p>
+                <ng-content select="[temporalConfirmCloseForm]"></ng-content>
                 <div class="temporal-section__row-actions">
                   <button type="button" class="temporal-section__danger-action" (click)="onCloseConfirmed(row.key)">
                     {{ texts().confirmCloseAction }}
@@ -102,17 +117,26 @@
                 </div>
               </div>
 
-              @if ((showRowEditCurrentAction() || showRowCloseAction()) && row.isCurrent === true) {
+              @if (
+                showRowCorrectAction() ||
+                ((showRowEditCurrentAction() || showRowCloseAction()) && row.isCurrent === true)
+              ) {
                 <div class="temporal-section__row-actions">
-                  @if (showRowEditCurrentAction()) {
+                  @if (showRowEditCurrentAction() && row.isCurrent === true) {
                     <button type="button" class="temporal-section__edit-current-action" (click)="onEditCurrentStarted(row.key)">
                       {{ texts().editCurrentAction }}
                     </button>
                   }
 
-                  @if (showRowCloseAction() && row.closeable === true) {
-                  <button type="button" class="temporal-section__danger-action" (click)="onCloseRequested(row.key)">
-                    {{ texts().closeAction }}
+                  @if (showRowCloseAction() && row.isCurrent === true && row.closeable === true) {
+                    <button type="button" class="temporal-section__danger-action" (click)="onCloseRequested(row.key)">
+                      {{ texts().closeAction }}
+                    </button>
+                  }
+
+                  @if (showRowCorrectAction()) {
+                  <button type="button" class="temporal-section__edit-current-action" (click)="onCorrectStarted(row.key)">
+                    {{ texts().correctAction }}
                   </button>
                   }
                 </div>

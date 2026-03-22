@@ -9,17 +9,25 @@ export interface TemporalRowViewModel<KeyType = number> {
   closeable?: boolean;
 }
 
-export type TemporalDisplayMode = 'view' | 'manage' | 'creating' | 'editingCurrent' | 'confirmingClose';
+export type TemporalDisplayMode =
+  | 'view'
+  | 'manage'
+  | 'creating'
+  | 'editingCurrent'
+  | 'correcting'
+  | 'confirmingClose';
 
 export interface TemporalSectionTexts {
   manageAction: string;
   exitManageAction: string;
   addAction: string;
   editCurrentAction: string;
+  correctAction: string;
   closeAction: string;
   cancelAction: string;
   saveCreateAction: string;
   saveEditCurrentAction: string;
+  saveCorrectAction: string;
   confirmCloseMessage: string;
   confirmCloseAction: string;
   emptyMessage: string;

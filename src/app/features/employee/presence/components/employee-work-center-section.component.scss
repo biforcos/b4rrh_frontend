@@ -1,0 +1,84 @@
+.employee-work-center-section__form-grid {
+  display: grid;
+  gap: 0.22rem;
+  width: 100%;
+  max-width: 56rem;
+}
+
+.employee-work-center-section__field {
+  display: grid;
+  gap: 0.08rem;
+}
+
+.employee-work-center-section__field span,
+.employee-work-center-section__readonly-field span {
+  font-size: 0.62rem;
+  line-height: 1.2;
+  color: #5f7386;
+}
+
+.employee-work-center-section__field input {
+  border: 1px solid #cedae7;
+  border-radius: 0.42rem;
+  background: #ffffff;
+  color: #1f3246;
+  font-size: 0.67rem;
+  line-height: 1.2;
+  padding: 0.22rem 0.32rem;
+  min-height: 1.8rem;
+}
+
+.employee-work-center-section__field input:focus-visible {
+  outline: none;
+  border-color: #7ea6cc;
+  box-shadow: 0 0 0 2px rgba(126, 166, 204, 0.2);
+}
+
+.employee-work-center-section__readonly-field {
+  display: grid;
+  gap: 0.06rem;
+  border: 1px solid #d4dfea;
+  border-radius: 0.42rem;
+  background: #f7fbff;
+  padding: 0.24rem 0.34rem;
+}
+
+.employee-work-center-section__readonly-field strong {
+  font-size: 0.7rem;
+  color: #1f3246;
+}
+
+.employee-work-center-section__close-form {
+  width: 100%;
+  max-width: 18rem;
+  margin-bottom: 0.12rem;
+}
+
+.employee-work-center-section__field--start-date,
+.employee-work-center-section__field--end-date,
+.employee-work-center-section__field--close-date {
+  max-width: 14rem;
+}
+
+@media (min-width: 900px) {
+  .employee-work-center-section__form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 0.7rem;
+    row-gap: 0.3rem;
+  }
+
+  .employee-work-center-section__readonly-field,
+  .employee-work-center-section__field--code {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 899px) {
+  .employee-work-center-section__form-grid,
+  .employee-work-center-section__close-form,
+  .employee-work-center-section__field--start-date,
+  .employee-work-center-section__field--end-date,
+  .employee-work-center-section__field--close-date {
+    max-width: none;
+  }
+}

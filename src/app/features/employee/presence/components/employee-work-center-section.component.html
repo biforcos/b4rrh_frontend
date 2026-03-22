@@ -1,0 +1,81 @@
+<app-temporal-section
+  [title]="texts.workCenterSectionTitle"
+  [subtitle]="sectionSubtitle"
+  [state]="sectionState()"
+  [displayMode]="displayMode()"
+  [rows]="rows()"
+  [texts]="sectionTexts"
+  [confirmingCloseKey]="confirmingCloseKey()"
+  [correctingKey]="correctingKey()"
+  [canCreate]="true"
+  [canEditCurrent]="false"
+  [canCorrect]="true"
+  [canClose]="true"
+  [createSubmitEnabled]="isCreateDraftValid()"
+  [correctSubmitEnabled]="isCorrectDraftValid()"
+  (manageStarted)="startManage()"
+  (manageExited)="exitManage()"
+  (createStarted)="startCreate()"
+  (correctStarted)="startCorrect($event)"
+  (closeRequested)="requestClose($event)"
+  (closeConfirmed)="confirmClose($event)"
+  (cancelled)="cancel()"
+  (createSubmitted)="submitCreate()"
+  (correctSubmitted)="submitCorrect($event)"
+>
+  <div temporalCreateForm class="employee-work-center-section__form-grid">
+    <label class="employee-work-center-section__field employee-work-center-section__field--code">
+      <span>{{ texts.workCenterSectionCodeLabel }}</span>
+      <input
+        type="text"
+        [value]="createDraft().workCenterCode"
+        (input)="updateCreateField('workCenterCode', $any($event.target).value)"
+      />
+    </label>
+
+    <label class="employee-work-center-section__field employee-work-center-section__field--start-date">
+      <span>{{ texts.workCenterSectionStartDateLabel }}</span>
+      <input type="date" [value]="createDraft().startDate" (input)="updateCreateField('startDate', $any($event.target).value)" />
+    </label>
+
+    <label class="employee-work-center-section__field employee-work-center-section__field--end-date">
+      <span>{{ texts.workCenterSectionEndDateLabel }}</span>
+      <input type="date" [value]="createDraft().endDate" (input)="updateCreateField('endDate', $any($event.target).value)" />
+    </label>
+  </div>
+
+  <div temporalCorrectForm class="employee-work-center-section__form-grid">
+    @if (correctingRow(); as correctingRow) {
+      <div class="employee-work-center-section__readonly-field">
+        <span>{{ texts.workCenterSectionAssignmentLabel }}</span>
+        <strong>#{{ correctingRow.workCenterAssignmentNumber }}</strong>
+      </div>
+    }
+
+    <label class="employee-work-center-section__field employee-work-center-section__field--code">
+      <span>{{ texts.workCenterSectionCodeLabel }}</span>
+      <input
+        type="text"
+        [value]="correctDraft().workCenterCode"
+        (input)="updateCorrectField('workCenterCode', $any($event.target).value)"
+      />
+    </label>
+
+    <label class="employee-work-center-section__field employee-work-center-section__field--start-date">
+      <span>{{ texts.workCenterSectionStartDateLabel }}</span>
+      <input type="date" [value]="correctDraft().startDate" (input)="updateCorrectField('startDate', $any($event.target).value)" />
+    </label>
+
+    <label class="employee-work-center-section__field employee-work-center-section__field--end-date">
+      <span>{{ texts.workCenterSectionEndDateLabel }}</span>
+      <input type="date" [value]="correctDraft().endDate" (input)="updateCorrectField('endDate', $any($event.target).value)" />
+    </label>
+  </div>
+
+  <div temporalConfirmCloseForm class="employee-work-center-section__close-form">
+    <label class="employee-work-center-section__field employee-work-center-section__field--close-date">
+      <span>{{ texts.workCenterSectionCloseDateLabel }}</span>
+      <input type="date" [value]="closeEndDate()" (input)="updateCloseEndDate($any($event.target).value)" />
+    </label>
+  </div>
+</app-temporal-section>
