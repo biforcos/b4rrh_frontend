@@ -2,6 +2,7 @@ import { EmployeeIdentifierApiModel } from '../clients/employee-identifier-read.
 
 export interface EmployeeIdentifierReadModel {
   typeCode: string;
+  typeName?: string | null;
   value: string;
   issuingCountryCode: string | null;
   expirationDate: string | null;
@@ -22,6 +23,7 @@ export function mapEmployeeIdentifierApiToReadModel(
 
   return {
     typeCode,
+    typeName: normalizeOptionalValue(source.identifierTypeName),
     value,
     issuingCountryCode: issuingCountryCode ? issuingCountryCode.toUpperCase() : null,
     expirationDate: normalizeOptionalValue(source.expirationDate),

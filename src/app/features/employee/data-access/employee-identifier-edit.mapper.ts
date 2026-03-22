@@ -2,6 +2,7 @@ import { CreateIdentifierRequest, UpdateIdentifierRequest } from '../../../core/
 import { EmployeeIdentifierApiModel } from '../../../core/api/clients/employee-identifier-read.client';
 import { EmployeeIdentifierModel } from '../models/employee-identifier.model';
 import { SlotRowViewModel } from '../shared/ui/section/editable-slot-section.model';
+import { getCatalogDisplay } from '../shared/utils/catalog-display.util';
 
 export interface IdentifierDraft {
   key: string | null;
@@ -32,13 +33,14 @@ export function mapEmployeeIdentifierApiToSlotRow(
 ): SlotRowViewModel<string> {
   const identifierTypeCode = source.identifierTypeCode.trim().toUpperCase();
   const identifierValue = source.identifierValue.trim();
+  const display = getCatalogDisplay(source.identifierTypeName, identifierTypeCode);
 
   return {
     key: identifierTypeCode,
-    keyLabel: identifierTypeCode,
+    keyLabel: display.label,
     value: identifierValue,
     valueLabel: null,
-    secondaryText: buildSecondaryText(source, texts),
+    secondaryText: buildSecondaryText(source, texts, display.code),
     badges: buildBadges(source, texts),
   };
 }
@@ -49,6 +51,7 @@ export function mapEmployeeIdentifierModelToSlotRow(
 ): SlotRowViewModel<string> {
   return mapEmployeeIdentifierApiToSlotRow({
     identifierTypeCode: source.typeCode,
+    identifierTypeName: source.typeName,
     identifierValue: source.value,
     issuingCountryCode: source.issuingCountryCode,
     expirationDate: source.expirationDate,
@@ -59,12 +62,13 @@ export function mapEmployeeIdentifierModelToSlotRow(
 function buildSecondaryText(
   source: EmployeeIdentifierApiModel,
   texts?: EmployeeIdentifierRowTexts,
+  typeCode?: string,
 ): string | null {
   const issuingCountryCode = normalizeOptionalCountryCode(source.issuingCountryCode);
   const expirationDate = normalizeOptionalValue(source.expirationDate);
   const expirationSegment = expirationDate && texts ? `${texts.expirationPrefix}: ${expirationDate}` : expirationDate;
 
-  const segments = [issuingCountryCode, expirationSegment].filter((segment): segment is string => Boolean(segment));
+  const segments = [typeCode, issuingCountryCode, expirationSegment].filter((segment): segment is string => Boolean(segment));
 
   return segments.length > 0 ? segments.join(' · ') : null;
 }

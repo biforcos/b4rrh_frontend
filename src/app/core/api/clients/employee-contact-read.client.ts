@@ -8,6 +8,7 @@ import { EmployeeBusinessKeyApiQuery } from './employee-read.client';
 
 export interface EmployeeContactApiModel {
   contactTypeCode: string;
+  contactTypeName?: string | null;
   contactValue: string;
 }
 
@@ -95,6 +96,7 @@ export class EmployeeContactReadClient {
   private toEmployeeContactApiModel(source: ContactResponse): EmployeeContactApiModel {
     return {
       contactTypeCode: source.contactTypeCode,
+      contactTypeName: source.contactTypeName ?? null,
       contactValue: source.contactValue,
     };
   }

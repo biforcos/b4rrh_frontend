@@ -11,6 +11,10 @@
 
 export interface IdentifierResponse { 
     identifierTypeCode: string;
+    /**
+     * Optional display name from EMPLOYEE_IDENTIFIER_TYPE rule entities in the employee ruleSystemCode catalog.
+     */
+    identifierTypeName?: string | null;
     identifierValue: string;
     /**
      * Optional ISO 3166-1 alpha-3 code from COUNTRY rule entities in the employee ruleSystemCode catalog.

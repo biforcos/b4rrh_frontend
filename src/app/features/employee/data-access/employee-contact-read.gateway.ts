@@ -29,6 +29,7 @@ export class EmployeeContactReadGateway {
   private toEmployeeContactModel(source: EmployeeContactReadModel): EmployeeContactModel {
     return {
       contactTypeCode: source.contactTypeCode,
+      contactTypeName: source.contactTypeName ?? null,
       contactValue: source.contactValue,
       type: source.type,
       label: source.label,

@@ -31,6 +31,7 @@ export class EmployeeIdentifierReadGateway {
   private toEmployeeIdentifierModel(source: EmployeeIdentifierReadModel): EmployeeIdentifierModel {
     return {
       typeCode: source.typeCode,
+      typeName: source.typeName ?? null,
       value: source.value,
       issuingCountryCode: source.issuingCountryCode,
       expirationDate: source.expirationDate,

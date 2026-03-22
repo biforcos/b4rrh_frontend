@@ -2,22 +2,26 @@ import { CreateContactRequest, UpdateContactRequest } from '../../../core/api/ge
 import { EmployeeContactApiModel } from '../../../core/api/clients/employee-contact-read.client';
 import { SlotDraft, SlotRowViewModel } from '../shared/ui/section/editable-slot-section.model';
 import { EmployeeContactModel } from '../models/employee-contact.model';
+import { getCatalogDisplay } from '../shared/utils/catalog-display.util';
 
 export function mapEmployeeContactApiToSlotRow(source: EmployeeContactApiModel): SlotRowViewModel<string> {
   const contactTypeCode = source.contactTypeCode.trim();
   const contactValue = source.contactValue.trim();
+  const display = getCatalogDisplay(source.contactTypeName, contactTypeCode);
 
   return {
     key: contactTypeCode,
-    keyLabel: contactTypeCode,
+    keyLabel: display.label,
     value: contactValue,
     valueLabel: null,
+    secondaryText: display.code,
   };
 }
 
 export function mapEmployeeContactModelToSlotRow(source: EmployeeContactModel): SlotRowViewModel<string> {
   return mapEmployeeContactApiToSlotRow({
     contactTypeCode: source.contactTypeCode,
+    contactTypeName: source.contactTypeName,
     contactValue: source.contactValue,
   });
 }

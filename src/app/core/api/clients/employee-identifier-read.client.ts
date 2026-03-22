@@ -12,6 +12,7 @@ import { EmployeeBusinessKeyApiQuery } from './employee-read.client';
 
 export interface EmployeeIdentifierApiModel {
   identifierTypeCode: string;
+  identifierTypeName?: string | null;
   identifierValue: string;
   issuingCountryCode: string | null;
   expirationDate: string | null;
@@ -113,6 +114,7 @@ export class EmployeeIdentifierReadClient {
   private toEmployeeIdentifierApiModel(source: IdentifierResponse): EmployeeIdentifierApiModel {
     return {
       identifierTypeCode: source.identifierTypeCode,
+      identifierTypeName: source.identifierTypeName ?? null,
       identifierValue: source.identifierValue,
       issuingCountryCode: source.issuingCountryCode ?? null,
       expirationDate: source.expirationDate ?? null,

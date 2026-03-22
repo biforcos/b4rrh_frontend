@@ -4,6 +4,7 @@ export type EmployeeContactReadType = 'phone' | 'email' | 'other';
 
 export interface EmployeeContactReadModel {
   contactTypeCode: string;
+  contactTypeName?: string | null;
   contactValue: string;
   type: EmployeeContactReadType;
   label: string | null;
@@ -27,11 +28,17 @@ export function mapEmployeeContactApiToReadModel(
 
   return {
     contactTypeCode: normalizedTypeCode,
+    contactTypeName: normalizeOptionalValue(source.contactTypeName),
     contactValue: normalizedValue,
     type: resolveContactType(normalizedTypeCodeForDetection, normalizedValue),
     label: normalizedTypeCode.length > 0 ? normalizedTypeCode : null,
     value: normalizedValue,
   };
+}
+
+function normalizeOptionalValue(value: string | null | undefined): string | null {
+  const normalizedValue = value?.trim() ?? '';
+  return normalizedValue.length > 0 ? normalizedValue : null;
 }
 
 function resolveContactType(typeCode: string, contactValue: string): EmployeeContactReadType {

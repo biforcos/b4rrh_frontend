@@ -11,6 +11,10 @@
 
 export interface ContactResponse { 
     contactTypeCode: string;
+    /**
+     * Optional display name from EMPLOYEE_CONTACT_TYPE rule entities in the employee ruleSystemCode catalog.
+     */
+    contactTypeName?: string | null;
     contactValue: string;
 }
 
