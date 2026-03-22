@@ -24,17 +24,17 @@
 >
   <ng-template #slotCreateForm slotCreateForm>
     <div class="employee-identifier-section__form-grid">
-      <label>
+      <label class="employee-identifier-section__field employee-identifier-section__field--key">
         <span>{{ texts.identifiersSectionKeyFieldLabel }}</span>
         <input type="text" [value]="draft().key ?? ''" (input)="updateDraftKey($any($event.target).value)" />
       </label>
 
-      <label>
+      <label class="employee-identifier-section__field employee-identifier-section__field--value">
         <span>{{ texts.identifiersSectionValueFieldLabel }}</span>
         <input type="text" [value]="draft().value" (input)="updateDraftValue($any($event.target).value)" />
       </label>
 
-      <label>
+      <label class="employee-identifier-section__field employee-identifier-section__field--country">
         <span>{{ texts.identifiersSectionIssuingCountryLabel }}</span>
         <input
           type="text"
@@ -43,7 +43,7 @@
         />
       </label>
 
-      <label>
+      <label class="employee-identifier-section__field employee-identifier-section__field--date">
         <span>{{ texts.identifiersSectionExpirationDateLabel }}</span>
         <input
           type="date"
@@ -65,17 +65,17 @@
 
   <ng-template #slotEditForm slotEditForm>
     <div class="employee-identifier-section__form-grid">
-      <div class="employee-identifier-section__readonly-field">
+      <div class="employee-identifier-section__readonly-field employee-identifier-section__field employee-identifier-section__field--key">
         <span>{{ texts.identifiersSectionKeyFieldLabel }}</span>
         <strong>{{ draft().key }}</strong>
       </div>
 
-      <label>
+      <label class="employee-identifier-section__field employee-identifier-section__field--value">
         <span>{{ texts.identifiersSectionValueFieldLabel }}</span>
         <input type="text" [value]="draft().value" (input)="updateDraftValue($any($event.target).value)" />
       </label>
 
-      <label>
+      <label class="employee-identifier-section__field employee-identifier-section__field--country">
         <span>{{ texts.identifiersSectionIssuingCountryLabel }}</span>
         <input
           type="text"
@@ -84,7 +84,7 @@
         />
       </label>
 
-      <label>
+      <label class="employee-identifier-section__field employee-identifier-section__field--date">
         <span>{{ texts.identifiersSectionExpirationDateLabel }}</span>
         <input
           type="date"

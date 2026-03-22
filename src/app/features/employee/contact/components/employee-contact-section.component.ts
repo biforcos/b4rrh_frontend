@@ -11,17 +11,10 @@ import {
   SlotDraft,
   SlotDisplayMode,
   SlotEditSubmission,
-  SlotKeyOption,
   SlotSectionTexts,
   SlotRowViewModel,
 } from '../../shared/ui/section/editable-slot-section.model';
 import { SectionMode, SectionUiState } from '../../shared/ui/section/section-ui-state.model';
-
-const contactTypeOptions: ReadonlyArray<SlotKeyOption<string>> = [
-  { value: 'EMAIL', label: 'Email' },
-  { value: 'PHONE', label: 'Telefono' },
-  { value: 'MOBILE', label: 'Movil' },
-];
 
 const sectionSubtitle = 'Un contacto por tipo. El tipo no se puede modificar una vez creado.';
 
@@ -37,6 +30,7 @@ function createEmptyContactDraft(): SlotDraft<string> {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [EditableSlotSectionComponent],
   templateUrl: './employee-contact-section.component.html',
+  styleUrl: './employee-contact-section.component.scss',
 })
 export class EmployeeContactSectionComponent {
   readonly employeeKey = input<EmployeeBusinessKey | null>(null);
@@ -71,11 +65,6 @@ export class EmployeeContactSectionComponent {
       .map((contact) => mapEmployeeContactModelToSlotRow(contact))
       .sort((left, right) => left.key.localeCompare(right.key)),
   );
-  protected readonly availableKeys = computed<ReadonlyArray<SlotKeyOption<string>>>(() => {
-    const usedKeys = new Set(this.rows().map((row) => row.key.trim().toUpperCase()));
-
-    return contactTypeOptions.filter((option) => !usedKeys.has(option.value));
-  });
   protected readonly displayMode = this.displayModeState.asReadonly();
   protected readonly draft = this.draftState.asReadonly();
   protected readonly editingKey = this.editingKeyState.asReadonly();

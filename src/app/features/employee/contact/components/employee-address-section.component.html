@@ -23,37 +23,37 @@
   (editCurrentSubmitted)="submitEditCurrent()"
 >
   <div temporalCreateForm class="employee-address-section__form-grid">
-    <label>
+    <label class="employee-address-section__field employee-address-section__field--type">
       <span>{{ texts.addressesSectionTypeLabel }}</span>
       <input type="text" [value]="createDraft().addressTypeCode" (input)="updateCreateField('addressTypeCode', $any($event.target).value)" />
     </label>
 
-    <label>
+    <label class="employee-address-section__field employee-address-section__field--street">
       <span>{{ texts.addressesSectionStreetLabel }}</span>
       <input type="text" [value]="createDraft().street" (input)="updateCreateField('street', $any($event.target).value)" />
     </label>
 
-    <label>
+    <label class="employee-address-section__field employee-address-section__field--city">
       <span>{{ texts.addressesSectionCityLabel }}</span>
       <input type="text" [value]="createDraft().city" (input)="updateCreateField('city', $any($event.target).value)" />
     </label>
 
-    <label>
+    <label class="employee-address-section__field employee-address-section__field--country">
       <span>{{ texts.addressesSectionCountryLabel }}</span>
       <input type="text" [value]="createDraft().countryCode" (input)="updateCreateField('countryCode', $any($event.target).value)" />
     </label>
 
-    <label>
+    <label class="employee-address-section__field employee-address-section__field--date">
       <span>{{ texts.addressesSectionStartDateLabel }}</span>
       <input type="date" [value]="createDraft().startDate" (input)="updateCreateField('startDate', $any($event.target).value)" />
     </label>
 
-    <label>
+    <label class="employee-address-section__field employee-address-section__field--postal">
       <span>{{ texts.addressesSectionPostalCodeLabel }}</span>
       <input type="text" [value]="createDraft().postalCode" (input)="updateCreateField('postalCode', $any($event.target).value)" />
     </label>
 
-    <label>
+    <label class="employee-address-section__field employee-address-section__field--region">
       <span>{{ texts.addressesSectionRegionLabel }}</span>
       <input type="text" [value]="createDraft().regionCode" (input)="updateCreateField('regionCode', $any($event.target).value)" />
     </label>
@@ -74,27 +74,27 @@
       </div>
     }
 
-    <label>
+    <label class="employee-address-section__field employee-address-section__field--street">
       <span>{{ texts.addressesSectionStreetLabel }}</span>
       <input type="text" [value]="editCurrentDraft().street" (input)="updateEditCurrentField('street', $any($event.target).value)" />
     </label>
 
-    <label>
+    <label class="employee-address-section__field employee-address-section__field--city">
       <span>{{ texts.addressesSectionCityLabel }}</span>
       <input type="text" [value]="editCurrentDraft().city" (input)="updateEditCurrentField('city', $any($event.target).value)" />
     </label>
 
-    <label>
+    <label class="employee-address-section__field employee-address-section__field--country">
       <span>{{ texts.addressesSectionCountryLabel }}</span>
       <input type="text" [value]="editCurrentDraft().countryCode" (input)="updateEditCurrentField('countryCode', $any($event.target).value)" />
     </label>
 
-    <label>
+    <label class="employee-address-section__field employee-address-section__field--postal">
       <span>{{ texts.addressesSectionPostalCodeLabel }}</span>
       <input type="text" [value]="editCurrentDraft().postalCode" (input)="updateEditCurrentField('postalCode', $any($event.target).value)" />
     </label>
 
-    <label>
+    <label class="employee-address-section__field employee-address-section__field--region">
       <span>{{ texts.addressesSectionRegionLabel }}</span>
       <input type="text" [value]="editCurrentDraft().regionCode" (input)="updateEditCurrentField('regionCode', $any($event.target).value)" />
     </label>

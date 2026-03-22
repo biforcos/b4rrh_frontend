@@ -1,0 +1,42 @@
+.employee-contact-section__form-grid {
+  display: grid;
+  gap: 0.22rem;
+  width: 100%;
+  max-width: 52rem;
+}
+
+.employee-contact-section__form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.08rem;
+}
+
+.employee-contact-section__form-label {
+  font-size: 0.62rem;
+  line-height: 1.2;
+  color: #5f7386;
+}
+
+.employee-contact-section__form-input {
+  width: 100%;
+  border: 1px solid #cedae7;
+  border-radius: 0.42rem;
+  background: #ffffff;
+  color: #1f3246;
+  font-size: 0.67rem;
+  line-height: 1.2;
+  padding: 0.22rem 0.32rem;
+  min-height: 1.8rem;
+}
+
+.employee-contact-section__form-input:focus-visible {
+  outline: none;
+  border-color: #7ea6cc;
+  box-shadow: 0 0 0 2px rgba(126, 166, 204, 0.2);
+}
+
+@media (max-width: 899px) {
+  .employee-contact-section__form-grid {
+    max-width: none;
+  }
+}

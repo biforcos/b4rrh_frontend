@@ -88,6 +88,7 @@
   padding: 0.52rem 0.58rem;
   display: grid;
   gap: 0.36rem;
+  justify-items: start;
   transition: border-color 120ms ease, background-color 120ms ease, box-shadow 120ms ease;
 }
 
@@ -120,6 +121,8 @@
 .editable-slot-section__summary {
   display: grid;
   gap: 0.12rem;
+  width: 100%;
+  max-width: 58rem;
 }
 
 .editable-slot-section__key,
@@ -172,6 +175,8 @@
 .editable-slot-section__fields {
   display: grid;
   gap: 0.34rem;
+  width: 100%;
+  max-width: 58rem;
 }
 
 .editable-slot-section__fields label,
@@ -215,6 +220,8 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.28rem;
+  width: 100%;
+  max-width: 58rem;
 }
 
 .editable-slot-section__summary + .editable-slot-section__row-actions button {
@@ -224,6 +231,8 @@
 .editable-slot-section__delete-confirm {
   display: grid;
   gap: 0.3rem;
+  width: 100%;
+  max-width: 58rem;
 }
 
 .editable-slot-section__delete-confirm p {
@@ -236,5 +245,12 @@
 @media (max-width: 900px) {
   .editable-slot-section__row {
     padding: 0.46rem 0.5rem;
+  }
+
+  .editable-slot-section__summary,
+  .editable-slot-section__fields,
+  .editable-slot-section__row-actions,
+  .editable-slot-section__delete-confirm {
+    max-width: none;
   }
 }

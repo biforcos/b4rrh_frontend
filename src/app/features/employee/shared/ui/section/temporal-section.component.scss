@@ -88,6 +88,7 @@
   padding: 0.52rem 0.58rem;
   display: grid;
   gap: 0.34rem;
+  justify-items: start;
 }
 
 .temporal-section__row--current {
@@ -115,6 +116,8 @@
 .temporal-section__summary {
   display: grid;
   gap: 0.14rem;
+  width: 100%;
+  max-width: 58rem;
 }
 
 .temporal-section__title,
@@ -172,22 +175,30 @@
 .temporal-section__create-form {
   display: grid;
   gap: 0.36rem;
+  width: 100%;
+  max-width: 58rem;
 }
 
 .temporal-section__edit-current-form {
   display: grid;
   gap: 0.36rem;
+  width: 100%;
+  max-width: 58rem;
 }
 
 .temporal-section__row-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.28rem;
+  width: 100%;
+  max-width: 58rem;
 }
 
 .temporal-section__confirm-close {
   display: grid;
   gap: 0.3rem;
+  width: 100%;
+  max-width: 58rem;
 }
 
 .temporal-section__confirm-close p {
@@ -200,5 +211,13 @@
 @media (max-width: 900px) {
   .temporal-section__row {
     padding: 0.46rem 0.5rem;
+  }
+
+  .temporal-section__summary,
+  .temporal-section__create-form,
+  .temporal-section__edit-current-form,
+  .temporal-section__row-actions,
+  .temporal-section__confirm-close {
+    max-width: none;
   }
 }

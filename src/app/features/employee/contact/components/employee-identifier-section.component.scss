@@ -1,11 +1,14 @@
 .employee-identifier-section__form-grid {
   display: grid;
   gap: 0.22rem;
+  width: 100%;
+  max-width: 52rem;
 }
 
-.employee-identifier-section__form-grid label {
+.employee-identifier-section__form-grid label,
+.employee-identifier-section__readonly-field {
   display: grid;
-  gap: 0.05rem;
+  gap: 0.08rem;
 }
 
 .employee-identifier-section__form-grid span,
@@ -24,6 +27,7 @@
   font-size: 0.67rem;
   line-height: 1.2;
   padding: 0.22rem 0.32rem;
+  min-height: 1.8rem;
 }
 
 .employee-identifier-section__form-grid input[type='text']:focus-visible,
@@ -36,7 +40,8 @@
 .employee-identifier-section__checkbox-field {
   display: flex !important;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.45rem;
+  margin-top: 0.1rem;
 }
 
 .employee-identifier-section__checkbox-field span {
@@ -44,12 +49,62 @@
   color: #3c546b;
 }
 
-.employee-identifier-section__readonly-field {
-  display: grid;
-  gap: 0.06rem;
+.employee-identifier-section__checkbox-field input[type='checkbox'] {
+  width: 0.95rem;
+  height: 0.95rem;
+  accent-color: #5f88b0;
 }
 
 .employee-identifier-section__readonly-field strong {
   font-size: 0.7rem;
   color: #1f3246;
+}
+
+.employee-identifier-section__readonly-field {
+  border: 1px solid #d4dfea;
+  border-radius: 0.42rem;
+  background: #f7fbff;
+  padding: 0.24rem 0.34rem;
+}
+
+.employee-identifier-section__field--country,
+.employee-identifier-section__field--date {
+  max-width: 16rem;
+}
+
+.employee-identifier-section__field--country input[type='text'] {
+  max-width: 12rem;
+}
+
+.employee-identifier-section__field--date input[type='date'] {
+  max-width: 12rem;
+}
+
+@media (min-width: 900px) {
+  .employee-identifier-section__form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 0.7rem;
+    row-gap: 0.3rem;
+  }
+
+  .employee-identifier-section__checkbox-field {
+    grid-column: 1 / -1;
+  }
+
+  .employee-identifier-section__field--value {
+    max-width: none;
+  }
+}
+
+@media (max-width: 899px) {
+  .employee-identifier-section__form-grid {
+    max-width: none;
+  }
+
+  .employee-identifier-section__field--country,
+  .employee-identifier-section__field--date,
+  .employee-identifier-section__field--country input[type='text'],
+  .employee-identifier-section__field--date input[type='date'] {
+    max-width: none;
+  }
 }

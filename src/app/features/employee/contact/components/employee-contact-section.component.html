@@ -8,7 +8,6 @@
   [draft]="draft()"
   [editingKey]="editingKey()"
   [deletingKey]="deletingKey()"
-  [availableKeys]="availableKeys()"
   [canCreate]="true"
   [canEdit]="true"
   [canDelete]="true"
@@ -23,4 +22,32 @@
   (draftValueChanged)="updateDraftValue($event)"
   (createSubmitted)="submitCreate($event)"
   (editSubmitted)="submitEdit($event)"
-/>
+>
+  <ng-template #slotCreateForm slotCreateForm>
+    <div class="employee-contact-section__form-grid">
+      <div class="employee-contact-section__form-field">
+        <label class="employee-contact-section__form-label" for="contactTypeInput">{{ texts.contactsSectionKeyFieldLabel }}</label>
+        <input
+          id="contactTypeInput"
+          class="employee-contact-section__form-input"
+          type="text"
+          [value]="draft().key ?? ''"
+          (input)="updateDraftKey($any($event.target).value)"
+          placeholder="Tipo de contacto"
+        />
+      </div>
+
+      <div class="employee-contact-section__form-field">
+        <label class="employee-contact-section__form-label" for="contactValueInput">{{ texts.contactsSectionValueFieldLabel }}</label>
+        <input
+          id="contactValueInput"
+          class="employee-contact-section__form-input"
+          type="text"
+          [value]="draft().value"
+          (input)="updateDraftValue($any($event.target).value)"
+          placeholder="Valor de contacto"
+        />
+      </div>
+    </div>
+  </ng-template>
+</app-editable-slot-section>
