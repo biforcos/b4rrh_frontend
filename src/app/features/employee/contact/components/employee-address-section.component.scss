@@ -1,0 +1,48 @@
+.employee-address-section__form-grid {
+  display: grid;
+  gap: 0.26rem;
+}
+
+.employee-address-section__form-grid label {
+  display: grid;
+  gap: 0.08rem;
+}
+
+.employee-address-section__form-grid span,
+.employee-address-section__readonly-grid span {
+  font-size: 0.62rem;
+  line-height: 1.2;
+  color: #5f7386;
+}
+
+.employee-address-section__form-grid input {
+  border: 1px solid #cedae7;
+  border-radius: 0.42rem;
+  background: #ffffff;
+  color: #1f3246;
+  font-size: 0.68rem;
+  line-height: 1.2;
+  padding: 0.26rem 0.34rem;
+}
+
+.employee-address-section__edit-hint {
+  margin: 0;
+  font-size: 0.68rem;
+  color: #2f4d69;
+}
+
+.employee-address-section__readonly-grid {
+  display: grid;
+  gap: 0.18rem;
+}
+
+.employee-address-section__readonly-grid p {
+  margin: 0;
+  display: grid;
+  gap: 0.06rem;
+}
+
+.employee-address-section__readonly-grid strong {
+  font-size: 0.72rem;
+  color: #1f3246;
+}

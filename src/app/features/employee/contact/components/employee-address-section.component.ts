@@ -8,6 +8,14 @@ import { TemporalSectionComponent } from '../../shared/ui/section/temporal-secti
 import { TemporalDisplayMode, TemporalRowViewModel, TemporalSectionTexts } from '../../shared/ui/section/temporal-section.model';
 import { SectionMode, SectionUiState } from '../../shared/ui/section/section-ui-state.model';
 
+interface AddressEditCurrentDraft {
+  street: string;
+  city: string;
+  countryCode: string;
+  postalCode: string;
+  regionCode: string;
+}
+
 const emptyDraft: AddressCreateDraft = {
   addressTypeCode: '',
   street: '',
@@ -22,91 +30,8 @@ const emptyDraft: AddressCreateDraft = {
   selector: 'app-employee-address-section',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [TemporalSectionComponent],
-  template: `
-    <app-temporal-section
-      [title]="texts.addressesSectionTitle"
-      [subtitle]="null"
-      [state]="sectionState()"
-      [displayMode]="displayMode()"
-      [rows]="rows()"
-      [texts]="sectionTexts"
-      [confirmingCloseKey]="confirmingCloseKey()"
-      [canCreate]="true"
-      [canClose]="true"
-      [createSubmitEnabled]="isCreateDraftValid()"
-      (manageStarted)="onManageStarted()"
-      (manageExited)="onManageExited()"
-      (createStarted)="onCreateStarted()"
-      (closeRequested)="onCloseRequested($event)"
-      (closeConfirmed)="onCloseConfirmed($event)"
-      (cancelled)="onCancelled()"
-      (createSubmitted)="onCreateSubmitted()"
-    >
-      <div temporalCreateForm class="employee-address-section__form-grid">
-        <label>
-          <span>{{ texts.addressesSectionTypeLabel }}</span>
-          <input type="text" [value]="createDraft().addressTypeCode" (input)="onDraftAddressTypeCodeChanged($event)" />
-        </label>
-
-        <label>
-          <span>{{ texts.addressesSectionStreetLabel }}</span>
-          <input type="text" [value]="createDraft().street" (input)="onDraftStreetChanged($event)" />
-        </label>
-
-        <label>
-          <span>{{ texts.addressesSectionCityLabel }}</span>
-          <input type="text" [value]="createDraft().city" (input)="onDraftCityChanged($event)" />
-        </label>
-
-        <label>
-          <span>{{ texts.addressesSectionCountryLabel }}</span>
-          <input type="text" [value]="createDraft().countryCode" (input)="onDraftCountryCodeChanged($event)" />
-        </label>
-
-        <label>
-          <span>{{ texts.addressesSectionStartDateLabel }}</span>
-          <input type="date" [value]="createDraft().startDate" (input)="onDraftStartDateChanged($event)" />
-        </label>
-
-        <label>
-          <span>{{ texts.addressesSectionPostalCodeLabel }}</span>
-          <input type="text" [value]="createDraft().postalCode" (input)="onDraftPostalCodeChanged($event)" />
-        </label>
-
-        <label>
-          <span>{{ texts.addressesSectionRegionLabel }}</span>
-          <input type="text" [value]="createDraft().regionCode" (input)="onDraftRegionCodeChanged($event)" />
-        </label>
-      </div>
-    </app-temporal-section>
-  `,
-  styles: `
-    .employee-address-section__form-grid {
-      display: grid;
-      gap: 0.26rem;
-    }
-
-    .employee-address-section__form-grid label {
-      display: grid;
-      gap: 0.08rem;
-    }
-
-    .employee-address-section__form-grid span {
-      font-size: 0.62rem;
-      line-height: 1.2;
-      color: #5f7386;
-    }
-
-    .employee-address-section__form-grid input {
-      border: 1px solid #cedae7;
-      border-radius: 0.42rem;
-      background: #ffffff;
-      color: #1f3246;
-      font-size: 0.68rem;
-      line-height: 1.2;
-      padding: 0.26rem 0.34rem;
-    }
-  `,
+  templateUrl: './employee-address-section.component.html',
+  styleUrl: './employee-address-section.component.scss',
 })
 export class EmployeeAddressSectionComponent {
   readonly employeeKey = input<EmployeeBusinessKey | null>(null);
@@ -115,16 +40,27 @@ export class EmployeeAddressSectionComponent {
   private readonly displayModeState = signal<TemporalDisplayMode>('view');
   private readonly localErrorMessageState = signal<string | null>(null);
   private readonly confirmingCloseKeyState = signal<number | null>(null);
+  private readonly editingCurrentKeyState = signal<number | null>(null);
   private readonly createDraftState = signal<AddressCreateDraft>(emptyDraft);
+  private readonly editCurrentDraftState = signal<AddressEditCurrentDraft>({
+    street: '',
+    city: '',
+    countryCode: '',
+    postalCode: '',
+    regionCode: '',
+  });
 
   protected readonly texts = employeeTexts;
+  protected readonly sectionSubtitle = this.texts.addressesSectionSubtitle;
   protected readonly sectionTexts: TemporalSectionTexts = {
     manageAction: this.texts.addressesSectionManageAction,
     exitManageAction: this.texts.addressesSectionExitManageAction,
     addAction: this.texts.addressesSectionAddAction,
+    editCurrentAction: this.texts.addressesSectionEditCurrentAction,
     closeAction: this.texts.addressesSectionCloseAction,
     cancelAction: this.texts.addressesSectionCancelAction,
     saveCreateAction: this.texts.addressesSectionSaveCreateAction,
+    saveEditCurrentAction: this.texts.addressesSectionSaveEditCurrentAction,
     confirmCloseMessage: this.texts.addressesSectionConfirmCloseMessage,
     confirmCloseAction: this.texts.addressesSectionConfirmCloseAction,
     emptyMessage: this.texts.addressesSectionEmptyMessage,
@@ -142,7 +78,12 @@ export class EmployeeAddressSectionComponent {
   );
   protected readonly displayMode = this.displayModeState.asReadonly();
   protected readonly confirmingCloseKey = this.confirmingCloseKeyState.asReadonly();
+  protected readonly editingCurrentKey = this.editingCurrentKeyState.asReadonly();
   protected readonly createDraft = this.createDraftState.asReadonly();
+  protected readonly editCurrentDraft = this.editCurrentDraftState.asReadonly();
+  protected readonly currentAddress = computed(
+    () => this.addressStore.addresses().find((address) => address.isActive) ?? null,
+  );
   protected readonly isCreateDraftValid = computed(() => {
     const draft = this.createDraftState();
 
@@ -154,12 +95,21 @@ export class EmployeeAddressSectionComponent {
       this.normalizeRequiredValue(draft.startDate).length > 0
     );
   });
+  protected readonly isEditCurrentDraftValid = computed(() => {
+    const draft = this.editCurrentDraftState();
+
+    return (
+      this.normalizeRequiredValue(draft.street).length > 0 &&
+      this.normalizeRequiredValue(draft.city).length > 0 &&
+      this.normalizeRequiredValue(draft.countryCode).length > 0
+    );
+  });
   protected readonly sectionState = computed<SectionUiState>(() => {
     const isBusy = this.addressStore.loading() || this.addressStore.mutating();
 
     return {
       mode: isBusy ? 'submitting' : this.toSectionMode(this.displayModeState()),
-      dirty: false,
+      dirty: this.displayModeState() === 'creating' || this.displayModeState() === 'editingCurrent',
       busy: isBusy,
       errorMessage: this.resolveErrorMessage(),
       successMessage: this.resolveSuccessMessage(),
@@ -177,7 +127,7 @@ export class EmployeeAddressSectionComponent {
     });
   }
 
-  protected onManageStarted(): void {
+  protected startManage(): void {
     if (!this.canStartInteraction()) {
       return;
     }
@@ -186,12 +136,12 @@ export class EmployeeAddressSectionComponent {
     this.enterManageMode();
   }
 
-  protected onManageExited(): void {
+  protected exitManage(): void {
     this.clearInteractionFeedback();
     this.enterViewMode();
   }
 
-  protected onCreateStarted(): void {
+  protected startCreate(): void {
     if (!this.canStartInteraction()) {
       return;
     }
@@ -200,7 +150,29 @@ export class EmployeeAddressSectionComponent {
     this.enterCreateMode();
   }
 
-  protected onCloseRequested(addressNumber: number): void {
+  protected startEditCurrent(addressNumber: number): void {
+    if (!this.canStartInteraction()) {
+      return;
+    }
+
+    const activeAddress = this.addressStore.addresses().find(
+      (address) => address.addressNumber === addressNumber && address.isActive,
+    );
+    if (!activeAddress) {
+      return;
+    }
+
+    this.clearInteractionFeedback();
+    this.enterEditingCurrentMode(activeAddress.addressNumber, {
+      street: activeAddress.street,
+      city: activeAddress.city,
+      countryCode: activeAddress.countryCode,
+      postalCode: activeAddress.postalCode ?? '',
+      regionCode: activeAddress.regionCode ?? '',
+    });
+  }
+
+  protected requestCloseCurrent(addressNumber: number): void {
     if (!this.canStartInteraction()) {
       return;
     }
@@ -214,7 +186,7 @@ export class EmployeeAddressSectionComponent {
     this.enterConfirmingCloseMode(addressNumber);
   }
 
-  protected onCloseConfirmed(addressNumber: number): void {
+  protected confirmCloseCurrent(addressNumber: number): void {
     const activeEmployeeKey = this.employeeKey();
     if (!activeEmployeeKey || this.addressStore.mutating()) {
       return;
@@ -225,12 +197,12 @@ export class EmployeeAddressSectionComponent {
     this.addressStore.closeAddress(activeEmployeeKey, addressNumber, this.currentBusinessDate());
   }
 
-  protected onCancelled(): void {
+  protected cancel(): void {
     this.clearInteractionFeedback();
     this.enterManageMode();
   }
 
-  protected onCreateSubmitted(): void {
+  protected submitCreate(): void {
     const activeEmployeeKey = this.employeeKey();
     if (!activeEmployeeKey || this.addressStore.mutating() || !this.isCreateDraftValid()) {
       return;
@@ -241,36 +213,73 @@ export class EmployeeAddressSectionComponent {
     this.addressStore.createAddress(activeEmployeeKey, this.createDraftState());
   }
 
-  protected onDraftAddressTypeCodeChanged(event: Event): void {
+  protected submitEditCurrent(): void {
+    const activeEmployeeKey = this.employeeKey();
+    if (!activeEmployeeKey || this.addressStore.mutating() || !this.isEditCurrentDraftValid()) {
+      return;
+    }
+
+    this.localErrorMessageState.set(this.texts.addressesSectionEditCurrentUnavailableMessage);
+  }
+
+  protected updateCreateDraftAddressTypeCode(event: Event): void {
     this.updateDraftField('addressTypeCode', this.readInputValue(event));
   }
 
-  protected onDraftStreetChanged(event: Event): void {
+  protected updateCreateDraftStreet(event: Event): void {
     this.updateDraftField('street', this.readInputValue(event));
   }
 
-  protected onDraftCityChanged(event: Event): void {
+  protected updateCreateDraftCity(event: Event): void {
     this.updateDraftField('city', this.readInputValue(event));
   }
 
-  protected onDraftCountryCodeChanged(event: Event): void {
+  protected updateCreateDraftCountryCode(event: Event): void {
     this.updateDraftField('countryCode', this.readInputValue(event));
   }
 
-  protected onDraftPostalCodeChanged(event: Event): void {
+  protected updateCreateDraftPostalCode(event: Event): void {
     this.updateDraftField('postalCode', this.readInputValue(event));
   }
 
-  protected onDraftRegionCodeChanged(event: Event): void {
+  protected updateCreateDraftRegionCode(event: Event): void {
     this.updateDraftField('regionCode', this.readInputValue(event));
   }
 
-  protected onDraftStartDateChanged(event: Event): void {
+  protected updateCreateDraftStartDate(event: Event): void {
     this.updateDraftField('startDate', this.readInputValue(event));
+  }
+
+  protected updateEditCurrentDraftStreet(event: Event): void {
+    this.updateEditCurrentDraftField('street', this.readInputValue(event));
+  }
+
+  protected updateEditCurrentDraftCity(event: Event): void {
+    this.updateEditCurrentDraftField('city', this.readInputValue(event));
+  }
+
+  protected updateEditCurrentDraftCountryCode(event: Event): void {
+    this.updateEditCurrentDraftField('countryCode', this.readInputValue(event));
+  }
+
+  protected updateEditCurrentDraftPostalCode(event: Event): void {
+    this.updateEditCurrentDraftField('postalCode', this.readInputValue(event));
+  }
+
+  protected updateEditCurrentDraftRegionCode(event: Event): void {
+    this.updateEditCurrentDraftField('regionCode', this.readInputValue(event));
   }
 
   private updateDraftField(field: keyof AddressCreateDraft, value: string): void {
     this.createDraftState.update((draft) => ({
+      ...draft,
+      [field]: value,
+    }));
+    this.clearInteractionFeedback();
+  }
+
+  private updateEditCurrentDraftField(field: keyof AddressEditCurrentDraft, value: string): void {
+    this.editCurrentDraftState.update((draft) => ({
       ...draft,
       [field]: value,
     }));
@@ -307,14 +316,38 @@ export class EmployeeAddressSectionComponent {
 
   private enterCreateMode(): void {
     this.displayModeState.set('creating');
+    this.editingCurrentKeyState.set(null);
     this.confirmingCloseKeyState.set(null);
     this.createDraftState.set(emptyDraft);
+    this.editCurrentDraftState.set({
+      street: '',
+      city: '',
+      countryCode: '',
+      postalCode: '',
+      regionCode: '',
+    });
+  }
+
+  private enterEditingCurrentMode(addressNumber: number, draft: AddressEditCurrentDraft): void {
+    this.displayModeState.set('editingCurrent');
+    this.editingCurrentKeyState.set(addressNumber);
+    this.confirmingCloseKeyState.set(null);
+    this.createDraftState.set(emptyDraft);
+    this.editCurrentDraftState.set(draft);
   }
 
   private enterConfirmingCloseMode(addressNumber: number): void {
     this.displayModeState.set('confirmingClose');
+    this.editingCurrentKeyState.set(null);
     this.confirmingCloseKeyState.set(addressNumber);
     this.createDraftState.set(emptyDraft);
+    this.editCurrentDraftState.set({
+      street: '',
+      city: '',
+      countryCode: '',
+      postalCode: '',
+      regionCode: '',
+    });
   }
 
   private clearInteractionFeedback(): void {
@@ -327,13 +360,25 @@ export class EmployeeAddressSectionComponent {
   }
 
   private resetOperationContext(): void {
+    this.editingCurrentKeyState.set(null);
     this.confirmingCloseKeyState.set(null);
     this.createDraftState.set(emptyDraft);
+    this.editCurrentDraftState.set({
+      street: '',
+      city: '',
+      countryCode: '',
+      postalCode: '',
+      regionCode: '',
+    });
   }
 
   private toSectionMode(displayMode: TemporalDisplayMode): SectionMode {
     if (displayMode === 'creating') {
       return 'creating';
+    }
+
+    if (displayMode === 'editingCurrent') {
+      return 'editing';
     }
 
     if (displayMode === 'confirmingClose') {

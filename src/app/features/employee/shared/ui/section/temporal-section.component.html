@@ -44,8 +44,25 @@
     @if (hasRows()) {
       <ul class="temporal-section__rows" role="list">
         @for (row of rows(); track trackRowByKey($index, row)) {
-          <li class="temporal-section__row" [class.temporal-section__row--current]="row.isCurrent === true">
-            @if (isRowCloseConfirming(row)) {
+          <li
+            class="temporal-section__row"
+            [class.temporal-section__row--current]="row.isCurrent === true"
+            [class.temporal-section__row--editing-current]="isRowEditingCurrent(row)"
+          >
+            @if (isRowEditingCurrent(row)) {
+              <div class="temporal-section__edit-current-form">
+                <ng-content select="[temporalEditCurrentForm]"></ng-content>
+              </div>
+
+              <div class="temporal-section__row-actions">
+                <button type="button" [disabled]="!editSubmitEnabled() || state().busy" (click)="onEditCurrentSubmitted(row.key)">
+                  {{ texts().saveEditCurrentAction }}
+                </button>
+                <button type="button" class="temporal-section__cancel-action" (click)="onCancelled()">
+                  {{ texts().cancelAction }}
+                </button>
+              </div>
+            } @else if (isRowCloseConfirming(row)) {
               <div class="temporal-section__confirm-close">
                 <p>{{ texts().confirmCloseMessage }}</p>
                 <div class="temporal-section__row-actions">
@@ -85,11 +102,17 @@
                 </div>
               </div>
 
-              @if (showRowCloseAction() && row.closeable === true) {
+              @if ((showRowEditCurrentAction() || showRowCloseAction()) && row.isCurrent === true) {
                 <div class="temporal-section__row-actions">
+                  @if (showRowEditCurrentAction()) {
+                    <button type="button" (click)="onEditCurrentStarted(row.key)">{{ texts().editCurrentAction }}</button>
+                  }
+
+                  @if (showRowCloseAction() && row.closeable === true) {
                   <button type="button" class="temporal-section__danger-action" (click)="onCloseRequested(row.key)">
                     {{ texts().closeAction }}
                   </button>
+                  }
                 </div>
               }
             }

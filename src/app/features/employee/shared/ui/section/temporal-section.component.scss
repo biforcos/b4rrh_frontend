@@ -100,6 +100,12 @@
   background: #f8fbff;
 }
 
+.temporal-section__row--editing-current {
+  border-color: #aac8e4;
+  background: #eff6ff;
+  box-shadow: inset 3px 0 0 #5f88b0;
+}
+
 .temporal-section__summary {
   display: grid;
   gap: 0.14rem;
@@ -152,6 +158,11 @@
 }
 
 .temporal-section__create-form {
+  display: grid;
+  gap: 0.36rem;
+}
+
+.temporal-section__edit-current-form {
   display: grid;
   gap: 0.36rem;
 }
