@@ -222,14 +222,14 @@ describe('EmployeeLaborClassificationSectionComponent', () => {
     const root = fixture.nativeElement as HTMLElement;
     const content = root.textContent ?? '';
 
-    expect(content).toContain('Convenio: Convenio A · AGR-A');
-    expect(content).toContain('Categoria: Categoria A · CAT-A');
+    expect(content).toContain('Convenio A · AGR-A');
+    expect(content).toContain('Categoria A · CAT-A');
 
-    expect(content).toContain('Convenio: Convenio B · AGR-B');
-    expect(content).toContain('Categoria: CAT-B');
+    expect(content).toContain('Convenio B · AGR-B');
+    expect(content).toContain('CAT-B');
 
-    expect(content).toContain('Convenio: AGR-C');
-    expect(content).toContain('Categoria: CAT-C');
+    expect(content).toContain('AGR-C');
+    expect(content).toContain('CAT-C');
   });
 
   function clickByText(text: string): void {

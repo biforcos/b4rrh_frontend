@@ -27,8 +27,6 @@ export interface EmployeeLaborClassificationRowTexts {
   closedStatus: string;
   currentPeriodLabel: string;
   periodPrefix: string;
-  agreementPrefix: string;
-  categoryPrefix: string;
 }
 
 export function createEmptyLaborClassificationReplaceDraft(): LaborClassificationReplaceDraft {
@@ -62,9 +60,9 @@ export function mapLaborClassificationToTemporalRow(
 
   return {
     key,
-    title: `${rowTexts.agreementPrefix}: ${agreementDisplay.label}`,
+    title: agreementDisplay.label,
     titleSecondary: agreementDisplay.code,
-    detailText: `${rowTexts.categoryPrefix}: ${categoryDisplay.label}`,
+    detailText: categoryDisplay.label,
     detailSecondary: categoryDisplay.code,
     periodText: source.endDate
       ? `${source.startDate} - ${source.endDate}`

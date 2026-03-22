@@ -6,8 +6,6 @@ const rowTexts = {
   closedStatus: 'Historica',
   currentPeriodLabel: 'actual',
   periodPrefix: 'Periodo',
-  agreementPrefix: 'Convenio',
-  categoryPrefix: 'Categoria',
 } as const;
 
 describe('mapLaborClassificationToTemporalRow', () => {
@@ -28,9 +26,9 @@ describe('mapLaborClassificationToTemporalRow', () => {
     expect(row.closeable).toBe(true);
     expect(row.deletable).toBe(false);
     expect(row.periodText).toBe('2025-01-01 - actual');
-    expect(row.title).toBe('Convenio: AGREEMENT-A');
+    expect(row.title).toBe('AGREEMENT-A');
     expect(row.titleSecondary).toBeNull();
-    expect(row.detailText).toBe('Categoria: CAT-A');
+    expect(row.detailText).toBe('CAT-A');
     expect(row.detailSecondary).toBeNull();
   });
 
@@ -66,9 +64,9 @@ describe('mapLaborClassificationToTemporalRow', () => {
 
     const row = mapLaborClassificationToTemporalRow(occurrence, rowTexts);
 
-    expect(row.title).toBe('Convenio: Convenio Tecnico');
+    expect(row.title).toBe('Convenio Tecnico');
     expect(row.titleSecondary).toBe('AGR-01');
-    expect(row.detailText).toBe('Categoria: Tecnico Nivel 2');
+    expect(row.detailText).toBe('Tecnico Nivel 2');
     expect(row.detailSecondary).toBe('CAT-02');
   });
 
@@ -85,9 +83,9 @@ describe('mapLaborClassificationToTemporalRow', () => {
 
     const row = mapLaborClassificationToTemporalRow(occurrence, rowTexts);
 
-    expect(row.title).toBe('Convenio: Convenio Tecnico');
+    expect(row.title).toBe('Convenio Tecnico');
     expect(row.titleSecondary).toBe('AGR-01');
-    expect(row.detailText).toBe('Categoria: CAT-02');
+    expect(row.detailText).toBe('CAT-02');
     expect(row.detailSecondary).toBeNull();
   });
 });
