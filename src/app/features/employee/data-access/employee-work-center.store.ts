@@ -18,7 +18,7 @@ export class EmployeeWorkCenterStore {
   private readonly loadingState = signal(false);
   private readonly mutatingState = signal(false);
   private readonly errorState = signal<EmployeeWorkCenterErrorCode | null>(null);
-  private readonly successState = signal<'created' | 'corrected' | 'closed' | null>(null);
+  private readonly successState = signal<'created' | 'corrected' | 'closed' | 'deleted' | null>(null);
   private requestId = 0;
 
   readonly selectedEmployeeKey = this.selectedEmployeeKeyState.asReadonly();
@@ -113,6 +113,33 @@ export class EmployeeWorkCenterStore {
         next: () => {
           this.mutatingState.set(false);
           this.successState.set('corrected');
+          this.loadWorkCentersByBusinessKeyInternal(normalizedEmployeeKey, true);
+        },
+        error: (error) => {
+          this.mutatingState.set(false);
+          this.errorState.set(mapEmployeeWorkCenterErrorCode(error));
+        },
+      });
+  }
+
+  deleteWorkCenter(employeeKey: EmployeeBusinessKey, workCenterAssignmentNumber: number): void {
+    if (this.mutatingState()) {
+      return;
+    }
+
+    const normalizedEmployeeKey = toEmployeeBusinessKey(employeeKey);
+
+    this.mutatingState.set(true);
+    this.errorState.set(null);
+    this.successState.set(null);
+
+    this.employeeWorkCenterGateway
+      .deleteWorkCenter(normalizedEmployeeKey, workCenterAssignmentNumber)
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          this.mutatingState.set(false);
+          this.successState.set('deleted');
           this.loadWorkCentersByBusinessKeyInternal(normalizedEmployeeKey, true);
         },
         error: (error) => {

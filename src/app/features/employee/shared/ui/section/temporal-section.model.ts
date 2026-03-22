@@ -7,6 +7,8 @@ export interface TemporalRowViewModel<KeyType = number> {
   statusLabel?: string | null;
   isCurrent?: boolean;
   closeable?: boolean;
+  deletable?: boolean;
+  deleteDisabledReason?: string | null;
 }
 
 export type TemporalDisplayMode =
@@ -15,7 +17,8 @@ export type TemporalDisplayMode =
   | 'creating'
   | 'editingCurrent'
   | 'correcting'
-  | 'confirmingClose';
+  | 'confirmingClose'
+  | 'confirmingDelete';
 
 export interface TemporalSectionTexts {
   manageAction: string;
@@ -24,11 +27,14 @@ export interface TemporalSectionTexts {
   editCurrentAction: string;
   correctAction: string;
   closeAction: string;
+  deleteAction: string;
   cancelAction: string;
   saveCreateAction: string;
   saveEditCurrentAction: string;
   saveCorrectAction: string;
   confirmCloseMessage: string;
   confirmCloseAction: string;
+  confirmDeleteMessage: string;
+  confirmDeleteAction: string;
   emptyMessage: string;
 }

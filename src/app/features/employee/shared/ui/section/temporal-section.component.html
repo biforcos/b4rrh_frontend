@@ -89,6 +89,18 @@
                   </button>
                 </div>
               </div>
+            } @else if (isRowDeleteConfirming(row)) {
+              <div class="temporal-section__confirm-close">
+                <p>{{ texts().confirmDeleteMessage }}</p>
+                <div class="temporal-section__row-actions">
+                  <button type="button" class="temporal-section__danger-action" (click)="onDeleteConfirmed(row.key)">
+                    {{ texts().confirmDeleteAction }}
+                  </button>
+                  <button type="button" class="temporal-section__cancel-action" (click)="onCancelled()">
+                    {{ texts().cancelAction }}
+                  </button>
+                </div>
+              </div>
             } @else {
               <div class="temporal-section__summary">
                 <p class="temporal-section__title">{{ row.title }}</p>
@@ -119,6 +131,7 @@
 
               @if (
                 showRowCorrectAction() ||
+                showRowDeleteAction() ||
                 ((showRowEditCurrentAction() || showRowCloseAction()) && row.isCurrent === true)
               ) {
                 <div class="temporal-section__row-actions">
@@ -138,6 +151,25 @@
                   <button type="button" class="temporal-section__edit-current-action" (click)="onCorrectStarted(row.key)">
                     {{ texts().correctAction }}
                   </button>
+                  }
+
+                  @if (showRowDeleteAction() && row.deletable === true) {
+                    <button type="button" class="temporal-section__delete-action" (click)="onDeleteRequested(row.key)">
+                      {{ texts().deleteAction }}
+                    </button>
+                  }
+
+                  @if (showRowDeleteAction() && row.deletable !== true && row.deleteDisabledReason) {
+                    <button
+                      type="button"
+                      class="temporal-section__delete-action"
+                      [title]="row.deleteDisabledReason"
+                      [attr.aria-label]="row.deleteDisabledReason"
+                      [disabled]="true"
+                    >
+                      {{ texts().deleteAction }}
+                    </button>
+                    <span class="temporal-section__disabled-action-reason">{{ row.deleteDisabledReason }}</span>
                   }
                 </div>
               }

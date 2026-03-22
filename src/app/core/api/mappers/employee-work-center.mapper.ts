@@ -7,6 +7,9 @@ export interface EmployeeWorkCenterReadModel {
   startDate: string;
   endDate: string | null;
   isActive: boolean;
+  canDelete: boolean;
+  startsAtPresenceStart: boolean;
+  deleteForbiddenReason: 'starts-at-presence-start' | null;
 }
 
 export function mapEmployeeWorkCenterApiToReadModel(
@@ -20,6 +23,11 @@ export function mapEmployeeWorkCenterApiToReadModel(
   }
 
   const endDate = normalizeOptionalValue(source.endDate);
+  const startsAtPresenceStart = source.startsAtPresenceStart === true;
+  const hasDeleteForbiddenByPresenceReason =
+    source.deleteForbiddenReason?.trim().toUpperCase() === 'STARTS_AT_PRESENCE_START';
+  const deleteForbiddenByPresenceReason = startsAtPresenceStart || hasDeleteForbiddenByPresenceReason;
+  const canDelete = source.canDelete ?? !deleteForbiddenByPresenceReason;
 
   return {
     workCenterAssignmentNumber: source.workCenterAssignmentNumber,
@@ -28,6 +36,9 @@ export function mapEmployeeWorkCenterApiToReadModel(
     startDate,
     endDate,
     isActive: endDate === null,
+    canDelete,
+    startsAtPresenceStart,
+    deleteForbiddenReason: deleteForbiddenByPresenceReason ? 'starts-at-presence-start' : null,
   };
 }
 

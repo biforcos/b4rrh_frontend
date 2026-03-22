@@ -221,6 +221,13 @@ export interface DeleteRuleEntityByBusinessKeyRequestParams {
     startDate: string;
 }
 
+export interface DeleteWorkCenterByBusinessKeyRequestParams {
+    ruleSystemCode: string;
+    employeeTypeCode: string;
+    employeeNumber: string;
+    workCenterAssignmentNumber: number;
+}
+
 export interface GetAddressByBusinessKeyRequestParams {
     ruleSystemCode: string;
     employeeTypeCode: string;
@@ -646,6 +653,14 @@ export interface DefaultServiceInterface {
 * @param requestParameters
      */
     deleteRuleEntityByBusinessKey(requestParameters: DeleteRuleEntityByBusinessKeyRequestParams, extraHttpRequestParams?: any): Observable<{}>;
+
+    /**
+     * Delete employee work center assignment by business key
+     * Administrative deletion of a specific work center assignment occurrence identified by business keys. This operation does not represent a workflow transition and does not replace close. Deletion is forbidden when the assignment startDate exactly matches the startDate of any presence for the same employee; in that case the occurrence must be corrected instead of deleted.
+     * @endpoint delete /employees/{ruleSystemCode}/{employeeTypeCode}/{employeeNumber}/work-centers/{workCenterAssignmentNumber}
+* @param requestParameters
+     */
+    deleteWorkCenterByBusinessKey(requestParameters: DeleteWorkCenterByBusinessKeyRequestParams, extraHttpRequestParams?: any): Observable<{}>;
 
     /**
      * Get employee address by business key

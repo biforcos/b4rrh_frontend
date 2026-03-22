@@ -5,6 +5,7 @@ const workCenterFunctionalErrorCodes = [
   'WORK_CENTER_NOT_FOUND',
   'WORK_CENTER_ALREADY_CLOSED',
   'WORK_CENTER_INVALID_PERIOD',
+  'WORK_CENTER_DELETE_FORBIDDEN_AT_PRESENCE_START',
 ] as const;
 
 export type EmployeeWorkCenterFunctionalErrorCode = (typeof workCenterFunctionalErrorCodes)[number];

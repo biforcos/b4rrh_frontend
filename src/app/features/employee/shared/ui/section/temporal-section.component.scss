@@ -57,6 +57,12 @@
   color: #6f4654 !important;
 }
 
+.temporal-section__delete-action {
+  border-color: #dfd3d8 !important;
+  background: #fffdfd !important;
+  color: #77505d !important;
+}
+
 .temporal-section__body {
   display: grid;
   gap: 0.42rem;
@@ -198,6 +204,13 @@
   gap: 0.28rem;
   width: 100%;
   max-width: 58rem;
+}
+
+.temporal-section__disabled-action-reason {
+  align-self: center;
+  color: #6f5a62;
+  font-size: 0.66rem;
+  line-height: 1.2;
 }
 
 .temporal-section__confirm-close {

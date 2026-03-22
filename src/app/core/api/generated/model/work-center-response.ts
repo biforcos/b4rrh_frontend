@@ -17,5 +17,8 @@ export interface WorkCenterResponse {
     workCenterCode: string;
     startDate: string;
     endDate?: string | null;
+    canDelete?: boolean;
+    startsAtPresenceStart?: boolean;
+    deleteForbiddenReason?: string | null;
 }
 

@@ -222,11 +222,15 @@ export const employeeTexts = {
   workCenterSectionAddAction: 'Agregar asignacion',
   workCenterSectionCorrectAction: 'Corregir ocurrencia',
   workCenterSectionCloseAction: 'Cerrar',
+  workCenterSectionDeleteAction: 'Eliminar',
   workCenterSectionCancelAction: 'Cancelar',
   workCenterSectionSaveCreateAction: 'Guardar',
   workCenterSectionSaveCorrectAction: 'Guardar correccion',
   workCenterSectionConfirmCloseMessage: 'Confirma el cierre de esta asignacion.',
   workCenterSectionConfirmCloseAction: 'Confirmar cierre',
+  workCenterSectionConfirmDeleteMessage:
+    'Vas a eliminar esta asignacion de centro de trabajo. Esta accion no se puede deshacer.',
+  workCenterSectionConfirmDeleteAction: 'Confirmar eliminacion',
   workCenterSectionEmptyMessage: 'No hay asignaciones de centro de trabajo cargadas.',
   workCenterSectionRequestFailedMessage:
     'No se pudo procesar la operacion de centro de trabajo. Reintenta.',
@@ -242,11 +246,16 @@ export const employeeTexts = {
     'La asignacion ya esta cerrada y no admite un nuevo cierre.',
   workCenterSectionFunctionalInvalidPeriodMessage:
     'El periodo informado no es valido para esta operacion de centro de trabajo.',
+  workCenterSectionDeleteForbiddenAtPresenceStartMessage:
+    'No se puede eliminar esta asignacion porque inicia una presence del empleado. Corrigela si necesitas cambiarla.',
+  workCenterSectionDeleteDisabledPresenceStartReason:
+    'No eliminable: inicia una presence del empleado. Usa Corregir ocurrencia.',
   workCenterSectionLoadFailedMessage:
     'No se pudo cargar la informacion de centro de trabajo.',
   workCenterSectionCreateSuccessMessage: 'Asignacion creada correctamente.',
   workCenterSectionCorrectSuccessMessage: 'Asignacion corregida correctamente.',
   workCenterSectionCloseSuccessMessage: 'Asignacion cerrada correctamente.',
+  workCenterSectionDeleteSuccessMessage: 'Asignacion eliminada correctamente.',
   workCenterSectionInvalidPeriodMessage:
     'El periodo es invalido. La fecha fin no puede ser anterior a la fecha inicio.',
   workCenterSectionCloseDateInvalidMessage:

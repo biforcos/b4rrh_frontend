@@ -92,6 +92,14 @@ export class EmployeeWorkCenterGateway {
       .pipe(map(() => undefined));
   }
 
+  deleteWorkCenter(employeeKey: EmployeeBusinessKey, workCenterAssignmentNumber: number): Observable<void> {
+    const normalizedKey = toEmployeeBusinessKey(employeeKey);
+
+    return this.workCenterClient
+      .deleteWorkCenterByBusinessKey(normalizedKey, workCenterAssignmentNumber)
+      .pipe(map(() => undefined));
+  }
+
   private toEmployeeWorkCenterModel(source: EmployeeWorkCenterReadModel): EmployeeWorkCenterModel {
     return {
       workCenterAssignmentNumber: source.workCenterAssignmentNumber,
@@ -100,6 +108,9 @@ export class EmployeeWorkCenterGateway {
       startDate: source.startDate,
       endDate: source.endDate,
       isActive: source.isActive,
+      canDelete: source.canDelete,
+      startsAtPresenceStart: source.startsAtPresenceStart,
+      deleteForbiddenReason: source.deleteForbiddenReason,
     };
   }
 }

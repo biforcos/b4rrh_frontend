@@ -24,6 +24,7 @@ export interface EmployeeWorkCenterRowTexts {
   currentPeriodLabel: string;
   periodPrefix: string;
   assignmentPrefix: string;
+  deleteDisabledPresenceStartReason: string;
 }
 
 export function mapEmployeeWorkCenterModelToTemporalRow(
@@ -40,6 +41,11 @@ export function mapEmployeeWorkCenterModelToTemporalRow(
     statusLabel: source.isActive ? texts.currentStatus : texts.closedStatus,
     isCurrent: source.isActive,
     closeable: source.isActive,
+    deletable: source.canDelete,
+    deleteDisabledReason:
+      source.canDelete || source.deleteForbiddenReason !== 'starts-at-presence-start'
+        ? null
+        : texts.deleteDisabledPresenceStartReason,
   };
 }
 

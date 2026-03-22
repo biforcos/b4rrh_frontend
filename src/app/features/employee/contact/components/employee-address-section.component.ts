@@ -61,12 +61,15 @@ export class EmployeeAddressSectionComponent {
     editCurrentAction: this.texts.addressesSectionEditCurrentAction,
     correctAction: this.texts.addressesSectionEditCurrentAction,
     closeAction: this.texts.addressesSectionCloseAction,
+    deleteAction: this.texts.addressesSectionCloseAction,
     cancelAction: this.texts.addressesSectionCancelAction,
     saveCreateAction: this.texts.addressesSectionSaveCreateAction,
     saveEditCurrentAction: this.texts.addressesSectionSaveEditCurrentAction,
     saveCorrectAction: this.texts.addressesSectionSaveEditCurrentAction,
     confirmCloseMessage: this.texts.addressesSectionConfirmCloseMessage,
     confirmCloseAction: this.texts.addressesSectionConfirmCloseAction,
+    confirmDeleteMessage: this.texts.addressesSectionConfirmCloseMessage,
+    confirmDeleteAction: this.texts.addressesSectionConfirmCloseAction,
     emptyMessage: this.texts.addressesSectionEmptyMessage,
   };
   protected readonly rows = computed<ReadonlyArray<TemporalRowViewModel<number>>>(() =>

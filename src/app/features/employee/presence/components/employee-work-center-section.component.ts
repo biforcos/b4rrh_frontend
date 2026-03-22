@@ -43,6 +43,7 @@ export class EmployeeWorkCenterSectionComponent {
   private readonly displayModeState = signal<TemporalDisplayMode>('view');
   private readonly localErrorMessageState = signal<string | null>(null);
   private readonly confirmingCloseKeyState = signal<number | null>(null);
+  private readonly confirmingDeleteKeyState = signal<number | null>(null);
   private readonly correctingKeyState = signal<number | null>(null);
   private readonly createDraftState = signal<WorkCenterCreateDraft>(createEmptyWorkCenterCreateDraft());
   private readonly correctDraftState = signal<WorkCenterCorrectDraft>(createEmptyWorkCenterCorrectDraft());
@@ -57,12 +58,15 @@ export class EmployeeWorkCenterSectionComponent {
     editCurrentAction: this.texts.workCenterSectionCorrectAction,
     correctAction: this.texts.workCenterSectionCorrectAction,
     closeAction: this.texts.workCenterSectionCloseAction,
+    deleteAction: this.texts.workCenterSectionDeleteAction,
     cancelAction: this.texts.workCenterSectionCancelAction,
     saveCreateAction: this.texts.workCenterSectionSaveCreateAction,
     saveEditCurrentAction: this.texts.workCenterSectionSaveCorrectAction,
     saveCorrectAction: this.texts.workCenterSectionSaveCorrectAction,
     confirmCloseMessage: this.texts.workCenterSectionConfirmCloseMessage,
     confirmCloseAction: this.texts.workCenterSectionConfirmCloseAction,
+    confirmDeleteMessage: this.texts.workCenterSectionConfirmDeleteMessage,
+    confirmDeleteAction: this.texts.workCenterSectionConfirmDeleteAction,
     emptyMessage: this.texts.workCenterSectionEmptyMessage,
   };
   protected readonly rowTexts: EmployeeWorkCenterRowTexts = {
@@ -71,6 +75,7 @@ export class EmployeeWorkCenterSectionComponent {
     currentPeriodLabel: this.texts.workCenterSectionCurrentPeriodLabel,
     periodPrefix: this.texts.workCenterSectionPeriodPrefix,
     assignmentPrefix: this.texts.workCenterSectionAssignmentPrefix,
+    deleteDisabledPresenceStartReason: this.texts.workCenterSectionDeleteDisabledPresenceStartReason,
   };
   protected readonly rows = computed<ReadonlyArray<TemporalRowViewModel<number>>>(() =>
     [...this.workCenterStore.workCenters()]
@@ -79,6 +84,7 @@ export class EmployeeWorkCenterSectionComponent {
   );
   protected readonly displayMode = this.displayModeState.asReadonly();
   protected readonly confirmingCloseKey = this.confirmingCloseKeyState.asReadonly();
+  protected readonly confirmingDeleteKey = this.confirmingDeleteKeyState.asReadonly();
   protected readonly correctingKey = this.correctingKeyState.asReadonly();
   protected readonly createDraft = this.createDraftState.asReadonly();
   protected readonly correctDraft = this.correctDraftState.asReadonly();
@@ -133,7 +139,8 @@ export class EmployeeWorkCenterSectionComponent {
       dirty:
         this.displayModeState() === 'creating' ||
         this.displayModeState() === 'correcting' ||
-        this.displayModeState() === 'confirmingClose',
+        this.displayModeState() === 'confirmingClose' ||
+        this.displayModeState() === 'confirmingDelete',
       busy: isBusy,
       errorMessage: this.resolveErrorMessage(),
       successMessage: this.resolveSuccessMessage(),
@@ -158,7 +165,7 @@ export class EmployeeWorkCenterSectionComponent {
         return;
       }
 
-      if (mode === 'creating' || mode === 'correcting' || mode === 'confirmingClose') {
+      if (mode === 'creating' || mode === 'correcting' || mode === 'confirmingClose' || mode === 'confirmingDelete') {
         this.enterManageMode();
       }
     });
@@ -221,6 +228,20 @@ export class EmployeeWorkCenterSectionComponent {
     this.enterConfirmingCloseMode(workCenterAssignmentNumber, this.currentBusinessDate());
   }
 
+  protected requestDelete(workCenterAssignmentNumber: number): void {
+    if (!this.canStartInteraction()) {
+      return;
+    }
+
+    const row = this.rows().find((item) => item.key === workCenterAssignmentNumber);
+    if (!row || row.deletable !== true) {
+      return;
+    }
+
+    this.clearInteractionFeedback();
+    this.enterConfirmingDeleteMode(workCenterAssignmentNumber);
+  }
+
   protected submitCreate(): void {
     const activeEmployeeKey = this.employeeKey();
     if (!activeEmployeeKey || this.workCenterStore.mutating()) {
@@ -251,6 +272,16 @@ export class EmployeeWorkCenterSectionComponent {
 
     this.clearLocalError();
     this.workCenterStore.closeWorkCenter(activeEmployeeKey, workCenterAssignmentNumber, closeEndDate);
+  }
+
+  protected confirmDelete(workCenterAssignmentNumber: number): void {
+    const activeEmployeeKey = this.employeeKey();
+    if (!activeEmployeeKey || this.workCenterStore.mutating()) {
+      return;
+    }
+
+    this.clearLocalError();
+    this.workCenterStore.deleteWorkCenter(activeEmployeeKey, workCenterAssignmentNumber);
   }
 
   protected submitCorrect(workCenterAssignmentNumber: number): void {
@@ -318,6 +349,7 @@ export class EmployeeWorkCenterSectionComponent {
     this.displayModeState.set('creating');
     this.correctingKeyState.set(null);
     this.confirmingCloseKeyState.set(null);
+    this.confirmingDeleteKeyState.set(null);
     this.createDraftState.set(createEmptyWorkCenterCreateDraft());
     this.correctDraftState.set(createEmptyWorkCenterCorrectDraft());
     this.closeEndDateState.set('');
@@ -327,6 +359,7 @@ export class EmployeeWorkCenterSectionComponent {
     this.displayModeState.set('correcting');
     this.correctingKeyState.set(workCenterAssignmentNumber);
     this.confirmingCloseKeyState.set(null);
+    this.confirmingDeleteKeyState.set(null);
     this.createDraftState.set(createEmptyWorkCenterCreateDraft());
     this.correctDraftState.set(draft);
     this.closeEndDateState.set('');
@@ -336,9 +369,20 @@ export class EmployeeWorkCenterSectionComponent {
     this.displayModeState.set('confirmingClose');
     this.correctingKeyState.set(null);
     this.confirmingCloseKeyState.set(workCenterAssignmentNumber);
+    this.confirmingDeleteKeyState.set(null);
     this.createDraftState.set(createEmptyWorkCenterCreateDraft());
     this.correctDraftState.set(createEmptyWorkCenterCorrectDraft());
     this.closeEndDateState.set(defaultEndDate);
+  }
+
+  private enterConfirmingDeleteMode(workCenterAssignmentNumber: number): void {
+    this.displayModeState.set('confirmingDelete');
+    this.correctingKeyState.set(null);
+    this.confirmingCloseKeyState.set(null);
+    this.confirmingDeleteKeyState.set(workCenterAssignmentNumber);
+    this.createDraftState.set(createEmptyWorkCenterCreateDraft());
+    this.correctDraftState.set(createEmptyWorkCenterCorrectDraft());
+    this.closeEndDateState.set('');
   }
 
   private clearInteractionFeedback(): void {
@@ -353,6 +397,7 @@ export class EmployeeWorkCenterSectionComponent {
   private resetOperationContext(): void {
     this.correctingKeyState.set(null);
     this.confirmingCloseKeyState.set(null);
+    this.confirmingDeleteKeyState.set(null);
     this.createDraftState.set(createEmptyWorkCenterCreateDraft());
     this.correctDraftState.set(createEmptyWorkCenterCorrectDraft());
     this.closeEndDateState.set('');
@@ -364,6 +409,10 @@ export class EmployeeWorkCenterSectionComponent {
     }
 
     if (displayMode === 'confirmingClose') {
+      return 'confirming';
+    }
+
+    if (displayMode === 'confirmingDelete') {
       return 'confirming';
     }
 
@@ -401,6 +450,10 @@ export class EmployeeWorkCenterSectionComponent {
       return this.texts.workCenterSectionFunctionalInvalidPeriodMessage;
     }
 
+    if (errorCode === 'WORK_CENTER_DELETE_FORBIDDEN_AT_PRESENCE_START') {
+      return this.texts.workCenterSectionDeleteForbiddenAtPresenceStartMessage;
+    }
+
     if (errorCode === 'request-failed') {
       return this.texts.workCenterSectionRequestFailedMessage;
     }
@@ -421,6 +474,10 @@ export class EmployeeWorkCenterSectionComponent {
 
     if (successCode === 'closed') {
       return this.texts.workCenterSectionCloseSuccessMessage;
+    }
+
+    if (successCode === 'deleted') {
+      return this.texts.workCenterSectionDeleteSuccessMessage;
     }
 
     return null;

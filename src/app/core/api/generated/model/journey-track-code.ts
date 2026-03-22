@@ -15,6 +15,8 @@ export enum JourneyTrackCode {
 
     Contract = 'CONTRACT',
 
-    LaborClassification = 'LABOR_CLASSIFICATION'
+    LaborClassification = 'LABOR_CLASSIFICATION',
+
+    WorkCenter = 'WORK_CENTER'
 }
 

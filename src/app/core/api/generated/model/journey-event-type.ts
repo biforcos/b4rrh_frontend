@@ -31,6 +31,10 @@ export enum JourneyEventType {
 
     LaborClassificationChange = 'LABOR_CLASSIFICATION_CHANGE',
 
-    LaborClassificationEnd = 'LABOR_CLASSIFICATION_END'
+    LaborClassificationEnd = 'LABOR_CLASSIFICATION_END',
+
+    WorkCenterStart = 'WORK_CENTER_START',
+
+    WorkCenterEnd = 'WORK_CENTER_END'
 }
 

@@ -18,6 +18,9 @@ const workCentersFixture: ReadonlyArray<EmployeeWorkCenterModel> = [
     startDate: '2025-01-01',
     endDate: null,
     isActive: true,
+    canDelete: true,
+    startsAtPresenceStart: false,
+    deleteForbiddenReason: null,
   },
   {
     workCenterAssignmentNumber: 9,
@@ -25,6 +28,9 @@ const workCentersFixture: ReadonlyArray<EmployeeWorkCenterModel> = [
     startDate: '2024-01-01',
     endDate: '2024-12-31',
     isActive: false,
+    canDelete: true,
+    startsAtPresenceStart: false,
+    deleteForbiddenReason: null,
   },
 ];
 
@@ -35,6 +41,7 @@ describe('EmployeeWorkCenterStore', () => {
     createWorkCenter: ReturnType<typeof vi.fn>;
     closeWorkCenter: ReturnType<typeof vi.fn>;
     correctWorkCenter: ReturnType<typeof vi.fn>;
+    deleteWorkCenter: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(() => {
@@ -43,6 +50,7 @@ describe('EmployeeWorkCenterStore', () => {
       createWorkCenter: vi.fn().mockReturnValue(of(undefined)),
       closeWorkCenter: vi.fn().mockReturnValue(of(undefined)),
       correctWorkCenter: vi.fn().mockReturnValue(of(undefined)),
+      deleteWorkCenter: vi.fn().mockReturnValue(of(undefined)),
     };
 
     TestBed.configureTestingModule({
@@ -106,6 +114,16 @@ describe('EmployeeWorkCenterStore', () => {
     expect(store.success()).toBe('corrected');
   });
 
+  it('deletes work center occurrence and refreshes list on success', () => {
+    store.loadWorkCenters(employeeBusinessKey);
+
+    store.deleteWorkCenter(employeeBusinessKey, 9);
+
+    expect(gatewayMock.deleteWorkCenter).toHaveBeenCalledWith(employeeBusinessKey, 9);
+    expect(gatewayMock.readWorkCenters).toHaveBeenCalledTimes(2);
+    expect(store.success()).toBe('deleted');
+  });
+
   it('keeps context and sets request-failed when mutation fails', () => {
     gatewayMock.correctWorkCenter.mockReturnValue(throwError(() => new Error('backend unavailable')));
 
@@ -155,6 +173,23 @@ describe('EmployeeWorkCenterStore', () => {
     });
 
     expect(store.error()).toBe('request-failed');
+    expect(store.workCenters()).toEqual(workCentersFixture);
+    expect(store.mutating()).toBe(false);
+  });
+
+  it('maps delete forbidden functional backend code on delete failure', () => {
+    gatewayMock.deleteWorkCenter.mockReturnValue(
+      throwError(() => ({
+        error: {
+          code: 'WORK_CENTER_DELETE_FORBIDDEN_AT_PRESENCE_START',
+        },
+      })),
+    );
+
+    store.loadWorkCenters(employeeBusinessKey);
+    store.deleteWorkCenter(employeeBusinessKey, 9);
+
+    expect(store.error()).toBe('WORK_CENTER_DELETE_FORBIDDEN_AT_PRESENCE_START');
     expect(store.workCenters()).toEqual(workCentersFixture);
     expect(store.mutating()).toBe(false);
   });

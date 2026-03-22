@@ -16,6 +16,9 @@ export interface EmployeeWorkCenterApiModel {
   workCenterCode: string;
   startDate: string;
   endDate: string | null;
+  canDelete?: boolean;
+  startsAtPresenceStart?: boolean;
+  deleteForbiddenReason?: string | null;
 }
 
 @Injectable({
@@ -111,6 +114,20 @@ export class EmployeeWorkCenterReadClient {
       .pipe(map((workCenter) => this.toEmployeeWorkCenterApiModel(workCenter)));
   }
 
+  deleteWorkCenterByBusinessKey(
+    key: EmployeeBusinessKeyApiQuery,
+    workCenterAssignmentNumber: number,
+  ): Observable<void> {
+    const normalizedKey = this.normalizeKey(key);
+
+    return this.api
+      .deleteWorkCenterByBusinessKey({
+        ...normalizedKey,
+        workCenterAssignmentNumber,
+      })
+      .pipe(map(() => undefined));
+  }
+
   private normalizeKey(key: EmployeeBusinessKeyApiQuery): EmployeeBusinessKeyApiQuery {
     return {
       ruleSystemCode: key.ruleSystemCode.trim(),
@@ -130,6 +147,9 @@ export class EmployeeWorkCenterReadClient {
       workCenterCode: source.workCenterCode,
       startDate: source.startDate,
       endDate: source.endDate ?? null,
+      canDelete: source.canDelete,
+      startsAtPresenceStart: source.startsAtPresenceStart,
+      deleteForbiddenReason: source.deleteForbiddenReason ?? null,
     };
   }
 }
