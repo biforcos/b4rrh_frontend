@@ -8,7 +8,9 @@ export interface EmployeePresenceBlockItemModel {
   companyCode: string;
   companyName?: string | null;
   entryReasonCode: string;
+  entryReasonName?: string | null;
   exitReasonCode: string | null;
+  exitReasonName?: string | null;
   startDate: string;
   endDate: string | null;
   isActive: boolean;
@@ -79,6 +81,22 @@ export class EmployeePresenceBlockComponent {
 
   protected resolveCompanyCodeSecondary(presence: EmployeePresenceBlockItemModel): string | undefined {
     return getCatalogDisplay(presence.companyName, presence.companyCode).code;
+  }
+
+  protected resolveEntryReasonLabel(presence: EmployeePresenceBlockItemModel): string {
+    return getCatalogDisplay(presence.entryReasonName, presence.entryReasonCode).label;
+  }
+
+  protected resolveEntryReasonCodeSecondary(presence: EmployeePresenceBlockItemModel): string | undefined {
+    return getCatalogDisplay(presence.entryReasonName, presence.entryReasonCode).code;
+  }
+
+  protected resolveExitReasonLabel(presence: EmployeePresenceBlockItemModel): string {
+    return getCatalogDisplay(presence.exitReasonName, presence.exitReasonCode ?? '').label;
+  }
+
+  protected resolveExitReasonCodeSecondary(presence: EmployeePresenceBlockItemModel): string | undefined {
+    return getCatalogDisplay(presence.exitReasonName, presence.exitReasonCode ?? '').code;
   }
 
   protected resolveStatusLabel(presence: EmployeePresenceBlockItemModel): string {

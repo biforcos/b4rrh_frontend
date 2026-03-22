@@ -23,7 +23,9 @@ describe('EmployeePresenceBlockComponent', () => {
         companyCode: 'AC01',
         companyName: 'Empresa Activa',
         entryReasonCode: 'ENT01',
+        entryReasonName: 'Alta inicial',
         exitReasonCode: null,
+        exitReasonName: null,
         startDate: '2026-01-10',
         endDate: null,
         isActive: true,
@@ -42,6 +44,8 @@ describe('EmployeePresenceBlockComponent', () => {
     expect(identity).toContain('Empresa Activa');
     expect(identity).toContain('AC01');
     expect(identity).toContain('#1');
+    expect(fixture.nativeElement.textContent as string).toContain('Alta inicial');
+    expect(fixture.nativeElement.textContent as string).toContain('ENT01');
   });
 
   it('falls back to CODE when companyName is missing and keeps period/reason rendering', () => {
@@ -51,7 +55,9 @@ describe('EmployeePresenceBlockComponent', () => {
         companyCode: 'AC01',
         companyName: null,
         entryReasonCode: 'ENT01',
-        exitReasonCode: null,
+        entryReasonName: null,
+        exitReasonCode: 'EXT01',
+        exitReasonName: null,
         startDate: '2026-01-10',
         endDate: null,
         isActive: true,
@@ -68,5 +74,8 @@ describe('EmployeePresenceBlockComponent', () => {
     expect(hostText).toContain('AC01');
     expect(hostText).toContain('Periodo');
     expect(hostText).toContain('Motivo entrada');
+    expect(hostText).toContain('ENT01');
+    expect(hostText).toContain('Motivo salida');
+    expect(hostText).toContain('EXT01');
   });
 });

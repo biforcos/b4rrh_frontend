@@ -26,9 +26,21 @@
           </span>
         </p>
         <p class="employee-presence-block__reason-row">
-          <span>{{ texts.presenceBlockEntryReasonLabel }}: {{ currentPresence.entryReasonCode }}</span>
+          <span>
+            {{ texts.presenceBlockEntryReasonLabel }}:
+            {{ resolveEntryReasonLabel(currentPresence) }}
+            @if (resolveEntryReasonCodeSecondary(currentPresence); as entryReasonCodeSecondary) {
+              <span class="employee-presence-block__reason-secondary"> · {{ entryReasonCodeSecondary }}</span>
+            }
+          </span>
           @if (currentPresence.exitReasonCode) {
-            <span>{{ texts.presenceBlockExitReasonLabel }}: {{ currentPresence.exitReasonCode }}</span>
+            <span>
+              {{ texts.presenceBlockExitReasonLabel }}:
+              {{ resolveExitReasonLabel(currentPresence) }}
+              @if (resolveExitReasonCodeSecondary(currentPresence); as exitReasonCodeSecondary) {
+                <span class="employee-presence-block__reason-secondary"> · {{ exitReasonCodeSecondary }}</span>
+              }
+            </span>
           }
         </p>
         <p class="employee-presence-block__context">{{ resolveCurrentKindLabel() }}</p>
@@ -61,9 +73,21 @@
                 </span>
               </p>
               <p class="employee-presence-block__reason-row">
-                <span>{{ texts.presenceBlockEntryReasonLabel }}: {{ presence.entryReasonCode }}</span>
+                <span>
+                  {{ texts.presenceBlockEntryReasonLabel }}:
+                  {{ resolveEntryReasonLabel(presence) }}
+                  @if (resolveEntryReasonCodeSecondary(presence); as entryReasonCodeSecondary) {
+                    <span class="employee-presence-block__reason-secondary"> · {{ entryReasonCodeSecondary }}</span>
+                  }
+                </span>
                 @if (presence.exitReasonCode) {
-                  <span>{{ texts.presenceBlockExitReasonLabel }}: {{ presence.exitReasonCode }}</span>
+                  <span>
+                    {{ texts.presenceBlockExitReasonLabel }}:
+                    {{ resolveExitReasonLabel(presence) }}
+                    @if (resolveExitReasonCodeSecondary(presence); as exitReasonCodeSecondary) {
+                      <span class="employee-presence-block__reason-secondary"> · {{ exitReasonCodeSecondary }}</span>
+                    }
+                  </span>
                 }
               </p>
             </article>

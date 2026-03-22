@@ -17,7 +17,15 @@ export interface PresenceResponse {
      */
     companyName?: string | null;
     entryReasonCode: string;
+    /**
+     * Optional display name from EMPLOYEE_PRESENCE_ENTRY_REASON rule entities in the employee ruleSystemCode catalog.
+     */
+    entryReasonName?: string | null;
     exitReasonCode?: string | null;
+    /**
+     * Optional display name from EMPLOYEE_PRESENCE_EXIT_REASON rule entities in the employee ruleSystemCode catalog.
+     */
+    exitReasonName?: string | null;
     startDate: string;
     endDate?: string | null;
 }

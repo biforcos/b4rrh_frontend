@@ -5,7 +5,9 @@ export interface EmployeePresenceReadModel {
   companyCode: string;
   companyName?: string | null;
   entryReasonCode: string;
+  entryReasonName?: string | null;
   exitReasonCode: string | null;
+  exitReasonName?: string | null;
   startDate: string;
   endDate: string | null;
   isActive: boolean;
@@ -29,7 +31,9 @@ export function mapEmployeePresenceApiToReadModel(
     companyCode,
     companyName: normalizeOptionalValue(source.companyName),
     entryReasonCode,
+    entryReasonName: normalizeOptionalValue(source.entryReasonName),
     exitReasonCode: normalizeOptionalValue(source.exitReasonCode),
+    exitReasonName: normalizeOptionalValue(source.exitReasonName),
     startDate,
     endDate,
     isActive: endDate === null,
