@@ -36,22 +36,30 @@
 
     <label class="employee-contract-section__field employee-contract-section__field--contract">
       <span>{{ texts.contractSectionContractLabel }}</span>
-      <input
-        type="text"
+      <select
         [value]="replaceDraft().contractCode"
-        [placeholder]="texts.contractSectionContractPlaceholder"
-        (input)="updateReplaceField('contractCode', $any($event.target).value)"
-      />
+        [disabled]="contractTypeOptionsLoading()"
+        (change)="updateReplaceField('contractCode', $any($event.target).value)"
+      >
+        <option value="">{{ texts.contractSectionContractLabel }}</option>
+        @for (option of contractTypeOptions(); track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
     </label>
 
     <label class="employee-contract-section__field employee-contract-section__field--subtype">
       <span>{{ texts.contractSectionSubtypeLabel }}</span>
-      <input
-        type="text"
+      <select
         [value]="replaceDraft().contractSubtypeCode"
-        [placeholder]="texts.contractSectionSubtypePlaceholder"
-        (input)="updateReplaceField('contractSubtypeCode', $any($event.target).value)"
-      />
+        [disabled]="replaceSubtypeDisabled()"
+        (change)="updateReplaceField('contractSubtypeCode', $any($event.target).value)"
+      >
+        <option value="">{{ texts.contractSectionSubtypeLabel }}</option>
+        @for (option of replaceSubtypeOptions(); track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
     </label>
   </div>
 
@@ -65,22 +73,30 @@
 
     <label class="employee-contract-section__field employee-contract-section__field--contract">
       <span>{{ texts.contractSectionContractLabel }}</span>
-      <input
-        type="text"
+      <select
         [value]="correctDraft().contractCode"
-        [placeholder]="texts.contractSectionContractPlaceholder"
-        (input)="updateCorrectField('contractCode', $any($event.target).value)"
-      />
+        [disabled]="contractTypeOptionsLoading()"
+        (change)="updateCorrectField('contractCode', $any($event.target).value)"
+      >
+        <option value="">{{ texts.contractSectionContractLabel }}</option>
+        @for (option of contractTypeOptions(); track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
     </label>
 
     <label class="employee-contract-section__field employee-contract-section__field--subtype">
       <span>{{ texts.contractSectionSubtypeLabel }}</span>
-      <input
-        type="text"
+      <select
         [value]="correctDraft().contractSubtypeCode"
-        [placeholder]="texts.contractSectionSubtypePlaceholder"
-        (input)="updateCorrectField('contractSubtypeCode', $any($event.target).value)"
-      />
+        [disabled]="correctSubtypeDisabled()"
+        (change)="updateCorrectField('contractSubtypeCode', $any($event.target).value)"
+      >
+        <option value="">{{ texts.contractSectionSubtypeLabel }}</option>
+        @for (option of correctSubtypeOptions(); track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
     </label>
   </div>
 

@@ -11,6 +11,7 @@ export * from './close-rule-entity-request';
 export * from './close-work-center-request';
 export * from './contact-response';
 export * from './contract-response';
+export * from './contract-subtype-catalog-item-response';
 export * from './correct-rule-entity-request';
 export * from './cost-center-response';
 export * from './create-address-request';

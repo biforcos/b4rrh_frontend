@@ -23,6 +23,7 @@ import { CloseRuleEntityRequest } from '../model/models';
 import { CloseWorkCenterRequest } from '../model/models';
 import { ContactResponse } from '../model/models';
 import { ContractResponse } from '../model/models';
+import { ContractSubtypeCatalogItemResponse } from '../model/models';
 import { CorrectRuleEntityRequest } from '../model/models';
 import { CostCenterResponse } from '../model/models';
 import { CreateAddressRequest } from '../model/models';
@@ -330,6 +331,12 @@ export interface GetWorkCenterByBusinessKeyRequestParams {
     employeeTypeCode: string;
     employeeNumber: string;
     workCenterAssignmentNumber: number;
+}
+
+export interface ListContractCatalogSubtypesRequestParams {
+    ruleSystemCode: string;
+    contractTypeCode: string;
+    referenceDate?: string;
 }
 
 export interface ListEmployeeAddressesByBusinessKeyRequestParams {
@@ -810,6 +817,14 @@ export interface DefaultServiceInterface {
 * @param requestParameters
      */
     getWorkCenterByBusinessKey(requestParameters: GetWorkCenterByBusinessKeyRequestParams, extraHttpRequestParams?: any): Observable<WorkCenterResponse>;
+
+    /**
+     * List contract subtypes valid for a contract type
+     * 
+     * @endpoint get /contract-catalog/contract-subtypes
+* @param requestParameters
+     */
+    listContractCatalogSubtypes(requestParameters: ListContractCatalogSubtypesRequestParams, extraHttpRequestParams?: any): Observable<Array<ContractSubtypeCatalogItemResponse>>;
 
     /**
      * List employee addresses by business key

@@ -1,5 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
+import { take } from 'rxjs';
 
+import { EmployeeContractCatalogGateway } from '../../data-access/employee-contract-catalog.gateway';
+import { EmployeeFieldCatalogService } from '../../data-access/employee-field-catalog.service';
 import {
   ContractCloseDraft,
   ContractCorrectDraft,
@@ -13,6 +16,8 @@ import {
 import { EmployeeContractStore } from '../../data-access/employee-contract.store';
 import { employeeTexts } from '../../employee.texts';
 import { EmployeeBusinessKey } from '../../models/employee-business-key.model';
+import { EmployeeContractCatalogItemModel } from '../../models/employee-contract-catalog-item.model';
+import { SlotKeyOption } from '../../shared/ui/section/editable-slot-section.model';
 import { SectionMode, SectionUiState } from '../../shared/ui/section/section-ui-state.model';
 import { TemporalSectionComponent } from '../../shared/ui/section/temporal-section.component';
 import {
@@ -32,6 +37,8 @@ export class EmployeeContractSectionComponent {
   readonly employeeBusinessKey = input<EmployeeBusinessKey | null>(null);
 
   private readonly contractStore = inject(EmployeeContractStore);
+  private readonly fieldCatalogService = inject(EmployeeFieldCatalogService);
+  private readonly contractCatalogGateway = inject(EmployeeContractCatalogGateway);
 
   private readonly displayModeState = signal<TemporalDisplayMode>('view');
   private readonly localErrorMessageState = signal<string | null>(null);
@@ -40,6 +47,16 @@ export class EmployeeContractSectionComponent {
   private readonly replaceDraftState = signal<ContractReplaceDraft>(createEmptyContractReplaceDraft());
   private readonly correctDraftState = signal<ContractCorrectDraft>(createEmptyContractCorrectDraft());
   private readonly closeDraftState = signal<ContractCloseDraft>(createEmptyContractCloseDraft());
+  private readonly contractTypeOptionsState = signal<ReadonlyArray<SlotKeyOption<string>>>([]);
+  private readonly replaceSubtypeOptionsState = signal<ReadonlyArray<SlotKeyOption<string>>>([]);
+  private readonly correctSubtypeOptionsState = signal<ReadonlyArray<SlotKeyOption<string>>>([]);
+  private readonly contractTypeOptionsLoadingState = signal(false);
+  private readonly replaceSubtypeLoadingState = signal(false);
+  private readonly correctSubtypeLoadingState = signal(false);
+
+  private contractTypeOptionsRequestId = 0;
+  private replaceSubtypeRequestId = 0;
+  private correctSubtypeRequestId = 0;
 
   protected readonly texts = employeeTexts;
   protected readonly sectionSubtitle = this.texts.contractSectionSubtitle;
@@ -77,6 +94,24 @@ export class EmployeeContractSectionComponent {
   protected readonly replaceDraft = this.replaceDraftState.asReadonly();
   protected readonly correctDraft = this.correctDraftState.asReadonly();
   protected readonly closeDraft = this.closeDraftState.asReadonly();
+  protected readonly contractTypeOptions = computed(() =>
+    this.withCurrentCodeOption(this.contractTypeOptionsState(), this.activeContractCode()),
+  );
+  protected readonly replaceSubtypeOptions = computed(() =>
+    this.withCurrentCodeOption(this.replaceSubtypeOptionsState(), this.replaceDraftState().contractSubtypeCode),
+  );
+  protected readonly correctSubtypeOptions = computed(() =>
+    this.withCurrentCodeOption(this.correctSubtypeOptionsState(), this.correctDraftState().contractSubtypeCode),
+  );
+  protected readonly contractTypeOptionsLoading = this.contractTypeOptionsLoadingState.asReadonly();
+  protected readonly replaceSubtypeLoading = this.replaceSubtypeLoadingState.asReadonly();
+  protected readonly correctSubtypeLoading = this.correctSubtypeLoadingState.asReadonly();
+  protected readonly replaceSubtypeDisabled = computed(
+    () => this.normalizeRequiredValue(this.replaceDraftState().contractCode).length === 0 || this.replaceSubtypeLoadingState(),
+  );
+  protected readonly correctSubtypeDisabled = computed(
+    () => this.normalizeRequiredValue(this.correctDraftState().contractCode).length === 0 || this.correctSubtypeLoadingState(),
+  );
   protected readonly supportedActions = computed(() => ({
     canReplaceFromDate: true,
     canCorrect: true,
@@ -152,6 +187,7 @@ export class EmployeeContractSectionComponent {
 
       untracked(() => {
         this.contractStore.loadContractsByBusinessKey(activeEmployeeKey);
+        this.loadContractTypeOptions(activeEmployeeKey?.ruleSystemCode ?? null);
         this.enterManageMode();
       });
     });
@@ -287,16 +323,70 @@ export class EmployeeContractSectionComponent {
   }
 
   protected updateReplaceField(field: keyof ContractReplaceDraft, value: string): void {
+    const currentDraft = this.replaceDraftState();
+
+    if (field === 'contractCode') {
+      const contractChanged =
+        this.normalizeRequiredValue(currentDraft.contractCode) !== this.normalizeRequiredValue(value);
+
+      this.replaceDraftState.set({
+        ...currentDraft,
+        contractCode: value,
+        contractSubtypeCode: contractChanged ? '' : currentDraft.contractSubtypeCode,
+      });
+
+      if (contractChanged) {
+        this.loadReplaceSubtypeOptions(value, currentDraft.effectiveDate, null);
+      }
+
+      this.clearInteractionFeedback();
+      return;
+    }
+
+    if (field === 'effectiveDate') {
+      this.replaceDraftState.set({
+        ...currentDraft,
+        effectiveDate: value,
+      });
+
+      if (this.normalizeRequiredValue(currentDraft.contractCode).length > 0) {
+        this.loadReplaceSubtypeOptions(currentDraft.contractCode, value, currentDraft.contractSubtypeCode);
+      }
+
+      this.clearInteractionFeedback();
+      return;
+    }
+
     this.replaceDraftState.set({
-      ...this.replaceDraftState(),
+      ...currentDraft,
       [field]: value,
     });
     this.clearInteractionFeedback();
   }
 
   protected updateCorrectField(field: keyof ContractCorrectDraft, value: string): void {
+    const currentDraft = this.correctDraftState();
+
+    if (field === 'contractCode') {
+      const contractChanged =
+        this.normalizeRequiredValue(currentDraft.contractCode) !== this.normalizeRequiredValue(value);
+
+      this.correctDraftState.set({
+        ...currentDraft,
+        contractCode: value,
+        contractSubtypeCode: contractChanged ? '' : currentDraft.contractSubtypeCode,
+      });
+
+      if (contractChanged) {
+        this.loadCorrectSubtypeOptions(value, this.correctingOccurrence()?.startDate ?? null, null);
+      }
+
+      this.clearInteractionFeedback();
+      return;
+    }
+
     this.correctDraftState.set({
-      ...this.correctDraftState(),
+      ...currentDraft,
       [field]: value,
     });
     this.clearInteractionFeedback();
@@ -335,6 +425,8 @@ export class EmployeeContractSectionComponent {
     this.replaceDraftState.set(createEmptyContractReplaceDraft());
     this.correctDraftState.set(createEmptyContractCorrectDraft());
     this.closeDraftState.set(createEmptyContractCloseDraft());
+    this.replaceSubtypeOptionsState.set([]);
+    this.replaceSubtypeLoadingState.set(false);
   }
 
   private enterCorrectingMode(rowKey: number, draft: ContractCorrectDraft): void {
@@ -344,6 +436,7 @@ export class EmployeeContractSectionComponent {
     this.replaceDraftState.set(createEmptyContractReplaceDraft());
     this.correctDraftState.set(draft);
     this.closeDraftState.set(createEmptyContractCloseDraft());
+    this.loadCorrectSubtypeOptions(draft.contractCode, this.correctingOccurrence()?.startDate ?? null, draft.contractSubtypeCode);
   }
 
   private enterConfirmingCloseMode(rowKey: number, endDate: string): void {
@@ -370,6 +463,10 @@ export class EmployeeContractSectionComponent {
     this.replaceDraftState.set(createEmptyContractReplaceDraft());
     this.correctDraftState.set(createEmptyContractCorrectDraft());
     this.closeDraftState.set(createEmptyContractCloseDraft());
+    this.replaceSubtypeOptionsState.set([]);
+    this.correctSubtypeOptionsState.set([]);
+    this.replaceSubtypeLoadingState.set(false);
+    this.correctSubtypeLoadingState.set(false);
   }
 
   private toSectionMode(displayMode: TemporalDisplayMode): SectionMode {
@@ -425,6 +522,199 @@ export class EmployeeContractSectionComponent {
 
   private normalizeRequiredValue(value: string | null | undefined): string {
     return value?.trim() ?? '';
+  }
+
+  private loadContractTypeOptions(ruleSystemCode: string | null): void {
+    const normalizedRuleSystemCode = ruleSystemCode?.trim() ?? '';
+
+    if (!normalizedRuleSystemCode) {
+      this.contractTypeOptionsRequestId += 1;
+      this.contractTypeOptionsLoadingState.set(false);
+      this.contractTypeOptionsState.set([]);
+      return;
+    }
+
+    const requestId = ++this.contractTypeOptionsRequestId;
+    this.contractTypeOptionsLoadingState.set(true);
+
+    this.fieldCatalogService
+      .loadContractTypeOptions(normalizedRuleSystemCode)
+      .pipe(take(1))
+      .subscribe((options) => {
+        if (requestId !== this.contractTypeOptionsRequestId) {
+          return;
+        }
+
+        this.contractTypeOptionsState.set(options);
+        this.contractTypeOptionsLoadingState.set(false);
+      });
+  }
+
+  private loadReplaceSubtypeOptions(
+    contractCode: string | null,
+    referenceDate: string | null,
+    preferredSubtypeCode: string | null,
+  ): void {
+    const normalizedContractCode = this.normalizeRequiredValue(contractCode);
+
+    if (!normalizedContractCode) {
+      this.replaceSubtypeRequestId += 1;
+      this.replaceSubtypeOptionsState.set([]);
+      this.replaceSubtypeLoadingState.set(false);
+      this.replaceDraftState.update((draft) => ({
+        ...draft,
+        contractSubtypeCode: '',
+      }));
+      return;
+    }
+
+    const ruleSystemCode = this.employeeBusinessKey()?.ruleSystemCode?.trim() ?? '';
+    if (!ruleSystemCode) {
+      this.replaceSubtypeRequestId += 1;
+      this.replaceSubtypeOptionsState.set([]);
+      this.replaceSubtypeLoadingState.set(false);
+      return;
+    }
+
+    const requestId = ++this.replaceSubtypeRequestId;
+    this.replaceSubtypeLoadingState.set(true);
+
+    this.contractCatalogGateway
+      .loadContractSubtypes(ruleSystemCode, normalizedContractCode, referenceDate)
+      .pipe(take(1))
+      .subscribe({
+        next: (subtypes) => {
+          if (requestId !== this.replaceSubtypeRequestId) {
+            return;
+          }
+
+          const options = this.toSlotOptions(subtypes);
+          this.replaceSubtypeOptionsState.set(options);
+          this.replaceSubtypeLoadingState.set(false);
+
+          const effectiveSubtype = this.resolveEffectiveSubtypeCode(options, preferredSubtypeCode);
+          if (!effectiveSubtype) {
+            this.replaceDraftState.update((draft) => ({
+              ...draft,
+              contractSubtypeCode: '',
+            }));
+          }
+        },
+        error: () => {
+          if (requestId !== this.replaceSubtypeRequestId) {
+            return;
+          }
+
+          this.replaceSubtypeOptionsState.set([]);
+          this.replaceSubtypeLoadingState.set(false);
+        },
+      });
+  }
+
+  private loadCorrectSubtypeOptions(
+    contractCode: string | null,
+    referenceDate: string | null,
+    preferredSubtypeCode: string | null,
+  ): void {
+    const normalizedContractCode = this.normalizeRequiredValue(contractCode);
+
+    if (!normalizedContractCode) {
+      this.correctSubtypeRequestId += 1;
+      this.correctSubtypeOptionsState.set([]);
+      this.correctSubtypeLoadingState.set(false);
+      this.correctDraftState.update((draft) => ({
+        ...draft,
+        contractSubtypeCode: '',
+      }));
+      return;
+    }
+
+    const ruleSystemCode = this.employeeBusinessKey()?.ruleSystemCode?.trim() ?? '';
+    if (!ruleSystemCode) {
+      this.correctSubtypeRequestId += 1;
+      this.correctSubtypeOptionsState.set([]);
+      this.correctSubtypeLoadingState.set(false);
+      return;
+    }
+
+    const requestId = ++this.correctSubtypeRequestId;
+    this.correctSubtypeLoadingState.set(true);
+
+    this.contractCatalogGateway
+      .loadContractSubtypes(ruleSystemCode, normalizedContractCode, referenceDate)
+      .pipe(take(1))
+      .subscribe({
+        next: (subtypes) => {
+          if (requestId !== this.correctSubtypeRequestId) {
+            return;
+          }
+
+          const options = this.toSlotOptions(subtypes);
+          this.correctSubtypeOptionsState.set(options);
+          this.correctSubtypeLoadingState.set(false);
+
+          const effectiveSubtype = this.resolveEffectiveSubtypeCode(options, preferredSubtypeCode);
+          if (!effectiveSubtype) {
+            this.correctDraftState.update((draft) => ({
+              ...draft,
+              contractSubtypeCode: '',
+            }));
+          }
+        },
+        error: () => {
+          if (requestId !== this.correctSubtypeRequestId) {
+            return;
+          }
+
+          this.correctSubtypeOptionsState.set([]);
+          this.correctSubtypeLoadingState.set(false);
+        },
+      });
+  }
+
+  private toSlotOptions(items: ReadonlyArray<EmployeeContractCatalogItemModel>): ReadonlyArray<SlotKeyOption<string>> {
+    return items.map((item) => ({
+      value: item.code,
+      label: item.label,
+    }));
+  }
+
+  private resolveEffectiveSubtypeCode(
+    options: ReadonlyArray<SlotKeyOption<string>>,
+    preferredSubtypeCode: string | null,
+  ): string | null {
+    const normalizedPreferredSubtypeCode = this.normalizeRequiredValue(preferredSubtypeCode);
+    if (!normalizedPreferredSubtypeCode) {
+      return null;
+    }
+
+    return options.some((option) => option.value === normalizedPreferredSubtypeCode)
+      ? normalizedPreferredSubtypeCode
+      : null;
+  }
+
+  private withCurrentCodeOption(
+    options: ReadonlyArray<SlotKeyOption<string>>,
+    currentCode: string,
+  ): ReadonlyArray<SlotKeyOption<string>> {
+    const normalizedCurrentCode = this.normalizeRequiredValue(currentCode);
+    if (!normalizedCurrentCode) {
+      return options;
+    }
+
+    if (options.some((option) => option.value === normalizedCurrentCode)) {
+      return options;
+    }
+
+    return [{ value: normalizedCurrentCode, label: normalizedCurrentCode }, ...options];
+  }
+
+  private activeContractCode(): string {
+    if (this.displayModeState() === 'correcting') {
+      return this.correctDraftState().contractCode;
+    }
+
+    return this.replaceDraftState().contractCode;
   }
 
   private toRowKey(startDate: string): number {

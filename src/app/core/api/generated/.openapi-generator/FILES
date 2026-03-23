@@ -22,6 +22,7 @@ model/close-rule-entity-request.ts
 model/close-work-center-request.ts
 model/contact-response.ts
 model/contract-response.ts
+model/contract-subtype-catalog-item-response.ts
 model/correct-rule-entity-request.ts
 model/cost-center-response.ts
 model/create-address-request.ts

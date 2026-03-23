@@ -41,6 +41,8 @@ import { ContactResponse } from '../model/contact-response';
 // @ts-ignore
 import { ContractResponse } from '../model/contract-response';
 // @ts-ignore
+import { ContractSubtypeCatalogItemResponse } from '../model/contract-subtype-catalog-item-response';
+// @ts-ignore
 import { CorrectRuleEntityRequest } from '../model/correct-rule-entity-request';
 // @ts-ignore
 import { CostCenterResponse } from '../model/cost-center-response';
@@ -163,6 +165,7 @@ import {
     GetRuleEntityTypeByCodeRequestParams,
     GetRuleSystemByCodeRequestParams,
     GetWorkCenterByBusinessKeyRequestParams,
+    ListContractCatalogSubtypesRequestParams,
     ListEmployeeAddressesByBusinessKeyRequestParams,
     ListEmployeeContactsByBusinessKeyRequestParams,
     ListEmployeeContractsByBusinessKeyRequestParams,
@@ -3129,6 +3132,98 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
         return this.httpClient.request<WorkCenterResponse>('get', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
+                responseType: <any>responseType_,
+                ...(withCredentials ? { withCredentials } : {}),
+                headers: localVarHeaders,
+                observe: observe,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * List contract subtypes valid for a contract type
+     * @endpoint get /contract-catalog/contract-subtypes
+     * @param requestParameters
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     * @param options additional options
+     */
+    public listContractCatalogSubtypes(requestParameters: ListContractCatalogSubtypesRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<Array<ContractSubtypeCatalogItemResponse>>;
+    public listContractCatalogSubtypes(requestParameters: ListContractCatalogSubtypesRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<ContractSubtypeCatalogItemResponse>>>;
+    public listContractCatalogSubtypes(requestParameters: ListContractCatalogSubtypesRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Array<ContractSubtypeCatalogItemResponse>>>;
+    public listContractCatalogSubtypes(requestParameters: ListContractCatalogSubtypesRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        const ruleSystemCode = requestParameters?.ruleSystemCode;
+        if (ruleSystemCode === null || ruleSystemCode === undefined) {
+            throw new Error('Required parameter ruleSystemCode was null or undefined when calling listContractCatalogSubtypes.');
+        }
+        const contractTypeCode = requestParameters?.contractTypeCode;
+        if (contractTypeCode === null || contractTypeCode === undefined) {
+            throw new Error('Required parameter contractTypeCode was null or undefined when calling listContractCatalogSubtypes.');
+        }
+        const referenceDate = requestParameters?.referenceDate;
+
+        let localVarQueryParameters = new OpenApiHttpParams(this.encoder);
+
+        localVarQueryParameters = this.addToHttpParams(
+            localVarQueryParameters,
+            'ruleSystemCode',
+            <any>ruleSystemCode,
+            QueryParamStyle.Form,
+            true,
+        );
+
+
+        localVarQueryParameters = this.addToHttpParams(
+            localVarQueryParameters,
+            'contractTypeCode',
+            <any>contractTypeCode,
+            QueryParamStyle.Form,
+            true,
+        );
+
+
+        localVarQueryParameters = this.addToHttpParams(
+            localVarQueryParameters,
+            'referenceDate',
+            <any>referenceDate,
+            QueryParamStyle.Form,
+            true,
+        );
+
+
+        let localVarHeaders = this.defaultHeaders;
+
+        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
+            'application/json'
+        ]);
+        if (localVarHttpHeaderAcceptSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+        }
+
+        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+        const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+
+        let responseType_: 'text' | 'json' | 'blob' = 'json';
+        if (localVarHttpHeaderAcceptSelected) {
+            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+                responseType_ = 'text';
+            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+                responseType_ = 'json';
+            } else {
+                responseType_ = 'blob';
+            }
+        }
+
+        let localVarPath = `/contract-catalog/contract-subtypes`;
+        const { basePath, withCredentials } = this.configuration;
+        return this.httpClient.request<Array<ContractSubtypeCatalogItemResponse>>('get', `${basePath}${localVarPath}`,
+            {
+                context: localVarHttpContext,
+                params: localVarQueryParameters.toHttpParams(),
                 responseType: <any>responseType_,
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,

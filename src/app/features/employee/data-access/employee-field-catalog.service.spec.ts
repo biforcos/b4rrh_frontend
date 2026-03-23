@@ -58,6 +58,14 @@ describe('EmployeeFieldCatalogService', () => {
           active: true,
         },
       ],
+      'employee.contract': [
+        {
+          fieldCode: 'contractTypeCode',
+          catalogKind: CatalogFieldBindingResponseCatalogKindEnum.Direct,
+          ruleEntityTypeCode: 'CONTRACT',
+          active: true,
+        },
+      ],
     };
 
     const directItemsByEntity: Record<string, ReadonlyArray<unknown>> = {
@@ -117,6 +125,15 @@ describe('EmployeeFieldCatalogService', () => {
         {
           code: 'AGR-TECH',
           name: 'Convenio tecnico',
+          active: true,
+          startDate: '2020-01-01',
+          endDate: null,
+        },
+      ],
+      CONTRACT: [
+        {
+          code: 'PERM',
+          name: 'Indefinido',
           active: true,
           startDate: '2020-01-01',
           endDate: null,
@@ -359,5 +376,22 @@ describe('EmployeeFieldCatalogService', () => {
       ruleEntityTypeCode: 'AGREEMENT',
     });
     expect(result).toEqual([{ value: 'AGR-TECH', label: 'Convenio tecnico · AGR-TECH' }]);
+  });
+
+  it('loads DIRECT options for employee.contract contractTypeCode', () => {
+    let result: ReadonlyArray<{ value: string; label: string }> = [];
+
+    service.loadContractTypeOptions('PA-ES').subscribe((options) => {
+      result = options;
+    });
+
+    expect(apiMock.getCatalogBindingsByResourceCode).toHaveBeenCalledWith({
+      resourceCode: 'employee.contract',
+    });
+    expect(apiMock.getDirectCatalogOptions).toHaveBeenCalledWith({
+      ruleSystemCode: 'PA-ES',
+      ruleEntityTypeCode: 'CONTRACT',
+    });
+    expect(result).toEqual([{ value: 'PERM', label: 'Indefinido · PERM' }]);
   });
 });
