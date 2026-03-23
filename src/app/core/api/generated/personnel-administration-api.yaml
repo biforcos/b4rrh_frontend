@@ -2402,6 +2402,74 @@ paths:
         '400':
           description: Invalid request
 
+  /catalog-bindings/{resourceCode}:
+    get:
+      operationId: getCatalogBindingsByResourceCode
+      summary: Get catalog bindings by resource code
+      parameters:
+        - in: path
+          name: resourceCode
+          required: true
+          schema:
+            type: string
+            maxLength: 80
+      responses:
+        '200':
+          description: Catalog bindings for the requested resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CatalogBindingsByResourceResponse'
+        '400':
+          description: Invalid resource code
+
+  /catalog-options/direct:
+    get:
+      operationId: getDirectCatalogOptions
+      summary: Get direct catalog options by rule system and entity type
+      description: |
+        Returns direct catalog options from `rulesystem.rule_entity` for the requested rule system and entity type.
+        `referenceDate` in the response is the effective date applied by the service:
+        - request `referenceDate` when provided
+        - current date when omitted
+        The `active` flag for each item is resolved against this effective date.
+      parameters:
+        - in: query
+          name: ruleSystemCode
+          required: true
+          schema:
+            type: string
+            maxLength: 5
+        - in: query
+          name: ruleEntityTypeCode
+          required: true
+          schema:
+            type: string
+            maxLength: 30
+        - in: query
+          name: referenceDate
+          required: false
+          schema:
+            type: string
+            format: date
+          description: Optional date used as effective date for validity filtering and item active evaluation.
+        - in: query
+          name: q
+          required: false
+          schema:
+            type: string
+            maxLength: 100
+          description: Optional case-insensitive search by option code or name.
+      responses:
+        '200':
+          description: Direct catalog options
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DirectCatalogOptionsResponse'
+        '400':
+          description: Invalid request
+
   /rule-systems/{ruleSystemCode}:
     get:
       operationId: getRuleSystemByCode
@@ -2779,11 +2847,23 @@ components:
           format: int32
         companyCode:
           type: string
+        companyName:
+          type: string
+          nullable: true
+          description: Optional display name from COMPANY rule entities in the employee ruleSystemCode catalog.
         entryReasonCode:
           type: string
+        entryReasonName:
+          type: string
+          nullable: true
+          description: Optional display name from EMPLOYEE_PRESENCE_ENTRY_REASON rule entities in the employee ruleSystemCode catalog.
         exitReasonCode:
           type: string
           nullable: true
+        exitReasonName:
+          type: string
+          nullable: true
+          description: Optional display name from EMPLOYEE_PRESENCE_EXIT_REASON rule entities in the employee ruleSystemCode catalog.
         startDate:
           type: string
           format: date
@@ -2879,6 +2959,10 @@ components:
           format: int32
         addressTypeCode:
           type: string
+        addressTypeName:
+          type: string
+          nullable: true
+          description: Optional display name from EMPLOYEE_ADDRESS_TYPE rule entities in the employee ruleSystemCode catalog.
         street:
           type: string
         city:
@@ -2974,6 +3058,10 @@ components:
         workCenterCode:
           type: string
           description: Code from active WORK_CENTER rule entities in the employee ruleSystemCode catalog.
+        workCenterName:
+          type: string
+          nullable: true
+          description: Optional visible label resolved from WORK_CENTER rule entities for the employee ruleSystemCode and workCenterCode.
         startDate:
           type: string
           format: date
@@ -3135,10 +3223,18 @@ components:
           type: string
           minLength: 3
           maxLength: 3
+        contractTypeName:
+          type: string
+          nullable: true
+          description: Optional display name from CONTRACT rule entities in the employee ruleSystemCode catalog.
         contractSubtypeCode:
           type: string
           minLength: 3
           maxLength: 3
+        contractSubtypeName:
+          type: string
+          nullable: true
+          description: Optional display name from CONTRACT_SUBTYPE rule entities in the employee ruleSystemCode catalog.
         startDate:
           type: string
           format: date
@@ -3227,8 +3323,14 @@ components:
       properties:
         agreementCode:
           type: string
+        agreementName:
+          type: string
+          nullable: true
         agreementCategoryCode:
           type: string
+        agreementCategoryName:
+          type: string
+          nullable: true
         startDate:
           type: string
           format: date
@@ -3291,6 +3393,10 @@ components:
       properties:
         identifierTypeCode:
           type: string
+        identifierTypeName:
+          type: string
+          nullable: true
+          description: Optional display name from EMPLOYEE_IDENTIFIER_TYPE rule entities in the employee ruleSystemCode catalog.
         identifierValue:
           type: string
         issuingCountryCode:
@@ -3333,6 +3439,10 @@ components:
       properties:
         contactTypeCode:
           type: string
+        contactTypeName:
+          type: string
+          nullable: true
+          description: Optional display name from EMPLOYEE_CONTACT_TYPE rule entities in the employee ruleSystemCode catalog.
         contactValue:
           type: string
     AgreementCategoryCatalogItemResponse:
@@ -3355,6 +3465,94 @@ components:
           type: string
           format: date
           nullable: true
+    CatalogFieldBindingResponse:
+      type: object
+      required:
+        - fieldCode
+        - catalogKind
+        - active
+      properties:
+        fieldCode:
+          type: string
+          maxLength: 80
+        catalogKind:
+          type: string
+          enum:
+            - DIRECT
+            - DEPENDENT
+            - CUSTOM
+        ruleEntityTypeCode:
+          type: string
+          maxLength: 30
+          nullable: true
+        dependsOnFieldCode:
+          type: string
+          maxLength: 80
+          nullable: true
+        customResolverCode:
+          type: string
+          maxLength: 80
+          nullable: true
+        active:
+          type: boolean
+    CatalogBindingsByResourceResponse:
+      type: object
+      required:
+        - resourceCode
+        - fields
+      properties:
+        resourceCode:
+          type: string
+          maxLength: 80
+        fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/CatalogFieldBindingResponse'
+    DirectCatalogOptionResponse:
+      type: object
+      required:
+        - code
+        - name
+        - active
+        - startDate
+      properties:
+        code:
+          type: string
+          maxLength: 30
+        name:
+          type: string
+          maxLength: 100
+        active:
+          type: boolean
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+          nullable: true
+    DirectCatalogOptionsResponse:
+      type: object
+      required:
+        - ruleSystemCode
+        - ruleEntityTypeCode
+        - referenceDate
+        - items
+      properties:
+        ruleSystemCode:
+          type: string
+          maxLength: 5
+        ruleEntityTypeCode:
+          type: string
+          maxLength: 30
+        referenceDate:
+          type: string
+          format: date
+          description: Effective date applied by the service (request referenceDate when provided; otherwise current date).
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/DirectCatalogOptionResponse'
     CreateRuleSystemRequest:
       type: object
       required:

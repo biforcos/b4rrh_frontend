@@ -21,6 +21,8 @@ import { AddressResponse } from '../model/address-response';
 // @ts-ignore
 import { AgreementCategoryCatalogItemResponse } from '../model/agreement-category-catalog-item-response';
 // @ts-ignore
+import { CatalogBindingsByResourceResponse } from '../model/catalog-bindings-by-resource-response';
+// @ts-ignore
 import { CloseAddressRequest } from '../model/close-address-request';
 // @ts-ignore
 import { CloseContractRequest } from '../model/close-contract-request';
@@ -66,6 +68,8 @@ import { CreateRuleEntityTypeRequest } from '../model/create-rule-entity-type-re
 import { CreateRuleSystemRequest } from '../model/create-rule-system-request';
 // @ts-ignore
 import { CreateWorkCenterRequest } from '../model/create-work-center-request';
+// @ts-ignore
+import { DirectCatalogOptionsResponse } from '../model/direct-catalog-options-response';
 // @ts-ignore
 import { EmployeeDirectoryItemResponse } from '../model/employee-directory-item-response';
 // @ts-ignore
@@ -144,9 +148,11 @@ import {
     DeleteRuleEntityByBusinessKeyRequestParams,
     DeleteWorkCenterByBusinessKeyRequestParams,
     GetAddressByBusinessKeyRequestParams,
+    GetCatalogBindingsByResourceCodeRequestParams,
     GetContactByBusinessKeyRequestParams,
     GetContractByBusinessKeyRequestParams,
     GetCostCenterByBusinessKeyRequestParams,
+    GetDirectCatalogOptionsRequestParams,
     GetEmployeeByBusinessKeyRequestParams,
     GetEmployeeJourneyRequestParams,
     GetEmployeeJourneyV2RequestParams,
@@ -2106,6 +2112,63 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
     }
 
     /**
+     * Get catalog bindings by resource code
+     * @endpoint get /catalog-bindings/{resourceCode}
+     * @param requestParameters
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     * @param options additional options
+     */
+    public getCatalogBindingsByResourceCode(requestParameters: GetCatalogBindingsByResourceCodeRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<CatalogBindingsByResourceResponse>;
+    public getCatalogBindingsByResourceCode(requestParameters: GetCatalogBindingsByResourceCodeRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<CatalogBindingsByResourceResponse>>;
+    public getCatalogBindingsByResourceCode(requestParameters: GetCatalogBindingsByResourceCodeRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<CatalogBindingsByResourceResponse>>;
+    public getCatalogBindingsByResourceCode(requestParameters: GetCatalogBindingsByResourceCodeRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        const resourceCode = requestParameters?.resourceCode;
+        if (resourceCode === null || resourceCode === undefined) {
+            throw new Error('Required parameter resourceCode was null or undefined when calling getCatalogBindingsByResourceCode.');
+        }
+
+        let localVarHeaders = this.defaultHeaders;
+
+        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
+            'application/json'
+        ]);
+        if (localVarHttpHeaderAcceptSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+        }
+
+        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+        const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+
+        let responseType_: 'text' | 'json' | 'blob' = 'json';
+        if (localVarHttpHeaderAcceptSelected) {
+            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+                responseType_ = 'text';
+            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+                responseType_ = 'json';
+            } else {
+                responseType_ = 'blob';
+            }
+        }
+
+        let localVarPath = `/catalog-bindings/${this.configuration.encodeParam({name: "resourceCode", value: resourceCode, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}`;
+        const { basePath, withCredentials } = this.configuration;
+        return this.httpClient.request<CatalogBindingsByResourceResponse>('get', `${basePath}${localVarPath}`,
+            {
+                context: localVarHttpContext,
+                responseType: <any>responseType_,
+                ...(withCredentials ? { withCredentials } : {}),
+                headers: localVarHeaders,
+                observe: observe,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
      * Get employee contact by business key
      * @endpoint get /employees/{ruleSystemCode}/{employeeTypeCode}/{employeeNumber}/contacts/{contactTypeCode}
      * @param requestParameters
@@ -2306,6 +2369,109 @@ export class DefaultService extends BaseService implements DefaultServiceInterfa
         return this.httpClient.request<CostCenterResponse>('get', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
+                responseType: <any>responseType_,
+                ...(withCredentials ? { withCredentials } : {}),
+                headers: localVarHeaders,
+                observe: observe,
+                ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * Get direct catalog options by rule system and entity type
+     * Returns direct catalog options from &#x60;rulesystem.rule_entity&#x60; for the requested rule system and entity type. &#x60;referenceDate&#x60; in the response is the effective date applied by the service: - request &#x60;referenceDate&#x60; when provided - current date when omitted The &#x60;active&#x60; flag for each item is resolved against this effective date. 
+     * @endpoint get /catalog-options/direct
+     * @param requestParameters
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     * @param options additional options
+     */
+    public getDirectCatalogOptions(requestParameters: GetDirectCatalogOptionsRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<DirectCatalogOptionsResponse>;
+    public getDirectCatalogOptions(requestParameters: GetDirectCatalogOptionsRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<DirectCatalogOptionsResponse>>;
+    public getDirectCatalogOptions(requestParameters: GetDirectCatalogOptionsRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<DirectCatalogOptionsResponse>>;
+    public getDirectCatalogOptions(requestParameters: GetDirectCatalogOptionsRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        const ruleSystemCode = requestParameters?.ruleSystemCode;
+        if (ruleSystemCode === null || ruleSystemCode === undefined) {
+            throw new Error('Required parameter ruleSystemCode was null or undefined when calling getDirectCatalogOptions.');
+        }
+        const ruleEntityTypeCode = requestParameters?.ruleEntityTypeCode;
+        if (ruleEntityTypeCode === null || ruleEntityTypeCode === undefined) {
+            throw new Error('Required parameter ruleEntityTypeCode was null or undefined when calling getDirectCatalogOptions.');
+        }
+        const referenceDate = requestParameters?.referenceDate;
+        const q = requestParameters?.q;
+
+        let localVarQueryParameters = new OpenApiHttpParams(this.encoder);
+
+        localVarQueryParameters = this.addToHttpParams(
+            localVarQueryParameters,
+            'ruleSystemCode',
+            <any>ruleSystemCode,
+            QueryParamStyle.Form,
+            true,
+        );
+
+
+        localVarQueryParameters = this.addToHttpParams(
+            localVarQueryParameters,
+            'ruleEntityTypeCode',
+            <any>ruleEntityTypeCode,
+            QueryParamStyle.Form,
+            true,
+        );
+
+
+        localVarQueryParameters = this.addToHttpParams(
+            localVarQueryParameters,
+            'referenceDate',
+            <any>referenceDate,
+            QueryParamStyle.Form,
+            true,
+        );
+
+
+        localVarQueryParameters = this.addToHttpParams(
+            localVarQueryParameters,
+            'q',
+            <any>q,
+            QueryParamStyle.Form,
+            true,
+        );
+
+
+        let localVarHeaders = this.defaultHeaders;
+
+        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
+            'application/json'
+        ]);
+        if (localVarHttpHeaderAcceptSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+        }
+
+        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+        const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+
+        let responseType_: 'text' | 'json' | 'blob' = 'json';
+        if (localVarHttpHeaderAcceptSelected) {
+            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+                responseType_ = 'text';
+            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+                responseType_ = 'json';
+            } else {
+                responseType_ = 'blob';
+            }
+        }
+
+        let localVarPath = `/catalog-options/direct`;
+        const { basePath, withCredentials } = this.configuration;
+        return this.httpClient.request<DirectCatalogOptionsResponse>('get', `${basePath}${localVarPath}`,
+            {
+                context: localVarHttpContext,
+                params: localVarQueryParameters.toHttpParams(),
                 responseType: <any>responseType_,
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,

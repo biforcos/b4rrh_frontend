@@ -15,6 +15,10 @@ export interface WorkCenterResponse {
      * Code from active WORK_CENTER rule entities in the employee ruleSystemCode catalog.
      */
     workCenterCode: string;
+    /**
+     * Optional visible label resolved from WORK_CENTER rule entities for the employee ruleSystemCode and workCenterCode.
+     */
+    workCenterName?: string | null;
     startDate: string;
     endDate?: string | null;
 }

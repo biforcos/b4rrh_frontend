@@ -9,11 +9,10 @@
  */
 
 
-export interface LaborClassificationResponse { 
-    agreementCode: string;
-    agreementName?: string | null;
-    agreementCategoryCode: string;
-    agreementCategoryName?: string | null;
+export interface DirectCatalogOptionResponse { 
+    code: string;
+    name: string;
+    active: boolean;
     startDate: string;
     endDate?: string | null;
 }

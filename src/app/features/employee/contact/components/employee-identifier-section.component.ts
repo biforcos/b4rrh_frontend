@@ -1,10 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
+import { take } from 'rxjs';
 
 import {
   IdentifierDraft,
   createEmptyIdentifierDraft,
   mapEmployeeIdentifierModelToSlotRow,
 } from '../../data-access/employee-identifier-edit.mapper';
+import { EmployeeFieldCatalogService } from '../../data-access/employee-field-catalog.service';
 import { EmployeeIdentifierStore } from '../../data-access/employee-identifier.store';
 import { employeeTexts } from '../../employee.texts';
 import { EmployeeBusinessKey } from '../../models/employee-business-key.model';
@@ -31,11 +33,16 @@ export class EmployeeIdentifierSectionComponent {
   readonly employeeKey = input<EmployeeBusinessKey | null>(null);
 
   private readonly identifierStore = inject(EmployeeIdentifierStore);
+  private readonly fieldCatalogService = inject(EmployeeFieldCatalogService);
   private readonly displayModeState = signal<SlotDisplayMode>('view');
   private readonly localErrorMessageState = signal<string | null>(null);
   private readonly editingKeyState = signal<string | null>(null);
   private readonly deletingKeyState = signal<string | null>(null);
   private readonly draftState = signal<IdentifierDraft>(createEmptyIdentifierDraft());
+  private readonly availableKeysState = signal<ReadonlyArray<SlotKeyOption<string>>>([]);
+  private readonly catalogLoadingState = signal(false);
+
+  private catalogRequestId = 0;
 
   protected readonly texts = employeeTexts;
   protected readonly sectionSubtitle = this.texts.identifiersSectionSubtitle;
@@ -65,7 +72,8 @@ export class EmployeeIdentifierSectionComponent {
       )
       .sort((left, right) => left.key.localeCompare(right.key)),
   );
-  protected readonly availableKeys = computed<ReadonlyArray<SlotKeyOption<string>>>(() => []);
+  protected readonly availableKeys = this.availableKeysState.asReadonly();
+  protected readonly catalogOptionsLoading = this.catalogLoadingState.asReadonly();
   protected readonly displayMode = this.displayModeState.asReadonly();
   protected readonly draft = this.draftState.asReadonly();
   protected readonly slotDraft = computed<SlotDraft<string>>(() => {
@@ -109,6 +117,7 @@ export class EmployeeIdentifierSectionComponent {
 
       untracked(() => {
         this.identifierStore.loadIdentifiers(activeEmployeeKey);
+        this.loadCatalogOptions(activeEmployeeKey?.ruleSystemCode ?? null);
         this.enterViewMode();
       });
     });
@@ -423,5 +432,52 @@ export class EmployeeIdentifierSectionComponent {
     }
 
     return null;
+  }
+
+  private loadCatalogOptions(ruleSystemCode: string | null): void {
+    const normalizedRuleSystemCode = ruleSystemCode?.trim() ?? '';
+
+    if (!normalizedRuleSystemCode) {
+      this.catalogRequestId += 1;
+      this.catalogLoadingState.set(false);
+      this.availableKeysState.set([]);
+      this.draftState.update((draft) => ({
+        ...draft,
+        key: null,
+      }));
+      return;
+    }
+
+    const requestId = ++this.catalogRequestId;
+    this.catalogLoadingState.set(true);
+    this.fieldCatalogService
+      .loadIdentifierTypeOptions(normalizedRuleSystemCode)
+      .pipe(take(1))
+      .subscribe((options) => {
+        if (requestId !== this.catalogRequestId) {
+          return;
+        }
+
+        this.catalogLoadingState.set(false);
+        this.availableKeysState.set(options);
+        this.syncDraftKeyWithAvailableOptions(options);
+      });
+  }
+
+  private syncDraftKeyWithAvailableOptions(options: ReadonlyArray<SlotKeyOption<string>>): void {
+    const currentDraftKey = this.draftState().key;
+    if (!currentDraftKey) {
+      return;
+    }
+
+    const hasMatchingKey = options.some((option) => option.value === currentDraftKey);
+    if (hasMatchingKey) {
+      return;
+    }
+
+    this.draftState.update((draft) => ({
+      ...draft,
+      key: null,
+    }));
   }
 }

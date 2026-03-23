@@ -1,6 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
+import { take } from 'rxjs';
 
 import { mapEmployeeContactModelToSlotRow } from '../../data-access/employee-contact-edit.mapper';
+import { EmployeeFieldCatalogService } from '../../data-access/employee-field-catalog.service';
 import { EmployeeContactStore } from '../../data-access/employee-contact.store';
 import { employeeTexts } from '../../employee.texts';
 import { EmployeeBusinessKey } from '../../models/employee-business-key.model';
@@ -10,6 +12,7 @@ import {
 import {
   SlotDraft,
   SlotDisplayMode,
+  SlotKeyOption,
   SlotEditSubmission,
   SlotSectionTexts,
   SlotRowViewModel,
@@ -36,11 +39,16 @@ export class EmployeeContactSectionComponent {
   readonly employeeKey = input<EmployeeBusinessKey | null>(null);
 
   private readonly contactStore = inject(EmployeeContactStore);
+  private readonly fieldCatalogService = inject(EmployeeFieldCatalogService);
   private readonly displayModeState = signal<SlotDisplayMode>('view');
   private readonly localErrorMessageState = signal<string | null>(null);
   private readonly editingKeyState = signal<string | null>(null);
   private readonly deletingKeyState = signal<string | null>(null);
   private readonly draftState = signal<SlotDraft<string>>(createEmptyContactDraft());
+  private readonly availableContactTypeOptionsState = signal<ReadonlyArray<SlotKeyOption<string>>>([]);
+  private readonly catalogLoadingState = signal(false);
+
+  private catalogRequestId = 0;
 
   protected readonly texts = employeeTexts;
   protected readonly slotTexts: SlotSectionTexts = {
@@ -67,6 +75,8 @@ export class EmployeeContactSectionComponent {
   );
   protected readonly displayMode = this.displayModeState.asReadonly();
   protected readonly draft = this.draftState.asReadonly();
+  protected readonly availableContactTypeOptions = this.availableContactTypeOptionsState.asReadonly();
+  protected readonly catalogOptionsLoading = this.catalogLoadingState.asReadonly();
   protected readonly editingKey = this.editingKeyState.asReadonly();
   protected readonly deletingKey = this.deletingKeyState.asReadonly();
   protected readonly sectionState = computed<SectionUiState>(() => {
@@ -87,6 +97,7 @@ export class EmployeeContactSectionComponent {
 
       untracked(() => {
         this.contactStore.loadContacts(activeEmployeeKey);
+        this.loadCatalogOptions(activeEmployeeKey?.ruleSystemCode ?? null);
         this.enterViewMode();
       });
     });
@@ -313,5 +324,49 @@ export class EmployeeContactSectionComponent {
     }
 
     return null;
+  }
+
+  private loadCatalogOptions(ruleSystemCode: string | null): void {
+    const normalizedRuleSystemCode = ruleSystemCode?.trim() ?? '';
+
+    if (!normalizedRuleSystemCode) {
+      this.catalogRequestId += 1;
+      this.catalogLoadingState.set(false);
+      this.availableContactTypeOptionsState.set([]);
+      this.draftState.update((draft) => ({ ...draft, key: null }));
+      return;
+    }
+
+    const requestId = ++this.catalogRequestId;
+    this.catalogLoadingState.set(true);
+    this.fieldCatalogService
+      .loadContactTypeOptions(normalizedRuleSystemCode)
+      .pipe(take(1))
+      .subscribe((options) => {
+        if (requestId !== this.catalogRequestId) {
+          return;
+        }
+
+        this.catalogLoadingState.set(false);
+        this.availableContactTypeOptionsState.set(options);
+        this.syncDraftKeyWithAvailableOptions(options);
+      });
+  }
+
+  private syncDraftKeyWithAvailableOptions(options: ReadonlyArray<SlotKeyOption<string>>): void {
+    const currentDraftKey = this.draftState().key;
+    if (!currentDraftKey) {
+      return;
+    }
+
+    const hasMatchingKey = options.some((option) => option.value === currentDraftKey);
+    if (hasMatchingKey) {
+      return;
+    }
+
+    this.draftState.update((draft) => ({
+      ...draft,
+      key: null,
+    }));
   }
 }

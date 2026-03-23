@@ -19,7 +19,8 @@
 }
 
 .employee-identifier-section__form-grid input[type='text'],
-.employee-identifier-section__form-grid input[type='date'] {
+.employee-identifier-section__form-grid input[type='date'],
+.employee-identifier-section__form-grid select {
   border: 1px solid #cedae7;
   border-radius: 0.42rem;
   background: #ffffff;
@@ -31,7 +32,8 @@
 }
 
 .employee-identifier-section__form-grid input[type='text']:focus-visible,
-.employee-identifier-section__form-grid input[type='date']:focus-visible {
+.employee-identifier-section__form-grid input[type='date']:focus-visible,
+.employee-identifier-section__form-grid select:focus-visible {
   outline: none;
   border-color: #7ea6cc;
   box-shadow: 0 0 0 2px rgba(126, 166, 204, 0.2);

@@ -25,7 +25,16 @@
   <div temporalCreateForm class="employee-address-section__form-grid">
     <label class="employee-address-section__field employee-address-section__field--type">
       <span>{{ texts.addressesSectionTypeLabel }}</span>
-      <input type="text" [value]="createDraft().addressTypeCode" (input)="updateCreateField('addressTypeCode', $any($event.target).value)" />
+      <select
+        [disabled]="catalogOptionsLoading()"
+        [value]="createDraft().addressTypeCode"
+        (change)="updateCreateField('addressTypeCode', $any($event.target).value)"
+      >
+        <option value="">{{ texts.addressesSectionTypeLabel }}</option>
+        @for (option of availableAddressTypeOptions(); track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
     </label>
 
     <label class="employee-address-section__field employee-address-section__field--street">

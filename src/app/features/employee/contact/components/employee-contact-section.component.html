@@ -27,14 +27,18 @@
     <div class="employee-contact-section__form-grid">
       <div class="employee-contact-section__form-field">
         <label class="employee-contact-section__form-label" for="contactTypeInput">{{ texts.contactsSectionKeyFieldLabel }}</label>
-        <input
+        <select
           id="contactTypeInput"
           class="employee-contact-section__form-input"
-          type="text"
+          [disabled]="catalogOptionsLoading()"
           [value]="draft().key ?? ''"
-          (input)="updateDraftKey($any($event.target).value)"
-          placeholder="Tipo de contacto"
-        />
+          (change)="updateDraftKey($any($event.target).value)"
+        >
+          <option value="">{{ texts.contactsSectionKeyFieldLabel }}</option>
+          @for (option of availableContactTypeOptions(); track option.value) {
+            <option [value]="option.value">{{ option.label }}</option>
+          }
+        </select>
       </div>
 
       <div class="employee-contact-section__form-field">

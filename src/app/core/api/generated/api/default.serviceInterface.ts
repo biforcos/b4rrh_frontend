@@ -13,6 +13,7 @@ import { Observable }                                        from 'rxjs';
 
 import { AddressResponse } from '../model/models';
 import { AgreementCategoryCatalogItemResponse } from '../model/models';
+import { CatalogBindingsByResourceResponse } from '../model/models';
 import { CloseAddressRequest } from '../model/models';
 import { CloseContractRequest } from '../model/models';
 import { CloseCostCenterRequest } from '../model/models';
@@ -36,6 +37,7 @@ import { CreateRuleEntityRequest } from '../model/models';
 import { CreateRuleEntityTypeRequest } from '../model/models';
 import { CreateRuleSystemRequest } from '../model/models';
 import { CreateWorkCenterRequest } from '../model/models';
+import { DirectCatalogOptionsResponse } from '../model/models';
 import { EmployeeDirectoryItemResponse } from '../model/models';
 import { EmployeeJourneyResponse } from '../model/models';
 import { EmployeeJourneyTracksResponse } from '../model/models';
@@ -236,6 +238,10 @@ export interface GetAddressByBusinessKeyRequestParams {
     addressNumber: number;
 }
 
+export interface GetCatalogBindingsByResourceCodeRequestParams {
+    resourceCode: string;
+}
+
 export interface GetContactByBusinessKeyRequestParams {
     ruleSystemCode: string;
     employeeTypeCode: string;
@@ -256,6 +262,13 @@ export interface GetCostCenterByBusinessKeyRequestParams {
     employeeNumber: string;
     costCenterCode: string;
     startDate: string;
+}
+
+export interface GetDirectCatalogOptionsRequestParams {
+    ruleSystemCode: string;
+    ruleEntityTypeCode: string;
+    referenceDate?: string;
+    q?: string;
 }
 
 export interface GetEmployeeByBusinessKeyRequestParams {
@@ -679,6 +692,14 @@ export interface DefaultServiceInterface {
     getAddressByBusinessKey(requestParameters: GetAddressByBusinessKeyRequestParams, extraHttpRequestParams?: any): Observable<AddressResponse>;
 
     /**
+     * Get catalog bindings by resource code
+     * 
+     * @endpoint get /catalog-bindings/{resourceCode}
+* @param requestParameters
+     */
+    getCatalogBindingsByResourceCode(requestParameters: GetCatalogBindingsByResourceCodeRequestParams, extraHttpRequestParams?: any): Observable<CatalogBindingsByResourceResponse>;
+
+    /**
      * Get employee contact by business key
      * 
      * @endpoint get /employees/{ruleSystemCode}/{employeeTypeCode}/{employeeNumber}/contacts/{contactTypeCode}
@@ -701,6 +722,14 @@ export interface DefaultServiceInterface {
 * @param requestParameters
      */
     getCostCenterByBusinessKey(requestParameters: GetCostCenterByBusinessKeyRequestParams, extraHttpRequestParams?: any): Observable<CostCenterResponse>;
+
+    /**
+     * Get direct catalog options by rule system and entity type
+     * Returns direct catalog options from &#x60;rulesystem.rule_entity&#x60; for the requested rule system and entity type. &#x60;referenceDate&#x60; in the response is the effective date applied by the service: - request &#x60;referenceDate&#x60; when provided - current date when omitted The &#x60;active&#x60; flag for each item is resolved against this effective date. 
+     * @endpoint get /catalog-options/direct
+* @param requestParameters
+     */
+    getDirectCatalogOptions(requestParameters: GetDirectCatalogOptionsRequestParams, extraHttpRequestParams?: any): Observable<DirectCatalogOptionsResponse>;
 
     /**
      * Get employee by business key

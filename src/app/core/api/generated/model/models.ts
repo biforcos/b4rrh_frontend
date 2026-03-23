@@ -1,5 +1,7 @@
 export * from './address-response';
 export * from './agreement-category-catalog-item-response';
+export * from './catalog-bindings-by-resource-response';
+export * from './catalog-field-binding-response';
 export * from './close-address-request';
 export * from './close-contract-request';
 export * from './close-cost-center-request';
@@ -23,6 +25,8 @@ export * from './create-rule-entity-request';
 export * from './create-rule-entity-type-request';
 export * from './create-rule-system-request';
 export * from './create-work-center-request';
+export * from './direct-catalog-option-response';
+export * from './direct-catalog-options-response';
 export * from './employee-directory-item-response';
 export * from './employee-journey-response';
 export * from './employee-journey-tracks-response';

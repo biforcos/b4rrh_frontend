@@ -18,5 +18,15 @@
     "target": "http://localhost:8080",
     "secure": false,
     "changeOrigin": true
+  },
+  "/catalog-bindings": {
+    "target": "http://localhost:8080",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/catalog-options": {
+    "target": "http://localhost:8080",
+    "secure": false,
+    "changeOrigin": true
   }
 }

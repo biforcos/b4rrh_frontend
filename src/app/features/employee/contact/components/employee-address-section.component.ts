@@ -1,14 +1,17 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
+import { take } from 'rxjs';
 
 import {
   AddressCreateDraft,
   AddressEditCurrentDraft,
   mapEmployeeAddressModelToTemporalRow,
 } from '../../data-access/employee-address-edit.mapper';
+import { EmployeeFieldCatalogService } from '../../data-access/employee-field-catalog.service';
 import { EmployeeAddressStore } from '../../data-access/employee-address.store';
 import { employeeTexts } from '../../employee.texts';
 import { EmployeeBusinessKey } from '../../models/employee-business-key.model';
 import { TemporalSectionComponent } from '../../shared/ui/section/temporal-section.component';
+import { SlotKeyOption } from '../../shared/ui/section/editable-slot-section.model';
 import { TemporalDisplayMode, TemporalRowViewModel, TemporalSectionTexts } from '../../shared/ui/section/temporal-section.model';
 import { SectionMode, SectionUiState } from '../../shared/ui/section/section-ui-state.model';
 
@@ -45,12 +48,17 @@ export class EmployeeAddressSectionComponent {
   readonly employeeKey = input<EmployeeBusinessKey | null>(null);
 
   private readonly addressStore = inject(EmployeeAddressStore);
+  private readonly fieldCatalogService = inject(EmployeeFieldCatalogService);
   private readonly displayModeState = signal<TemporalDisplayMode>('view');
   private readonly localErrorMessageState = signal<string | null>(null);
   private readonly confirmingCloseKeyState = signal<number | null>(null);
   private readonly editingCurrentKeyState = signal<number | null>(null);
   private readonly createDraftState = signal<AddressCreateDraft>(createEmptyAddressCreateDraft());
   private readonly editCurrentDraftState = signal<AddressEditCurrentDraft>(createEmptyAddressEditCurrentDraft());
+  private readonly availableAddressTypeOptionsState = signal<ReadonlyArray<SlotKeyOption<string>>>([]);
+  private readonly catalogLoadingState = signal(false);
+
+  private catalogRequestId = 0;
 
   protected readonly texts = employeeTexts;
   protected readonly sectionSubtitle = this.texts.addressesSectionSubtitle;
@@ -88,6 +96,8 @@ export class EmployeeAddressSectionComponent {
   protected readonly editingCurrentKey = this.editingCurrentKeyState.asReadonly();
   protected readonly createDraft = this.createDraftState.asReadonly();
   protected readonly editCurrentDraft = this.editCurrentDraftState.asReadonly();
+  protected readonly availableAddressTypeOptions = this.availableAddressTypeOptionsState.asReadonly();
+  protected readonly catalogOptionsLoading = this.catalogLoadingState.asReadonly();
   protected readonly currentAddress = computed(
     () => this.addressStore.addresses().find((address) => address.isActive) ?? null,
   );
@@ -129,6 +139,7 @@ export class EmployeeAddressSectionComponent {
 
       untracked(() => {
         this.addressStore.loadAddresses(activeEmployeeKey);
+        this.loadCatalogOptions(activeEmployeeKey?.ruleSystemCode ?? null);
         this.enterViewMode();
       });
     });
@@ -382,5 +393,52 @@ export class EmployeeAddressSectionComponent {
 
   private normalizeRequiredValue(value: string): string {
     return value.trim();
+  }
+
+  private loadCatalogOptions(ruleSystemCode: string | null): void {
+    const normalizedRuleSystemCode = ruleSystemCode?.trim() ?? '';
+
+    if (!normalizedRuleSystemCode) {
+      this.catalogRequestId += 1;
+      this.catalogLoadingState.set(false);
+      this.availableAddressTypeOptionsState.set([]);
+      this.createDraftState.update((draft) => ({
+        ...draft,
+        addressTypeCode: '',
+      }));
+      return;
+    }
+
+    const requestId = ++this.catalogRequestId;
+    this.catalogLoadingState.set(true);
+    this.fieldCatalogService
+      .loadAddressTypeOptions(normalizedRuleSystemCode)
+      .pipe(take(1))
+      .subscribe((options) => {
+        if (requestId !== this.catalogRequestId) {
+          return;
+        }
+
+        this.catalogLoadingState.set(false);
+        this.availableAddressTypeOptionsState.set(options);
+        this.syncCreateDraftTypeWithAvailableOptions(options);
+      });
+  }
+
+  private syncCreateDraftTypeWithAvailableOptions(options: ReadonlyArray<SlotKeyOption<string>>): void {
+    const currentTypeCode = this.createDraftState().addressTypeCode;
+    if (!currentTypeCode) {
+      return;
+    }
+
+    const hasMatchingTypeCode = options.some((option) => option.value === currentTypeCode);
+    if (hasMatchingTypeCode) {
+      return;
+    }
+
+    this.createDraftState.update((draft) => ({
+      ...draft,
+      addressTypeCode: '',
+    }));
   }
 }

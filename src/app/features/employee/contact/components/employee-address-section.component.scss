@@ -17,7 +17,8 @@
   color: #5f7386;
 }
 
-.employee-address-section__form-grid input {
+.employee-address-section__form-grid input,
+.employee-address-section__form-grid select {
   border: 1px solid #cedae7;
   border-radius: 0.42rem;
   background: #ffffff;
@@ -28,7 +29,8 @@
   min-height: 1.8rem;
 }
 
-.employee-address-section__form-grid input:focus-visible {
+.employee-address-section__form-grid input:focus-visible,
+.employee-address-section__form-grid select:focus-visible {
   outline: none;
   border-color: #7ea6cc;
   box-shadow: 0 0 0 2px rgba(126, 166, 204, 0.2);
@@ -71,7 +73,8 @@
 .employee-address-section__field--date input,
 .employee-address-section__field--postal input,
 .employee-address-section__field--region input,
-.employee-address-section__field--type input {
+.employee-address-section__field--type input,
+.employee-address-section__field--type select {
   max-width: 12rem;
 }
 
@@ -117,7 +120,8 @@
   .employee-address-section__field--date input,
   .employee-address-section__field--postal input,
   .employee-address-section__field--region input,
-  .employee-address-section__field--type input {
+  .employee-address-section__field--type input,
+  .employee-address-section__field--type select {
     max-width: none;
   }
 }
