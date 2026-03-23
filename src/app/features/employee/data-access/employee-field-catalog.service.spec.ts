@@ -42,6 +42,14 @@ describe('EmployeeFieldCatalogService', () => {
           active: true,
         },
       ],
+      'employee.work_center': [
+        {
+          fieldCode: 'workCenterCode',
+          catalogKind: CatalogFieldBindingResponseCatalogKindEnum.Direct,
+          ruleEntityTypeCode: 'EMPLOYEE_WORK_CENTER',
+          active: true,
+        },
+      ],
     };
 
     const directItemsByEntity: Record<string, ReadonlyArray<unknown>> = {
@@ -83,6 +91,15 @@ describe('EmployeeFieldCatalogService', () => {
         {
           code: 'END',
           name: 'Fin de relacion',
+          active: true,
+          startDate: '2020-01-01',
+          endDate: null,
+        },
+      ],
+      EMPLOYEE_WORK_CENTER: [
+        {
+          code: 'MADRID-01',
+          name: 'Madrid Centro',
           active: true,
           startDate: '2020-01-01',
           endDate: null,
@@ -291,5 +308,22 @@ describe('EmployeeFieldCatalogService', () => {
     expect(companyResult).toEqual([{ value: 'COMP-ES', label: 'Compania Espana · COMP-ES' }]);
     expect(entryReasonResult).toEqual([{ value: 'HIRE', label: 'Alta inicial · HIRE' }]);
     expect(exitReasonResult).toEqual([]);
+  });
+
+  it('loads DIRECT options for employee.work_center workCenterCode', () => {
+    let result: ReadonlyArray<{ value: string; label: string }> = [];
+
+    service.loadWorkCenterOptions('PA-ES').subscribe((options) => {
+      result = options;
+    });
+
+    expect(apiMock.getCatalogBindingsByResourceCode).toHaveBeenCalledWith({
+      resourceCode: 'employee.work_center',
+    });
+    expect(apiMock.getDirectCatalogOptions).toHaveBeenCalledWith({
+      ruleSystemCode: 'PA-ES',
+      ruleEntityTypeCode: 'EMPLOYEE_WORK_CENTER',
+    });
+    expect(result).toEqual([{ value: 'MADRID-01', label: 'Madrid Centro · MADRID-01' }]);
   });
 });

@@ -14,6 +14,7 @@ const employeeCatalogFields = {
   contactType: { resourceCode: 'employee.contact', fieldCode: 'contactTypeCode' },
   identifierType: { resourceCode: 'employee.identifier', fieldCode: 'identifierTypeCode' },
   addressType: { resourceCode: 'employee.address', fieldCode: 'addressTypeCode' },
+  workCenter: { resourceCode: 'employee.work_center', fieldCode: 'workCenterCode' },
   presenceCompany: { resourceCode: 'employee.presence', fieldCode: 'companyCode' },
   presenceEntryReason: { resourceCode: 'employee.presence', fieldCode: 'entryReasonCode' },
   presenceExitReason: { resourceCode: 'employee.presence', fieldCode: 'exitReasonCode' },
@@ -47,6 +48,10 @@ export class EmployeeFieldCatalogService {
 
   loadAddressTypeOptions(ruleSystemCode: string): Observable<ReadonlyArray<SlotKeyOption<string>>> {
     return this.loadDirectOptionsByField(ruleSystemCode, employeeCatalogFields.addressType);
+  }
+
+  loadWorkCenterOptions(ruleSystemCode: string): Observable<ReadonlyArray<SlotKeyOption<string>>> {
+    return this.loadDirectOptionsByField(ruleSystemCode, employeeCatalogFields.workCenter);
   }
 
   loadPresenceCompanyOptions(ruleSystemCode: string): Observable<ReadonlyArray<SlotKeyOption<string>>> {

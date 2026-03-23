@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
+import { take } from 'rxjs';
 
 import {
   EmployeeWorkCenterRowTexts,
@@ -6,9 +7,11 @@ import {
   WorkCenterCreateDraft,
   mapEmployeeWorkCenterModelToTemporalRow,
 } from '../../data-access/employee-work-center.mapper';
+import { EmployeeFieldCatalogService } from '../../data-access/employee-field-catalog.service';
 import { EmployeeWorkCenterStore } from '../../data-access/employee-work-center.store';
 import { employeeTexts } from '../../employee.texts';
 import { EmployeeBusinessKey } from '../../models/employee-business-key.model';
+import { SlotKeyOption } from '../../shared/ui/section/editable-slot-section.model';
 import { TemporalSectionComponent } from '../../shared/ui/section/temporal-section.component';
 import { TemporalDisplayMode, TemporalRowViewModel, TemporalSectionTexts } from '../../shared/ui/section/temporal-section.model';
 import { SectionMode, SectionUiState } from '../../shared/ui/section/section-ui-state.model';
@@ -40,6 +43,7 @@ export class EmployeeWorkCenterSectionComponent {
   readonly employeeKey = input<EmployeeBusinessKey | null>(null);
 
   private readonly workCenterStore = inject(EmployeeWorkCenterStore);
+  private readonly fieldCatalogService = inject(EmployeeFieldCatalogService);
   private readonly displayModeState = signal<TemporalDisplayMode>('view');
   private readonly localErrorMessageState = signal<string | null>(null);
   private readonly confirmingCloseKeyState = signal<number | null>(null);
@@ -48,6 +52,10 @@ export class EmployeeWorkCenterSectionComponent {
   private readonly createDraftState = signal<WorkCenterCreateDraft>(createEmptyWorkCenterCreateDraft());
   private readonly correctDraftState = signal<WorkCenterCorrectDraft>(createEmptyWorkCenterCorrectDraft());
   private readonly closeEndDateState = signal<string>('');
+  private readonly availableWorkCenterOptionsState = signal<ReadonlyArray<SlotKeyOption<string>>>([]);
+  private readonly catalogLoadingState = signal(false);
+
+  private catalogRequestId = 0;
 
   protected readonly texts = employeeTexts;
   protected readonly sectionSubtitle = this.texts.workCenterSectionSubtitle;
@@ -89,6 +97,14 @@ export class EmployeeWorkCenterSectionComponent {
   protected readonly createDraft = this.createDraftState.asReadonly();
   protected readonly correctDraft = this.correctDraftState.asReadonly();
   protected readonly closeEndDate = this.closeEndDateState.asReadonly();
+  protected readonly availableWorkCenterOptions = this.availableWorkCenterOptionsState.asReadonly();
+  protected readonly catalogOptionsLoading = this.catalogLoadingState.asReadonly();
+  protected readonly createWorkCenterCodeOptions = computed(() =>
+    this.withCurrentCodeOption(this.availableWorkCenterOptionsState(), this.createDraftState().workCenterCode),
+  );
+  protected readonly correctWorkCenterCodeOptions = computed(() =>
+    this.withCurrentCodeOption(this.availableWorkCenterOptionsState(), this.correctDraftState().workCenterCode),
+  );
   protected readonly correctingRow = computed(() => {
     const correctingKey = this.correctingKeyState();
     if (correctingKey === null) {
@@ -153,6 +169,7 @@ export class EmployeeWorkCenterSectionComponent {
 
       untracked(() => {
         this.workCenterStore.loadWorkCenters(activeEmployeeKey);
+        this.loadCatalogOptions(activeEmployeeKey?.ruleSystemCode ?? null);
         this.enterViewMode();
       });
     });
@@ -524,5 +541,49 @@ export class EmployeeWorkCenterSectionComponent {
   private normalizeOptionalValue(value: string | null | undefined): string | null {
     const normalizedValue = value?.trim() ?? '';
     return normalizedValue.length > 0 ? normalizedValue : null;
+  }
+
+  private loadCatalogOptions(ruleSystemCode: string | null): void {
+    const normalizedRuleSystemCode = ruleSystemCode?.trim() ?? '';
+
+    if (!normalizedRuleSystemCode) {
+      this.catalogRequestId += 1;
+      this.catalogLoadingState.set(false);
+      this.availableWorkCenterOptionsState.set([]);
+      this.createDraftState.update((draft) => ({ ...draft, workCenterCode: '' }));
+      this.correctDraftState.update((draft) => ({ ...draft, workCenterCode: '' }));
+      return;
+    }
+
+    const requestId = ++this.catalogRequestId;
+    this.catalogLoadingState.set(true);
+
+    this.fieldCatalogService
+      .loadWorkCenterOptions(normalizedRuleSystemCode)
+      .pipe(take(1))
+      .subscribe((options) => {
+        if (requestId !== this.catalogRequestId) {
+          return;
+        }
+
+        this.availableWorkCenterOptionsState.set(options);
+        this.catalogLoadingState.set(false);
+      });
+  }
+
+  private withCurrentCodeOption(
+    options: ReadonlyArray<SlotKeyOption<string>>,
+    currentCode: string,
+  ): ReadonlyArray<SlotKeyOption<string>> {
+    const normalizedCurrentCode = this.normalizeRequiredValue(currentCode);
+    if (!normalizedCurrentCode) {
+      return options;
+    }
+
+    if (options.some((option) => option.value === normalizedCurrentCode)) {
+      return options;
+    }
+
+    return [{ value: normalizedCurrentCode, label: normalizedCurrentCode }, ...options];
   }
 }

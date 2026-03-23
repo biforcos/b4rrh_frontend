@@ -30,11 +30,16 @@
   <div temporalCreateForm class="employee-work-center-section__form-grid">
     <label class="employee-work-center-section__field employee-work-center-section__field--code">
       <span>{{ texts.workCenterSectionCodeLabel }}</span>
-      <input
-        type="text"
+      <select
         [value]="createDraft().workCenterCode"
-        (input)="updateCreateField('workCenterCode', $any($event.target).value)"
-      />
+        [disabled]="catalogOptionsLoading()"
+        (change)="updateCreateField('workCenterCode', $any($event.target).value)"
+      >
+        <option value="">{{ texts.workCenterSectionCodeLabel }}</option>
+        @for (option of createWorkCenterCodeOptions(); track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
     </label>
 
     <label class="employee-work-center-section__field employee-work-center-section__field--start-date">
@@ -60,11 +65,16 @@
 
     <label class="employee-work-center-section__field employee-work-center-section__field--code">
       <span>{{ texts.workCenterSectionCodeLabel }}</span>
-      <input
-        type="text"
+      <select
         [value]="correctDraft().workCenterCode"
-        (input)="updateCorrectField('workCenterCode', $any($event.target).value)"
-      />
+        [disabled]="catalogOptionsLoading()"
+        (change)="updateCorrectField('workCenterCode', $any($event.target).value)"
+      >
+        <option value="">{{ texts.workCenterSectionCodeLabel }}</option>
+        @for (option of correctWorkCenterCodeOptions(); track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
     </label>
 
     <label class="employee-work-center-section__field employee-work-center-section__field--start-date">
