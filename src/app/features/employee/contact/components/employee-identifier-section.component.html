@@ -31,7 +31,15 @@
 
       <label class="employee-identifier-section__field employee-identifier-section__field--value">
         <span>{{ texts.identifiersSectionValueFieldLabel }}</span>
-        <input type="text" [value]="draft().value" (input)="updateDraftValue($any($event.target).value)" />
+        <input
+          type="text"
+          [class.employee-identifier-section__input--invalid]="isDniInvalid()"
+          [value]="draft().value"
+          (input)="updateDraftValue($any($event.target).value)"
+        />
+        @if (isDniInvalid()) {
+          <small class="employee-identifier-section__field-error">{{ texts.identifiersSectionInvalidDniMessage }}</small>
+        }
       </label>
 
       <label class="employee-identifier-section__field employee-identifier-section__field--country">
@@ -72,7 +80,15 @@
 
       <label class="employee-identifier-section__field employee-identifier-section__field--value">
         <span>{{ texts.identifiersSectionValueFieldLabel }}</span>
-        <input type="text" [value]="draft().value" (input)="updateDraftValue($any($event.target).value)" />
+        <input
+          type="text"
+          [class.employee-identifier-section__input--invalid]="isDniInvalid()"
+          [value]="draft().value"
+          (input)="updateDraftValue($any($event.target).value)"
+        />
+        @if (isDniInvalid()) {
+          <small class="employee-identifier-section__field-error">{{ texts.identifiersSectionInvalidDniMessage }}</small>
+        }
       </label>
 
       <label class="employee-identifier-section__field employee-identifier-section__field--country">

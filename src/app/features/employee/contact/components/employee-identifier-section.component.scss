@@ -37,6 +37,18 @@
   box-shadow: 0 0 0 2px rgba(126, 166, 204, 0.2);
 }
 
+.employee-identifier-section__form-grid .employee-identifier-section__input--invalid,
+.employee-identifier-section__form-grid .employee-identifier-section__input--invalid:focus-visible {
+  border-color: #d14343;
+  box-shadow: 0 0 0 2px rgba(209, 67, 67, 0.16);
+}
+
+.employee-identifier-section__field-error {
+  font-size: 0.62rem;
+  line-height: 1.2;
+  color: #b42318;
+}
+
 .employee-identifier-section__checkbox-field {
   display: flex !important;
   align-items: center;

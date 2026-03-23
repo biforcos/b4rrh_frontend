@@ -172,6 +172,7 @@ export const employeeTexts = {
   identifiersSectionRequestFailedMessage:
     'No se pudo procesar la operacion de identificadores. Reintenta.',
   identifiersSectionDuplicateTypeMessage: 'Ya existe un identificador para ese tipo.',
+  identifiersSectionInvalidDniMessage: 'DNI no válido',
   identifiersSectionPrimaryBadge: 'Principal',
   identifiersSectionExpirationPrefix: 'Caduca',
   identifiersSectionCreateSuccessMessage: 'Identificador creado correctamente.',

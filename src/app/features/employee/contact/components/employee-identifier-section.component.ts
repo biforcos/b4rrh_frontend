@@ -10,6 +10,7 @@ import { employeeTexts } from '../../employee.texts';
 import { EmployeeBusinessKey } from '../../models/employee-business-key.model';
 import { EmployeeIdentifierModel } from '../../models/employee-identifier.model';
 import { EditableSlotSectionComponent } from '../../shared/ui/section/editable-slot-section.component';
+import { isValidSpanishDni } from '../../shared/utils/spanish-dni.util';
 import {
   SlotDraft,
   SlotDisplayMode,
@@ -77,6 +78,19 @@ export class EmployeeIdentifierSectionComponent {
   });
   protected readonly editingKey = this.editingKeyState.asReadonly();
   protected readonly deletingKey = this.deletingKeyState.asReadonly();
+  protected readonly shouldValidateDni = computed(() => this.isDniValidationApplicable(this.draftState()));
+  protected readonly isDniInvalid = computed(() => {
+    if (!this.shouldValidateDni()) {
+      return false;
+    }
+
+    const normalizedValue = this.draftState().value.trim();
+    if (normalizedValue.length === 0) {
+      return false;
+    }
+
+    return !isValidSpanishDni(normalizedValue);
+  });
   protected readonly sectionState = computed<SectionUiState>(() => {
     const isBusy = this.identifierStore.loading() || this.identifierStore.mutating();
 
@@ -225,6 +239,10 @@ export class EmployeeIdentifierSectionComponent {
       return;
     }
 
+    if (!this.validateDraftDniForCurrentContext(draft)) {
+      return;
+    }
+
     this.clearLocalError();
     this.identifierStore.createIdentifier(activeEmployeeKey, {
       ...draft,
@@ -246,6 +264,10 @@ export class EmployeeIdentifierSectionComponent {
     }
 
     if (!this.findIdentifierByTypeCode(normalizedTypeCode)) {
+      return;
+    }
+
+    if (!this.validateDraftDniForCurrentContext(draft)) {
       return;
     }
 
@@ -278,6 +300,26 @@ export class EmployeeIdentifierSectionComponent {
 
   private normalizeIdentifierTypeCode(identifierTypeCode: string | null): string {
     return identifierTypeCode?.trim().toUpperCase() ?? '';
+  }
+
+  private validateDraftDniForCurrentContext(draft: IdentifierDraft): boolean {
+    if (!this.isDniValidationApplicable(draft)) {
+      return true;
+    }
+
+    if (isValidSpanishDni(draft.value)) {
+      return true;
+    }
+
+    this.localErrorMessageState.set(this.texts.identifiersSectionInvalidDniMessage);
+    return false;
+  }
+
+  private isDniValidationApplicable(draft: IdentifierDraft): boolean {
+    const identifierTypeCode = this.normalizeIdentifierTypeCode(draft.key);
+    const issuingCountryCode = (draft.issuingCountryCode ?? '').trim().toUpperCase();
+
+    return identifierTypeCode === 'NATIONAL_ID' && issuingCountryCode === 'ESP';
   }
 
   private enterViewMode(): void {
