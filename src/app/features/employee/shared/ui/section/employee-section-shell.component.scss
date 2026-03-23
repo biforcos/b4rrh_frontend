@@ -10,7 +10,7 @@
 .employee-section-shell__header {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
 }
@@ -40,9 +40,36 @@
 .employee-section-shell__header-actions {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 0.3rem;
   justify-content: flex-end;
   flex: 0 0 auto;
+  margin-left: auto;
+}
+
+.employee-section-shell__header-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  border: 1px solid #c8d5e3;
+  border-radius: 0.45rem;
+  background: #f6f9fd;
+  color: #2a4356;
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1;
+  padding: 0.34rem 0.52rem;
+  cursor: pointer;
+}
+
+.employee-section-shell__header-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.employee-section-shell__action-icon {
+  font-size: 0.67rem;
+  color: #5e7488;
 }
 
 .employee-section-shell__header-actions:empty {
@@ -86,6 +113,7 @@
   border-color: #c8dfd1;
   background: #f2fbf5;
   color: #1f5a3b;
+  opacity: 0.92;
 }
 
 @media (max-width: 900px) {

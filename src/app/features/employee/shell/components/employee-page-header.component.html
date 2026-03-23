@@ -1,0 +1,66 @@
+<header class="employee-page-header" aria-label="Employee page header">
+  <div class="employee-page-header__top-row">
+    <div class="employee-page-header__identity">
+      <h1>{{ fullName() }}</h1>
+      <div class="employee-page-header__identifiers" aria-label="Employee identifiers">
+        <span class="employee-page-header__pill">
+          <span class="employee-page-header__icon">[EMP]</span>
+          {{ employeeNumber() }}
+        </span>
+        <span class="employee-page-header__pill">
+          <span class="employee-page-header__icon">[TYPE]</span>
+          {{ employeeTypeCode() }}
+        </span>
+        <span class="employee-page-header__pill">
+          <span class="employee-page-header__icon">[RULE]</span>
+          {{ ruleSystemCode() }}
+        </span>
+      </div>
+    </div>
+
+    <div class="employee-page-header__status-actions">
+      <span
+        class="employee-page-header__status-badge"
+        [class.employee-page-header__status-badge--active]="isActive()"
+        [class.employee-page-header__status-badge--inactive]="!isActive()"
+      >
+        {{ statusLabel() }}
+      </span>
+
+      <div class="employee-page-header__actions" aria-label="Header actions">
+        <button type="button">Edit identity</button>
+        @if (isActive()) {
+          <button type="button" class="employee-page-header__danger-action">Terminate</button>
+        } @else {
+          <button type="button" class="employee-page-header__neutral-action">Rehire</button>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="employee-page-header__context-row" aria-label="Employee contextual information">
+    <p>
+      <span class="employee-page-header__icon">[CO]</span>
+      Company: <strong>{{ companyCode() }}</strong>
+    </p>
+    <p>
+      <span class="employee-page-header__icon">[WC]</span>
+      Work center: <strong>{{ workCenterCode() }}</strong>
+    </p>
+    <p>
+      <span class="employee-page-header__icon">[DATE]</span>
+      Hire date: <strong>{{ hireDate() }}</strong>
+    </p>
+  </div>
+
+  <div class="employee-page-header__contact-row" aria-label="Employee contact information">
+    <p>
+      <span class="employee-page-header__icon">[MAIL]</span>
+      {{ email() }}
+    </p>
+    <p>
+      <span class="employee-page-header__icon">[TEL]</span>
+      {{ phone() }}
+    </p>
+  </div>
+</header>

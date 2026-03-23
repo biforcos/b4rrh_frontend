@@ -1,4 +1,4 @@
-<section class="employee-section-shell" [attr.data-mode]="state().mode">
+<section class="employee-section-shell">
   <header class="employee-section-shell__header">
     <div class="employee-section-shell__heading">
       <h3 class="employee-section-shell__title">{{ title() }}</h3>
@@ -8,6 +8,16 @@
     </div>
 
     <div class="employee-section-shell__header-actions">
+      @if (hasActions()) {
+        @for (action of actions(); track action.label) {
+          <button type="button" [disabled]="action.disabled ?? false">
+            @if (action.icon) {
+              <span class="employee-section-shell__action-icon" aria-hidden="true">{{ action.icon }}</span>
+            }
+            <span>{{ action.label }}</span>
+          </button>
+        }
+      }
       <ng-content select="[sectionShellHeaderActions]"></ng-content>
     </div>
   </header>
@@ -24,13 +34,13 @@
 
       @if (showError()) {
         <p class="employee-section-shell__status employee-section-shell__status--error">
-          {{ state().errorMessage }}
+          {{ errorMessage() }}
         </p>
       }
 
       @if (showSuccess()) {
         <p class="employee-section-shell__status employee-section-shell__status--success">
-          {{ state().successMessage }}
+          {{ successMessage() }}
         </p>
       }
     </footer>

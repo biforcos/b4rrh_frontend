@@ -10,7 +10,6 @@ import { EmployeeDirectoryStore } from '../../data-access/employee-directory.sto
 import { EmployeeJourneyStore } from '../../data-access/employee-journey.store';
 import { employeeTexts } from '../../employee.texts';
 import { EmployeeBusinessKey } from '../../models/employee-business-key.model';
-import { EmployeeCoreIdentityDraft } from '../../models/employee-core-identity-draft.model';
 import { EmployeeDetailModel } from '../../models/employee-detail.model';
 import { EmployeeListItemModel } from '../../models/employee-list-item.model';
 import {
@@ -23,7 +22,7 @@ import {
   readEmployeeBusinessKeyFromParamMap,
   toEmployeeBusinessKey,
 } from '../../routing/employee-route-key.util';
-import { EmployeeDetailHeaderComponent } from '../components/employee-detail-header.component';
+import { EmployeePageHeaderComponent } from '../components/employee-page-header.component';
 import { EmployeeJourneyTimelineComponent } from '../components/employee-journey-timeline.component';
 import { EmployeeDetailNavComponent } from '../components/employee-detail-nav.component';
 import { EmployeeDirectoryListComponent } from '../components/employee-directory-list.component';
@@ -36,7 +35,7 @@ import { EmployeeDirectoryListComponent } from '../components/employee-directory
     RouterOutlet,
     PanelComponent,
     EmployeeDirectoryListComponent,
-    EmployeeDetailHeaderComponent,
+    EmployeePageHeaderComponent,
     EmployeeJourneyTimelineComponent,
     EmployeeDetailNavComponent,
   ],
@@ -60,9 +59,6 @@ export class EmployeeShellPageComponent {
   protected readonly selectedEmployeeDetail = this.detailStore.selectedEmployeeDetail;
   protected readonly loadingDetail = this.detailStore.loadingDetail;
   protected readonly detailError = this.detailStore.detailError;
-  protected readonly mutatingEmployeeDetail = this.detailStore.mutating;
-  protected readonly employeeDetailMutationError = this.detailStore.mutationError;
-  protected readonly employeeDetailMutationSuccess = this.detailStore.mutationSuccess;
   protected readonly journey = this.journeyStore.journey;
   protected readonly loadingJourney = this.journeyStore.loading;
   protected readonly journeyError = this.journeyStore.error;
@@ -83,6 +79,20 @@ export class EmployeeShellPageComponent {
     }
 
     return this.toUnknownDetail(activeEmployeeKey);
+  });
+  protected readonly foundationMarker = 'FOUNDATION INTEGRATED';
+  protected readonly headerStatus = computed<'ACTIVE' | 'INACTIVE'>(() => {
+    const employee = this.selectedEmployee();
+    if (!employee) {
+      return 'INACTIVE';
+    }
+
+    const normalizedStatus = employee.statusLabel.trim().toLowerCase();
+    if (normalizedStatus.includes('active') || normalizedStatus.includes('alta')) {
+      return 'ACTIVE';
+    }
+
+    return 'INACTIVE';
   });
 
   constructor() {
@@ -121,19 +131,6 @@ export class EmployeeShellPageComponent {
     section: EmployeeRouteSection = 'contact',
   ): Promise<boolean> {
     return this.router.navigate(buildEmployeeDetailRouteCommands(employeeKey, section));
-  }
-
-  protected updateEmployeeCoreIdentity(draft: EmployeeCoreIdentityDraft): void {
-    const employeeKey = this.activeEmployeeKey();
-    if (!employeeKey) {
-      return;
-    }
-
-    this.detailStore.updateEmployeeCoreIdentity(employeeKey, draft);
-  }
-
-  protected clearEmployeeCoreIdentityFeedback(): void {
-    this.detailStore.clearMutationFeedback();
   }
 
   private resolveActiveEmployeeKey(): EmployeeBusinessKey | null {
