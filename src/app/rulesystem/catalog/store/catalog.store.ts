@@ -114,13 +114,19 @@ export class CatalogStore {
           this.ruleSystemsState.set(ruleSystems);
           this.ruleEntityTypesState.set(ruleEntityTypes);
 
-          if (!this.selectedRuleSystemCodeState() && ruleSystems.length > 0) {
-            this.selectedRuleSystemCodeState.set(ruleSystems[0].code);
-          }
+          this.selectedRuleSystemCodeState.set(
+            this.resolveSelectedCode(
+              this.selectedRuleSystemCodeState(),
+              ruleSystems.map((item) => item.code),
+            ),
+          );
 
-          if (!this.selectedRuleEntityTypeCodeState() && ruleEntityTypes.length > 0) {
-            this.selectedRuleEntityTypeCodeState.set(ruleEntityTypes[0].code);
-          }
+          this.selectedRuleEntityTypeCodeState.set(
+            this.resolveSelectedCode(
+              this.selectedRuleEntityTypeCodeState(),
+              ruleEntityTypes.map((item) => item.code),
+            ),
+          );
 
           this.loadRuleEntitiesForCurrentContext();
         },
@@ -511,6 +517,19 @@ export class CatalogStore {
     }
 
     return null;
+  }
+
+  private resolveSelectedCode(currentCode: string | null, availableCodes: ReadonlyArray<string>): string | null {
+    if (availableCodes.length === 0) {
+      return null;
+    }
+
+    const normalizedCurrentCode = normalizeRequiredValue(currentCode);
+    if (normalizedCurrentCode.length === 0) {
+      return availableCodes[0];
+    }
+
+    return availableCodes.includes(normalizedCurrentCode) ? normalizedCurrentCode : availableCodes[0];
   }
 }
 

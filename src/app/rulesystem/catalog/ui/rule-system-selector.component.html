@@ -5,7 +5,9 @@
     [disabled]="disabled()"
     (change)="onSelectionChange($event)"
   >
-    <option value="">{{ texts.selectorPlaceholder }}</option>
+    @if (ruleSystems().length === 0) {
+      <option value="">{{ texts.selectorPlaceholder }}</option>
+    }
     @for (item of ruleSystems(); track item.code) {
       <option [value]="item.code">{{ item.code }} · {{ item.name }}</option>
     }

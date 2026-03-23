@@ -67,6 +67,12 @@ describe('CatalogStore', () => {
     store.initialize();
   });
 
+  it('initializes selected rule system and type with first available values', () => {
+    expect(store.selectedRuleSystemCode()).toBe('PA-ES');
+    expect(store.selectedRuleEntityTypeCode()).toBe('CONTRACT');
+    expect(gatewayMock.loadRuleEntities).toHaveBeenCalledWith('PA-ES', 'CONTRACT');
+  });
+
   it('submits correct operation over same occurrence business key', () => {
     store.startCorrect(activeOccurrence.occurrenceKey);
     store.updateCorrectDraft('name', 'Indefinido actualizado');
