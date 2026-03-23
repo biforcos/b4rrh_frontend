@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 
 import { catalogTexts } from '../catalog.texts';
 import { RuleEntityModel } from '../models/rule-entity.model';
@@ -11,5 +11,33 @@ import { RuleEntityModel } from '../models/rule-entity.model';
 })
 export class RuleEntityListComponent {
   readonly items = input<ReadonlyArray<RuleEntityModel>>([]);
+  readonly actionsDisabled = input(false);
+  readonly correctRequested = output<string>();
+  readonly closeRequested = output<string>();
+  readonly deleteRequested = output<string>();
   protected readonly texts = catalogTexts;
+
+  protected requestCorrect(occurrenceKey: string): void {
+    if (this.actionsDisabled()) {
+      return;
+    }
+
+    this.correctRequested.emit(occurrenceKey);
+  }
+
+  protected requestClose(occurrenceKey: string): void {
+    if (this.actionsDisabled()) {
+      return;
+    }
+
+    this.closeRequested.emit(occurrenceKey);
+  }
+
+  protected requestDelete(occurrenceKey: string): void {
+    if (this.actionsDisabled()) {
+      return;
+    }
+
+    this.deleteRequested.emit(occurrenceKey);
+  }
 }

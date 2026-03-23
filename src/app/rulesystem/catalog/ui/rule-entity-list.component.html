@@ -7,16 +7,38 @@
         <th>{{ texts.listActiveHeader }}</th>
         <th>{{ texts.listStartDateHeader }}</th>
         <th>{{ texts.listEndDateHeader }}</th>
+        <th>{{ texts.listActionsHeader }}</th>
       </tr>
     </thead>
     <tbody>
-      @for (item of items(); track item.code) {
+      @for (item of items(); track item.occurrenceKey) {
         <tr>
           <td>{{ item.code }}</td>
           <td>{{ item.name }}</td>
           <td>{{ item.active ? texts.activeYes : texts.activeNo }}</td>
           <td>{{ item.startDate }}</td>
           <td>{{ item.endDate ?? '-' }}</td>
+          <td>
+            <div class="rule-entity-list__actions">
+              @if (item.canCorrect) {
+                <button type="button" (click)="requestCorrect(item.occurrenceKey)" [disabled]="actionsDisabled()">
+                  {{ texts.actionCorrect }}
+                </button>
+              }
+
+              @if (item.canClose) {
+                <button type="button" class="rule-entity-list__danger-action" (click)="requestClose(item.occurrenceKey)" [disabled]="actionsDisabled()">
+                  {{ texts.actionClose }}
+                </button>
+              }
+
+              @if (item.canDelete) {
+                <button type="button" class="rule-entity-list__delete-action" (click)="requestDelete(item.occurrenceKey)" [disabled]="actionsDisabled()">
+                  {{ texts.actionDelete }}
+                </button>
+              }
+            </div>
+          </td>
         </tr>
       }
     </tbody>

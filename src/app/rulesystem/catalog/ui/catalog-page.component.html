@@ -54,7 +54,130 @@
       } @else if (ruleEntities().length === 0) {
         <p class="catalog-page__empty">{{ texts.emptyNoEntities }}</p>
       } @else {
-        <app-rule-entity-list [items]="ruleEntities()" />
+        <app-rule-entity-list
+          [items]="ruleEntities()"
+          [actionsDisabled]="mutating()"
+          (correctRequested)="requestCorrect($event)"
+          (closeRequested)="requestClose($event)"
+          (deleteRequested)="requestDelete($event)"
+        />
+
+        @if (correctingOccurrence(); as occurrence) {
+          <section class="catalog-page__operation-zone">
+            <header class="catalog-page__panel-header">
+              <h3>{{ texts.operationPanelCorrectTitle }}</h3>
+              <p>{{ texts.operationPanelCorrectSubtitle }}</p>
+            </header>
+
+            <p class="catalog-page__operation-target">
+              {{ texts.operationTargetLabel }}: {{ occurrenceLabel(occurrence.code, occurrence.startDate) }}
+            </p>
+
+            <div class="catalog-page__operation-form">
+              <label>
+                <span>{{ texts.createNameLabel }}</span>
+                <input
+                  type="text"
+                  maxlength="100"
+                  [value]="correctDraft().name"
+                  [disabled]="mutating()"
+                  (input)="updateCorrectField('name', $any($event.target).value)"
+                />
+              </label>
+
+              <label>
+                <span>{{ texts.createDescriptionLabel }}</span>
+                <textarea
+                  rows="3"
+                  maxlength="500"
+                  [value]="correctDraft().description"
+                  [disabled]="mutating()"
+                  (input)="updateCorrectField('description', $any($event.target).value)"
+                ></textarea>
+              </label>
+
+              <label>
+                <span>{{ texts.createEndDateLabel }}</span>
+                <input
+                  type="date"
+                  [value]="correctDraft().endDate"
+                  [disabled]="mutating()"
+                  (change)="updateCorrectField('endDate', $any($event.target).value)"
+                />
+              </label>
+
+              <div class="catalog-page__operation-actions">
+                <button type="button" [disabled]="!correctDraftValid() || mutating()" (click)="submitCorrect()">
+                  {{ texts.operationSubmitCorrectAction }}
+                </button>
+                <button type="button" class="catalog-page__operation-cancel" [disabled]="mutating()" (click)="cancelOperation()">
+                  {{ texts.actionCancel }}
+                </button>
+              </div>
+            </div>
+          </section>
+        }
+
+        @if (closingOccurrence(); as occurrence) {
+          <section class="catalog-page__operation-zone">
+            <header class="catalog-page__panel-header">
+              <h3>{{ texts.operationPanelCloseTitle }}</h3>
+              <p>{{ texts.operationPanelCloseSubtitle }}</p>
+            </header>
+
+            <p class="catalog-page__operation-target">
+              {{ texts.operationTargetLabel }}: {{ occurrenceLabel(occurrence.code, occurrence.startDate) }}
+            </p>
+
+            <div class="catalog-page__operation-form">
+              <label>
+                <span>{{ texts.createEndDateLabel }}</span>
+                <input
+                  type="date"
+                  [value]="closeEndDate()"
+                  [disabled]="mutating()"
+                  (change)="updateCloseEndDate($any($event.target).value)"
+                />
+              </label>
+
+              <div class="catalog-page__operation-actions">
+                <button type="button" class="catalog-page__operation-danger" [disabled]="!closeDraftValid() || mutating()" (click)="confirmClose()">
+                  {{ texts.operationSubmitCloseAction }}
+                </button>
+                <button type="button" class="catalog-page__operation-cancel" [disabled]="mutating()" (click)="cancelOperation()">
+                  {{ texts.actionCancel }}
+                </button>
+              </div>
+            </div>
+          </section>
+        }
+
+        @if (deletingOccurrence(); as occurrence) {
+          <section class="catalog-page__operation-zone catalog-page__operation-zone--danger">
+            <header class="catalog-page__panel-header">
+              <h3>{{ texts.operationPanelDeleteTitle }}</h3>
+              <p>{{ texts.operationPanelDeleteSubtitle }}</p>
+            </header>
+
+            <p class="catalog-page__operation-target">
+              {{ texts.operationTargetLabel }}: {{ occurrenceLabel(occurrence.code, occurrence.startDate) }}
+            </p>
+            <p class="catalog-page__operation-warning">{{ texts.operationDeleteMessage }}</p>
+
+            <div class="catalog-page__operation-actions">
+              <button type="button" class="catalog-page__operation-danger" [disabled]="mutating()" (click)="confirmDelete()">
+                @if (mutating()) {
+                  {{ texts.operationDeletingMessage }}
+                } @else {
+                  {{ texts.operationConfirmDeleteAction }}
+                }
+              </button>
+              <button type="button" class="catalog-page__operation-cancel" [disabled]="mutating()" (click)="cancelOperation()">
+                {{ texts.actionCancel }}
+              </button>
+            </div>
+          </section>
+        }
       }
 
       @if (hasContext()) {
@@ -66,6 +189,7 @@
 
           <app-create-rule-entity-form
             [creating]="creating()"
+            [disabled]="mutating()"
             [resetToken]="createResetToken()"
             (submitRequested)="createEntity($event)"
             (interactionStarted)="clearFeedback()"

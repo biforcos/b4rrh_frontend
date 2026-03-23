@@ -13,6 +13,7 @@ import { CreateRuleEntityFormModel } from '../models/create-rule-entity-form.mod
 })
 export class CreateRuleEntityFormComponent implements OnChanges {
   readonly creating = input(false);
+  readonly disabled = input(false);
   readonly resetToken = input(0);
   readonly submitRequested = output<CreateRuleEntityFormModel>();
   readonly interactionStarted = output<void>();
@@ -36,7 +37,7 @@ export class CreateRuleEntityFormComponent implements OnChanges {
   }
 
   protected submit(): void {
-    if (this.form.invalid || this.creating()) {
+    if (this.form.invalid || this.creating() || this.disabled()) {
       this.form.markAllAsTouched();
       return;
     }

@@ -1,7 +1,7 @@
 <form class="create-rule-entity-form" [formGroup]="form" (ngSubmit)="submit()">
   <label>
     <span>{{ texts.createCodeLabel }}</span>
-    <input type="text" formControlName="code" maxlength="30" (input)="markInteraction()" />
+    <input type="text" formControlName="code" maxlength="30" (input)="markInteraction()" [disabled]="disabled()" />
     @if (form.controls.code.touched && form.controls.code.hasError('required')) {
       <small class="create-rule-entity-form__error">{{ texts.createCodeRequired }}</small>
     }
@@ -12,7 +12,7 @@
 
   <label>
     <span>{{ texts.createNameLabel }}</span>
-    <input type="text" formControlName="name" maxlength="100" (input)="markInteraction()" />
+    <input type="text" formControlName="name" maxlength="100" (input)="markInteraction()" [disabled]="disabled()" />
     @if (form.controls.name.touched && form.controls.name.hasError('required')) {
       <small class="create-rule-entity-form__error">{{ texts.createNameRequired }}</small>
     }
@@ -23,7 +23,7 @@
 
   <label>
     <span>{{ texts.createDescriptionLabel }}</span>
-    <textarea formControlName="description" maxlength="500" rows="3" (input)="markInteraction()"></textarea>
+    <textarea formControlName="description" maxlength="500" rows="3" (input)="markInteraction()" [disabled]="disabled()"></textarea>
     @if (form.controls.description.touched && form.controls.description.hasError('maxlength')) {
       <small class="create-rule-entity-form__error">{{ texts.createDescriptionMaxLength }}</small>
     }
@@ -31,7 +31,7 @@
 
   <label>
     <span>{{ texts.createStartDateLabel }}</span>
-    <input type="date" formControlName="startDate" (change)="markInteraction()" />
+    <input type="date" formControlName="startDate" (change)="markInteraction()" [disabled]="disabled()" />
     @if (form.controls.startDate.touched && form.controls.startDate.hasError('required')) {
       <small class="create-rule-entity-form__error">{{ texts.createStartDateRequired }}</small>
     }
@@ -39,7 +39,7 @@
 
   <label>
     <span>{{ texts.createEndDateLabel }}</span>
-    <input type="date" formControlName="endDate" (change)="markInteraction()" />
+    <input type="date" formControlName="endDate" (change)="markInteraction()" [disabled]="disabled()" />
   </label>
 
   @if (hasRangeError()) {
@@ -47,7 +47,7 @@
   }
 
   <div class="create-rule-entity-form__actions">
-    <button type="submit" [disabled]="creating()">
+    <button type="submit" [disabled]="creating() || disabled()">
       @if (creating()) {
         {{ texts.creatingMessage }}
       } @else {

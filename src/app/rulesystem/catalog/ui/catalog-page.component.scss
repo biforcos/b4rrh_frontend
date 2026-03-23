@@ -63,6 +63,94 @@
   border-top: 1px solid #e6edf5;
 }
 
+.catalog-page__operation-zone {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.56rem;
+  padding: 0.6rem;
+  border: 1px solid #dae5f2;
+  border-radius: 0.62rem;
+  background: #f8fbff;
+}
+
+.catalog-page__operation-zone--danger {
+  background: #fff8f7;
+  border-color: #f1d2d2;
+}
+
+.catalog-page__operation-target {
+  margin: 0;
+  font-size: 0.74rem;
+  color: #3d5268;
+}
+
+.catalog-page__operation-warning {
+  margin: 0;
+  font-size: 0.76rem;
+  color: #8d1f1f;
+}
+
+.catalog-page__operation-form {
+  display: grid;
+  gap: 0.52rem;
+}
+
+.catalog-page__operation-form label {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.catalog-page__operation-form span {
+  font-size: 0.73rem;
+  font-weight: 600;
+  color: #3b4d61;
+}
+
+.catalog-page__operation-form input,
+.catalog-page__operation-form textarea {
+  border: 1px solid #c8d5e5;
+  border-radius: 0.44rem;
+  min-height: 2rem;
+  padding: 0.34rem 0.5rem;
+  background: #ffffff;
+  color: #1f2d3d;
+}
+
+.catalog-page__operation-form textarea {
+  min-height: 4.5rem;
+}
+
+.catalog-page__operation-actions {
+  display: flex;
+  gap: 0.42rem;
+  justify-content: flex-end;
+}
+
+.catalog-page__operation-actions button {
+  border-radius: 0.42rem;
+  border: 1px solid #c4d2e2;
+  background: #ffffff;
+  color: #334558;
+  min-height: 1.95rem;
+  padding: 0 0.72rem;
+  font-weight: 600;
+}
+
+.catalog-page__operation-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.catalog-page__operation-danger {
+  border-color: #dd5f5f;
+  background: #dd5f5f;
+  color: #ffffff;
+}
+
+.catalog-page__operation-cancel {
+  border-color: #d1d9e3;
+}
+
 .catalog-page__feedback,
 .catalog-page__empty {
   margin: 0;

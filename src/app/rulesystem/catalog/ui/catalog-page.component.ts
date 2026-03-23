@@ -33,10 +33,30 @@ export class CatalogPageComponent {
   protected readonly loadingRuleSystems = this.store.loadingRuleSystems;
   protected readonly loadingRuleEntityTypes = this.store.loadingRuleEntityTypes;
   protected readonly loadingRuleEntities = this.store.loadingRuleEntities;
+  protected readonly mutating = this.store.mutating;
   protected readonly creating = this.store.creating;
+  protected readonly correctingOccurrenceKey = this.store.correctingOccurrenceKey;
+  protected readonly closingOccurrenceKey = this.store.closingOccurrenceKey;
+  protected readonly deletingOccurrenceKey = this.store.deletingOccurrenceKey;
+  protected readonly correctDraft = this.store.correctDraft;
+  protected readonly closeEndDate = this.store.closeEndDate;
+  protected readonly correctDraftValid = this.store.correctDraftValid;
+  protected readonly closeDraftValid = this.store.closeDraftValid;
   protected readonly errorMessage = this.store.errorMessage;
   protected readonly successMessage = this.store.successMessage;
   protected readonly createResetToken = this.store.createResetToken;
+  protected readonly correctingOccurrence = computed(() => {
+    const occurrenceKey = this.correctingOccurrenceKey();
+    return occurrenceKey ? this.ruleEntities().find((item) => item.occurrenceKey === occurrenceKey) ?? null : null;
+  });
+  protected readonly closingOccurrence = computed(() => {
+    const occurrenceKey = this.closingOccurrenceKey();
+    return occurrenceKey ? this.ruleEntities().find((item) => item.occurrenceKey === occurrenceKey) ?? null : null;
+  });
+  protected readonly deletingOccurrence = computed(() => {
+    const occurrenceKey = this.deletingOccurrenceKey();
+    return occurrenceKey ? this.ruleEntities().find((item) => item.occurrenceKey === occurrenceKey) ?? null : null;
+  });
 
   protected readonly hasContext = computed(
     () => this.selectedRuleSystemCode() !== null && this.selectedRuleEntityTypeCode() !== null,
@@ -68,5 +88,45 @@ export class CatalogPageComponent {
 
   protected clearFeedback(): void {
     this.store.clearFeedback();
+  }
+
+  protected requestCorrect(occurrenceKey: string): void {
+    this.store.startCorrect(occurrenceKey);
+  }
+
+  protected submitCorrect(): void {
+    this.store.submitCorrect();
+  }
+
+  protected updateCorrectField(field: 'name' | 'description' | 'endDate', value: string): void {
+    this.store.updateCorrectDraft(field, value);
+  }
+
+  protected requestClose(occurrenceKey: string): void {
+    this.store.requestClose(occurrenceKey);
+  }
+
+  protected updateCloseEndDate(value: string): void {
+    this.store.updateCloseEndDate(value);
+  }
+
+  protected confirmClose(): void {
+    this.store.confirmClose();
+  }
+
+  protected requestDelete(occurrenceKey: string): void {
+    this.store.requestDelete(occurrenceKey);
+  }
+
+  protected confirmDelete(): void {
+    this.store.confirmDelete();
+  }
+
+  protected cancelOperation(): void {
+    this.store.cancel();
+  }
+
+  protected occurrenceLabel(code: string, startDate: string): string {
+    return `${code} · ${startDate}`;
   }
 }

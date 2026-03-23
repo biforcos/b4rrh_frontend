@@ -1,4 +1,5 @@
 export interface RuleEntityModel {
+  occurrenceKey: string;
   ruleSystemCode: string;
   ruleEntityTypeCode: string;
   code: string;
@@ -7,4 +8,7 @@ export interface RuleEntityModel {
   active: boolean;
   startDate: string;
   endDate: string | null;
+  canCorrect: boolean;
+  canClose: boolean;
+  canDelete: boolean;
 }
