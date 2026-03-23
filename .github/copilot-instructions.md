@@ -60,6 +60,7 @@ Do not mix Personnel Administration and Payroll concepts in components, routes, 
 - User-facing initial language may be Spanish, but implementation must remain localization-ready.
 - Forms must be explicit, validated, and user-friendly.
 - Prefer reactive patterns and predictable state transitions.
+- No UI string is allowed outside employeeTexts.
 
 ## Security
 

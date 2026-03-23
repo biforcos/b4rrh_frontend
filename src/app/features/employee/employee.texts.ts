@@ -145,6 +145,8 @@ export const employeeTexts = {
   contactsSectionConfirmDeleteMessage: 'Confirma la eliminacion de este contacto.',
   contactsSectionConfirmDeleteAction: 'Confirmar eliminacion',
   contactsSectionEmptyMessage: 'No hay contactos cargados.',
+  contactsSectionSubtitle: 'Canales principales de comunicacion del empleado.',
+  contactsSectionListAriaLabel: 'Listado de contactos del empleado',
   contactsSectionKeyFieldLabel: 'Tipo de contacto',
   contactsSectionValueFieldLabel: 'Valor de contacto',
   contactsSectionRequestFailedMessage: 'No se pudo procesar la operacion de contactos. Reintenta.',

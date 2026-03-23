@@ -1,57 +1,108 @@
-<app-editable-slot-section
-  [title]="texts.contactsSectionTitle"
-  [subtitle]="sectionSubtitle"
-  [state]="sectionState()"
-  [displayMode]="displayMode()"
-  [rows]="rows()"
-  [texts]="slotTexts"
-  [draft]="draft()"
-  [editingKey]="editingKey()"
-  [deletingKey]="deletingKey()"
-  [canCreate]="true"
-  [canEdit]="true"
-  [canDelete]="true"
-  (manageStarted)="startManage()"
-  (manageExited)="exitManage()"
-  (createStarted)="startCreate()"
-  (editStarted)="startEdit($event)"
-  (deleteRequested)="requestDelete($event)"
-  (deleteConfirmed)="confirmDelete($event)"
-  (cancelled)="cancel()"
-  (draftKeyChanged)="updateDraftKey($event)"
-  (draftValueChanged)="updateDraftValue($event)"
-  (createSubmitted)="submitCreate($event)"
-  (editSubmitted)="submitEdit($event)"
->
-  <ng-template #slotCreateForm slotCreateForm>
-    <div class="employee-contact-section__form-grid">
-      <div class="employee-contact-section__form-field">
-        <label class="employee-contact-section__form-label" for="contactTypeInput">{{ texts.contactsSectionKeyFieldLabel }}</label>
-        <select
-          id="contactTypeInput"
-          class="employee-contact-section__form-input"
-          [disabled]="catalogOptionsLoading()"
-          [value]="draft().key ?? ''"
-          (change)="updateDraftKey($any($event.target).value)"
-        >
-          <option value="">{{ texts.contactsSectionKeyFieldLabel }}</option>
-          @for (option of availableContactTypeOptions(); track option.value) {
-            <option [value]="option.value">{{ option.label }}</option>
-          }
-        </select>
-      </div>
+<app-employee-section-shell [title]="sectionTitle" [subtitle]="sectionSubtitle" [state]="sectionState()">
+  <div sectionShellHeaderActions class="employee-contact-section__header-actions">
+    <button type="button" [disabled]="sectionState().busy || creating()" (click)="startCreate()">
+      {{ texts.contactsSectionAddAction }}
+    </button>
+  </div>
 
-      <div class="employee-contact-section__form-field">
-        <label class="employee-contact-section__form-label" for="contactValueInput">{{ texts.contactsSectionValueFieldLabel }}</label>
-        <input
-          id="contactValueInput"
-          class="employee-contact-section__form-input"
-          type="text"
-          [value]="draft().value"
-          (input)="updateDraftValue($any($event.target).value)"
-          placeholder="Valor de contacto"
-        />
-      </div>
-    </div>
-  </ng-template>
-</app-editable-slot-section>
+  <div class="employee-contact-section__body">
+    @if (creating()) {
+      <article class="employee-contact-section__slot employee-contact-section__slot--create">
+        <div class="employee-contact-section__form-grid">
+          <div class="employee-contact-section__form-field">
+            <label class="employee-contact-section__form-label" for="contactTypeInput">{{ texts.contactsSectionKeyFieldLabel }}</label>
+            <select
+              id="contactTypeInput"
+              class="employee-contact-section__form-input"
+              [disabled]="catalogOptionsLoading() || sectionState().busy"
+              [value]="createDraft().key ?? ''"
+              (change)="updateCreateDraftKey($any($event.target).value || null)"
+            >
+              <option value="">{{ texts.contactsSectionKeyFieldLabel }}</option>
+              @for (option of availableContactTypeOptions(); track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="employee-contact-section__form-field">
+            <label class="employee-contact-section__form-label" for="contactValueInput">{{ texts.contactsSectionValueFieldLabel }}</label>
+            <input
+              id="contactValueInput"
+              class="employee-contact-section__form-input"
+              type="text"
+              [value]="createDraft().value"
+              (input)="updateCreateDraftValue($any($event.target).value)"
+            />
+          </div>
+        </div>
+
+        <div class="employee-contact-section__row-actions">
+          <button type="button" [disabled]="!canSaveCreate() || sectionState().busy" (click)="submitCreate()">
+            {{ texts.contactsSectionSaveCreateAction }}
+          </button>
+          <button type="button" class="employee-contact-section__secondary-action" [disabled]="sectionState().busy" (click)="cancelCreate()">
+            {{ texts.contactsSectionCancelAction }}
+          </button>
+        </div>
+      </article>
+    }
+
+    @if (hasRows()) {
+      <ul class="employee-contact-section__list" role="list" [attr.aria-label]="texts.contactsSectionListAriaLabel">
+        @for (row of rows(); track row.key) {
+          <li class="employee-contact-section__row">
+            <div class="employee-contact-section__row-main">
+              <p class="employee-contact-section__row-type">{{ row.typeLabel }}</p>
+
+              @if (editingKey() === row.key) {
+                <input
+                  class="employee-contact-section__inline-input"
+                  type="text"
+                  aria-label="{{ texts.contactsSectionValueFieldLabel }}"
+                  title="{{ texts.contactsSectionValueFieldLabel }}"
+                  placeholder="{{ texts.contactsSectionValueFieldLabel }}"
+                  [value]="editDraftValue()"
+                  (input)="updateEditDraftValue($any($event.target).value)"
+                />
+              } @else {
+                <p class="employee-contact-section__row-value">{{ row.value }}</p>
+              }
+
+              @if (deletingKey() === row.key) {
+                <p class="employee-contact-section__confirm-text">{{ texts.contactsSectionConfirmDeleteMessage }}</p>
+              }
+            </div>
+
+            <div class="employee-contact-section__row-actions">
+              @if (editingKey() === row.key) {
+                <button type="button" [disabled]="!canSaveEdit() || sectionState().busy" (click)="submitEdit(row.key)">
+                  {{ texts.contactsSectionSaveEditAction }}
+                </button>
+                <button type="button" class="employee-contact-section__secondary-action" [disabled]="sectionState().busy" (click)="cancelEdit()">
+                  {{ texts.contactsSectionCancelAction }}
+                </button>
+              } @else if (deletingKey() === row.key) {
+                <button type="button" class="employee-contact-section__danger-action" [disabled]="sectionState().busy" (click)="confirmDelete(row.key)">
+                  {{ texts.contactsSectionDeleteAction }}
+                </button>
+                <button type="button" class="employee-contact-section__secondary-action" [disabled]="sectionState().busy" (click)="cancelDelete()">
+                  {{ texts.contactsSectionCancelAction }}
+                </button>
+              } @else {
+                <button type="button" [disabled]="sectionState().busy" (click)="startEdit(row.key)">
+                  {{ texts.contactsSectionEditAction }}
+                </button>
+                <button type="button" class="employee-contact-section__danger-action" [disabled]="sectionState().busy" (click)="requestDelete(row.key)">
+                  {{ texts.contactsSectionDeleteAction }}
+                </button>
+              }
+            </div>
+          </li>
+        }
+      </ul>
+    } @else if (!creating()) {
+      <p class="employee-contact-section__empty">{{ texts.contactsSectionEmptyMessage }}</p>
+    }
+  </div>
+</app-employee-section-shell>
