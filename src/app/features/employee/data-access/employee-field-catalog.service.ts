@@ -15,6 +15,7 @@ const employeeCatalogFields = {
   identifierType: { resourceCode: 'employee.identifier', fieldCode: 'identifierTypeCode' },
   addressType: { resourceCode: 'employee.address', fieldCode: 'addressTypeCode' },
   workCenter: { resourceCode: 'employee.work_center', fieldCode: 'workCenterCode' },
+  laborClassificationAgreement: { resourceCode: 'employee.labor_classification', fieldCode: 'agreementCode' },
   presenceCompany: { resourceCode: 'employee.presence', fieldCode: 'companyCode' },
   presenceEntryReason: { resourceCode: 'employee.presence', fieldCode: 'entryReasonCode' },
   presenceExitReason: { resourceCode: 'employee.presence', fieldCode: 'exitReasonCode' },
@@ -52,6 +53,10 @@ export class EmployeeFieldCatalogService {
 
   loadWorkCenterOptions(ruleSystemCode: string): Observable<ReadonlyArray<SlotKeyOption<string>>> {
     return this.loadDirectOptionsByField(ruleSystemCode, employeeCatalogFields.workCenter);
+  }
+
+  loadLaborClassificationAgreementOptions(ruleSystemCode: string): Observable<ReadonlyArray<SlotKeyOption<string>>> {
+    return this.loadDirectOptionsByField(ruleSystemCode, employeeCatalogFields.laborClassificationAgreement);
   }
 
   loadPresenceCompanyOptions(ruleSystemCode: string): Observable<ReadonlyArray<SlotKeyOption<string>>> {

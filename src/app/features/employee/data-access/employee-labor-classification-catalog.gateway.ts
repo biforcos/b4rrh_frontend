@@ -6,6 +6,7 @@ import {
   LaborClassificationCatalogApiItem,
 } from '../../../core/api/clients/employee-labor-classification-catalog.client';
 import { EmployeeLaborClassificationCatalogItemModel } from '../models/employee-labor-classification-catalog-item.model';
+import { getCatalogDisplay } from '../shared/utils/catalog-display.util';
 
 @Injectable({
   providedIn: 'root',
@@ -45,11 +46,7 @@ export class EmployeeLaborClassificationCatalogGateway {
   }
 
   private buildLabel(code: string, name: string | null): string {
-    const trimmedName = name?.trim() ?? '';
-    if (!trimmedName) {
-      return code;
-    }
-
-    return `${code} · ${trimmedName}`;
+    const display = getCatalogDisplay(name, code);
+    return display.code ? `${display.label} · ${display.code}` : display.label;
   }
 }

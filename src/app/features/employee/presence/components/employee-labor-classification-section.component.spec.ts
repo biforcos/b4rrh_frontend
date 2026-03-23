@@ -1,6 +1,9 @@
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { of } from 'rxjs';
 
+import { EmployeeFieldCatalogService } from '../../data-access/employee-field-catalog.service';
+import { EmployeeLaborClassificationCatalogGateway } from '../../data-access/employee-labor-classification-catalog.gateway';
 import { EmployeeLaborClassificationStore } from '../../data-access/employee-labor-classification.store';
 import { employeeTexts } from '../../employee.texts';
 import { EmployeeLaborClassificationModel } from '../../models/employee-labor-classification.model';
@@ -28,8 +31,13 @@ class MockEmployeeLaborClassificationStore {
 
 describe('EmployeeLaborClassificationSectionComponent', () => {
   let fixture: ComponentFixture<EmployeeLaborClassificationSectionComponent>;
-  let component: EmployeeLaborClassificationSectionComponent;
   let laborStore: MockEmployeeLaborClassificationStore;
+  let fieldCatalogService: {
+    loadLaborClassificationAgreementOptions: ReturnType<typeof vi.fn>;
+  };
+  let laborCatalogGateway: {
+    loadAgreementCategories: ReturnType<typeof vi.fn>;
+  };
 
   const employeeBusinessKey = {
     ruleSystemCode: 'RS1',
@@ -39,14 +47,60 @@ describe('EmployeeLaborClassificationSectionComponent', () => {
 
   beforeEach(async () => {
     laborStore = new MockEmployeeLaborClassificationStore();
+    fieldCatalogService = {
+      loadLaborClassificationAgreementOptions: vi.fn().mockReturnValue(
+        of([
+          {
+            value: 'AGR-A',
+            label: 'Convenio A · AGR-A',
+          },
+          {
+            value: 'AGR-B',
+            label: 'Convenio B · AGR-B',
+          },
+        ]),
+      ),
+    };
+    laborCatalogGateway = {
+      loadAgreementCategories: vi.fn().mockImplementation((_ruleSystemCode: string, agreementCode: string) => {
+        if (agreementCode === 'AGR-A') {
+          return of([
+            {
+              code: 'CAT-A',
+              name: 'Categoria A',
+              label: 'Categoria A · CAT-A',
+              startDate: '2020-01-01',
+              endDate: null,
+            },
+          ]);
+        }
+
+        if (agreementCode === 'AGR-B') {
+          return of([
+            {
+              code: 'CAT-B',
+              name: 'Categoria B',
+              label: 'Categoria B · CAT-B',
+              startDate: '2020-01-01',
+              endDate: null,
+            },
+          ]);
+        }
+
+        return of([]);
+      }),
+    };
 
     await TestBed.configureTestingModule({
       imports: [EmployeeLaborClassificationSectionComponent],
-      providers: [{ provide: EmployeeLaborClassificationStore, useValue: laborStore }],
+      providers: [
+        { provide: EmployeeLaborClassificationStore, useValue: laborStore },
+        { provide: EmployeeFieldCatalogService, useValue: fieldCatalogService },
+        { provide: EmployeeLaborClassificationCatalogGateway, useValue: laborCatalogGateway },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(EmployeeLaborClassificationSectionComponent);
-    component = fixture.componentInstance;
   });
 
   it('shows Cambiar clasificacion desde fecha as primary block action', () => {
@@ -58,17 +112,21 @@ describe('EmployeeLaborClassificationSectionComponent', () => {
     expect(actionTexts).not.toContain('Administrar clasificacion');
   });
 
-  it('does not render fake selects and uses simple text inputs', () => {
+  it('loads agreement options from DIRECT binding and renders Name · CODE in select', () => {
     fixture.componentRef.setInput('employeeBusinessKey', employeeBusinessKey);
     fixture.detectChanges();
 
     clickByText(employeeTexts.laborClassificationSectionReplaceAction);
     fixture.detectChanges();
 
-    const root = fixture.nativeElement as HTMLElement;
-    expect(root.querySelectorAll('select').length).toBe(0);
-    expect(root.querySelectorAll('input[type="text"]').length).toBe(2);
-    expect(root.textContent ?? '').toContain(employeeTexts.laborClassificationSectionLookupPendingHint);
+    const agreementSelect = getActiveCreateSelects().agreement;
+    const agreementOptionTexts = Array.from(agreementSelect.querySelectorAll('option')).map(
+      (option) => option.textContent?.trim() ?? '',
+    );
+
+    expect(fieldCatalogService.loadLaborClassificationAgreementOptions).toHaveBeenCalledWith('RS1');
+    expect(agreementOptionTexts).toContain('Convenio A · AGR-A');
+    expect(agreementOptionTexts).toContain('Convenio B · AGR-B');
   });
 
   it('shows current row actions: Corregir ocurrencia and Cerrar', () => {
@@ -137,26 +195,64 @@ describe('EmployeeLaborClassificationSectionComponent', () => {
     expect(historicalRowTexts).not.toContain(employeeTexts.laborClassificationSectionDeleteAction);
   });
 
-  it('maps busy and backend error into section ui state', () => {
-    laborStore.mutatingState.set(true);
-    laborStore.errorState.set('AGREEMENT_CATEGORY_RELATION_INVALID');
-
+  it('loads dependent agreement categories from specific endpoint when agreement changes', () => {
     fixture.componentRef.setInput('employeeBusinessKey', employeeBusinessKey);
     fixture.detectChanges();
 
-    const sectionState = (component as unknown as { sectionState: () => { busy: boolean; mode: string; errorMessage: string | null } }).sectionState();
-    expect(sectionState.busy).toBe(true);
-    expect(sectionState.mode).toBe('submitting');
-    expect(sectionState.errorMessage).toBe(employeeTexts.laborClassificationSectionAgreementCategoryRelationInvalidMessage);
+    clickByText(employeeTexts.laborClassificationSectionReplaceAction);
+    setSelectValue(getActiveCreateSelects().agreement, 'AGR-A');
+    fixture.detectChanges();
+
+    const categorySelect = getActiveCreateSelects().category;
+    const categoryOptionTexts = Array.from(categorySelect.querySelectorAll('option')).map(
+      (option) => option.textContent?.trim() ?? '',
+    );
+
+    expect(laborCatalogGateway.loadAgreementCategories).toHaveBeenCalledWith('RS1', 'AGR-A', '');
+    expect(categoryOptionTexts).toContain('Categoria A · CAT-A');
   });
 
-  it('submits correction with text inputs and keeps backend errors visible', () => {
+  it('resets category when agreement changes and previous category is no longer valid', () => {
+    fixture.componentRef.setInput('employeeBusinessKey', employeeBusinessKey);
+    fixture.detectChanges();
+
+    clickByText(employeeTexts.laborClassificationSectionReplaceAction);
+    setSelectValue(getActiveCreateSelects().agreement, 'AGR-A');
+    setSelectValue(getActiveCreateSelects().category, 'CAT-A');
+
+    setSelectValue(getActiveCreateSelects().agreement, 'AGR-B');
+    fixture.detectChanges();
+
+    const categorySelect = getActiveCreateSelects().category;
+    const categoryOptionValues = Array.from(categorySelect.querySelectorAll('option')).map(
+      (option) => option.value,
+    );
+
+    expect(categorySelect.value).toBe('');
+    expect(categoryOptionValues).toContain('CAT-B');
+    expect(categoryOptionValues).not.toContain('CAT-A');
+  });
+
+  it('does not load dependent categories when agreement is empty', () => {
+    fixture.componentRef.setInput('employeeBusinessKey', employeeBusinessKey);
+    fixture.detectChanges();
+
+    clickByText(employeeTexts.laborClassificationSectionReplaceAction);
+    fixture.detectChanges();
+
+    const categorySelect = getActiveCreateSelects().category;
+
+    expect(laborCatalogGateway.loadAgreementCategories).not.toHaveBeenCalled();
+    expect(categorySelect.disabled).toBe(true);
+  });
+
+  it('keeps correction action working with catalog-driven selects', () => {
     laborStore.laborClassificationsState.set([
       {
-        agreementCode: 'CONV-A',
-        agreementName: null,
+        agreementCode: 'AGR-A',
+        agreementName: 'Convenio A',
         agreementCategoryCode: 'CAT-A',
-        agreementCategoryName: null,
+        agreementCategoryName: 'Categoria A',
         startDate: '2025-01-01',
         endDate: null,
         isActive: true,
@@ -166,23 +262,18 @@ describe('EmployeeLaborClassificationSectionComponent', () => {
     fixture.componentRef.setInput('employeeBusinessKey', employeeBusinessKey);
     fixture.detectChanges();
 
-    clickInRow('CONV-A', employeeTexts.laborClassificationSectionCorrectAction);
+    clickInRow('AGR-A', employeeTexts.laborClassificationSectionCorrectAction);
     fixture.detectChanges();
 
-    setTextInput(0, 'NEW-AGREEMENT');
-    setTextInput(1, 'NEW-CATEGORY');
+    const correctSelects = getActiveCorrectSelects();
+    setSelectValue(correctSelects.agreement, 'AGR-B');
+    setSelectValue(correctSelects.category, 'CAT-B');
     clickByText(employeeTexts.laborClassificationSectionSaveCorrectAction);
 
     expect(laborStore.correctOccurrence).toHaveBeenCalledWith(employeeBusinessKey, '2025-01-01', {
-      agreementCode: 'NEW-AGREEMENT',
-      agreementCategoryCode: 'NEW-CATEGORY',
+      agreementCode: 'AGR-B',
+      agreementCategoryCode: 'CAT-B',
     });
-
-    laborStore.errorState.set('AGREEMENT_CATEGORY_RELATION_INVALID');
-    fixture.detectChanges();
-
-    const sectionState = (component as unknown as { sectionState: () => { errorMessage: string | null } }).sectionState();
-    expect(sectionState.errorMessage).toBe(employeeTexts.laborClassificationSectionAgreementCategoryRelationInvalidMessage);
   });
 
   it('renders names as primary values and falls back to code per field when names are missing', () => {
@@ -220,12 +311,15 @@ describe('EmployeeLaborClassificationSectionComponent', () => {
     fixture.detectChanges();
 
     const root = fixture.nativeElement as HTMLElement;
-    const content = root.textContent ?? '';
+    const content = (root.textContent ?? '').replace(/\s+/g, ' ');
 
-    expect(content).toContain('Convenio A · AGR-A');
-    expect(content).toContain('Categoria A · CAT-A');
+    expect(content).toContain('Convenio A');
+    expect(content).toContain('AGR-A');
+    expect(content).toContain('Categoria A');
+    expect(content).toContain('CAT-A');
 
-    expect(content).toContain('Convenio B · AGR-B');
+    expect(content).toContain('Convenio B');
+    expect(content).toContain('AGR-B');
     expect(content).toContain('CAT-B');
 
     expect(content).toContain('AGR-C');
@@ -254,14 +348,40 @@ describe('EmployeeLaborClassificationSectionComponent', () => {
     fixture.detectChanges();
   }
 
-  function setTextInput(index: number, value: string): void {
+  function getActiveCreateSelects(): { agreement: HTMLSelectElement; category: HTMLSelectElement } {
     const root = fixture.nativeElement as HTMLElement;
-    const inputs = Array.from(root.querySelectorAll('input[type="text"]')) as HTMLInputElement[];
-    const input = inputs[index];
+    const form = root.querySelector('div.employee-labor-classification-section__form-grid--create') as HTMLElement | null;
 
-    expect(input).toBeDefined();
-    input.value = value;
-    input.dispatchEvent(new Event('input'));
+    expect(form).toBeTruthy();
+
+    const selects = Array.from(form?.querySelectorAll('select') ?? []) as HTMLSelectElement[];
+    expect(selects.length).toBe(2);
+
+    return {
+      agreement: selects[0],
+      category: selects[1],
+    };
+  }
+
+  function getActiveCorrectSelects(): { agreement: HTMLSelectElement; category: HTMLSelectElement } {
+    const root = fixture.nativeElement as HTMLElement;
+    const form = root.querySelector('div.employee-labor-classification-section__form-grid--correct') as HTMLElement | null;
+
+    expect(form).toBeTruthy();
+
+    const selects = Array.from(form?.querySelectorAll('select') ?? []) as HTMLSelectElement[];
+    expect(selects.length).toBe(2);
+
+    return {
+      agreement: selects[0],
+      category: selects[1],
+    };
+  }
+
+  function setSelectValue(select: HTMLSelectElement, value: string): void {
+    expect(select).toBeDefined();
+    select.value = value;
+    select.dispatchEvent(new Event('change'));
     fixture.detectChanges();
   }
 

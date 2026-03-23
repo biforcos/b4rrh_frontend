@@ -1,5 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
+import { take } from 'rxjs';
 
+import { EmployeeFieldCatalogService } from '../../data-access/employee-field-catalog.service';
+import { EmployeeLaborClassificationCatalogGateway } from '../../data-access/employee-labor-classification-catalog.gateway';
 import {
   EmployeeLaborClassificationRowTexts,
   LaborClassificationCloseDraft,
@@ -12,7 +15,9 @@ import {
 } from '../../data-access/employee-labor-classification.mapper';
 import { EmployeeLaborClassificationStore } from '../../data-access/employee-labor-classification.store';
 import { employeeTexts } from '../../employee.texts';
+import { EmployeeLaborClassificationCatalogItemModel } from '../../models/employee-labor-classification-catalog-item.model';
 import { EmployeeBusinessKey } from '../../models/employee-business-key.model';
+import { SlotKeyOption } from '../../shared/ui/section/editable-slot-section.model';
 import { TemporalSectionComponent } from '../../shared/ui/section/temporal-section.component';
 import {
   TemporalDisplayMode,
@@ -32,6 +37,8 @@ export class EmployeeLaborClassificationSectionComponent {
   readonly employeeBusinessKey = input<EmployeeBusinessKey | null>(null);
 
   private readonly laborClassificationStore = inject(EmployeeLaborClassificationStore);
+  private readonly fieldCatalogService = inject(EmployeeFieldCatalogService);
+  private readonly laborClassificationCatalogGateway = inject(EmployeeLaborClassificationCatalogGateway);
 
   private readonly displayModeState = signal<TemporalDisplayMode>('view');
   private readonly localErrorMessageState = signal<string | null>(null);
@@ -46,6 +53,16 @@ export class EmployeeLaborClassificationSectionComponent {
   private readonly closeDraftState = signal<LaborClassificationCloseDraft>(
     createEmptyLaborClassificationCloseDraft(),
   );
+  private readonly agreementOptionsState = signal<ReadonlyArray<SlotKeyOption<string>>>([]);
+  private readonly replaceCategoryOptionsState = signal<ReadonlyArray<SlotKeyOption<string>>>([]);
+  private readonly correctCategoryOptionsState = signal<ReadonlyArray<SlotKeyOption<string>>>([]);
+  private readonly agreementOptionsLoadingState = signal(false);
+  private readonly replaceCategoryLoadingState = signal(false);
+  private readonly correctCategoryLoadingState = signal(false);
+
+  private agreementOptionsRequestId = 0;
+  private replaceCategoryRequestId = 0;
+  private correctCategoryRequestId = 0;
 
   protected readonly texts = employeeTexts;
   protected readonly sectionSubtitle = this.texts.laborClassificationSectionSubtitle;
@@ -85,6 +102,24 @@ export class EmployeeLaborClassificationSectionComponent {
   protected readonly replaceDraft = this.replaceDraftState.asReadonly();
   protected readonly correctDraft = this.correctDraftState.asReadonly();
   protected readonly closeDraft = this.closeDraftState.asReadonly();
+  protected readonly agreementOptions = computed(() =>
+    this.withCurrentCodeOption(this.agreementOptionsState(), this.activeAgreementCode()),
+  );
+  protected readonly replaceCategoryOptions = computed(() =>
+    this.withCurrentCodeOption(this.replaceCategoryOptionsState(), this.replaceDraftState().agreementCategoryCode),
+  );
+  protected readonly correctCategoryOptions = computed(() =>
+    this.withCurrentCodeOption(this.correctCategoryOptionsState(), this.correctDraftState().agreementCategoryCode),
+  );
+  protected readonly agreementOptionsLoading = this.agreementOptionsLoadingState.asReadonly();
+  protected readonly replaceCategoryLoading = this.replaceCategoryLoadingState.asReadonly();
+  protected readonly correctCategoryLoading = this.correctCategoryLoadingState.asReadonly();
+  protected readonly replaceCategoryDisabled = computed(
+    () => this.normalizeRequiredValue(this.replaceDraftState().agreementCode).length === 0 || this.replaceCategoryLoadingState(),
+  );
+  protected readonly correctCategoryDisabled = computed(
+    () => this.normalizeRequiredValue(this.correctDraftState().agreementCode).length === 0 || this.correctCategoryLoadingState(),
+  );
   protected readonly supportedActions = computed(() => ({
     canReplaceFromDate: true,
     canCorrect: true,
@@ -167,6 +202,7 @@ export class EmployeeLaborClassificationSectionComponent {
 
       untracked(() => {
         this.laborClassificationStore.loadLaborClassificationsByBusinessKey(activeEmployeeKey);
+        this.loadAgreementOptions(activeEmployeeKey?.ruleSystemCode ?? null);
         this.enterManageMode();
       });
     });
@@ -241,7 +277,7 @@ export class EmployeeLaborClassificationSectionComponent {
     this.enterCorrectingMode(rowKey, {
       agreementCode: occurrence.agreementCode,
       agreementCategoryCode: occurrence.agreementCategoryCode,
-    });
+    }, occurrence.startDate);
   }
 
   protected submitCorrect(rowKey: number): void {
@@ -310,8 +346,42 @@ export class EmployeeLaborClassificationSectionComponent {
   }
 
   protected updateReplaceField(field: keyof LaborClassificationReplaceDraft, value: string): void {
+    const currentDraft = this.replaceDraftState();
+
+    if (field === 'agreementCode') {
+      const agreementChanged =
+        this.normalizeRequiredValue(currentDraft.agreementCode) !== this.normalizeRequiredValue(value);
+
+      this.replaceDraftState.set({
+        ...currentDraft,
+        agreementCode: value,
+        agreementCategoryCode: agreementChanged ? '' : currentDraft.agreementCategoryCode,
+      });
+
+      if (agreementChanged) {
+        this.loadReplaceCategoryOptions(value, currentDraft.effectiveDate, null);
+      }
+
+      this.clearInteractionFeedback();
+      return;
+    }
+
+    if (field === 'effectiveDate') {
+      this.replaceDraftState.set({
+        ...currentDraft,
+        effectiveDate: value,
+      });
+
+      if (this.normalizeRequiredValue(currentDraft.agreementCode).length > 0) {
+        this.loadReplaceCategoryOptions(currentDraft.agreementCode, value, currentDraft.agreementCategoryCode);
+      }
+
+      this.clearInteractionFeedback();
+      return;
+    }
+
     this.replaceDraftState.set({
-      ...this.replaceDraftState(),
+      ...currentDraft,
       [field]: value,
     });
 
@@ -319,8 +389,28 @@ export class EmployeeLaborClassificationSectionComponent {
   }
 
   protected updateCorrectField(field: keyof LaborClassificationCorrectDraft, value: string): void {
+    const currentDraft = this.correctDraftState();
+
+    if (field === 'agreementCode') {
+      const agreementChanged =
+        this.normalizeRequiredValue(currentDraft.agreementCode) !== this.normalizeRequiredValue(value);
+
+      this.correctDraftState.set({
+        ...currentDraft,
+        agreementCode: value,
+        agreementCategoryCode: agreementChanged ? '' : currentDraft.agreementCategoryCode,
+      });
+
+      if (agreementChanged) {
+        this.loadCorrectCategoryOptions(value, this.correctingOccurrence()?.startDate ?? null, null);
+      }
+
+      this.clearInteractionFeedback();
+      return;
+    }
+
     this.correctDraftState.set({
-      ...this.correctDraftState(),
+      ...currentDraft,
       [field]: value,
     });
 
@@ -360,15 +450,18 @@ export class EmployeeLaborClassificationSectionComponent {
     this.replaceDraftState.set(createEmptyLaborClassificationReplaceDraft());
     this.correctDraftState.set(createEmptyLaborClassificationCorrectDraft());
     this.closeDraftState.set(createEmptyLaborClassificationCloseDraft());
+    this.replaceCategoryOptionsState.set([]);
+    this.replaceCategoryLoadingState.set(false);
   }
 
-  private enterCorrectingMode(rowKey: number, draft: LaborClassificationCorrectDraft): void {
+  private enterCorrectingMode(rowKey: number, draft: LaborClassificationCorrectDraft, referenceDate: string): void {
     this.displayModeState.set('correcting');
     this.correctingKeyState.set(rowKey);
     this.confirmingCloseKeyState.set(null);
     this.replaceDraftState.set(createEmptyLaborClassificationReplaceDraft());
     this.correctDraftState.set(draft);
     this.closeDraftState.set(createEmptyLaborClassificationCloseDraft());
+    this.loadCorrectCategoryOptions(draft.agreementCode, referenceDate, draft.agreementCategoryCode);
   }
 
   private enterConfirmingCloseMode(rowKey: number, endDate: string): void {
@@ -395,6 +488,10 @@ export class EmployeeLaborClassificationSectionComponent {
     this.replaceDraftState.set(createEmptyLaborClassificationReplaceDraft());
     this.correctDraftState.set(createEmptyLaborClassificationCorrectDraft());
     this.closeDraftState.set(createEmptyLaborClassificationCloseDraft());
+    this.replaceCategoryOptionsState.set([]);
+    this.correctCategoryOptionsState.set([]);
+    this.replaceCategoryLoadingState.set(false);
+    this.correctCategoryLoadingState.set(false);
   }
 
   private toSectionMode(displayMode: TemporalDisplayMode): SectionMode {
@@ -483,6 +580,201 @@ export class EmployeeLaborClassificationSectionComponent {
 
   private normalizeRequiredValue(value: string | null | undefined): string {
     return value?.trim() ?? '';
+  }
+
+  private loadAgreementOptions(ruleSystemCode: string | null): void {
+    const normalizedRuleSystemCode = ruleSystemCode?.trim() ?? '';
+
+    if (!normalizedRuleSystemCode) {
+      this.agreementOptionsRequestId += 1;
+      this.agreementOptionsLoadingState.set(false);
+      this.agreementOptionsState.set([]);
+      return;
+    }
+
+    const requestId = ++this.agreementOptionsRequestId;
+    this.agreementOptionsLoadingState.set(true);
+
+    this.fieldCatalogService
+      .loadLaborClassificationAgreementOptions(normalizedRuleSystemCode)
+      .pipe(take(1))
+      .subscribe((options) => {
+        if (requestId !== this.agreementOptionsRequestId) {
+          return;
+        }
+
+        this.agreementOptionsState.set(options);
+        this.agreementOptionsLoadingState.set(false);
+      });
+  }
+
+  private loadReplaceCategoryOptions(
+    agreementCode: string | null,
+    referenceDate: string | null,
+    preferredCategoryCode: string | null,
+  ): void {
+    const normalizedAgreementCode = this.normalizeRequiredValue(agreementCode);
+
+    if (!normalizedAgreementCode) {
+      this.replaceCategoryRequestId += 1;
+      this.replaceCategoryOptionsState.set([]);
+      this.replaceCategoryLoadingState.set(false);
+      this.replaceDraftState.update((draft) => ({
+        ...draft,
+        agreementCategoryCode: '',
+      }));
+      return;
+    }
+
+    const ruleSystemCode = this.employeeBusinessKey()?.ruleSystemCode?.trim() ?? '';
+    if (!ruleSystemCode) {
+      this.replaceCategoryRequestId += 1;
+      this.replaceCategoryOptionsState.set([]);
+      this.replaceCategoryLoadingState.set(false);
+      return;
+    }
+
+    const requestId = ++this.replaceCategoryRequestId;
+    this.replaceCategoryLoadingState.set(true);
+
+    this.laborClassificationCatalogGateway
+      .loadAgreementCategories(ruleSystemCode, normalizedAgreementCode, referenceDate)
+      .pipe(take(1))
+      .subscribe({
+        next: (categories) => {
+          if (requestId !== this.replaceCategoryRequestId) {
+            return;
+          }
+
+          const options = this.toSlotOptions(categories);
+          this.replaceCategoryOptionsState.set(options);
+          this.replaceCategoryLoadingState.set(false);
+
+          const effectiveCategory = this.resolveEffectiveCategoryCode(options, preferredCategoryCode);
+          if (!effectiveCategory) {
+            this.replaceDraftState.update((draft) => ({
+              ...draft,
+              agreementCategoryCode: '',
+            }));
+          }
+        },
+        error: () => {
+          if (requestId !== this.replaceCategoryRequestId) {
+            return;
+          }
+
+          this.replaceCategoryOptionsState.set([]);
+          this.replaceCategoryLoadingState.set(false);
+        },
+      });
+  }
+
+  private loadCorrectCategoryOptions(
+    agreementCode: string | null,
+    referenceDate: string | null,
+    preferredCategoryCode: string | null,
+  ): void {
+    const normalizedAgreementCode = this.normalizeRequiredValue(agreementCode);
+
+    if (!normalizedAgreementCode) {
+      this.correctCategoryRequestId += 1;
+      this.correctCategoryOptionsState.set([]);
+      this.correctCategoryLoadingState.set(false);
+      this.correctDraftState.update((draft) => ({
+        ...draft,
+        agreementCategoryCode: '',
+      }));
+      return;
+    }
+
+    const ruleSystemCode = this.employeeBusinessKey()?.ruleSystemCode?.trim() ?? '';
+    if (!ruleSystemCode) {
+      this.correctCategoryRequestId += 1;
+      this.correctCategoryOptionsState.set([]);
+      this.correctCategoryLoadingState.set(false);
+      return;
+    }
+
+    const requestId = ++this.correctCategoryRequestId;
+    this.correctCategoryLoadingState.set(true);
+
+    this.laborClassificationCatalogGateway
+      .loadAgreementCategories(ruleSystemCode, normalizedAgreementCode, referenceDate)
+      .pipe(take(1))
+      .subscribe({
+        next: (categories) => {
+          if (requestId !== this.correctCategoryRequestId) {
+            return;
+          }
+
+          const options = this.toSlotOptions(categories);
+          this.correctCategoryOptionsState.set(options);
+          this.correctCategoryLoadingState.set(false);
+
+          const effectiveCategory = this.resolveEffectiveCategoryCode(options, preferredCategoryCode);
+          if (!effectiveCategory) {
+            this.correctDraftState.update((draft) => ({
+              ...draft,
+              agreementCategoryCode: '',
+            }));
+          }
+        },
+        error: () => {
+          if (requestId !== this.correctCategoryRequestId) {
+            return;
+          }
+
+          this.correctCategoryOptionsState.set([]);
+          this.correctCategoryLoadingState.set(false);
+        },
+      });
+  }
+
+  private toSlotOptions(
+    items: ReadonlyArray<EmployeeLaborClassificationCatalogItemModel>,
+  ): ReadonlyArray<SlotKeyOption<string>> {
+    return items.map((item) => ({
+      value: item.code,
+      label: item.label,
+    }));
+  }
+
+  private resolveEffectiveCategoryCode(
+    options: ReadonlyArray<SlotKeyOption<string>>,
+    preferredCategoryCode: string | null,
+  ): string | null {
+    const normalizedPreferredCategoryCode = this.normalizeRequiredValue(preferredCategoryCode);
+    if (!normalizedPreferredCategoryCode) {
+      return null;
+    }
+
+    return options.some((option) => option.value === normalizedPreferredCategoryCode)
+      ? normalizedPreferredCategoryCode
+      : null;
+  }
+
+  private withCurrentCodeOption(
+    options: ReadonlyArray<SlotKeyOption<string>>,
+    currentCode: string,
+  ): ReadonlyArray<SlotKeyOption<string>> {
+    const normalizedCurrentCode = this.normalizeRequiredValue(currentCode);
+    if (!normalizedCurrentCode) {
+      return options;
+    }
+
+    if (options.some((option) => option.value === normalizedCurrentCode)) {
+      return options;
+    }
+
+    return [{ value: normalizedCurrentCode, label: normalizedCurrentCode }, ...options];
+  }
+
+  private activeAgreementCode(): string {
+    if (this.displayModeState() === 'correcting') {
+      return this.correctDraftState().agreementCode;
+    }
+
+    return this.replaceDraftState().agreementCode;
   }
 
   private toRowKey(startDate: string): number {

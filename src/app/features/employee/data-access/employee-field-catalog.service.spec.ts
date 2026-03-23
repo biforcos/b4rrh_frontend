@@ -50,6 +50,14 @@ describe('EmployeeFieldCatalogService', () => {
           active: true,
         },
       ],
+      'employee.labor_classification': [
+        {
+          fieldCode: 'agreementCode',
+          catalogKind: CatalogFieldBindingResponseCatalogKindEnum.Direct,
+          ruleEntityTypeCode: 'AGREEMENT',
+          active: true,
+        },
+      ],
     };
 
     const directItemsByEntity: Record<string, ReadonlyArray<unknown>> = {
@@ -100,6 +108,15 @@ describe('EmployeeFieldCatalogService', () => {
         {
           code: 'MADRID-01',
           name: 'Madrid Centro',
+          active: true,
+          startDate: '2020-01-01',
+          endDate: null,
+        },
+      ],
+      AGREEMENT: [
+        {
+          code: 'AGR-TECH',
+          name: 'Convenio tecnico',
           active: true,
           startDate: '2020-01-01',
           endDate: null,
@@ -325,5 +342,22 @@ describe('EmployeeFieldCatalogService', () => {
       ruleEntityTypeCode: 'EMPLOYEE_WORK_CENTER',
     });
     expect(result).toEqual([{ value: 'MADRID-01', label: 'Madrid Centro · MADRID-01' }]);
+  });
+
+  it('loads DIRECT options for employee.labor_classification agreementCode', () => {
+    let result: ReadonlyArray<{ value: string; label: string }> = [];
+
+    service.loadLaborClassificationAgreementOptions('PA-ES').subscribe((options) => {
+      result = options;
+    });
+
+    expect(apiMock.getCatalogBindingsByResourceCode).toHaveBeenCalledWith({
+      resourceCode: 'employee.labor_classification',
+    });
+    expect(apiMock.getDirectCatalogOptions).toHaveBeenCalledWith({
+      ruleSystemCode: 'PA-ES',
+      ruleEntityTypeCode: 'AGREEMENT',
+    });
+    expect(result).toEqual([{ value: 'AGR-TECH', label: 'Convenio tecnico · AGR-TECH' }]);
   });
 });

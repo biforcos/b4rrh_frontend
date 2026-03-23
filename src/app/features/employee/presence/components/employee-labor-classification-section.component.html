@@ -36,22 +36,30 @@
 
     <label class="employee-labor-classification-section__field employee-labor-classification-section__field--agreement">
       <span>{{ texts.laborClassificationSectionAgreementLabel }}</span>
-      <input
-        type="text"
+      <select
         [value]="replaceDraft().agreementCode"
-        [placeholder]="texts.laborClassificationSectionAgreementPlaceholder"
-        (input)="updateReplaceField('agreementCode', $any($event.target).value)"
-      />
+        [disabled]="agreementOptionsLoading()"
+        (change)="updateReplaceField('agreementCode', $any($event.target).value)"
+      >
+        <option value="">{{ texts.laborClassificationSectionAgreementLabel }}</option>
+        @for (option of agreementOptions(); track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
     </label>
 
     <label class="employee-labor-classification-section__field employee-labor-classification-section__field--category">
       <span>{{ texts.laborClassificationSectionCategoryLabel }}</span>
-      <input
-        type="text"
+      <select
         [value]="replaceDraft().agreementCategoryCode"
-        [placeholder]="texts.laborClassificationSectionCategoryPlaceholder"
-        (input)="updateReplaceField('agreementCategoryCode', $any($event.target).value)"
-      />
+        [disabled]="replaceCategoryDisabled()"
+        (change)="updateReplaceField('agreementCategoryCode', $any($event.target).value)"
+      >
+        <option value="">{{ texts.laborClassificationSectionCategoryLabel }}</option>
+        @for (option of replaceCategoryOptions(); track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
     </label>
   </div>
 
@@ -65,22 +73,30 @@
 
     <label class="employee-labor-classification-section__field employee-labor-classification-section__field--agreement">
       <span>{{ texts.laborClassificationSectionAgreementLabel }}</span>
-      <input
-        type="text"
+      <select
         [value]="correctDraft().agreementCode"
-        [placeholder]="texts.laborClassificationSectionAgreementPlaceholder"
-        (input)="updateCorrectField('agreementCode', $any($event.target).value)"
-      />
+        [disabled]="agreementOptionsLoading()"
+        (change)="updateCorrectField('agreementCode', $any($event.target).value)"
+      >
+        <option value="">{{ texts.laborClassificationSectionAgreementLabel }}</option>
+        @for (option of agreementOptions(); track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
     </label>
 
     <label class="employee-labor-classification-section__field employee-labor-classification-section__field--category">
       <span>{{ texts.laborClassificationSectionCategoryLabel }}</span>
-      <input
-        type="text"
+      <select
         [value]="correctDraft().agreementCategoryCode"
-        [placeholder]="texts.laborClassificationSectionCategoryPlaceholder"
-        (input)="updateCorrectField('agreementCategoryCode', $any($event.target).value)"
-      />
+        [disabled]="correctCategoryDisabled()"
+        (change)="updateCorrectField('agreementCategoryCode', $any($event.target).value)"
+      >
+        <option value="">{{ texts.laborClassificationSectionCategoryLabel }}</option>
+        @for (option of correctCategoryOptions(); track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
     </label>
   </div>
 
