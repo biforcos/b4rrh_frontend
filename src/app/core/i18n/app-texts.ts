@@ -10,7 +10,7 @@ export const appTexts = {
   sectionCompanies: 'Empresas',
   sectionWorkCenters: 'Centros de trabajo',
   sectionCostCenters: 'Centros de coste',
-  sectionCatalogs: 'Catalogos',
+  sectionCatalogs: 'Catálogos',
   sectionSettings: 'Configuracion',
   sectionRuleSystems: 'Rule systems',
   homeTitle: 'Inicio',

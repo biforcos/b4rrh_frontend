@@ -1,5 +1,5 @@
 export const catalogTexts = {
-  pageTitle: 'Catalogos',
+  pageTitle: 'Catálogos',
   pageSubtitle: 'Selecciona un rule system y un tipo para consultar y crear entidades de catalogo.',
   selectorLabel: 'Rule system',
   selectorPlaceholder: 'Selecciona un rule system',
