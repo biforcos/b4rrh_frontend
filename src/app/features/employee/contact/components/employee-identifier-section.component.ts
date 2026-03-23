@@ -11,21 +11,23 @@ import { EmployeeIdentifierStore } from '../../data-access/employee-identifier.s
 import { employeeTexts } from '../../employee.texts';
 import { EmployeeBusinessKey } from '../../models/employee-business-key.model';
 import { EmployeeIdentifierModel } from '../../models/employee-identifier.model';
-import { EditableSlotSectionComponent } from '../../shared/ui/section/editable-slot-section.component';
+import { EmployeeSectionShellComponent } from '../../shared/ui/section/employee-section-shell.component';
 import { isValidSpanishDni } from '../../shared/utils/spanish-dni.util';
-import {
-  SlotDraft,
-  SlotDisplayMode,
-  SlotKeyOption,
-  SlotRowViewModel,
-  SlotSectionTexts,
-} from '../../shared/ui/section/editable-slot-section.model';
+import { SlotKeyOption } from '../../shared/ui/section/editable-slot-section.model';
 import { SectionMode, SectionUiState } from '../../shared/ui/section/section-ui-state.model';
+
+interface IdentifierRowViewModel {
+  key: string;
+  typeLabel: string;
+  value: string;
+  secondaryText: string | null;
+  badges: ReadonlyArray<string>;
+}
 
 @Component({
   selector: 'app-employee-identifier-section',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [EditableSlotSectionComponent],
+  imports: [EmployeeSectionShellComponent],
   templateUrl: './employee-identifier-section.component.html',
   styleUrl: './employee-identifier-section.component.scss',
 })
@@ -34,34 +36,21 @@ export class EmployeeIdentifierSectionComponent {
 
   private readonly identifierStore = inject(EmployeeIdentifierStore);
   private readonly fieldCatalogService = inject(EmployeeFieldCatalogService);
-  private readonly displayModeState = signal<SlotDisplayMode>('view');
-  private readonly localErrorMessageState = signal<string | null>(null);
+  private readonly creatingState = signal(false);
   private readonly editingKeyState = signal<string | null>(null);
   private readonly deletingKeyState = signal<string | null>(null);
-  private readonly draftState = signal<IdentifierDraft>(createEmptyIdentifierDraft());
+  private readonly localErrorMessageState = signal<string | null>(null);
+  private readonly createDraftState = signal<IdentifierDraft>(createEmptyIdentifierDraft());
+  private readonly editDraftState = signal<IdentifierDraft>(createEmptyIdentifierDraft());
   private readonly availableKeysState = signal<ReadonlyArray<SlotKeyOption<string>>>([]);
   private readonly catalogLoadingState = signal(false);
 
   private catalogRequestId = 0;
 
   protected readonly texts = employeeTexts;
+  protected readonly sectionTitle = this.texts.identifiersSectionTitle;
   protected readonly sectionSubtitle = this.texts.identifiersSectionSubtitle;
-  protected readonly slotTexts: SlotSectionTexts = {
-    manageAction: this.texts.identifiersSectionManageAction,
-    exitManageAction: this.texts.identifiersSectionExitManageAction,
-    addAction: this.texts.identifiersSectionAddAction,
-    editAction: this.texts.identifiersSectionEditAction,
-    deleteAction: this.texts.identifiersSectionDeleteAction,
-    cancelAction: this.texts.identifiersSectionCancelAction,
-    saveCreateAction: this.texts.identifiersSectionSaveCreateAction,
-    saveEditAction: this.texts.identifiersSectionSaveEditAction,
-    confirmDeleteMessage: this.texts.identifiersSectionConfirmDeleteMessage,
-    confirmDeleteAction: this.texts.identifiersSectionConfirmDeleteAction,
-    emptyMessage: this.texts.identifiersSectionEmptyMessage,
-    keyFieldLabel: this.texts.identifiersSectionKeyFieldLabel,
-    valueFieldLabel: this.texts.identifiersSectionValueFieldLabel,
-  };
-  protected readonly rows = computed<ReadonlyArray<SlotRowViewModel<string>>>(() =>
+  protected readonly rows = computed<ReadonlyArray<IdentifierRowViewModel>>(() =>
     this.identifierStore
       .identifiers()
       .map((identifier) =>
@@ -70,41 +59,40 @@ export class EmployeeIdentifierSectionComponent {
           expirationPrefix: this.texts.identifiersSectionExpirationPrefix,
         }),
       )
+      .map((row) => ({
+        key: row.key,
+        typeLabel: row.keyLabel,
+        value: row.value,
+        secondaryText: row.secondaryText ?? null,
+        badges: row.badges ?? [],
+      }))
       .sort((left, right) => left.key.localeCompare(right.key)),
   );
+  protected readonly hasRows = computed(() => this.rows().length > 0);
+  protected readonly creating = this.creatingState.asReadonly();
+  protected readonly createDraft = this.createDraftState.asReadonly();
+  protected readonly editDraft = this.editDraftState.asReadonly();
   protected readonly availableKeys = this.availableKeysState.asReadonly();
   protected readonly catalogOptionsLoading = this.catalogLoadingState.asReadonly();
-  protected readonly displayMode = this.displayModeState.asReadonly();
-  protected readonly draft = this.draftState.asReadonly();
-  protected readonly slotDraft = computed<SlotDraft<string>>(() => {
-    const draft = this.draftState();
-
-    return {
-      key: draft.key,
-      value: draft.value,
-    };
-  });
   protected readonly editingKey = this.editingKeyState.asReadonly();
   protected readonly deletingKey = this.deletingKeyState.asReadonly();
-  protected readonly shouldValidateDni = computed(() => this.isDniValidationApplicable(this.draftState()));
-  protected readonly isDniInvalid = computed(() => {
-    if (!this.shouldValidateDni()) {
-      return false;
-    }
-
-    const normalizedValue = this.draftState().value.trim();
-    if (normalizedValue.length === 0) {
-      return false;
-    }
-
-    return !isValidSpanishDni(normalizedValue);
+  protected readonly isCreateDniInvalid = computed(() => this.isDraftDniInvalid(this.createDraftState()));
+  protected readonly isEditDniInvalid = computed(() => this.isDraftDniInvalid(this.editDraftState()));
+  protected readonly canSaveCreate = computed(() => {
+    const draft = this.createDraftState();
+    const normalizedTypeCode = this.normalizeIdentifierTypeCode(draft.key);
+    return normalizedTypeCode.length > 0 && draft.value.trim().length > 0 && !this.isCreateDniInvalid();
+  });
+  protected readonly canSaveEdit = computed(() => {
+    const draft = this.editDraftState();
+    return draft.value.trim().length > 0 && !this.isEditDniInvalid();
   });
   protected readonly sectionState = computed<SectionUiState>(() => {
     const isBusy = this.identifierStore.loading() || this.identifierStore.mutating();
 
     return {
-      mode: isBusy ? 'submitting' : this.toSectionMode(this.displayModeState()),
-      dirty: this.displayModeState() === 'creating' || this.displayModeState() === 'editing',
+      mode: isBusy ? 'submitting' : this.resolveSectionMode(),
+      dirty: this.creatingState() || this.editingKeyState() !== null,
       busy: isBusy,
       errorMessage: this.resolveErrorMessage(),
       successMessage: this.resolveSuccessMessage(),
@@ -118,23 +106,9 @@ export class EmployeeIdentifierSectionComponent {
       untracked(() => {
         this.identifierStore.loadIdentifiers(activeEmployeeKey);
         this.loadCatalogOptions(activeEmployeeKey?.ruleSystemCode ?? null);
-        this.enterViewMode();
+        this.resetInteractionState();
       });
     });
-  }
-
-  protected startManage(): void {
-    if (!this.canStartInteraction()) {
-      return;
-    }
-
-    this.clearInteractionFeedback();
-    this.enterManageMode();
-  }
-
-  protected exitManage(): void {
-    this.clearInteractionFeedback();
-    this.enterViewMode();
   }
 
   protected startCreate(): void {
@@ -143,7 +117,10 @@ export class EmployeeIdentifierSectionComponent {
     }
 
     this.clearInteractionFeedback();
-    this.enterCreateMode();
+    this.creatingState.set(true);
+    this.editingKeyState.set(null);
+    this.deletingKeyState.set(null);
+    this.createDraftState.set(createEmptyIdentifierDraft());
   }
 
   protected startEdit(identifierTypeCode: string): void {
@@ -151,13 +128,22 @@ export class EmployeeIdentifierSectionComponent {
       return;
     }
 
-    const row = this.findRowByKey(identifierTypeCode);
-    if (!row) {
+    const sourceIdentifier = this.findIdentifierByTypeCode(identifierTypeCode);
+    if (!sourceIdentifier) {
       return;
     }
 
     this.clearInteractionFeedback();
-    this.enterEditMode(row);
+    this.creatingState.set(false);
+    this.deletingKeyState.set(null);
+    this.editingKeyState.set(sourceIdentifier.typeCode);
+    this.editDraftState.set({
+      key: sourceIdentifier.typeCode,
+      value: sourceIdentifier.value,
+      issuingCountryCode: sourceIdentifier.issuingCountryCode ?? '',
+      expirationDate: sourceIdentifier.expirationDate ?? '',
+      isPrimary: sourceIdentifier.isPrimary,
+    });
   }
 
   protected requestDelete(identifierTypeCode: string): void {
@@ -171,7 +157,9 @@ export class EmployeeIdentifierSectionComponent {
     }
 
     this.clearInteractionFeedback();
-    this.enterDeleteConfirmMode(row.key);
+    this.creatingState.set(false);
+    this.editingKeyState.set(null);
+    this.deletingKeyState.set(row.key);
   }
 
   protected confirmDelete(identifierTypeCode: string): void {
@@ -181,49 +169,91 @@ export class EmployeeIdentifierSectionComponent {
     }
 
     this.clearLocalError();
-    this.enterManageMode();
+    this.resetInteractionState();
     this.identifierStore.deleteIdentifier(activeEmployeeKey, identifierTypeCode);
   }
 
-  protected cancel(): void {
+  protected cancelCreate(): void {
     this.clearInteractionFeedback();
-    this.enterManageMode();
+    this.resetInteractionState();
   }
 
-  protected updateDraftKey(identifierTypeCode: string | null): void {
-    this.draftState.update((draft) => ({
+  protected cancelEdit(): void {
+    this.clearInteractionFeedback();
+    this.resetInteractionState();
+  }
+
+  protected cancelDelete(): void {
+    this.clearInteractionFeedback();
+    this.resetInteractionState();
+  }
+
+  protected updateCreateDraftKey(identifierTypeCode: string | null): void {
+    this.createDraftState.update((draft) => ({
       ...draft,
       key: identifierTypeCode,
     }));
     this.clearInteractionFeedback();
   }
 
-  protected updateDraftValue(identifierValue: string): void {
-    this.draftState.update((draft) => ({
+  protected updateCreateDraftValue(identifierValue: string): void {
+    this.createDraftState.update((draft) => ({
       ...draft,
       value: identifierValue,
     }));
     this.clearInteractionFeedback();
   }
 
-  protected updateDraftIssuingCountryCode(issuingCountryCode: string): void {
-    this.draftState.update((draft) => ({
+  protected updateCreateDraftIssuingCountryCode(issuingCountryCode: string): void {
+    this.createDraftState.update((draft) => ({
       ...draft,
       issuingCountryCode,
     }));
     this.clearInteractionFeedback();
   }
 
-  protected updateDraftExpirationDate(expirationDate: string): void {
-    this.draftState.update((draft) => ({
+  protected updateCreateDraftExpirationDate(expirationDate: string): void {
+    this.createDraftState.update((draft) => ({
       ...draft,
       expirationDate,
     }));
     this.clearInteractionFeedback();
   }
 
-  protected updateDraftIsPrimary(isPrimary: boolean): void {
-    this.draftState.update((draft) => ({
+  protected updateCreateDraftIsPrimary(isPrimary: boolean): void {
+    this.createDraftState.update((draft) => ({
+      ...draft,
+      isPrimary,
+    }));
+    this.clearInteractionFeedback();
+  }
+
+  protected updateEditDraftValue(identifierValue: string): void {
+    this.editDraftState.update((draft) => ({
+      ...draft,
+      value: identifierValue,
+    }));
+    this.clearInteractionFeedback();
+  }
+
+  protected updateEditDraftIssuingCountryCode(issuingCountryCode: string): void {
+    this.editDraftState.update((draft) => ({
+      ...draft,
+      issuingCountryCode,
+    }));
+    this.clearInteractionFeedback();
+  }
+
+  protected updateEditDraftExpirationDate(expirationDate: string): void {
+    this.editDraftState.update((draft) => ({
+      ...draft,
+      expirationDate,
+    }));
+    this.clearInteractionFeedback();
+  }
+
+  protected updateEditDraftIsPrimary(isPrimary: boolean): void {
+    this.editDraftState.update((draft) => ({
       ...draft,
       isPrimary,
     }));
@@ -236,7 +266,7 @@ export class EmployeeIdentifierSectionComponent {
       return;
     }
 
-    const draft = this.draftState();
+    const draft = this.createDraftState();
     const normalizedTypeCode = this.normalizeIdentifierTypeCode(draft.key);
     if (!normalizedTypeCode) {
       return;
@@ -253,39 +283,41 @@ export class EmployeeIdentifierSectionComponent {
     }
 
     this.clearLocalError();
+    this.resetInteractionState();
     this.identifierStore.createIdentifier(activeEmployeeKey, {
       ...draft,
       key: normalizedTypeCode,
     });
-    this.enterManageMode();
   }
 
-  protected submitEdit(): void {
+  protected submitEdit(identifierTypeCode: string): void {
     const activeEmployeeKey = this.employeeKey();
     if (!activeEmployeeKey || this.identifierStore.mutating()) {
       return;
     }
 
-    const draft = this.draftState();
-    const normalizedTypeCode = this.normalizeIdentifierTypeCode(draft.key);
+    const normalizedTypeCode = this.normalizeIdentifierTypeCode(identifierTypeCode);
     if (!normalizedTypeCode) {
       return;
     }
 
-    if (!this.findIdentifierByTypeCode(normalizedTypeCode)) {
+    const sourceIdentifier = this.findIdentifierByTypeCode(normalizedTypeCode);
+    if (!sourceIdentifier) {
       return;
     }
+
+    const draft = {
+      ...this.editDraftState(),
+      key: normalizedTypeCode,
+    };
 
     if (!this.validateDraftDniForCurrentContext(draft)) {
       return;
     }
 
     this.clearLocalError();
-    this.identifierStore.updateIdentifier(activeEmployeeKey, normalizedTypeCode, {
-      ...draft,
-      key: normalizedTypeCode,
-    });
-    this.enterManageMode();
+    this.resetInteractionState();
+    this.identifierStore.updateIdentifier(activeEmployeeKey, normalizedTypeCode, draft);
   }
 
   private canStartInteraction(): boolean {
@@ -297,7 +329,7 @@ export class EmployeeIdentifierSectionComponent {
     return !this.identifierStore.mutating();
   }
 
-  private findRowByKey(identifierTypeCode: string): SlotRowViewModel<string> | null {
+  private findRowByKey(identifierTypeCode: string): IdentifierRowViewModel | null {
     const normalizedTypeCode = this.normalizeIdentifierTypeCode(identifierTypeCode);
     return this.rows().find((row) => row.key === normalizedTypeCode) ?? null;
   }
@@ -331,46 +363,25 @@ export class EmployeeIdentifierSectionComponent {
     return identifierTypeCode === 'NATIONAL_ID' && issuingCountryCode === 'ESP';
   }
 
-  private enterViewMode(): void {
-    this.displayModeState.set('view');
-    this.resetOperationContext();
-  }
-
-  private enterManageMode(): void {
-    this.displayModeState.set('manage');
-    this.resetOperationContext();
-  }
-
-  private enterCreateMode(): void {
-    this.displayModeState.set('creating');
-    this.editingKeyState.set(null);
-    this.deletingKeyState.set(null);
-    this.draftState.set(createEmptyIdentifierDraft());
-  }
-
-  private enterEditMode(row: SlotRowViewModel<string>): void {
-    const sourceIdentifier = this.findIdentifierByTypeCode(row.key);
-    if (!sourceIdentifier) {
-      return;
+  private isDraftDniInvalid(draft: IdentifierDraft): boolean {
+    if (!this.isDniValidationApplicable(draft)) {
+      return false;
     }
 
-    this.displayModeState.set('editing');
-    this.editingKeyState.set(row.key);
-    this.deletingKeyState.set(null);
-    this.draftState.set({
-      key: sourceIdentifier.typeCode,
-      value: sourceIdentifier.value,
-      issuingCountryCode: sourceIdentifier.issuingCountryCode ?? '',
-      expirationDate: sourceIdentifier.expirationDate ?? '',
-      isPrimary: sourceIdentifier.isPrimary,
-    });
+    const normalizedValue = draft.value.trim();
+    if (normalizedValue.length === 0) {
+      return false;
+    }
+
+    return !isValidSpanishDni(normalizedValue);
   }
 
-  private enterDeleteConfirmMode(identifierTypeCode: string): void {
-    this.displayModeState.set('confirmingDelete');
+  private resetInteractionState(): void {
+    this.creatingState.set(false);
     this.editingKeyState.set(null);
-    this.deletingKeyState.set(identifierTypeCode);
-    this.draftState.set(createEmptyIdentifierDraft());
+    this.deletingKeyState.set(null);
+    this.createDraftState.set(createEmptyIdentifierDraft());
+    this.editDraftState.set(createEmptyIdentifierDraft());
   }
 
   private clearInteractionFeedback(): void {
@@ -382,22 +393,16 @@ export class EmployeeIdentifierSectionComponent {
     this.localErrorMessageState.set(null);
   }
 
-  private resetOperationContext(): void {
-    this.editingKeyState.set(null);
-    this.deletingKeyState.set(null);
-    this.draftState.set(createEmptyIdentifierDraft());
-  }
-
-  private toSectionMode(displayMode: SlotDisplayMode): SectionMode {
-    if (displayMode === 'creating') {
+  private resolveSectionMode(): SectionMode {
+    if (this.creatingState()) {
       return 'creating';
     }
 
-    if (displayMode === 'editing') {
+    if (this.editingKeyState() !== null) {
       return 'editing';
     }
 
-    if (displayMode === 'confirmingDelete') {
+    if (this.deletingKeyState() !== null) {
       return 'confirming';
     }
 
@@ -441,7 +446,7 @@ export class EmployeeIdentifierSectionComponent {
       this.catalogRequestId += 1;
       this.catalogLoadingState.set(false);
       this.availableKeysState.set([]);
-      this.draftState.update((draft) => ({
+      this.createDraftState.update((draft) => ({
         ...draft,
         key: null,
       }));
@@ -465,7 +470,7 @@ export class EmployeeIdentifierSectionComponent {
   }
 
   private syncDraftKeyWithAvailableOptions(options: ReadonlyArray<SlotKeyOption<string>>): void {
-    const currentDraftKey = this.draftState().key;
+    const currentDraftKey = this.createDraftState().key;
     if (!currentDraftKey) {
       return;
     }
@@ -475,7 +480,7 @@ export class EmployeeIdentifierSectionComponent {
       return;
     }
 
-    this.draftState.update((draft) => ({
+    this.createDraftState.update((draft) => ({
       ...draft,
       key: null,
     }));

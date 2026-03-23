@@ -1,127 +1,180 @@
-<app-editable-slot-section
-  [title]="texts.identifiersSectionTitle"
-  [subtitle]="sectionSubtitle"
-  [state]="sectionState()"
-  [displayMode]="displayMode()"
-  [rows]="rows()"
-  [texts]="slotTexts"
-  [draft]="slotDraft()"
-  [editingKey]="editingKey()"
-  [deletingKey]="deletingKey()"
-  [availableKeys]="availableKeys()"
-  [canCreate]="true"
-  [canEdit]="true"
-  [canDelete]="true"
-  (manageStarted)="startManage()"
-  (manageExited)="exitManage()"
-  (createStarted)="startCreate()"
-  (editStarted)="startEdit($event)"
-  (deleteRequested)="requestDelete($event)"
-  (deleteConfirmed)="confirmDelete($event)"
-  (cancelled)="cancel()"
-  (createSubmitted)="submitCreate()"
-  (editSubmitted)="submitEdit()"
->
-  <ng-template #slotCreateForm slotCreateForm>
-    <div class="employee-identifier-section__form-grid">
-      <label class="employee-identifier-section__field employee-identifier-section__field--key">
-        <span>{{ texts.identifiersSectionKeyFieldLabel }}</span>
-        <select [disabled]="catalogOptionsLoading()" [value]="draft().key ?? ''" (change)="updateDraftKey($any($event.target).value)">
-          <option value="">{{ texts.identifiersSectionKeyFieldLabel }}</option>
-          @for (option of availableKeys(); track option.value) {
-            <option [value]="option.value">{{ option.label }}</option>
-          }
-        </select>
-      </label>
+<app-employee-section-shell [title]="sectionTitle" [subtitle]="sectionSubtitle" [state]="sectionState()">
+  <div sectionShellHeaderActions class="employee-identifier-section__header-actions">
+    <button type="button" [disabled]="sectionState().busy || creating()" (click)="startCreate()">
+      {{ texts.identifiersSectionAddAction }}
+    </button>
+  </div>
 
-      <label class="employee-identifier-section__field employee-identifier-section__field--value">
-        <span>{{ texts.identifiersSectionValueFieldLabel }}</span>
-        <input
-          type="text"
-          [class.employee-identifier-section__input--invalid]="isDniInvalid()"
-          [value]="draft().value"
-          (input)="updateDraftValue($any($event.target).value)"
-        />
-        @if (isDniInvalid()) {
-          <small class="employee-identifier-section__field-error">{{ texts.identifiersSectionInvalidDniMessage }}</small>
+  <div class="employee-identifier-section__body">
+    @if (creating()) {
+      <article class="employee-identifier-section__slot employee-identifier-section__slot--create">
+        <div class="employee-identifier-section__form-grid">
+          <label class="employee-identifier-section__field employee-identifier-section__field--key">
+            <span>{{ texts.identifiersSectionKeyFieldLabel }}</span>
+            <select
+              [disabled]="catalogOptionsLoading() || sectionState().busy"
+              [value]="createDraft().key ?? ''"
+              (change)="updateCreateDraftKey($any($event.target).value || null)"
+            >
+              <option value="">{{ texts.identifiersSectionKeyFieldLabel }}</option>
+              @for (option of availableKeys(); track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </label>
+
+          <label class="employee-identifier-section__field employee-identifier-section__field--value">
+            <span>{{ texts.identifiersSectionValueFieldLabel }}</span>
+            <input
+              type="text"
+              [class.employee-identifier-section__input--invalid]="isCreateDniInvalid()"
+              [value]="createDraft().value"
+              (input)="updateCreateDraftValue($any($event.target).value)"
+            />
+            @if (isCreateDniInvalid()) {
+              <small class="employee-identifier-section__field-error">{{ texts.identifiersSectionInvalidDniMessage }}</small>
+            }
+          </label>
+
+          <label class="employee-identifier-section__field employee-identifier-section__field--country">
+            <span>{{ texts.identifiersSectionIssuingCountryLabel }}</span>
+            <input
+              type="text"
+              [value]="createDraft().issuingCountryCode"
+              (input)="updateCreateDraftIssuingCountryCode($any($event.target).value)"
+            />
+          </label>
+
+          <label class="employee-identifier-section__field employee-identifier-section__field--date">
+            <span>{{ texts.identifiersSectionExpirationDateLabel }}</span>
+            <input
+              type="date"
+              [value]="createDraft().expirationDate"
+              (input)="updateCreateDraftExpirationDate($any($event.target).value)"
+            />
+          </label>
+
+          <label class="employee-identifier-section__checkbox-field">
+            <input
+              type="checkbox"
+              [checked]="createDraft().isPrimary"
+              (change)="updateCreateDraftIsPrimary($any($event.target).checked)"
+            />
+            <span>{{ texts.identifiersSectionIsPrimaryLabel }}</span>
+          </label>
+        </div>
+
+        <div class="employee-identifier-section__row-actions">
+          <button type="button" [disabled]="!canSaveCreate() || sectionState().busy" (click)="submitCreate()">
+            {{ texts.identifiersSectionSaveCreateAction }}
+          </button>
+          <button type="button" class="employee-identifier-section__secondary-action" [disabled]="sectionState().busy" (click)="cancelCreate()">
+            {{ texts.identifiersSectionCancelAction }}
+          </button>
+        </div>
+      </article>
+    }
+
+    @if (hasRows()) {
+      <ul class="employee-identifier-section__list" role="list" [attr.aria-label]="texts.identifiersSectionListAriaLabel">
+        @for (row of rows(); track row.key) {
+          <li class="employee-identifier-section__row">
+            <div class="employee-identifier-section__row-main">
+              <div class="employee-identifier-section__row-heading">
+                <p class="employee-identifier-section__row-type">{{ row.typeLabel }}</p>
+                @for (badge of row.badges; track badge) {
+                  <span class="employee-identifier-section__badge">{{ badge }}</span>
+                }
+              </div>
+
+              @if (editingKey() === row.key) {
+                <div class="employee-identifier-section__form-grid employee-identifier-section__form-grid--edit">
+                  <div class="employee-identifier-section__readonly-field employee-identifier-section__field employee-identifier-section__field--key">
+                    <span>{{ texts.identifiersSectionKeyFieldLabel }}</span>
+                    <strong>{{ row.typeLabel }}</strong>
+                  </div>
+
+                  <label class="employee-identifier-section__field employee-identifier-section__field--value">
+                    <span>{{ texts.identifiersSectionValueFieldLabel }}</span>
+                    <input
+                      type="text"
+                      [class.employee-identifier-section__input--invalid]="isEditDniInvalid()"
+                      [value]="editDraft().value"
+                      (input)="updateEditDraftValue($any($event.target).value)"
+                    />
+                    @if (isEditDniInvalid()) {
+                      <small class="employee-identifier-section__field-error">{{ texts.identifiersSectionInvalidDniMessage }}</small>
+                    }
+                  </label>
+
+                  <label class="employee-identifier-section__field employee-identifier-section__field--country">
+                    <span>{{ texts.identifiersSectionIssuingCountryLabel }}</span>
+                    <input
+                      type="text"
+                      [value]="editDraft().issuingCountryCode"
+                      (input)="updateEditDraftIssuingCountryCode($any($event.target).value)"
+                    />
+                  </label>
+
+                  <label class="employee-identifier-section__field employee-identifier-section__field--date">
+                    <span>{{ texts.identifiersSectionExpirationDateLabel }}</span>
+                    <input
+                      type="date"
+                      [value]="editDraft().expirationDate"
+                      (input)="updateEditDraftExpirationDate($any($event.target).value)"
+                    />
+                  </label>
+
+                  <label class="employee-identifier-section__checkbox-field">
+                    <input
+                      type="checkbox"
+                      [checked]="editDraft().isPrimary"
+                      (change)="updateEditDraftIsPrimary($any($event.target).checked)"
+                    />
+                    <span>{{ texts.identifiersSectionIsPrimaryLabel }}</span>
+                  </label>
+                </div>
+              } @else {
+                <p class="employee-identifier-section__row-value">{{ row.value }}</p>
+                @if (row.secondaryText) {
+                  <p class="employee-identifier-section__row-meta">{{ row.secondaryText }}</p>
+                }
+              }
+
+              @if (deletingKey() === row.key) {
+                <p class="employee-identifier-section__confirm-text">{{ texts.identifiersSectionConfirmDeleteMessage }}</p>
+              }
+            </div>
+
+            <div class="employee-identifier-section__row-actions">
+              @if (editingKey() === row.key) {
+                <button type="button" [disabled]="!canSaveEdit() || sectionState().busy" (click)="submitEdit(row.key)">
+                  {{ texts.identifiersSectionSaveEditAction }}
+                </button>
+                <button type="button" class="employee-identifier-section__secondary-action" [disabled]="sectionState().busy" (click)="cancelEdit()">
+                  {{ texts.identifiersSectionCancelAction }}
+                </button>
+              } @else if (deletingKey() === row.key) {
+                <button type="button" class="employee-identifier-section__danger-action" [disabled]="sectionState().busy" (click)="confirmDelete(row.key)">
+                  {{ texts.identifiersSectionDeleteAction }}
+                </button>
+                <button type="button" class="employee-identifier-section__secondary-action" [disabled]="sectionState().busy" (click)="cancelDelete()">
+                  {{ texts.identifiersSectionCancelAction }}
+                </button>
+              } @else {
+                <button type="button" [disabled]="sectionState().busy" (click)="startEdit(row.key)">
+                  {{ texts.identifiersSectionEditAction }}
+                </button>
+                <button type="button" class="employee-identifier-section__danger-action" [disabled]="sectionState().busy" (click)="requestDelete(row.key)">
+                  {{ texts.identifiersSectionDeleteAction }}
+                </button>
+              }
+            </div>
+          </li>
         }
-      </label>
-
-      <label class="employee-identifier-section__field employee-identifier-section__field--country">
-        <span>{{ texts.identifiersSectionIssuingCountryLabel }}</span>
-        <input
-          type="text"
-          [value]="draft().issuingCountryCode"
-          (input)="updateDraftIssuingCountryCode($any($event.target).value)"
-        />
-      </label>
-
-      <label class="employee-identifier-section__field employee-identifier-section__field--date">
-        <span>{{ texts.identifiersSectionExpirationDateLabel }}</span>
-        <input
-          type="date"
-          [value]="draft().expirationDate"
-          (input)="updateDraftExpirationDate($any($event.target).value)"
-        />
-      </label>
-
-      <label class="employee-identifier-section__checkbox-field">
-        <input
-          type="checkbox"
-          [checked]="draft().isPrimary"
-          (change)="updateDraftIsPrimary($any($event.target).checked)"
-        />
-        <span>{{ texts.identifiersSectionIsPrimaryLabel }}</span>
-      </label>
-    </div>
-  </ng-template>
-
-  <ng-template #slotEditForm slotEditForm>
-    <div class="employee-identifier-section__form-grid">
-      <div class="employee-identifier-section__readonly-field employee-identifier-section__field employee-identifier-section__field--key">
-        <span>{{ texts.identifiersSectionKeyFieldLabel }}</span>
-        <strong>{{ draft().key }}</strong>
-      </div>
-
-      <label class="employee-identifier-section__field employee-identifier-section__field--value">
-        <span>{{ texts.identifiersSectionValueFieldLabel }}</span>
-        <input
-          type="text"
-          [class.employee-identifier-section__input--invalid]="isDniInvalid()"
-          [value]="draft().value"
-          (input)="updateDraftValue($any($event.target).value)"
-        />
-        @if (isDniInvalid()) {
-          <small class="employee-identifier-section__field-error">{{ texts.identifiersSectionInvalidDniMessage }}</small>
-        }
-      </label>
-
-      <label class="employee-identifier-section__field employee-identifier-section__field--country">
-        <span>{{ texts.identifiersSectionIssuingCountryLabel }}</span>
-        <input
-          type="text"
-          [value]="draft().issuingCountryCode"
-          (input)="updateDraftIssuingCountryCode($any($event.target).value)"
-        />
-      </label>
-
-      <label class="employee-identifier-section__field employee-identifier-section__field--date">
-        <span>{{ texts.identifiersSectionExpirationDateLabel }}</span>
-        <input
-          type="date"
-          [value]="draft().expirationDate"
-          (input)="updateDraftExpirationDate($any($event.target).value)"
-        />
-      </label>
-
-      <label class="employee-identifier-section__checkbox-field">
-        <input
-          type="checkbox"
-          [checked]="draft().isPrimary"
-          (change)="updateDraftIsPrimary($any($event.target).checked)"
-        />
-        <span>{{ texts.identifiersSectionIsPrimaryLabel }}</span>
-      </label>
-    </div>
-  </ng-template>
-</app-editable-slot-section>
+      </ul>
+    } @else if (!creating()) {
+      <p class="employee-identifier-section__empty">{{ texts.identifiersSectionEmptyMessage }}</p>
+    }
+  </div>
+</app-employee-section-shell>

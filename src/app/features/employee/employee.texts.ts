@@ -166,6 +166,7 @@ export const employeeTexts = {
   identifiersSectionConfirmDeleteMessage: 'Confirma la eliminacion de este identificador.',
   identifiersSectionConfirmDeleteAction: 'Confirmar eliminacion',
   identifiersSectionEmptyMessage: 'No hay identificadores cargados.',
+  identifiersSectionListAriaLabel: 'Listado de identificadores del empleado',
   identifiersSectionKeyFieldLabel: 'Tipo de identificador',
   identifiersSectionValueFieldLabel: 'Valor del identificador',
   identifiersSectionIssuingCountryLabel: 'Pais emisor',

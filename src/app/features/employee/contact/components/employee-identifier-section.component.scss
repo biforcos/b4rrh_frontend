@@ -1,8 +1,36 @@
+.employee-identifier-section__header-actions button {
+  border: 1px solid #bfcfe0;
+  border-radius: 0.45rem;
+  background: #eef4fb;
+  color: #274055;
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1;
+  padding: 0.34rem 0.56rem;
+  cursor: pointer;
+}
+
+.employee-identifier-section__header-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.employee-identifier-section__body {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.employee-identifier-section__slot {
+  border: 1px solid #dce6f1;
+  border-radius: 0.65rem;
+  background: #fcfdff;
+  padding: 0.64rem;
+}
+
 .employee-identifier-section__form-grid {
   display: grid;
-  gap: 0.22rem;
+  gap: 0.4rem;
   width: 100%;
-  max-width: 52rem;
 }
 
 .employee-identifier-section__form-grid label,
@@ -13,7 +41,7 @@
 
 .employee-identifier-section__form-grid span,
 .employee-identifier-section__readonly-field span {
-  font-size: 0.62rem;
+  font-size: 0.68rem;
   line-height: 1.2;
   color: #5f7386;
 }
@@ -25,10 +53,10 @@
   border-radius: 0.42rem;
   background: #ffffff;
   color: #1f3246;
-  font-size: 0.67rem;
+  font-size: 0.75rem;
   line-height: 1.2;
-  padding: 0.22rem 0.32rem;
-  min-height: 1.8rem;
+  padding: 0.34rem 0.42rem;
+  min-height: 2rem;
 }
 
 .employee-identifier-section__form-grid input[type='text']:focus-visible,
@@ -46,7 +74,7 @@
 }
 
 .employee-identifier-section__field-error {
-  font-size: 0.62rem;
+  font-size: 0.68rem;
   line-height: 1.2;
   color: #b42318;
 }
@@ -59,7 +87,7 @@
 }
 
 .employee-identifier-section__checkbox-field span {
-  font-size: 0.66rem;
+  font-size: 0.7rem;
   color: #3c546b;
 }
 
@@ -70,7 +98,7 @@
 }
 
 .employee-identifier-section__readonly-field strong {
-  font-size: 0.7rem;
+  font-size: 0.74rem;
   color: #1f3246;
 }
 
@@ -78,20 +106,122 @@
   border: 1px solid #d4dfea;
   border-radius: 0.42rem;
   background: #f7fbff;
-  padding: 0.24rem 0.34rem;
+  padding: 0.34rem 0.42rem;
 }
 
-.employee-identifier-section__field--country,
-.employee-identifier-section__field--date {
-  max-width: 16rem;
+.employee-identifier-section__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.56rem;
 }
 
-.employee-identifier-section__field--country input[type='text'] {
-  max-width: 12rem;
+.employee-identifier-section__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.7rem;
+  border: 1px solid #dbe5f0;
+  border-radius: 0.62rem;
+  background: #ffffff;
+  padding: 0.56rem;
 }
 
-.employee-identifier-section__field--date input[type='date'] {
-  max-width: 12rem;
+.employee-identifier-section__row-main {
+  min-width: 0;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.employee-identifier-section__row-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.employee-identifier-section__row-type {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #2d4458;
+}
+
+.employee-identifier-section__badge {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #bfd4ea;
+  border-radius: 999px;
+  background: #edf5fd;
+  color: #2d4b67;
+  font-size: 0.66rem;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0.16rem 0.42rem;
+}
+
+.employee-identifier-section__row-value {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #475f74;
+}
+
+.employee-identifier-section__row-meta {
+  margin: 0;
+  font-size: 0.72rem;
+  color: #6a8196;
+}
+
+.employee-identifier-section__confirm-text {
+  margin: 0;
+  font-size: 0.72rem;
+  color: #7a2530;
+}
+
+.employee-identifier-section__row-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.32rem;
+}
+
+.employee-identifier-section__row-actions button {
+  border: 1px solid #c6d4e3;
+  border-radius: 0.45rem;
+  background: #f5f9fe;
+  color: #264052;
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1;
+  padding: 0.34rem 0.56rem;
+  cursor: pointer;
+}
+
+.employee-identifier-section__row-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.employee-identifier-section__secondary-action {
+  background: #fbfcff;
+  color: #4b6073;
+}
+
+.employee-identifier-section__danger-action {
+  border-color: #d8bdc2;
+  background: #fbf3f4;
+  color: #8a1f2e;
+}
+
+.employee-identifier-section__empty {
+  margin: 0;
+  border: 1px dashed #d1deea;
+  border-radius: 0.62rem;
+  background: #fbfdff;
+  color: #5a7185;
+  font-size: 0.79rem;
+  padding: 0.55rem 0.62rem;
 }
 
 @media (min-width: 900px) {
@@ -104,21 +234,14 @@
   .employee-identifier-section__checkbox-field {
     grid-column: 1 / -1;
   }
-
-  .employee-identifier-section__field--value {
-    max-width: none;
-  }
 }
 
 @media (max-width: 899px) {
-  .employee-identifier-section__form-grid {
-    max-width: none;
+  .employee-identifier-section__row {
+    flex-direction: column;
   }
 
-  .employee-identifier-section__field--country,
-  .employee-identifier-section__field--date,
-  .employee-identifier-section__field--country input[type='text'],
-  .employee-identifier-section__field--date input[type='date'] {
-    max-width: none;
+  .employee-identifier-section__row-actions {
+    justify-content: flex-start;
   }
 }
