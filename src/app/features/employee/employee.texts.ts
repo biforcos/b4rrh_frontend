@@ -223,6 +223,12 @@ export const employeeTexts = {
   addressesSectionPostalCodeLabel: 'Codigo postal',
   addressesSectionRegionLabel: 'Region',
   addressesSectionStartDateLabel: 'Fecha inicio',
+  addressesSectionEndDateLabel: 'Periodo',
+  addressesSectionCurrentBadge: 'Actual',
+  addressesSectionCurrentAriaLabel: 'Direccion actual del empleado',
+  addressesSectionCurrentTitle: 'Direcciones actuales',
+  addressesSectionHistoricalTitle: 'Historico de direcciones',
+  addressesSectionListAriaLabel: 'Listado historico de direcciones del empleado',
   workCenterSectionTitle: 'Centro de trabajo',
   workCenterSectionSubtitle:
     'Gestiona la asignacion vigente y el historico de centros de trabajo. Permite alta, cierre y correccion administrativa de ocurrencias.',

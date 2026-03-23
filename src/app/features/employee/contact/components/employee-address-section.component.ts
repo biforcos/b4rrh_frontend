@@ -10,10 +10,23 @@ import { EmployeeFieldCatalogService } from '../../data-access/employee-field-ca
 import { EmployeeAddressStore } from '../../data-access/employee-address.store';
 import { employeeTexts } from '../../employee.texts';
 import { EmployeeBusinessKey } from '../../models/employee-business-key.model';
-import { TemporalSectionComponent } from '../../shared/ui/section/temporal-section.component';
+import { EmployeeSectionShellComponent } from '../../shared/ui/section/employee-section-shell.component';
 import { SlotKeyOption } from '../../shared/ui/section/editable-slot-section.model';
-import { TemporalDisplayMode, TemporalRowViewModel, TemporalSectionTexts } from '../../shared/ui/section/temporal-section.model';
 import { SectionMode, SectionUiState } from '../../shared/ui/section/section-ui-state.model';
+
+type AddressInteractionMode = 'view' | 'creating' | 'editingCurrent' | 'confirmingClose';
+
+interface AddressRowViewModel {
+  key: number;
+  title: string;
+  titleSecondary: string | null;
+  subtitle: string | null;
+  detailText: string | null;
+  periodText: string | null;
+  statusLabel: string | null;
+  isCurrent: boolean;
+  closeable: boolean;
+}
 
 function createEmptyAddressCreateDraft(): AddressCreateDraft {
   return {
@@ -40,7 +53,7 @@ function createEmptyAddressEditCurrentDraft(): AddressEditCurrentDraft {
 @Component({
   selector: 'app-employee-address-section',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TemporalSectionComponent],
+  imports: [EmployeeSectionShellComponent],
   templateUrl: './employee-address-section.component.html',
   styleUrl: './employee-address-section.component.scss',
 })
@@ -49,7 +62,7 @@ export class EmployeeAddressSectionComponent {
 
   private readonly addressStore = inject(EmployeeAddressStore);
   private readonly fieldCatalogService = inject(EmployeeFieldCatalogService);
-  private readonly displayModeState = signal<TemporalDisplayMode>('view');
+  private readonly modeState = signal<AddressInteractionMode>('view');
   private readonly localErrorMessageState = signal<string | null>(null);
   private readonly confirmingCloseKeyState = signal<number | null>(null);
   private readonly editingCurrentKeyState = signal<number | null>(null);
@@ -61,26 +74,9 @@ export class EmployeeAddressSectionComponent {
   private catalogRequestId = 0;
 
   protected readonly texts = employeeTexts;
+  protected readonly sectionTitle = this.texts.addressesSectionTitle;
   protected readonly sectionSubtitle = this.texts.addressesSectionSubtitle;
-  protected readonly sectionTexts: TemporalSectionTexts = {
-    manageAction: this.texts.addressesSectionManageAction,
-    exitManageAction: this.texts.addressesSectionExitManageAction,
-    addAction: this.texts.addressesSectionAddAction,
-    editCurrentAction: this.texts.addressesSectionEditCurrentAction,
-    correctAction: this.texts.addressesSectionEditCurrentAction,
-    closeAction: this.texts.addressesSectionCloseAction,
-    deleteAction: this.texts.addressesSectionCloseAction,
-    cancelAction: this.texts.addressesSectionCancelAction,
-    saveCreateAction: this.texts.addressesSectionSaveCreateAction,
-    saveEditCurrentAction: this.texts.addressesSectionSaveEditCurrentAction,
-    saveCorrectAction: this.texts.addressesSectionSaveEditCurrentAction,
-    confirmCloseMessage: this.texts.addressesSectionConfirmCloseMessage,
-    confirmCloseAction: this.texts.addressesSectionConfirmCloseAction,
-    confirmDeleteMessage: this.texts.addressesSectionConfirmCloseMessage,
-    confirmDeleteAction: this.texts.addressesSectionConfirmCloseAction,
-    emptyMessage: this.texts.addressesSectionEmptyMessage,
-  };
-  protected readonly rows = computed<ReadonlyArray<TemporalRowViewModel<number>>>(() =>
+  protected readonly rows = computed<ReadonlyArray<AddressRowViewModel>>(() =>
     [...this.addressStore.addresses()]
       .sort((left, right) => this.compareAddressOrder(left, right))
       .map((address) =>
@@ -89,19 +85,33 @@ export class EmployeeAddressSectionComponent {
           closedStatus: this.texts.addressesSectionClosedStatus,
           currentPeriodLabel: this.texts.addressesSectionCurrentPeriodLabel,
         }),
-      ),
+      )
+      .map((row) => ({
+        key: row.key,
+        title: row.title,
+        titleSecondary: row.titleSecondary ?? null,
+        subtitle: row.subtitle ?? null,
+        detailText: row.detailText ?? null,
+        periodText: row.periodText ?? null,
+        statusLabel: row.statusLabel ?? null,
+        isCurrent: row.isCurrent === true,
+        closeable: row.closeable === true,
+      })),
   );
-  protected readonly displayMode = this.displayModeState.asReadonly();
+  protected readonly currentAddresses = computed(() => this.rows().filter((row) => row.isCurrent === true));
+  protected readonly historicalAddresses = computed(() => this.rows().filter((row) => row.isCurrent === false));
+  protected readonly hasCurrentAddresses = computed(() => this.currentAddresses().length > 0);
+  protected readonly hasHistoricalAddresses = computed(() => this.historicalAddresses().length > 0);
+  protected readonly creating = computed(() => this.modeState() === 'creating');
+  protected readonly editingCurrent = computed(() => this.modeState() === 'editingCurrent');
+  protected readonly confirmingClose = computed(() => this.modeState() === 'confirmingClose');
   protected readonly confirmingCloseKey = this.confirmingCloseKeyState.asReadonly();
   protected readonly editingCurrentKey = this.editingCurrentKeyState.asReadonly();
   protected readonly createDraft = this.createDraftState.asReadonly();
   protected readonly editCurrentDraft = this.editCurrentDraftState.asReadonly();
   protected readonly availableAddressTypeOptions = this.availableAddressTypeOptionsState.asReadonly();
   protected readonly catalogOptionsLoading = this.catalogLoadingState.asReadonly();
-  protected readonly currentAddress = computed(
-    () => this.addressStore.addresses().find((address) => address.isActive) ?? null,
-  );
-  protected readonly isCreateDraftValid = computed(() => {
+  protected readonly canSaveCreate = computed(() => {
     const draft = this.createDraftState();
 
     return (
@@ -112,7 +122,7 @@ export class EmployeeAddressSectionComponent {
       this.normalizeRequiredValue(draft.startDate).length > 0
     );
   });
-  protected readonly isEditCurrentDraftValid = computed(() => {
+  protected readonly canSaveEditCurrent = computed(() => {
     const draft = this.editCurrentDraftState();
 
     return (
@@ -125,8 +135,8 @@ export class EmployeeAddressSectionComponent {
     const isBusy = this.addressStore.loading() || this.addressStore.mutating();
 
     return {
-      mode: isBusy ? 'submitting' : this.toSectionMode(this.displayModeState()),
-      dirty: this.displayModeState() === 'creating' || this.displayModeState() === 'editingCurrent',
+      mode: isBusy ? 'submitting' : this.toSectionMode(this.modeState()),
+      dirty: this.modeState() === 'creating' || this.modeState() === 'editingCurrent',
       busy: isBusy,
       errorMessage: this.resolveErrorMessage(),
       successMessage: this.resolveSuccessMessage(),
@@ -140,23 +150,9 @@ export class EmployeeAddressSectionComponent {
       untracked(() => {
         this.addressStore.loadAddresses(activeEmployeeKey);
         this.loadCatalogOptions(activeEmployeeKey?.ruleSystemCode ?? null);
-        this.enterViewMode();
+        this.resetInteractionState();
       });
     });
-  }
-
-  protected startManage(): void {
-    if (!this.canStartInteraction()) {
-      return;
-    }
-
-    this.clearInteractionFeedback();
-    this.enterManageMode();
-  }
-
-  protected exitManage(): void {
-    this.clearInteractionFeedback();
-    this.enterViewMode();
   }
 
   protected startCreate(): void {
@@ -165,7 +161,11 @@ export class EmployeeAddressSectionComponent {
     }
 
     this.clearInteractionFeedback();
-    this.enterCreateMode();
+    this.modeState.set('creating');
+    this.editingCurrentKeyState.set(null);
+    this.confirmingCloseKeyState.set(null);
+    this.createDraftState.set(createEmptyAddressCreateDraft());
+    this.editCurrentDraftState.set(createEmptyAddressEditCurrentDraft());
   }
 
   protected startEditCurrent(addressNumber: number): void {
@@ -181,7 +181,11 @@ export class EmployeeAddressSectionComponent {
     }
 
     this.clearInteractionFeedback();
-    this.enterEditingCurrentMode(activeAddress.addressNumber, {
+    this.modeState.set('editingCurrent');
+    this.editingCurrentKeyState.set(activeAddress.addressNumber);
+    this.confirmingCloseKeyState.set(null);
+    this.createDraftState.set(createEmptyAddressCreateDraft());
+    this.editCurrentDraftState.set({
       street: activeAddress.street,
       city: activeAddress.city,
       countryCode: activeAddress.countryCode,
@@ -201,7 +205,9 @@ export class EmployeeAddressSectionComponent {
     }
 
     this.clearInteractionFeedback();
-    this.enterConfirmingCloseMode(addressNumber);
+    this.modeState.set('confirmingClose');
+    this.editingCurrentKeyState.set(null);
+    this.confirmingCloseKeyState.set(addressNumber);
   }
 
   protected confirmCloseCurrent(addressNumber: number): void {
@@ -211,43 +217,47 @@ export class EmployeeAddressSectionComponent {
     }
 
     this.clearLocalError();
+    this.resetInteractionState();
     this.addressStore.closeAddress(activeEmployeeKey, addressNumber, this.currentBusinessDate());
-    this.enterManageMode();
   }
 
-  protected cancel(): void {
+  protected cancelCreate(): void {
     this.clearInteractionFeedback();
-    this.enterManageMode();
+    this.resetInteractionState();
+  }
+
+  protected cancelEditCurrent(): void {
+    this.clearInteractionFeedback();
+    this.resetInteractionState();
+  }
+
+  protected cancelCloseCurrent(): void {
+    this.clearInteractionFeedback();
+    this.resetInteractionState();
   }
 
   protected submitCreate(): void {
     const activeEmployeeKey = this.employeeKey();
-    if (!activeEmployeeKey || this.addressStore.mutating() || !this.isCreateDraftValid()) {
+    if (!activeEmployeeKey || this.addressStore.mutating() || !this.canSaveCreate()) {
       return;
     }
 
     const draft = this.createDraftState();
     this.clearLocalError();
+    this.resetInteractionState();
     this.addressStore.createAddress(activeEmployeeKey, draft);
-    this.enterManageMode();
   }
 
-  protected submitEditCurrent(): void {
+  protected submitEditCurrent(addressNumber: number): void {
     const activeEmployeeKey = this.employeeKey();
-    const editingAddressNumber = this.editingCurrentKeyState();
-    if (
-      !activeEmployeeKey ||
-      editingAddressNumber === null ||
-      this.addressStore.mutating() ||
-      !this.isEditCurrentDraftValid()
-    ) {
+    if (!activeEmployeeKey || this.addressStore.mutating() || !this.canSaveEditCurrent()) {
       return;
     }
 
     const draft = this.editCurrentDraftState();
     this.clearLocalError();
-    this.addressStore.updateAddress(activeEmployeeKey, editingAddressNumber, draft);
-    this.enterManageMode();
+    this.resetInteractionState();
+    this.addressStore.updateAddress(activeEmployeeKey, addressNumber, draft);
   }
 
   protected updateCreateField(field: keyof AddressCreateDraft, value: string): void {
@@ -275,36 +285,10 @@ export class EmployeeAddressSectionComponent {
     return !this.addressStore.mutating();
   }
 
-  private enterViewMode(): void {
-    this.displayModeState.set('view');
-    this.resetOperationContext();
-  }
-
-  private enterManageMode(): void {
-    this.displayModeState.set('manage');
-    this.resetOperationContext();
-  }
-
-  private enterCreateMode(): void {
-    this.displayModeState.set('creating');
+  private resetInteractionState(): void {
+    this.modeState.set('view');
     this.editingCurrentKeyState.set(null);
     this.confirmingCloseKeyState.set(null);
-    this.createDraftState.set(createEmptyAddressCreateDraft());
-    this.editCurrentDraftState.set(createEmptyAddressEditCurrentDraft());
-  }
-
-  private enterEditingCurrentMode(addressNumber: number, draft: AddressEditCurrentDraft): void {
-    this.displayModeState.set('editingCurrent');
-    this.editingCurrentKeyState.set(addressNumber);
-    this.confirmingCloseKeyState.set(null);
-    this.createDraftState.set(createEmptyAddressCreateDraft());
-    this.editCurrentDraftState.set(draft);
-  }
-
-  private enterConfirmingCloseMode(addressNumber: number): void {
-    this.displayModeState.set('confirmingClose');
-    this.editingCurrentKeyState.set(null);
-    this.confirmingCloseKeyState.set(addressNumber);
     this.createDraftState.set(createEmptyAddressCreateDraft());
     this.editCurrentDraftState.set(createEmptyAddressEditCurrentDraft());
   }
@@ -318,14 +302,7 @@ export class EmployeeAddressSectionComponent {
     this.localErrorMessageState.set(null);
   }
 
-  private resetOperationContext(): void {
-    this.editingCurrentKeyState.set(null);
-    this.confirmingCloseKeyState.set(null);
-    this.createDraftState.set(createEmptyAddressCreateDraft());
-    this.editCurrentDraftState.set(createEmptyAddressEditCurrentDraft());
-  }
-
-  private toSectionMode(displayMode: TemporalDisplayMode): SectionMode {
+  private toSectionMode(displayMode: AddressInteractionMode): SectionMode {
     if (displayMode === 'creating') {
       return 'creating';
     }

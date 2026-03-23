@@ -1,111 +1,261 @@
-<app-temporal-section
-  [title]="texts.addressesSectionTitle"
-  [subtitle]="sectionSubtitle"
-  [state]="sectionState()"
-  [displayMode]="displayMode()"
-  [rows]="rows()"
-  [texts]="sectionTexts"
-  [confirmingCloseKey]="confirmingCloseKey()"
-  [editingCurrentKey]="editingCurrentKey()"
-  [canCreate]="true"
-  [canEditCurrent]="true"
-  [canClose]="true"
-  [createSubmitEnabled]="isCreateDraftValid()"
-  [editSubmitEnabled]="isEditCurrentDraftValid()"
-  (manageStarted)="startManage()"
-  (manageExited)="exitManage()"
-  (createStarted)="startCreate()"
-  (editCurrentStarted)="startEditCurrent($event)"
-  (closeRequested)="requestCloseCurrent($event)"
-  (closeConfirmed)="confirmCloseCurrent($event)"
-  (cancelled)="cancel()"
-  (createSubmitted)="submitCreate()"
-  (editCurrentSubmitted)="submitEditCurrent()"
->
-  <div temporalCreateForm class="employee-address-section__form-grid">
-    <label class="employee-address-section__field employee-address-section__field--type">
-      <span>{{ texts.addressesSectionTypeLabel }}</span>
-      <select
-        [disabled]="catalogOptionsLoading()"
-        [value]="createDraft().addressTypeCode"
-        (change)="updateCreateField('addressTypeCode', $any($event.target).value)"
-      >
-        <option value="">{{ texts.addressesSectionTypeLabel }}</option>
-        @for (option of availableAddressTypeOptions(); track option.value) {
-          <option [value]="option.value">{{ option.label }}</option>
-        }
-      </select>
-    </label>
-
-    <label class="employee-address-section__field employee-address-section__field--street">
-      <span>{{ texts.addressesSectionStreetLabel }}</span>
-      <input type="text" [value]="createDraft().street" (input)="updateCreateField('street', $any($event.target).value)" />
-    </label>
-
-    <label class="employee-address-section__field employee-address-section__field--city">
-      <span>{{ texts.addressesSectionCityLabel }}</span>
-      <input type="text" [value]="createDraft().city" (input)="updateCreateField('city', $any($event.target).value)" />
-    </label>
-
-    <label class="employee-address-section__field employee-address-section__field--country">
-      <span>{{ texts.addressesSectionCountryLabel }}</span>
-      <input type="text" [value]="createDraft().countryCode" (input)="updateCreateField('countryCode', $any($event.target).value)" />
-    </label>
-
-    <label class="employee-address-section__field employee-address-section__field--date">
-      <span>{{ texts.addressesSectionStartDateLabel }}</span>
-      <input type="date" [value]="createDraft().startDate" (input)="updateCreateField('startDate', $any($event.target).value)" />
-    </label>
-
-    <label class="employee-address-section__field employee-address-section__field--postal">
-      <span>{{ texts.addressesSectionPostalCodeLabel }}</span>
-      <input type="text" [value]="createDraft().postalCode" (input)="updateCreateField('postalCode', $any($event.target).value)" />
-    </label>
-
-    <label class="employee-address-section__field employee-address-section__field--region">
-      <span>{{ texts.addressesSectionRegionLabel }}</span>
-      <input type="text" [value]="createDraft().regionCode" (input)="updateCreateField('regionCode', $any($event.target).value)" />
-    </label>
+<app-employee-section-shell [title]="sectionTitle" [subtitle]="sectionSubtitle" [state]="sectionState()">
+  <div sectionShellHeaderActions class="employee-address-section__header-actions">
+    <button type="button" [disabled]="sectionState().busy || creating()" (click)="startCreate()">
+      {{ texts.addressesSectionAddAction }}
+    </button>
   </div>
 
-  <div temporalEditCurrentForm class="employee-address-section__form-grid">
-    @if (currentAddress(); as currentAddress) {
-      <p class="employee-address-section__edit-hint">{{ texts.addressesSectionEditCurrentHint }}</p>
-      <div class="employee-address-section__readonly-grid">
-        <p>
-          <span>{{ texts.addressesSectionTypeLabel }}</span>
-          <strong>{{ currentAddress.addressTypeCode }}</strong>
-        </p>
-        <p>
-          <span>{{ texts.addressesSectionStartDateLabel }}</span>
-          <strong>{{ currentAddress.startDate }}</strong>
-        </p>
-      </div>
+  <div class="employee-address-section__body">
+    @if (creating()) {
+      <article class="employee-address-section__slot employee-address-section__slot--create">
+        <div class="employee-address-section__form-grid">
+          <label class="employee-address-section__field employee-address-section__field--type">
+            <span>{{ texts.addressesSectionTypeLabel }}</span>
+            <select
+              [disabled]="catalogOptionsLoading() || sectionState().busy"
+              [value]="createDraft().addressTypeCode"
+              (change)="updateCreateField('addressTypeCode', $any($event.target).value)"
+            >
+              <option value="">{{ texts.addressesSectionTypeLabel }}</option>
+              @for (option of availableAddressTypeOptions(); track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </label>
+
+          <label class="employee-address-section__field employee-address-section__field--street">
+            <span>{{ texts.addressesSectionStreetLabel }}</span>
+            <input
+              type="text"
+              [value]="createDraft().street"
+              (input)="updateCreateField('street', $any($event.target).value)"
+            />
+          </label>
+
+          <label class="employee-address-section__field employee-address-section__field--city">
+            <span>{{ texts.addressesSectionCityLabel }}</span>
+            <input
+              type="text"
+              [value]="createDraft().city"
+              (input)="updateCreateField('city', $any($event.target).value)"
+            />
+          </label>
+
+          <label class="employee-address-section__field employee-address-section__field--country">
+            <span>{{ texts.addressesSectionCountryLabel }}</span>
+            <input
+              type="text"
+              [value]="createDraft().countryCode"
+              (input)="updateCreateField('countryCode', $any($event.target).value)"
+            />
+          </label>
+
+          <label class="employee-address-section__field employee-address-section__field--date">
+            <span>{{ texts.addressesSectionStartDateLabel }}</span>
+            <input
+              type="date"
+              [value]="createDraft().startDate"
+              (input)="updateCreateField('startDate', $any($event.target).value)"
+            />
+          </label>
+
+          <label class="employee-address-section__field employee-address-section__field--postal">
+            <span>{{ texts.addressesSectionPostalCodeLabel }}</span>
+            <input
+              type="text"
+              [value]="createDraft().postalCode"
+              (input)="updateCreateField('postalCode', $any($event.target).value)"
+            />
+          </label>
+
+          <label class="employee-address-section__field employee-address-section__field--region">
+            <span>{{ texts.addressesSectionRegionLabel }}</span>
+            <input
+              type="text"
+              [value]="createDraft().regionCode"
+              (input)="updateCreateField('regionCode', $any($event.target).value)"
+            />
+          </label>
+        </div>
+
+        <div class="employee-address-section__actions">
+          <button type="button" [disabled]="!canSaveCreate() || sectionState().busy" (click)="submitCreate()">
+            {{ texts.addressesSectionSaveCreateAction }}
+          </button>
+          <button type="button" class="employee-address-section__secondary-action" [disabled]="sectionState().busy" (click)="cancelCreate()">
+            {{ texts.addressesSectionCancelAction }}
+          </button>
+        </div>
+      </article>
     }
 
-    <label class="employee-address-section__field employee-address-section__field--street">
-      <span>{{ texts.addressesSectionStreetLabel }}</span>
-      <input type="text" [value]="editCurrentDraft().street" (input)="updateEditCurrentField('street', $any($event.target).value)" />
-    </label>
+    @if (hasCurrentAddresses()) {
+      <section class="employee-address-section__current" [attr.aria-label]="texts.addressesSectionCurrentTitle">
+        <h4>{{ texts.addressesSectionCurrentTitle }}</h4>
+        <ul class="employee-address-section__history-list" role="list" [attr.aria-label]="texts.addressesSectionCurrentAriaLabel">
+          @for (currentAddress of currentAddresses(); track currentAddress.key) {
+            <li>
+              <article class="employee-address-section__current-card" [attr.aria-label]="texts.addressesSectionCurrentAriaLabel">
+                <div class="employee-address-section__current-header">
+                  <div class="employee-address-section__current-title-block">
+                    <p class="employee-address-section__current-type">
+                      {{ currentAddress.title }}
+                      @if (currentAddress.titleSecondary) {
+                        <span class="employee-address-section__current-type-code">{{ currentAddress.titleSecondary }}</span>
+                      }
+                    </p>
+                    <span class="employee-address-section__current-badge">{{ texts.addressesSectionCurrentBadge }}</span>
+                  </div>
 
-    <label class="employee-address-section__field employee-address-section__field--city">
-      <span>{{ texts.addressesSectionCityLabel }}</span>
-      <input type="text" [value]="editCurrentDraft().city" (input)="updateEditCurrentField('city', $any($event.target).value)" />
-    </label>
+                  <div class="employee-address-section__actions">
+                    @if (editingCurrentKey() === currentAddress.key) {
+                      <button type="button" [disabled]="!canSaveEditCurrent() || sectionState().busy" (click)="submitEditCurrent(currentAddress.key)">
+                        {{ texts.addressesSectionSaveEditCurrentAction }}
+                      </button>
+                      <button type="button" class="employee-address-section__secondary-action" [disabled]="sectionState().busy" (click)="cancelEditCurrent()">
+                        {{ texts.addressesSectionCancelAction }}
+                      </button>
+                    } @else if (confirmingCloseKey() === currentAddress.key) {
+                      <button type="button" class="employee-address-section__danger-action" [disabled]="sectionState().busy" (click)="confirmCloseCurrent(currentAddress.key)">
+                        {{ texts.addressesSectionConfirmCloseAction }}
+                      </button>
+                      <button type="button" class="employee-address-section__secondary-action" [disabled]="sectionState().busy" (click)="cancelCloseCurrent()">
+                        {{ texts.addressesSectionCancelAction }}
+                      </button>
+                    } @else {
+                      <button type="button" [disabled]="sectionState().busy || creating() || confirmingClose()" (click)="startEditCurrent(currentAddress.key)">
+                        {{ texts.addressesSectionEditCurrentAction }}
+                      </button>
+                      @if (currentAddress.closeable) {
+                        <button type="button" class="employee-address-section__danger-action" [disabled]="sectionState().busy || creating() || editingCurrent()" (click)="requestCloseCurrent(currentAddress.key)">
+                          {{ texts.addressesSectionCloseAction }}
+                        </button>
+                      }
+                    }
+                  </div>
+                </div>
 
-    <label class="employee-address-section__field employee-address-section__field--country">
-      <span>{{ texts.addressesSectionCountryLabel }}</span>
-      <input type="text" [value]="editCurrentDraft().countryCode" (input)="updateEditCurrentField('countryCode', $any($event.target).value)" />
-    </label>
+                @if (editingCurrentKey() === currentAddress.key) {
+                  <div class="employee-address-section__form-grid employee-address-section__form-grid--edit">
+                    <p class="employee-address-section__edit-hint">{{ texts.addressesSectionEditCurrentHint }}</p>
 
-    <label class="employee-address-section__field employee-address-section__field--postal">
-      <span>{{ texts.addressesSectionPostalCodeLabel }}</span>
-      <input type="text" [value]="editCurrentDraft().postalCode" (input)="updateEditCurrentField('postalCode', $any($event.target).value)" />
-    </label>
+                    <div class="employee-address-section__readonly-grid">
+                      <p>
+                        <span>{{ texts.addressesSectionTypeLabel }}</span>
+                        <strong>{{ currentAddress.title }}</strong>
+                      </p>
+                      @if (currentAddress.periodText) {
+                        <p>
+                          <span>{{ texts.addressesSectionStartDateLabel }}</span>
+                          <strong>{{ currentAddress.periodText }}</strong>
+                        </p>
+                      }
+                    </div>
 
-    <label class="employee-address-section__field employee-address-section__field--region">
-      <span>{{ texts.addressesSectionRegionLabel }}</span>
-      <input type="text" [value]="editCurrentDraft().regionCode" (input)="updateEditCurrentField('regionCode', $any($event.target).value)" />
-    </label>
+                    <label class="employee-address-section__field employee-address-section__field--street">
+                      <span>{{ texts.addressesSectionStreetLabel }}</span>
+                      <input
+                        type="text"
+                        [value]="editCurrentDraft().street"
+                        (input)="updateEditCurrentField('street', $any($event.target).value)"
+                      />
+                    </label>
+
+                    <label class="employee-address-section__field employee-address-section__field--city">
+                      <span>{{ texts.addressesSectionCityLabel }}</span>
+                      <input
+                        type="text"
+                        [value]="editCurrentDraft().city"
+                        (input)="updateEditCurrentField('city', $any($event.target).value)"
+                      />
+                    </label>
+
+                    <label class="employee-address-section__field employee-address-section__field--country">
+                      <span>{{ texts.addressesSectionCountryLabel }}</span>
+                      <input
+                        type="text"
+                        [value]="editCurrentDraft().countryCode"
+                        (input)="updateEditCurrentField('countryCode', $any($event.target).value)"
+                      />
+                    </label>
+
+                    <label class="employee-address-section__field employee-address-section__field--postal">
+                      <span>{{ texts.addressesSectionPostalCodeLabel }}</span>
+                      <input
+                        type="text"
+                        [value]="editCurrentDraft().postalCode"
+                        (input)="updateEditCurrentField('postalCode', $any($event.target).value)"
+                      />
+                    </label>
+
+                    <label class="employee-address-section__field employee-address-section__field--region">
+                      <span>{{ texts.addressesSectionRegionLabel }}</span>
+                      <input
+                        type="text"
+                        [value]="editCurrentDraft().regionCode"
+                        (input)="updateEditCurrentField('regionCode', $any($event.target).value)"
+                      />
+                    </label>
+                  </div>
+                } @else {
+                  @if (currentAddress.subtitle) {
+                    <p class="employee-address-section__current-street">{{ currentAddress.subtitle }}</p>
+                  }
+
+                  @if (currentAddress.detailText) {
+                    <p class="employee-address-section__current-locality">{{ currentAddress.detailText }}</p>
+                  }
+
+                  @if (currentAddress.periodText) {
+                    <p class="employee-address-section__current-period">
+                      <span>{{ texts.addressesSectionStartDateLabel }}:</span>
+                      {{ currentAddress.periodText }}
+                    </p>
+                  }
+                }
+
+                @if (confirmingCloseKey() === currentAddress.key) {
+                  <p class="employee-address-section__confirm-text">{{ texts.addressesSectionConfirmCloseMessage }}</p>
+                }
+              </article>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
+    @if (hasHistoricalAddresses()) {
+      <section class="employee-address-section__history" [attr.aria-label]="texts.addressesSectionHistoricalTitle">
+        <h4>{{ texts.addressesSectionHistoricalTitle }}</h4>
+        <ul class="employee-address-section__history-list" role="list" [attr.aria-label]="texts.addressesSectionListAriaLabel">
+          @for (row of historicalAddresses(); track row.key) {
+            <li class="employee-address-section__history-row">
+              <p class="employee-address-section__history-type">
+                {{ row.title }}
+                @if (row.titleSecondary) {
+                  <span class="employee-address-section__history-type-code">{{ row.titleSecondary }}</span>
+                }
+              </p>
+              @if (row.subtitle) {
+                <p class="employee-address-section__history-street">{{ row.subtitle }}</p>
+              }
+              @if (row.detailText) {
+                <p class="employee-address-section__history-locality">{{ row.detailText }}</p>
+              }
+              @if (row.periodText) {
+                <p class="employee-address-section__history-period">
+                  <span>{{ texts.addressesSectionEndDateLabel }}:</span>
+                  {{ row.periodText }}
+                </p>
+              }
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
+    @if (!hasCurrentAddresses() && !hasHistoricalAddresses() && !creating()) {
+      <p class="employee-address-section__empty">{{ texts.addressesSectionEmptyMessage }}</p>
+    }
   </div>
-</app-temporal-section>
+</app-employee-section-shell>

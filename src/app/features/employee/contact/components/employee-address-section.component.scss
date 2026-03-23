@@ -1,18 +1,172 @@
-.employee-address-section__form-grid {
-  display: grid;
-  gap: 0.22rem;
-  width: 100%;
-  max-width: 56rem;
+.employee-address-section__header-actions button,
+.employee-address-section__actions button {
+  border: 1px solid #bfcfe0;
+  border-radius: 0.45rem;
+  background: #eef4fb;
+  color: #274055;
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1;
+  padding: 0.34rem 0.56rem;
+  cursor: pointer;
 }
 
-.employee-address-section__form-grid label {
+.employee-address-section__header-actions button:disabled,
+.employee-address-section__actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.employee-address-section__body {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.employee-address-section__slot,
+.employee-address-section__current-card {
+  border: 1px solid #dce6f1;
+  border-radius: 0.65rem;
+  background: #fcfdff;
+  padding: 0.64rem;
+}
+
+.employee-address-section__current-card {
+  border-color: #bfd5eb;
+  background: #f3f8fe;
+}
+
+.employee-address-section__current-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+.employee-address-section__current-title-block {
+  display: flex;
+  align-items: center;
+  gap: 0.42rem;
+  flex-wrap: wrap;
+}
+
+.employee-address-section__current-type,
+.employee-address-section__history-type {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #274055;
+}
+
+.employee-address-section__current-type-code,
+.employee-address-section__history-type-code {
+  margin-left: 0.18rem;
+  font-size: 0.68rem;
+  color: #61778c;
+  font-weight: 600;
+}
+
+.employee-address-section__current-badge {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #b9d0e8;
+  border-radius: 999px;
+  background: #e8f2fc;
+  color: #2a4a67;
+  font-size: 0.66rem;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0.18rem 0.42rem;
+}
+
+.employee-address-section__current-street,
+.employee-address-section__current-locality,
+.employee-address-section__history-street,
+.employee-address-section__history-locality {
+  font-size: 0.79rem;
+  color: #475f74;
+  line-height: 1.35;
+}
+
+.employee-address-section__current-period,
+.employee-address-section__history-period {
+  font-size: 0.72rem;
+  color: #5e7488;
+}
+
+.employee-address-section__current-period span,
+.employee-address-section__history-period span {
+  font-weight: 700;
+}
+
+.employee-address-section__confirm-text {
+  margin: 0.5rem 0 0;
+  font-size: 0.72rem;
+  color: #7a2530;
+}
+
+.employee-address-section__history {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.employee-address-section__history h4 {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #445c71;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.employee-address-section__history-list {
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.48rem;
+}
+
+.employee-address-section__history-row {
+  border: 1px solid #dbe5f0;
+  border-radius: 0.6rem;
+  background: #ffffff;
+  padding: 0.52rem;
+  display: grid;
+  gap: 0.14rem;
+  opacity: 0.9;
+}
+
+.employee-address-section__actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.32rem;
+}
+
+.employee-address-section__secondary-action {
+  background: #fbfcff;
+  color: #4b6073;
+}
+
+.employee-address-section__danger-action {
+  border-color: #d8bdc2;
+  background: #fbf3f4;
+  color: #8a1f2e;
+}
+
+.employee-address-section__form-grid {
+  display: grid;
+  gap: 0.4rem;
+  width: 100%;
+}
+
+.employee-address-section__form-grid label,
+.employee-address-section__readonly-grid p {
   display: grid;
   gap: 0.08rem;
 }
 
 .employee-address-section__form-grid span,
 .employee-address-section__readonly-grid span {
-  font-size: 0.62rem;
+  font-size: 0.68rem;
   line-height: 1.2;
   color: #5f7386;
 }
@@ -23,10 +177,10 @@
   border-radius: 0.42rem;
   background: #ffffff;
   color: #1f3246;
-  font-size: 0.67rem;
+  font-size: 0.75rem;
   line-height: 1.2;
-  padding: 0.22rem 0.32rem;
-  min-height: 1.8rem;
+  padding: 0.34rem 0.42rem;
+  min-height: 2rem;
 }
 
 .employee-address-section__form-grid input:focus-visible,
@@ -37,8 +191,7 @@
 }
 
 .employee-address-section__edit-hint {
-  margin: 0;
-  font-size: 0.66rem;
+  font-size: 0.68rem;
   color: #3b5874;
   line-height: 1.3;
 }
@@ -46,82 +199,25 @@
 .employee-address-section__readonly-grid {
   display: grid;
   gap: 0.14rem;
-  margin-bottom: 0.08rem;
   width: 100%;
 }
 
-.employee-address-section__readonly-grid p {
-  margin: 0;
-  display: grid;
-  gap: 0.06rem;
-}
-
-.employee-address-section__readonly-grid strong {
-  font-size: 0.7rem;
-  color: #1f3246;
-}
-
-.employee-address-section__field--country,
-.employee-address-section__field--postal,
-.employee-address-section__field--region,
-.employee-address-section__field--date,
-.employee-address-section__field--type {
-  max-width: 16rem;
-}
-
-.employee-address-section__field--country input,
-.employee-address-section__field--date input,
-.employee-address-section__field--postal input,
-.employee-address-section__field--region input,
-.employee-address-section__field--type input,
-.employee-address-section__field--type select {
-  max-width: 12rem;
-}
-
-@media (min-width: 900px) {
-  .employee-address-section__form-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: 0.7rem;
-    row-gap: 0.3rem;
-  }
-
-  .employee-address-section__field--street,
-  .employee-address-section__edit-hint,
-  .employee-address-section__readonly-grid {
-    grid-column: 1 / -1;
-  }
-}
-
-@media (min-width: 1200px) {
-  .employee-address-section__form-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .employee-address-section__field--street {
-    grid-column: 1 / -1;
-  }
-
-  .employee-address-section__field--city {
-    grid-column: span 2;
-  }
+.employee-address-section__empty {
+  border: 1px dashed #d1deea;
+  border-radius: 0.62rem;
+  background: #fbfdff;
+  color: #5a7185;
+  font-size: 0.79rem;
+  padding: 0.55rem 0.62rem;
 }
 
 @media (max-width: 899px) {
-  .employee-address-section__form-grid {
-    max-width: none;
+  .employee-address-section__current-header {
+    flex-direction: column;
+    align-items: stretch;
   }
 
-  .employee-address-section__field--country,
-  .employee-address-section__field--postal,
-  .employee-address-section__field--region,
-  .employee-address-section__field--date,
-  .employee-address-section__field--type,
-  .employee-address-section__field--country input,
-  .employee-address-section__field--date input,
-  .employee-address-section__field--postal input,
-  .employee-address-section__field--region input,
-  .employee-address-section__field--type input,
-  .employee-address-section__field--type select {
-    max-width: none;
+  .employee-address-section__actions {
+    justify-content: flex-start;
   }
 }
