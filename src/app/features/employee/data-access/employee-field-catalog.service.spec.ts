@@ -13,43 +13,100 @@ describe('EmployeeFieldCatalogService', () => {
   };
 
   beforeEach(() => {
-    apiMock = {
-      getCatalogBindingsByResourceCode: vi.fn().mockReturnValue(
-        of({
-          resourceCode: 'employee.contact',
-          fields: [
-            {
-              fieldCode: 'contactTypeCode',
-              catalogKind: CatalogFieldBindingResponseCatalogKindEnum.Direct,
-              ruleEntityTypeCode: 'EMPLOYEE_CONTACT_TYPE',
-              active: true,
-            },
-          ],
-        }),
-      ),
-      getDirectCatalogOptions: vi.fn().mockReturnValue(
-        of({
-          ruleSystemCode: 'PA-ES',
+    const bindingsByResource: Record<string, ReadonlyArray<unknown>> = {
+      'employee.contact': [
+        {
+          fieldCode: 'contactTypeCode',
+          catalogKind: CatalogFieldBindingResponseCatalogKindEnum.Direct,
           ruleEntityTypeCode: 'EMPLOYEE_CONTACT_TYPE',
-          referenceDate: '2026-03-23',
-          items: [
-            {
-              code: 'WORK_EMAIL',
-              name: 'Correo laboral',
-              active: true,
-              startDate: '2020-01-01',
-              endDate: null,
-            },
-            {
-              code: 'INACTIVE',
-              name: 'No usar',
-              active: false,
-              startDate: '2020-01-01',
-              endDate: null,
-            },
-          ],
+          active: true,
+        },
+      ],
+      'employee.presence': [
+        {
+          fieldCode: 'companyCode',
+          catalogKind: CatalogFieldBindingResponseCatalogKindEnum.Direct,
+          ruleEntityTypeCode: 'EMPLOYEE_COMPANY',
+          active: true,
+        },
+        {
+          fieldCode: 'entryReasonCode',
+          catalogKind: CatalogFieldBindingResponseCatalogKindEnum.Direct,
+          ruleEntityTypeCode: 'EMPLOYEE_ENTRY_REASON',
+          active: true,
+        },
+        {
+          fieldCode: 'exitReasonCode',
+          catalogKind: CatalogFieldBindingResponseCatalogKindEnum.Direct,
+          ruleEntityTypeCode: 'EMPLOYEE_EXIT_REASON',
+          active: true,
+        },
+      ],
+    };
+
+    const directItemsByEntity: Record<string, ReadonlyArray<unknown>> = {
+      EMPLOYEE_CONTACT_TYPE: [
+        {
+          code: 'WORK_EMAIL',
+          name: 'Correo laboral',
+          active: true,
+          startDate: '2020-01-01',
+          endDate: null,
+        },
+        {
+          code: 'INACTIVE',
+          name: 'No usar',
+          active: false,
+          startDate: '2020-01-01',
+          endDate: null,
+        },
+      ],
+      EMPLOYEE_COMPANY: [
+        {
+          code: 'COMP-ES',
+          name: 'Compania Espana',
+          active: true,
+          startDate: '2020-01-01',
+          endDate: null,
+        },
+      ],
+      EMPLOYEE_ENTRY_REASON: [
+        {
+          code: 'HIRE',
+          name: 'Alta inicial',
+          active: true,
+          startDate: '2020-01-01',
+          endDate: null,
+        },
+      ],
+      EMPLOYEE_EXIT_REASON: [
+        {
+          code: 'END',
+          name: 'Fin de relacion',
+          active: true,
+          startDate: '2020-01-01',
+          endDate: null,
+        },
+      ],
+    };
+
+    apiMock = {
+      getCatalogBindingsByResourceCode: vi.fn().mockImplementation(({ resourceCode }: { resourceCode: string }) =>
+        of({
+          resourceCode,
+          fields: bindingsByResource[resourceCode] ?? [],
         }),
       ),
+      getDirectCatalogOptions: vi
+        .fn()
+        .mockImplementation(({ ruleSystemCode, ruleEntityTypeCode }: { ruleSystemCode: string; ruleEntityTypeCode: string }) =>
+          of({
+            ruleSystemCode,
+            ruleEntityTypeCode,
+            referenceDate: '2026-03-23',
+            items: directItemsByEntity[ruleEntityTypeCode] ?? [],
+          }),
+        ),
     };
 
     TestBed.configureTestingModule({
@@ -117,5 +174,122 @@ describe('EmployeeFieldCatalogService', () => {
     });
 
     expect(result).toEqual([]);
+  });
+
+  it('loads presence DIRECT options for company, entry reason and exit reason from employee.presence bindings', () => {
+    let companyResult: ReadonlyArray<{ value: string; label: string }> = [];
+    let entryReasonResult: ReadonlyArray<{ value: string; label: string }> = [];
+    let exitReasonResult: ReadonlyArray<{ value: string; label: string }> = [];
+
+    service.loadPresenceCompanyOptions('PA-ES').subscribe((options) => {
+      companyResult = options;
+    });
+
+    service.loadPresenceEntryReasonOptions('PA-ES').subscribe((options) => {
+      entryReasonResult = options;
+    });
+
+    service.loadPresenceExitReasonOptions('PA-ES').subscribe((options) => {
+      exitReasonResult = options;
+    });
+
+    expect(apiMock.getCatalogBindingsByResourceCode).toHaveBeenCalledWith({
+      resourceCode: 'employee.presence',
+    });
+    expect(apiMock.getDirectCatalogOptions).toHaveBeenCalledWith({
+      ruleSystemCode: 'PA-ES',
+      ruleEntityTypeCode: 'EMPLOYEE_COMPANY',
+    });
+    expect(apiMock.getDirectCatalogOptions).toHaveBeenCalledWith({
+      ruleSystemCode: 'PA-ES',
+      ruleEntityTypeCode: 'EMPLOYEE_ENTRY_REASON',
+    });
+    expect(apiMock.getDirectCatalogOptions).toHaveBeenCalledWith({
+      ruleSystemCode: 'PA-ES',
+      ruleEntityTypeCode: 'EMPLOYEE_EXIT_REASON',
+    });
+
+    expect(companyResult).toEqual([{ value: 'COMP-ES', label: 'Compania Espana · COMP-ES' }]);
+    expect(entryReasonResult).toEqual([{ value: 'HIRE', label: 'Alta inicial · HIRE' }]);
+    expect(exitReasonResult).toEqual([{ value: 'END', label: 'Fin de relacion · END' }]);
+  });
+
+  it('does not mix presence catalog options between fields', () => {
+    let companyResult: ReadonlyArray<{ value: string; label: string }> = [];
+    let entryReasonResult: ReadonlyArray<{ value: string; label: string }> = [];
+
+    service.loadPresenceCompanyOptions('PA-ES').subscribe((options) => {
+      companyResult = options;
+    });
+
+    service.loadPresenceEntryReasonOptions('PA-ES').subscribe((options) => {
+      entryReasonResult = options;
+    });
+
+    expect(companyResult).toEqual([{ value: 'COMP-ES', label: 'Compania Espana · COMP-ES' }]);
+    expect(entryReasonResult).toEqual([{ value: 'HIRE', label: 'Alta inicial · HIRE' }]);
+  });
+
+  it('returns empty options for one presence field without affecting the others', () => {
+    apiMock.getDirectCatalogOptions.mockImplementation(
+      ({ ruleSystemCode, ruleEntityTypeCode }: { ruleSystemCode: string; ruleEntityTypeCode: string }) => {
+        if (ruleEntityTypeCode === 'EMPLOYEE_EXIT_REASON') {
+          return of({
+            ruleSystemCode,
+            ruleEntityTypeCode,
+            referenceDate: '2026-03-23',
+            items: [],
+          });
+        }
+
+        const itemsByEntity: Record<string, ReadonlyArray<unknown>> = {
+          EMPLOYEE_COMPANY: [
+            {
+              code: 'COMP-ES',
+              name: 'Compania Espana',
+              active: true,
+              startDate: '2020-01-01',
+              endDate: null,
+            },
+          ],
+          EMPLOYEE_ENTRY_REASON: [
+            {
+              code: 'HIRE',
+              name: 'Alta inicial',
+              active: true,
+              startDate: '2020-01-01',
+              endDate: null,
+            },
+          ],
+        };
+
+        return of({
+          ruleSystemCode,
+          ruleEntityTypeCode,
+          referenceDate: '2026-03-23',
+          items: itemsByEntity[ruleEntityTypeCode] ?? [],
+        });
+      },
+    );
+
+    let companyResult: ReadonlyArray<{ value: string; label: string }> = [];
+    let entryReasonResult: ReadonlyArray<{ value: string; label: string }> = [];
+    let exitReasonResult: ReadonlyArray<{ value: string; label: string }> = [];
+
+    service.loadPresenceCompanyOptions('PA-ES').subscribe((options) => {
+      companyResult = options;
+    });
+
+    service.loadPresenceEntryReasonOptions('PA-ES').subscribe((options) => {
+      entryReasonResult = options;
+    });
+
+    service.loadPresenceExitReasonOptions('PA-ES').subscribe((options) => {
+      exitReasonResult = options;
+    });
+
+    expect(companyResult).toEqual([{ value: 'COMP-ES', label: 'Compania Espana · COMP-ES' }]);
+    expect(entryReasonResult).toEqual([{ value: 'HIRE', label: 'Alta inicial · HIRE' }]);
+    expect(exitReasonResult).toEqual([]);
   });
 });

@@ -32,6 +32,9 @@ export interface EmployeePresenceBlockModel {
 })
 export class EmployeePresenceBlockComponent {
   readonly presence = input<EmployeePresenceBlockModel | null>(null);
+  readonly companyLabelsByCode = input<Readonly<Record<string, string>>>({});
+  readonly entryReasonLabelsByCode = input<Readonly<Record<string, string>>>({});
+  readonly exitReasonLabelsByCode = input<Readonly<Record<string, string>>>({});
 
   protected readonly texts = employeeTexts;
   protected readonly currentPresence = computed(() => this.presence()?.currentPresence ?? null);
@@ -76,26 +79,55 @@ export class EmployeePresenceBlockComponent {
   }
 
   protected resolveCompanyLabel(presence: EmployeePresenceBlockItemModel): string {
+    const catalogLabel = this.companyLabelsByCode()[presence.companyCode];
+    if (catalogLabel) {
+      return catalogLabel;
+    }
+
     return getCatalogDisplay(presence.companyName, presence.companyCode).label;
   }
 
   protected resolveCompanyCodeSecondary(presence: EmployeePresenceBlockItemModel): string | undefined {
+    if (this.companyLabelsByCode()[presence.companyCode]) {
+      return undefined;
+    }
+
     return getCatalogDisplay(presence.companyName, presence.companyCode).code;
   }
 
   protected resolveEntryReasonLabel(presence: EmployeePresenceBlockItemModel): string {
+    const catalogLabel = this.entryReasonLabelsByCode()[presence.entryReasonCode];
+    if (catalogLabel) {
+      return catalogLabel;
+    }
+
     return getCatalogDisplay(presence.entryReasonName, presence.entryReasonCode).label;
   }
 
   protected resolveEntryReasonCodeSecondary(presence: EmployeePresenceBlockItemModel): string | undefined {
+    if (this.entryReasonLabelsByCode()[presence.entryReasonCode]) {
+      return undefined;
+    }
+
     return getCatalogDisplay(presence.entryReasonName, presence.entryReasonCode).code;
   }
 
   protected resolveExitReasonLabel(presence: EmployeePresenceBlockItemModel): string {
+    const exitReasonCode = presence.exitReasonCode ?? '';
+    const catalogLabel = this.exitReasonLabelsByCode()[exitReasonCode];
+    if (catalogLabel) {
+      return catalogLabel;
+    }
+
     return getCatalogDisplay(presence.exitReasonName, presence.exitReasonCode ?? '').label;
   }
 
   protected resolveExitReasonCodeSecondary(presence: EmployeePresenceBlockItemModel): string | undefined {
+    const exitReasonCode = presence.exitReasonCode ?? '';
+    if (this.exitReasonLabelsByCode()[exitReasonCode]) {
+      return undefined;
+    }
+
     return getCatalogDisplay(presence.exitReasonName, presence.exitReasonCode ?? '').code;
   }
 

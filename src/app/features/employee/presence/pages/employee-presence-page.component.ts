@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
-import { map } from 'rxjs';
+import { Observable, map, take } from 'rxjs';
 
+import { EmployeeFieldCatalogService } from '../../data-access/employee-field-catalog.service';
 import { EmployeeContractSectionComponent } from '../components/employee-contract-section.component';
 import {
   EmployeePresenceBlockComponent,
@@ -30,6 +31,16 @@ import { readEmployeeBusinessKeyFromParamMap } from '../../routing/employee-rout
 export class EmployeePresencePageComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly employeePresenceStore = inject(EmployeePresenceStore);
+  private readonly fieldCatalogService = inject(EmployeeFieldCatalogService);
+
+  private readonly companyCatalogLabelsByCodeState = signal<Readonly<Record<string, string>>>({});
+  private readonly entryReasonCatalogLabelsByCodeState = signal<Readonly<Record<string, string>>>({});
+  private readonly exitReasonCatalogLabelsByCodeState = signal<Readonly<Record<string, string>>>({});
+  private readonly companyCatalogLoadingState = signal(false);
+  private readonly entryReasonCatalogLoadingState = signal(false);
+  private readonly exitReasonCatalogLoadingState = signal(false);
+
+  private presenceCatalogRequestId = 0;
 
   protected readonly texts = employeeTexts;
   protected readonly activeEmployeeKey = toSignal(
@@ -42,14 +53,94 @@ export class EmployeePresencePageComponent {
   protected readonly loadingPresences = this.employeePresenceStore.loading;
   protected readonly presencesError = this.employeePresenceStore.error;
   protected readonly laborAreaLoading = computed(() => this.loadingPresences());
+  protected readonly companyCatalogLabelsByCode = this.companyCatalogLabelsByCodeState;
+  protected readonly entryReasonCatalogLabelsByCode = this.entryReasonCatalogLabelsByCodeState;
+  protected readonly exitReasonCatalogLabelsByCode = this.exitReasonCatalogLabelsByCodeState;
+  protected readonly presenceCatalogLoading = computed(
+    () =>
+      this.companyCatalogLoadingState()
+      || this.entryReasonCatalogLoadingState()
+      || this.exitReasonCatalogLoadingState(),
+  );
   protected readonly presenceBlockModel = computed<EmployeePresenceBlockModel>(() =>
     this.toPresenceBlockModel(this.presences()),
   );
 
   constructor() {
     effect(() => {
-      this.employeePresenceStore.loadPresencesByBusinessKey(this.activeEmployeeKey());
+      const activeEmployeeKey = this.activeEmployeeKey();
+      this.employeePresenceStore.loadPresencesByBusinessKey(activeEmployeeKey);
+      this.loadPresenceCatalogOptions(activeEmployeeKey?.ruleSystemCode ?? null);
     });
+  }
+
+  private loadPresenceCatalogOptions(ruleSystemCode: string | null): void {
+    const normalizedRuleSystemCode = ruleSystemCode?.trim() ?? '';
+
+    if (!normalizedRuleSystemCode) {
+      this.presenceCatalogRequestId += 1;
+      this.companyCatalogLoadingState.set(false);
+      this.entryReasonCatalogLoadingState.set(false);
+      this.exitReasonCatalogLoadingState.set(false);
+      this.companyCatalogLabelsByCodeState.set({});
+      this.entryReasonCatalogLabelsByCodeState.set({});
+      this.exitReasonCatalogLabelsByCodeState.set({});
+      return;
+    }
+
+    const requestId = ++this.presenceCatalogRequestId;
+
+    this.loadSinglePresenceCatalog(
+      requestId,
+      () => this.companyCatalogLoadingState.set(true),
+      () => this.companyCatalogLoadingState.set(false),
+      (value) => this.companyCatalogLabelsByCodeState.set(value),
+      this.fieldCatalogService.loadPresenceCompanyOptions(normalizedRuleSystemCode),
+    );
+
+    this.loadSinglePresenceCatalog(
+      requestId,
+      () => this.entryReasonCatalogLoadingState.set(true),
+      () => this.entryReasonCatalogLoadingState.set(false),
+      (value) => this.entryReasonCatalogLabelsByCodeState.set(value),
+      this.fieldCatalogService.loadPresenceEntryReasonOptions(normalizedRuleSystemCode),
+    );
+
+    this.loadSinglePresenceCatalog(
+      requestId,
+      () => this.exitReasonCatalogLoadingState.set(true),
+      () => this.exitReasonCatalogLoadingState.set(false),
+      (value) => this.exitReasonCatalogLabelsByCodeState.set(value),
+      this.fieldCatalogService.loadPresenceExitReasonOptions(normalizedRuleSystemCode),
+    );
+  }
+
+  private loadSinglePresenceCatalog(
+    requestId: number,
+    startLoading: () => void,
+    stopLoading: () => void,
+    setTarget: (value: Readonly<Record<string, string>>) => void,
+    options$: Observable<ReadonlyArray<{ value: string; label: string }>>,
+  ): void {
+    startLoading();
+
+    options$.pipe(take(1)).subscribe((options) => {
+      if (requestId !== this.presenceCatalogRequestId) {
+        return;
+      }
+
+      setTarget(this.toLabelMapByCode(options));
+      stopLoading();
+    });
+  }
+
+  private toLabelMapByCode(
+    options: ReadonlyArray<{ value: string; label: string }>,
+  ): Readonly<Record<string, string>> {
+    return options.reduce<Record<string, string>>((accumulator, option) => {
+      accumulator[option.value] = option.label;
+      return accumulator;
+    }, {});
   }
 
   private toPresenceBlockModel(presences: ReadonlyArray<EmployeePresenceModel>): EmployeePresenceBlockModel {

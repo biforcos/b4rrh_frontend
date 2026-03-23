@@ -14,6 +14,9 @@ const employeeCatalogFields = {
   contactType: { resourceCode: 'employee.contact', fieldCode: 'contactTypeCode' },
   identifierType: { resourceCode: 'employee.identifier', fieldCode: 'identifierTypeCode' },
   addressType: { resourceCode: 'employee.address', fieldCode: 'addressTypeCode' },
+  presenceCompany: { resourceCode: 'employee.presence', fieldCode: 'companyCode' },
+  presenceEntryReason: { resourceCode: 'employee.presence', fieldCode: 'entryReasonCode' },
+  presenceExitReason: { resourceCode: 'employee.presence', fieldCode: 'exitReasonCode' },
 } as const;
 
 type CatalogFieldSpec = (typeof employeeCatalogFields)[keyof typeof employeeCatalogFields];
@@ -44,6 +47,18 @@ export class EmployeeFieldCatalogService {
 
   loadAddressTypeOptions(ruleSystemCode: string): Observable<ReadonlyArray<SlotKeyOption<string>>> {
     return this.loadDirectOptionsByField(ruleSystemCode, employeeCatalogFields.addressType);
+  }
+
+  loadPresenceCompanyOptions(ruleSystemCode: string): Observable<ReadonlyArray<SlotKeyOption<string>>> {
+    return this.loadDirectOptionsByField(ruleSystemCode, employeeCatalogFields.presenceCompany);
+  }
+
+  loadPresenceEntryReasonOptions(ruleSystemCode: string): Observable<ReadonlyArray<SlotKeyOption<string>>> {
+    return this.loadDirectOptionsByField(ruleSystemCode, employeeCatalogFields.presenceEntryReason);
+  }
+
+  loadPresenceExitReasonOptions(ruleSystemCode: string): Observable<ReadonlyArray<SlotKeyOption<string>>> {
+    return this.loadDirectOptionsByField(ruleSystemCode, employeeCatalogFields.presenceExitReason);
   }
 
   private loadDirectOptionsByField(

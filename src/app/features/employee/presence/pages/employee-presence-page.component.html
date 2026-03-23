@@ -12,7 +12,12 @@
 
   <div class="employee-area__modules">
     <section class="employee-area__module">
-      <app-employee-presence-block [presence]="presenceBlockModel()" />
+      <app-employee-presence-block
+        [presence]="presenceBlockModel()"
+        [companyLabelsByCode]="companyCatalogLabelsByCode()"
+        [entryReasonLabelsByCode]="entryReasonCatalogLabelsByCode()"
+        [exitReasonLabelsByCode]="exitReasonCatalogLabelsByCode()"
+      />
     </section>
 
     <section class="employee-area__module">
