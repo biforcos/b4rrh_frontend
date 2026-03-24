@@ -17,6 +17,19 @@
   min-height: 0;
 }
 
+/* Left sidebar: make it visually lighter and secondary to main content */
+.employee-shell__master .panel {
+  background: transparent;
+  border: 1px solid rgba(15, 23, 42, 0.04);
+  box-shadow: none;
+}
+
+/* Ensure search and result areas feel lighter */
+.employee-shell__master app-panel .panel__header,
+.employee-shell__master app-panel .panel__content {
+  padding: 0.6rem 0.7rem;
+}
+
 .employee-shell__search-form {
   display: grid;
   gap: 0.46rem;
@@ -162,6 +175,35 @@
   padding: 0.64rem;
 }
 
+.employee-shell__main-zone {
+  min-width: 0;
+  border-radius: 0.75rem;
+  /* section background slightly different from app background to create depth */
+  background: var(--surface-block);
+  padding: 0.8rem;
+  border: 1px solid rgba(15, 23, 42, 0.04);
+}
+.employee-shell__timeline-zone {
+  min-width: 0;
+  border-radius: 0.75rem;
+  background: var(--surface-block-alt);
+  padding: 0.64rem;
+  border-left: 1px solid rgba(15, 23, 42, 0.06);
+  box-shadow: 0 2px 6px rgba(15,23,42,0.02);
+}
+
+/* Inside main zone: reduce inner panel border prominence to avoid box-in-box */
+.employee-shell__main-zone .panel {
+  background: var(--surface-panel);
+  border: 1px solid rgba(15, 23, 42, 0.04);
+  box-shadow: none;
+}
+
+/* Section headers within main zone get a very light background to separate from content */
+.employee-shell__main-zone .panel__header {
+  background: var(--surface-block-alt);
+  padding: 0.56rem 0.7rem;
+}
 .employee-shell__nav-zone {
   margin-bottom: 0.62rem;
 }

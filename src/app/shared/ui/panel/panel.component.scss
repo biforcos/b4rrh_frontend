@@ -6,8 +6,9 @@
 }
 
 .panel__header {
-  border-bottom: 1px solid var(--border-subtle);
-  padding: 0.82rem 0.9rem 0.74rem;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.04);
+  padding: 0.7rem 0.86rem 0.62rem;
+  background: transparent;
 }
 
 .panel__title {
@@ -23,5 +24,13 @@
 }
 
 .panel__content {
-  padding: 0.86rem;
+  padding: 0.72rem;
+  background: transparent;
+}
+
+/* Reduce visual weight for nested panels by default (used in main content)
+   Specific panels can override when a stronger border is needed. */
+.panel.panel--light {
+  border: 1px solid rgba(15,23,42,0.04);
+  box-shadow: none;
 }

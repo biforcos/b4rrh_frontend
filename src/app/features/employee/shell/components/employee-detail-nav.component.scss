@@ -47,7 +47,7 @@
 
 .employee-detail-nav__tab--active {
   border-bottom-color: transparent;
-  background: transparent;
+  background: rgba(3,105,161,0.06);
   color: #0f172a;
 }
 
@@ -57,7 +57,7 @@
   left: 0.36rem;
   right: 0.36rem;
   bottom: -1px;
-  height: 2px;
+  height: 3px;
   border-radius: 2px;
   background: var(--accent-strong);
 }
