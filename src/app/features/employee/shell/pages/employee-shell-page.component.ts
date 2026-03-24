@@ -8,10 +8,16 @@ import { PanelComponent } from '../../../../shared/ui/panel/panel.component';
 import { EmployeeDetailStore } from '../../data-access/employee-detail.store';
 import { EmployeeDirectoryStore } from '../../data-access/employee-directory.store';
 import { EmployeeJourneyStore } from '../../data-access/employee-journey.store';
+import { EmployeeContactStore } from '../../data-access/employee-contact.store';
+import { EmployeePresenceStore } from '../../data-access/employee-presence.store';
+import { EmployeeWorkCenterStore } from '../../data-access/employee-work-center.store';
 import { employeeTexts } from '../../employee.texts';
 import { EmployeeBusinessKey } from '../../models/employee-business-key.model';
+import { EmployeeContactModel } from '../../models/employee-contact.model';
+import { EmployeeCoreIdentityDraft } from '../../models/employee-core-identity-draft.model';
 import { EmployeeDetailModel } from '../../models/employee-detail.model';
 import { EmployeeListItemModel } from '../../models/employee-list-item.model';
+import { EmployeePresenceModel } from '../../models/employee-presence.model';
 import {
   buildEmployeeDetailRouteCommands,
   EmployeeRouteSection,
@@ -23,6 +29,7 @@ import {
   toEmployeeBusinessKey,
 } from '../../routing/employee-route-key.util';
 import { EmployeePageHeaderComponent } from '../components/employee-page-header.component';
+import { EmployeeDetailHeaderComponent } from '../components/employee-detail-header.component';
 import { EmployeeJourneyTimelineComponent } from '../components/employee-journey-timeline.component';
 import { EmployeeDetailNavComponent } from '../components/employee-detail-nav.component';
 import { EmployeeDirectoryListComponent } from '../components/employee-directory-list.component';
@@ -36,6 +43,7 @@ import { EmployeeDirectoryListComponent } from '../components/employee-directory
     PanelComponent,
     EmployeeDirectoryListComponent,
     EmployeePageHeaderComponent,
+    EmployeeDetailHeaderComponent,
     EmployeeJourneyTimelineComponent,
     EmployeeDetailNavComponent,
   ],
@@ -47,6 +55,9 @@ export class EmployeeShellPageComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly directoryStore = inject(EmployeeDirectoryStore);
   private readonly detailStore = inject(EmployeeDetailStore);
+  private readonly contactStore = inject(EmployeeContactStore);
+  private readonly presenceStore = inject(EmployeePresenceStore);
+  private readonly workCenterStore = inject(EmployeeWorkCenterStore);
   private readonly journeyStore = inject(EmployeeJourneyStore);
 
   protected readonly texts = employeeTexts;
@@ -62,6 +73,13 @@ export class EmployeeShellPageComponent {
   protected readonly journey = this.journeyStore.journey;
   protected readonly loadingJourney = this.journeyStore.loading;
   protected readonly journeyError = this.journeyStore.error;
+  protected readonly contacts = this.contactStore.contacts;
+  protected readonly presences = this.presenceStore.presences;
+  protected readonly workCenters = this.workCenterStore.workCenters;
+  protected readonly updatingIdentity = this.detailStore.mutating;
+  protected readonly updateIdentityError = computed(() => this.detailStore.mutationError() === 'request-failed');
+  protected readonly updateIdentitySuccess = computed(() => this.detailStore.mutationSuccess() === 'updated');
+  protected readonly openIdentityEditorRequestId = signal(0);
   protected readonly selectedEmployee = computed<EmployeeDetailModel | null>(() => {
     const activeEmployeeKey = this.activeEmployeeKey();
     if (!activeEmployeeKey) {
@@ -94,6 +112,32 @@ export class EmployeeShellPageComponent {
 
     return 'INACTIVE';
   });
+  protected readonly activePresence = computed(() => this.resolveActivePresence(this.presences()));
+  protected readonly headerCompany = computed(() => {
+    const presence = this.activePresence();
+    if (!presence) {
+      return this.texts.employeePageHeaderEmptyValue;
+    }
+
+    const candidate = [presence.companyName ?? '', presence.companyCode]
+      .map((value) => value.trim())
+      .find((value) => value.length > 0);
+
+    return candidate ?? this.texts.employeePageHeaderEmptyValue;
+  });
+  protected readonly headerWorkCenter = computed(() => this.resolveHeaderWorkCenter(this.workCenters(), this.selectedEmployee()));
+  protected readonly headerHireDate = computed(() => {
+    const presences = this.presences();
+    if (presences.length === 0) {
+      return this.texts.employeePageHeaderEmptyValue;
+    }
+
+    const earliestPresence = [...presences].sort((left, right) => left.startDate.localeCompare(right.startDate))[0];
+
+    return earliestPresence?.startDate ?? this.texts.employeePageHeaderEmptyValue;
+  });
+  protected readonly headerEmail = computed(() => this.findPreferredContactValue(this.contacts(), 'email'));
+  protected readonly headerPhone = computed(() => this.findPreferredContactValue(this.contacts(), 'phone'));
 
   constructor() {
     this.searchForm.controls.searchTerm.valueChanges
@@ -113,8 +157,29 @@ export class EmployeeShellPageComponent {
         this.activeEmployeeKey.set(activeEmployeeKey);
         this.activeDetailSection.set(this.resolveActiveDetailSection());
         this.detailStore.loadEmployeeDetailByBusinessKey(activeEmployeeKey);
+        this.contactStore.loadContactsByBusinessKey(activeEmployeeKey);
+        this.presenceStore.loadPresencesByBusinessKey(activeEmployeeKey);
+        this.workCenterStore.loadWorkCenters(activeEmployeeKey);
         this.journeyStore.loadJourneyByBusinessKey(activeEmployeeKey);
       });
+  }
+
+  protected openIdentityEditorFromHeader(): void {
+    this.detailStore.clearMutationFeedback();
+    this.openIdentityEditorRequestId.update((value) => value + 1);
+  }
+
+  protected submitIdentityUpdate(draft: EmployeeCoreIdentityDraft): void {
+    const employeeKey = this.activeEmployeeKey();
+    if (!employeeKey) {
+      return;
+    }
+
+    this.detailStore.updateEmployeeCoreIdentity(employeeKey, draft);
+  }
+
+  protected clearIdentityFeedback(): void {
+    this.detailStore.clearMutationFeedback();
   }
 
   protected openEmployeeFromSearch(): void {
@@ -188,5 +253,54 @@ export class EmployeeShellPageComponent {
       statusLabel: this.texts.unknownEmployeeStatus,
       workCenter: this.texts.unknownEmployeeWorkCenter,
     };
+  }
+
+  private resolveActivePresence(presences: ReadonlyArray<EmployeePresenceModel>): EmployeePresenceModel | null {
+    if (presences.length === 0) {
+      return null;
+    }
+
+    const activePresence = presences.find((presence) => presence.isActive);
+    if (activePresence) {
+      return activePresence;
+    }
+
+    return [...presences].sort((left, right) => right.startDate.localeCompare(left.startDate))[0] ?? null;
+  }
+
+  private resolveHeaderWorkCenter(
+    workCenters: ReadonlyArray<import('../../models/employee-work-center.model').EmployeeWorkCenterModel>,
+    employee: import('../../models/employee-detail.model').EmployeeDetailModel | null,
+  ): string {
+    // Prefer an explicitly active work center assignment
+    if (workCenters && workCenters.length > 0) {
+      const active = workCenters.find((w) => w.isActive);
+      if (active) {
+        return (active.workCenterName ?? active.workCenterCode ?? '').trim() || this.texts.employeePageHeaderEmptyValue;
+      }
+
+      // Fallback to most recent by startDate
+      const recent = [...workCenters].sort((l, r) => r.startDate.localeCompare(l.startDate))[0];
+      if (recent) {
+        return (recent.workCenterName ?? recent.workCenterCode ?? '').trim() || this.texts.employeePageHeaderEmptyValue;
+      }
+    }
+
+    // Fall back to employee.workCenter (directory or detail mapping)
+    if (employee && employee.workCenter) {
+      return employee.workCenter;
+    }
+
+    return this.texts.employeePageHeaderEmptyValue;
+  }
+
+  private findPreferredContactValue(
+    contacts: ReadonlyArray<EmployeeContactModel>,
+    type: EmployeeContactModel['type'],
+  ): string {
+    const directMatch = contacts.find((contact) => contact.type === type);
+    const value = directMatch?.value?.trim() ?? '';
+
+    return value.length > 0 ? value : this.texts.employeePageHeaderEmptyValue;
   }
 }

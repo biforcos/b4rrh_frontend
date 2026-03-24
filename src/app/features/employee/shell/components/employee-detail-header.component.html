@@ -1,31 +1,33 @@
 <header class="employee-detail-header" aria-label="Employee detail header">
-  <div class="employee-detail-header__identity-row">
-    <div class="employee-detail-header__identity-main">
-      <div class="employee-detail-header__name-row">
-        <h2>{{ employee().displayName }}</h2>
-        <button
-          type="button"
-          class="employee-detail-header__edit-trigger"
-          [disabled]="updating()"
-          (click)="openIdentityEditor()"
-        >
-          {{ texts.detailHeaderEditAction }}
-        </button>
+  @if (!editorOnly()) {
+    <div class="employee-detail-header__identity-row">
+      <div class="employee-detail-header__identity-main">
+        <div class="employee-detail-header__name-row">
+          <h2>{{ employee().displayName }}</h2>
+          <button
+            type="button"
+            class="employee-detail-header__edit-trigger"
+            [disabled]="updating()"
+            (click)="openIdentityEditor()"
+          >
+            {{ texts.detailHeaderEditAction }}
+          </button>
+        </div>
+
+        <div class="employee-detail-header__keyline" [attr.aria-label]="texts.currentEmployeeKeyLabel">
+          <span class="employee-detail-header__identity-chip employee-detail-header__identity-chip--primary">
+            {{ employee().employeeNumber }}
+          </span>
+          <span class="employee-detail-header__identity-chip">{{ employee().employeeTypeCode }}</span>
+          <span class="employee-detail-header__identity-chip">{{ employee().ruleSystemCode }}</span>
+        </div>
       </div>
 
-      <div class="employee-detail-header__keyline" [attr.aria-label]="texts.currentEmployeeKeyLabel">
-        <span class="employee-detail-header__identity-chip employee-detail-header__identity-chip--primary">
-          {{ employee().employeeNumber }}
-        </span>
-        <span class="employee-detail-header__identity-chip">{{ employee().employeeTypeCode }}</span>
-        <span class="employee-detail-header__identity-chip">{{ employee().ruleSystemCode }}</span>
+      <div class="employee-detail-header__avatar" [attr.aria-label]="texts.detailAvatarPlaceholderAriaLabel">
+        <span class="employee-detail-header__avatar-initials">{{ avatarInitials() }}</span>
       </div>
     </div>
-
-    <div class="employee-detail-header__avatar" [attr.aria-label]="texts.detailAvatarPlaceholderAriaLabel">
-      <span class="employee-detail-header__avatar-initials">{{ avatarInitials() }}</span>
-    </div>
-  </div>
+  }
 
   @if (editingIdentity()) {
     <section class="employee-detail-header__edit-popover" (click)="$event.stopPropagation()">
@@ -80,23 +82,25 @@
     </section>
   }
 
-  <dl class="employee-detail-header__meta-row">
-    <div class="employee-detail-header__meta-item">
-      <dt>{{ texts.detailHeaderStatusLabel }}</dt>
-      <dd>
-        <span
-          class="employee-detail-header__status-chip"
-          [class.employee-detail-header__status-chip--positive]="statusTone() === 'positive'"
-          [class.employee-detail-header__status-chip--warning]="statusTone() === 'warning'"
-          [class.employee-detail-header__status-chip--neutral]="statusTone() === 'neutral'"
-        >
-          {{ employee().statusLabel }}
-        </span>
-      </dd>
-    </div>
-    <div class="employee-detail-header__meta-item">
-      <dt>{{ texts.detailHeaderWorkCenterLabel }}</dt>
-      <dd>{{ employee().workCenter }}</dd>
-    </div>
-  </dl>
+  @if (!editorOnly()) {
+    <dl class="employee-detail-header__meta-row">
+      <div class="employee-detail-header__meta-item">
+        <dt>{{ texts.detailHeaderStatusLabel }}</dt>
+        <dd>
+          <span
+            class="employee-detail-header__status-chip"
+            [class.employee-detail-header__status-chip--positive]="statusTone() === 'positive'"
+            [class.employee-detail-header__status-chip--warning]="statusTone() === 'warning'"
+            [class.employee-detail-header__status-chip--neutral]="statusTone() === 'neutral'"
+          >
+            {{ employee().statusLabel }}
+          </span>
+        </dd>
+      </div>
+      <div class="employee-detail-header__meta-item">
+        <dt>{{ texts.detailHeaderWorkCenterLabel }}</dt>
+        <dd>{{ employee().workCenter }}</dd>
+      </div>
+    </dl>
+  }
 </header>

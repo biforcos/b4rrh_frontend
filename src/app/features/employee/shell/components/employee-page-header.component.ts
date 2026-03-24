@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { employeeTexts } from '../../employee.texts';
 
 type EmployeeStatus = 'ACTIVE' | 'INACTIVE';
 
@@ -19,7 +20,12 @@ export class EmployeePageHeaderComponent {
   readonly hireDate = input('2024-01-15');
   readonly email = input('marina.lopez@b4rrhh.local');
   readonly phone = input('+34 600 123 456');
+  readonly editIdentityRequested = output<void>();
 
+  protected readonly texts = employeeTexts;
   protected readonly isActive = computed(() => this.status() === 'ACTIVE');
-  protected readonly statusLabel = computed(() => (this.isActive() ? 'Active' : 'Inactive'));
+
+  protected requestEditIdentity(): void {
+    this.editIdentityRequested.emit();
+  }
 }

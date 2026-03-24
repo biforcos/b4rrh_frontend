@@ -52,19 +52,30 @@
 
       @if (selectedEmployee(); as employee) {
         <section class="employee-shell__identity-zone">
-          <app-employee-page-header
+            <app-employee-page-header
             [fullName]="employee.displayName"
             [employeeNumber]="employee.employeeNumber"
             [ruleSystemCode]="employee.ruleSystemCode"
             [employeeTypeCode]="employee.employeeTypeCode"
             [status]="headerStatus()"
-            [companyCode]="'N/A'"
-            [workCenterCode]="employee.workCenter"
-            [hireDate]="'N/A'"
-            [email]="'N/A'"
-            [phone]="'N/A'"
+            [companyCode]="headerCompany()"
+              [workCenterCode]="headerWorkCenter()"
+            [hireDate]="headerHireDate()"
+            [email]="headerEmail()"
+            [phone]="headerPhone()"
+            (editIdentityRequested)="openIdentityEditorFromHeader()"
           />
-          <p class="employee-shell__foundation-marker">{{ foundationMarker }}</p>
+
+          <app-employee-detail-header
+            [employee]="employee"
+            [editorOnly]="true"
+            [openEditorRequestId]="openIdentityEditorRequestId()"
+            [updating]="updatingIdentity()"
+            [updateError]="updateIdentityError()"
+            [updateSuccess]="updateIdentitySuccess()"
+            (updateRequested)="submitIdentityUpdate($event)"
+            (editInteractionStarted)="clearIdentityFeedback()"
+          />
         </section>
 
         <div class="employee-shell__content-layout">

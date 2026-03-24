@@ -4,10 +4,12 @@ import {
   ElementRef,
   HostListener,
   computed,
+  effect,
   inject,
   input,
   output,
   signal,
+  untracked,
 } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
@@ -26,6 +28,8 @@ export class EmployeeDetailHeaderComponent {
   private readonly elementRef = inject(ElementRef<HTMLElement>);
 
   readonly employee = input.required<EmployeeDetailModel>();
+  readonly editorOnly = input(false);
+  readonly openEditorRequestId = input(0);
   readonly updating = input(false);
   readonly updateError = input(false);
   readonly updateSuccess = input(false);
@@ -42,6 +46,19 @@ export class EmployeeDetailHeaderComponent {
   });
   protected readonly avatarInitials = computed(() => this.buildAvatarInitials(this.employee().displayName));
   protected readonly statusTone = computed(() => this.resolveStatusTone(this.employee().statusLabel));
+
+  constructor() {
+    effect(() => {
+      const requestId = this.openEditorRequestId();
+      if (requestId <= 0) {
+        return;
+      }
+
+      untracked(() => {
+        this.openIdentityEditor();
+      });
+    });
+  }
 
   protected openIdentityEditor(): void {
     const employee = this.employee();
