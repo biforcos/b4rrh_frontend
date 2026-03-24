@@ -7,6 +7,7 @@ import {
   EmployeeJourneyEventStatus,
   EmployeeJourneyModel,
 } from '../../models/employee-journey.model';
+import { EmployeePresenceModel } from '../../models/employee-presence.model';
 
 interface JourneyDetailEntryViewModel {
   id: string;
@@ -27,6 +28,22 @@ interface GroupedJourneyEventViewModel {
   hasFutureEvent: boolean;
 }
 
+interface PresenceDateGroupViewModel {
+  eventDate: string;
+  semanticLabel: string | null;
+  events: ReadonlyArray<EmployeeJourneyEventModel>;
+}
+
+interface PresenceGroupViewModel {
+  id: string;
+  company: string | null;
+  start: string;
+  end: string | null;
+  isActive: boolean;
+  events: ReadonlyArray<EmployeeJourneyEventModel>;
+  groupedEvents: ReadonlyArray<PresenceDateGroupViewModel>;
+}
+
 const trackPriorityByCode: Readonly<Record<string, number>> = {
   PRESENCE: 0,
   CONTRACT: 1,
@@ -43,17 +60,22 @@ const secondaryTrackLabelByCode: Readonly<Record<string, string>> = {
   selector: 'app-employee-journey-timeline',
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './employee-journey-timeline.component.html',
-  styleUrl: './employee-journey-timeline.component.scss',
+  styleUrls: ['./employee-journey-timeline.component.scss'],
 })
 export class EmployeeJourneyTimelineComponent {
   readonly journey = input<EmployeeJourneyModel | null>(null);
+  readonly presences = input<ReadonlyArray<EmployeePresenceModel> | null>(null);
   readonly loading = input(false);
   readonly error = input<EmployeeJourneyErrorCode | null>(null);
   protected readonly isExpanded = signal(false);
+  protected readonly expandedPresences = signal<Record<string, boolean>>({});
 
   protected readonly texts = employeeTexts;
   protected readonly groupedTimelineEvents = computed<ReadonlyArray<GroupedJourneyEventViewModel>>(() =>
     this.groupEventsByDate(this.journey()?.events ?? []),
+  );
+  protected readonly presenceGroups = computed(() =>
+    this.groupEventsByPresence(this.journey()?.events ?? [], this.presences() ?? []),
   );
   protected readonly collapsedSummary = computed(() => {
     if (this.loading()) {
@@ -69,8 +91,9 @@ export class EmployeeJourneyTimelineComponent {
       return this.texts.timelineNoEventsMessage;
     }
 
-    const groupedEvents = this.groupedTimelineEvents();
-    const latestGroupedEvent = groupedEvents[groupedEvents.length - 1];
+    const presenceGroups = this.presenceGroups();
+    const latestGroup = presenceGroups[0];
+    const latestGroupedEvent = latestGroup ? latestGroup.events[latestGroup.events.length - 1] : null;
     const eventsLabel =
       totalEvents === 1 ? this.texts.timelineEventsSingularLabel : this.texts.timelineEventsPluralLabel;
 
@@ -78,15 +101,28 @@ export class EmployeeJourneyTimelineComponent {
       return `${totalEvents} ${eventsLabel}`;
     }
 
-    return `${totalEvents} ${eventsLabel} · ${this.texts.timelineLastEventLabel}: ${latestGroupedEvent.primaryEvent.title} (${latestGroupedEvent.eventDate})`;
+    return `${totalEvents} ${eventsLabel} · ${this.texts.timelineLastEventLabel}: ${latestGroupedEvent.title} (${latestGroupedEvent.eventDate})`;
   });
   protected readonly toggleAriaLabel = computed(() =>
     this.isExpanded() ? this.texts.timelineCollapseActionLabel : this.texts.timelineExpandActionLabel,
   );
-  protected readonly hasEvents = computed(() => this.groupedTimelineEvents().length > 0);
+  protected readonly hasEvents = computed(() => this.presenceGroups().length > 0);
 
   protected toggle(): void {
     this.isExpanded.update((value) => !value);
+  }
+
+  protected isPresenceExpanded(presenceId: string, defaultExpanded: boolean): boolean {
+    const map = this.expandedPresences();
+    if (Object.prototype.hasOwnProperty.call(map, presenceId)) {
+      return Boolean(map[presenceId]);
+    }
+
+    return defaultExpanded;
+  }
+
+  protected togglePresence(presenceId: string): void {
+    this.expandedPresences.update((m) => ({ ...m, [presenceId]: !Boolean(m[presenceId]) }));
   }
 
   protected resolveStatusLabel(status: EmployeeJourneyEventStatus): string {
@@ -106,85 +142,58 @@ export class EmployeeJourneyTimelineComponent {
     return `${groupedEvent.eventDate}-${index}-${primaryEvent.eventType}-${primaryEvent.title}`;
   }
 
+  protected trackPresenceBy(_index: number, presence: { id: string }): string {
+    return presence.id;
+  }
+
   private groupEventsByDate(
     events: ReadonlyArray<EmployeeJourneyEventModel>,
   ): ReadonlyArray<GroupedJourneyEventViewModel> {
     const groupedEvents = new Map<string, Array<EmployeeJourneyEventModel>>();
 
-    for (const event of events) {
-      const eventsByDate = groupedEvents.get(event.eventDate);
-      if (eventsByDate) {
-        eventsByDate.push(event);
-        continue;
-      }
+    const extractDate = (d: string | undefined | null) => (d ? String(d).slice(0, 10) : '');
 
-      groupedEvents.set(event.eventDate, [event]);
+    for (const ev of events) {
+      const dk = extractDate(ev.eventDate) || '_unknown_date';
+      const arr = groupedEvents.get(dk) ?? [];
+      arr.push(ev);
+      groupedEvents.set(dk, arr);
     }
 
-    return Array.from(groupedEvents.entries()).map(([eventDate, dayEvents]) => {
-      const primaryEventIndex = this.selectPrimaryEventIndex(dayEvents);
-      const primaryEvent = dayEvents[primaryEventIndex];
+    const result: GroupedJourneyEventViewModel[] = [];
+    for (const [date, evs] of groupedEvents.entries()) {
+      // pick primary by track priority, then by original order
+      let primaryIndex = 0;
+      let primaryPriority = Number.MAX_SAFE_INTEGER;
+      for (let i = 0; i < evs.length; i++) {
+        const code = (evs[i].trackCode ?? '').toString().trim().toUpperCase();
+        const p = trackPriorityByCode[code] ?? 99;
+        if (p < primaryPriority) {
+          primaryPriority = p;
+          primaryIndex = i;
+        }
+      }
 
-      return {
-        eventDate,
+      const primaryEvent = evs[primaryIndex];
+      const secondaryEvents = evs.filter((_, i) => i !== primaryIndex).map((e) => ({
+        id: `${e.eventDate}-${e.eventType}-secondary`,
+        summary: this.toSecondarySummary(e),
+      }));
+
+      result.push({
+        eventDate: date,
         primaryEvent,
-        primaryDetails: this.toCompactDetails(primaryEvent),
-        secondaryEvents: dayEvents
-          .filter((_, index) => index !== primaryEventIndex)
-          .map((event, index) => this.toSecondaryEvent(event, eventDate, index)),
-        hasCurrentEvent: dayEvents.some((event) => event.isCurrent || event.status === 'current'),
-        hasFutureEvent: dayEvents.some((event) => event.status === 'future'),
-      };
-    });
-  }
-
-  private selectPrimaryEventIndex(events: ReadonlyArray<EmployeeJourneyEventModel>): number {
-    let selectedIndex = 0;
-    let selectedPriority = this.toTrackPriority(events[0].trackCode);
-
-    for (let index = 1; index < events.length; index += 1) {
-      const eventPriority = this.toTrackPriority(events[index].trackCode);
-      if (eventPriority < selectedPriority) {
-        selectedPriority = eventPriority;
-        selectedIndex = index;
-      }
+        primaryDetails: [],
+        secondaryEvents,
+        hasCurrentEvent: primaryEvent.status === 'current',
+        hasFutureEvent: primaryEvent.status === 'future',
+      });
     }
 
-    return selectedIndex;
-  }
+    // sort by date desc
+    result.sort((a, b) => b.eventDate.localeCompare(a.eventDate));
 
-  private toTrackPriority(trackCode: string): number {
-    const normalizedTrackCode = trackCode.trim().toUpperCase();
-    return trackPriorityByCode[normalizedTrackCode] ?? Number.MAX_SAFE_INTEGER;
-  }
-
-  private toSecondaryEvent(
-    event: EmployeeJourneyEventModel,
-    eventDate: string,
-    index: number,
-  ): GroupedJourneySecondaryEventViewModel {
-    return {
-      id: `${eventDate}-${index}-${event.eventType}-${event.title}`,
-      summary: this.toSecondarySummary(event),
-    };
-  }
-
-  private toCompactDetails(event: EmployeeJourneyEventModel): ReadonlyArray<JourneyDetailEntryViewModel> {
-    if (!this.isPresenceTrack(event.trackCode)) {
-      return [];
-    }
-
-    const summary = this.toPresenceContextSummary(event.details, event.subtitle);
-    if (!summary) {
-      return [];
-    }
-
-    return [
-      {
-        id: `${event.eventDate}-${event.eventType}-presence-context`,
-        text: summary,
-      },
-    ];
+    return result;
   }
 
   private toSecondarySummary(event: EmployeeJourneyEventModel): string {
@@ -237,8 +246,8 @@ export class EmployeeJourneyTimelineComponent {
       return this.normalizeNarrativeValue(fallbackSubtitle);
     }
 
-    const companyCode = this.toDisplayableValue(details['companyCode']);
-    const presenceNumber = this.toDisplayableValue(details['presenceNumber']);
+    const companyCode = this.toDisplayableValue((details as any)['companyCode']);
+    const presenceNumber = this.toDisplayableValue((details as any)['presenceNumber']);
 
     if (companyCode && presenceNumber) {
       return `${companyCode} · periodo #${presenceNumber}`;
@@ -260,8 +269,8 @@ export class EmployeeJourneyTimelineComponent {
     firstKey: string,
     secondKey: string,
   ): string | null {
-    const firstValue = this.toDisplayableValue(details[firstKey]);
-    const secondValue = this.toDisplayableValue(details[secondKey]);
+    const firstValue = this.toDisplayableValue((details as any)[firstKey]);
+    const secondValue = this.toDisplayableValue((details as any)[secondKey]);
 
     if (firstValue && secondValue) {
       return `${firstValue} / ${secondValue}`;
@@ -280,15 +289,15 @@ export class EmployeeJourneyTimelineComponent {
   }
 
   private isPresenceTrack(trackCode: string): boolean {
-    return trackCode.trim().toUpperCase() === 'PRESENCE';
+    return (trackCode ?? '').toString().trim().toUpperCase() === 'PRESENCE';
   }
 
   private isContractTrack(trackCode: string): boolean {
-    return trackCode.trim().toUpperCase() === 'CONTRACT';
+    return (trackCode ?? '').toString().trim().toUpperCase() === 'CONTRACT';
   }
 
   private isLaborClassificationTrack(trackCode: string): boolean {
-    return trackCode.trim().toUpperCase() === 'LABOR_CLASSIFICATION';
+    return (trackCode ?? '').toString().trim().toUpperCase() === 'LABOR_CLASSIFICATION';
   }
 
   private toDisplayableValue(value: unknown): string | null {
@@ -299,6 +308,198 @@ export class EmployeeJourneyTimelineComponent {
 
     if (typeof value === 'number' || typeof value === 'boolean') {
       return String(value);
+    }
+
+    return null;
+  }
+
+  private groupEventsByPresence(events: ReadonlyArray<EmployeeJourneyEventModel>, presences: ReadonlyArray<EmployeePresenceModel>) {
+    // STEP 1: Build presence blocks from authoritative presences list
+    const presenceMap = new Map<string, {
+      presence: EmployeePresenceModel;
+      assigned: EmployeeJourneyEventModel[];
+    }>();
+
+    for (const p of presences) {
+      const id = String((p as any).presenceNumber);
+      presenceMap.set(id, { presence: p, assigned: [] });
+    }
+
+    const unassignedEvents: EmployeeJourneyEventModel[] = [];
+    const extractDate = (d: string | undefined | null) => (d ? String(d).slice(0, 10) : '');
+
+    // STEP 2: Assign events deterministically
+    for (const ev of events) {
+      const evDate = extractDate(ev.eventDate);
+
+      // 2.1 presenceId in details
+      const detailsPresence = ev.details && (ev.details as any)['presenceNumber'] ? String((ev.details as any)['presenceNumber']) : null;
+      if (detailsPresence && presenceMap.has(detailsPresence)) {
+        presenceMap.get(detailsPresence)!.assigned.push(ev);
+        continue;
+      }
+
+      // 2.2 assign by date containment
+      const candidates: Array<{ id: string; start: string; end: string | null }> = [];
+      for (const [id, { presence }] of presenceMap.entries()) {
+        const start = extractDate((presence as any).startDate);
+        const end = (presence as any).endDate ? extractDate((presence as any).endDate) : null;
+        if (!evDate) continue;
+        if (evDate >= start && (end === null || evDate <= end)) {
+          candidates.push({ id, start, end });
+        }
+      }
+
+      if (candidates.length === 0) {
+        // 2.4 no match -> unassigned (debug only)
+        unassignedEvents.push(ev);
+        continue;
+      }
+
+      // 2.3 if multiple matches pick most recent matching presence (latest startDate)
+      candidates.sort((a, b) => b.start.localeCompare(a.start));
+      const chosen = candidates[0];
+      presenceMap.get(chosen.id)!.assigned.push(ev);
+    }
+
+    // STEP 3: For each presence, group events by exact date and build final structure
+    const result: PresenceGroupViewModel[] = [];
+    for (const [id, { presence, assigned }] of presenceMap.entries()) {
+      // group by date preserving assigned order
+      const byDate = new Map<string, EmployeeJourneyEventModel[]>();
+      for (const ev of assigned) {
+        const dk = extractDate(ev.eventDate) || '_unknown_date';
+        const arr = byDate.get(dk) ?? [];
+        arr.push(ev);
+        byDate.set(dk, arr);
+      }
+
+      const dateGroups: PresenceDateGroupViewModel[] = Array.from(byDate.entries()).map(([date, evs]) => ({
+        eventDate: date,
+        semanticLabel: null,
+        events: evs,
+      }));
+
+      // STEP 4: sort date groups DESC
+      dateGroups.sort((a, b) => (b.eventDate ?? '').localeCompare(a.eventDate ?? ''));
+
+      // STEP 5: events inside groups keep stable order (already preserved)
+
+      // STEP 6: semantic labels strict rules
+      for (const dg of dateGroups) {
+        const evs = dg.events;
+        const hasContract = evs.some((e) => this.isContractTrack(e.trackCode));
+        const hasClassification = evs.some((e) => this.isLaborClassificationTrack(e.trackCode));
+        const hasAssignment = evs.some((e) => {
+          const code = (e.trackCode ?? '').toString().trim().toUpperCase();
+          if (code.includes('WORK') || code.includes('ASSIGN') || code.includes('ORGANIZ')) return true;
+          const txt = `${e.eventType} ${e.title} ${e.subtitle ?? ''}`.toLowerCase();
+          return txt.includes('assignment') || txt.includes('work center') || txt.includes('centro');
+        });
+
+        const isRehire = evs.some((e) => `${e.eventType} ${e.title} ${e.subtitle ?? ''}`.toLowerCase().includes('rehire'));
+        const isTermination = evs.some((e) => {
+          const code = (e.trackCode ?? '').toString().trim().toUpperCase();
+          const txt = `${e.eventType} ${e.title} ${e.subtitle ?? ''}`.toLowerCase();
+          return code === 'PRESENCE' && (txt.includes('baja') || txt.includes('termination') || txt.includes('despido') || txt.includes('finish'));
+        });
+
+        if (isRehire) {
+          dg.semanticLabel = 'Rehire';
+          continue;
+        }
+
+        if (isTermination) {
+          dg.semanticLabel = 'Termination';
+          continue;
+        }
+
+        if (hasContract && hasClassification && hasAssignment) {
+          dg.semanticLabel = 'Hire';
+          continue;
+        }
+
+        dg.semanticLabel = null;
+      }
+
+      result.push({
+        id,
+        company: (presence as any).companyName ?? (presence as any).companyCode ?? null,
+        start: (presence as any).startDate,
+        end: (presence as any).endDate,
+        isActive: (presence as any).isActive,
+        events: assigned,
+        groupedEvents: dateGroups,
+      });
+    }
+
+    // Optionally: log debug info
+    // console.debug('timeline: presences', result.length, 'unassigned', unassignedEvents.length);
+
+    return result;
+  }
+  
+
+  private detectSemanticLabel(events: ReadonlyArray<EmployeeJourneyEventModel>): string | null {
+    // simple heuristics based on event type or title/subtitle keywords
+    const hay = events.map((e) => `${e.eventType} ${e.title} ${e.subtitle ?? ''}`.toLowerCase()).join(' ');
+
+    if (hay.includes('hire') || hay.includes('alta') || hay.includes('contrat') || hay.includes('incorp')) {
+      return 'Hire';
+    }
+
+    if (hay.includes('termination') || hay.includes('despido') || hay.includes('baja') || hay.includes('finish')) {
+      return 'Termination';
+    }
+
+    if (hay.includes('rehire') || hay.includes('reincorp') || hay.includes('reingres')) {
+      return 'Rehire';
+    }
+
+    if (hay.includes('change') || hay.includes('cambio') || hay.includes('modific') || hay.includes('update')) {
+      return 'Change';
+    }
+
+    return null;
+  }
+
+  private detectSemanticLabelForPresenceGroup(
+    group: PresenceDateGroupViewModel,
+    context: { start: string; end: string | null; isActive: boolean; events: ReadonlyArray<EmployeeJourneyEventModel> },
+  ): string | null {
+    // Conservative rules:
+    // - Hire: when the group's date equals presence start and presence contains at least PRESENCE + CONTRACT (or labor classification)
+    // - Termination: when group's date equals presence end and presence is closed
+    // - Rehire: when any event in group has explicit 'rehire' keyword
+
+    const hay = group.events.map((e) => `${e.eventType} ${e.title} ${e.subtitle ?? ''}`.toLowerCase()).join(' ');
+
+    // Rehire explicit
+    if (hay.includes('rehire') || hay.includes('reincorp') || hay.includes('reingres')) {
+      return 'Rehire';
+    }
+
+    // Termination: only if presence is closed and group date equals context.end
+    if (!context.isActive && context.end && group.eventDate === context.end) {
+      const hasEndSignal = group.events.some((e) => {
+        const txt = `${e.title} ${e.subtitle ?? ''}`.toLowerCase();
+        return txt.includes('baja') || txt.includes('termination') || txt.includes('despido') || txt.includes('finish');
+      });
+
+      if (hasEndSignal) return 'Termination';
+    }
+
+    // Hire: only when group's date equals presence start and the presence has clear start-related tracks
+    if (group.eventDate === context.start) {
+      const trackSet = new Set(context.events.map((e) => e.trackCode.trim().toUpperCase()));
+      const hasPresence = trackSet.has('PRESENCE');
+      const hasContract = trackSet.has('CONTRACT');
+      const hasClassification = trackSet.has('LABOR_CLASSIFICATION');
+
+      // require at least PRESENCE + one of CONTRACT or LABOR_CLASSIFICATION
+      if (hasPresence && (hasContract || hasClassification)) {
+        return 'Hire';
+      }
     }
 
     return null;
