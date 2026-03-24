@@ -22,17 +22,17 @@
   text-align: left;
   display: grid;
   gap: 0.24rem;
-  border: 1px solid var(--border-subtle);
+  border: 1px solid rgba(15,23,42,0.02);
   border-radius: 0.52rem;
   background: var(--surface-panel);
-  padding: 0.44rem 0.54rem;
+  padding: 0.42rem 0.48rem;
   cursor: pointer;
   transition: border-color 120ms ease, background-color 120ms ease, box-shadow 120ms ease;
 }
 
 .employee-directory-list__item:hover {
-  border-color: #b7c7da;
-  background: #f9fbfd;
+  border-color: rgba(15,23,42,0.045);
+  background: #fbfcfd;
 }
 
 .employee-directory-list__item:focus-visible {
@@ -41,9 +41,18 @@
 }
 
 .employee-directory-list__item--selected {
-  border-color: var(--accent-strong);
-  background: #edf6fe;
-  box-shadow: inset 2px 0 0 var(--accent-strong);
+  border-color: rgba(2,108,200,0.22);
+  background: rgba(2,108,200,0.045);
+  box-shadow: none;
+  outline: 1px solid rgba(2,108,200,0.07);
+}
+
+.employee-directory-list__item:not(.employee-directory-list__item--selected) {
+  opacity: 0.96;
+}
+
+.employee-directory-list__context-value {
+  color: rgba(50,70,90,0.5);
 }
 
 .employee-directory-list__topline {
