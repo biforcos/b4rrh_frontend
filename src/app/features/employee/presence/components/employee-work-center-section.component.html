@@ -30,26 +30,26 @@
   <div temporalCreateForm class="employee-work-center-section__form-grid">
     <label class="employee-work-center-section__field employee-work-center-section__field--code">
       <span>{{ texts.workCenterSectionCodeLabel }}</span>
-      <select
+      <app-ui-select
         [value]="createDraft().workCenterCode"
         [disabled]="catalogOptionsLoading()"
-        (change)="updateCreateField('workCenterCode', $any($event.target).value)"
+        (valueChanged)="updateCreateField('workCenterCode', $event)"
       >
         <option value="">{{ texts.workCenterSectionCodeLabel }}</option>
         @for (option of createWorkCenterCodeOptions(); track option.value) {
           <option [value]="option.value">{{ option.label }}</option>
         }
-      </select>
+      </app-ui-select>
     </label>
 
     <label class="employee-work-center-section__field employee-work-center-section__field--start-date">
       <span>{{ texts.workCenterSectionStartDateLabel }}</span>
-      <input type="date" [value]="createDraft().startDate" (input)="updateCreateField('startDate', $any($event.target).value)" />
+      <app-ui-date-input [value]="createDraft().startDate" (valueChanged)="updateCreateField('startDate', $event)" />
     </label>
 
     <label class="employee-work-center-section__field employee-work-center-section__field--end-date">
       <span>{{ texts.workCenterSectionEndDateLabel }}</span>
-      <input type="date" [value]="createDraft().endDate" (input)="updateCreateField('endDate', $any($event.target).value)" />
+      <app-ui-date-input [value]="createDraft().endDate" (valueChanged)="updateCreateField('endDate', $event)" />
     </label>
   </div>
 
@@ -65,26 +65,26 @@
 
     <label class="employee-work-center-section__field employee-work-center-section__field--code">
       <span>{{ texts.workCenterSectionCodeLabel }}</span>
-      <select
+      <app-ui-select
         [value]="correctDraft().workCenterCode"
         [disabled]="catalogOptionsLoading()"
-        (change)="updateCorrectField('workCenterCode', $any($event.target).value)"
+        (valueChanged)="updateCorrectField('workCenterCode', $event)"
       >
         <option value="">{{ texts.workCenterSectionCodeLabel }}</option>
         @for (option of correctWorkCenterCodeOptions(); track option.value) {
           <option [value]="option.value">{{ option.label }}</option>
         }
-      </select>
+      </app-ui-select>
     </label>
 
     <label class="employee-work-center-section__field employee-work-center-section__field--start-date">
       <span>{{ texts.workCenterSectionStartDateLabel }}</span>
-      <input type="date" [value]="correctDraft().startDate" (input)="updateCorrectField('startDate', $any($event.target).value)" />
+      <app-ui-date-input [value]="correctDraft().startDate" (valueChanged)="updateCorrectField('startDate', $event)" />
     </label>
 
     <label class="employee-work-center-section__field employee-work-center-section__field--end-date">
       <span>{{ texts.workCenterSectionEndDateLabel }}</span>
-      <input type="date" [value]="correctDraft().endDate" (input)="updateCorrectField('endDate', $any($event.target).value)" />
+      <app-ui-date-input [value]="correctDraft().endDate" (valueChanged)="updateCorrectField('endDate', $event)" />
     </label>
   </div>
 
@@ -93,7 +93,7 @@
 
     <label class="employee-work-center-section__field employee-work-center-section__field--close-date">
       <span>{{ texts.workCenterSectionCloseDateLabel }}</span>
-      <input type="date" [value]="closeEndDate()" (input)="updateCloseEndDate($any($event.target).value)" />
+      <app-ui-date-input [value]="closeEndDate()" (valueChanged)="updateCloseEndDate($event)" />
     </label>
   </div>
 </app-temporal-section>

@@ -1,0 +1,73 @@
+.ui-tabs-nav {
+  display: grid;
+}
+
+.ui-tabs-nav :where(.p-tabs) {
+  background: transparent;
+}
+
+.ui-tabs-nav :where(.p-tablist) {
+  border-bottom: 1px solid rgba(148, 163, 184, 0.28);
+}
+
+.ui-tabs-nav :where(.p-tablist-tab-list) {
+  gap: 0.16rem;
+  padding: 0 0.08rem;
+}
+
+.ui-tabs-nav :where(.p-tab) {
+  min-width: 7.2rem;
+  min-height: 2.14rem;
+  border-radius: 0.62rem 0.62rem 0 0;
+  color: #52667b;
+  font-size: 0.74rem;
+  font-weight: 700;
+  line-height: 1.2;
+  padding: 0.34rem 0.62rem;
+  border: 1px solid transparent;
+  transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+
+.ui-tabs-nav :where(.p-tab:hover) {
+  background: #f2f8ff;
+  border-color: rgba(203, 213, 225, 0.42);
+  color: #0f172a;
+}
+
+.ui-tabs-nav :where(.p-tab.p-tab-active) {
+  background: linear-gradient(180deg, rgba(14, 116, 144, 0.14) 0%, rgba(14, 116, 144, 0.06) 100%);
+  border-color: rgba(14, 116, 144, 0.38);
+  color: #0a2f46;
+}
+
+.ui-tabs-nav :where(.p-tab.p-disabled) {
+  opacity: 0.64;
+}
+
+.ui-tabs-nav :where(.p-tablist-active-bar) {
+  background: #0e7490;
+  height: 3px;
+  border-radius: 3px;
+}
+
+.ui-tabs-nav__label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  text-align: center;
+}
+
+@media (max-width: 1100px) {
+  .ui-tabs-nav :where(.p-tab) {
+    min-width: 6.8rem;
+  }
+}
+
+@media (max-width: 760px) {
+  .ui-tabs-nav :where(.p-tab) {
+    min-width: 6.2rem;
+    min-height: 1.98rem;
+    padding: 0.3rem 0.46rem;
+  }
+}

@@ -1,8 +1,8 @@
 export const appTexts = {
   brandName: 'B4RRHH',
-  moduleName: 'Personnel Administration',
-  environmentLabel: 'Backoffice',
+  brandHomeAriaLabel: 'Ir a inicio',
   navigationAriaLabel: 'Navegacion principal de la aplicacion',
+  sectionGeneral: 'General',
   sectionHome: 'Inicio',
   sectionPeople: 'Personas',
   sectionEmployees: 'Empleados',

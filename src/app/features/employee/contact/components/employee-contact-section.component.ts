@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
+import { InputTextModule } from 'primeng/inputtext';
 import { take } from 'rxjs';
 
 import { mapEmployeeContactModelToSlotRow } from '../../data-access/employee-contact-edit.mapper';
@@ -7,6 +8,8 @@ import { EmployeeContactStore } from '../../data-access/employee-contact.store';
 import { employeeTexts } from '../../employee.texts';
 import { EmployeeBusinessKey } from '../../models/employee-business-key.model';
 import { EmployeeSectionShellComponent } from '../../shared/ui/section/employee-section-shell.component';
+import { UiButtonComponent } from '../../../../shared/ui/button/ui-button.component';
+import { UiSelectComponent } from '../../../../shared/ui/select/ui-select.component';
 import {
   SlotDraft,
   SlotKeyOption,
@@ -29,7 +32,7 @@ function createEmptyContactDraft(): SlotDraft<string> {
 @Component({
   selector: 'app-employee-contact-section',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [EmployeeSectionShellComponent],
+  imports: [EmployeeSectionShellComponent, UiButtonComponent, UiSelectComponent, InputTextModule],
   templateUrl: './employee-contact-section.component.html',
   styleUrl: './employee-contact-section.component.scss',
 })

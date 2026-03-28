@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 
+import { UiTagComponent } from '../../../../shared/ui/tag/ui-tag.component';
 import { employeeTexts } from '../../employee.texts';
 import { EmployeeBusinessKey } from '../../models/employee-business-key.model';
 import { EmployeeListItemModel } from '../../models/employee-list-item.model';
@@ -7,7 +8,9 @@ import { areEmployeeBusinessKeysEqual, toEmployeeBusinessKey } from '../../routi
 
 @Component({
   selector: 'app-employee-directory-list',
+  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [UiTagComponent],
   templateUrl: './employee-directory-list.component.html',
   styleUrl: './employee-directory-list.component.scss',
 })
@@ -24,5 +27,10 @@ export class EmployeeDirectoryListComponent {
 
   protected isSelected(employee: EmployeeListItemModel): boolean {
     return areEmployeeBusinessKeysEqual(this.selectedEmployeeKey(), employee);
+  }
+
+  protected resolveStatusSeverity(statusLabel: string): 'success' | 'secondary' {
+    const normalizedStatus = statusLabel.trim().toLowerCase();
+    return normalizedStatus.includes('active') || normalizedStatus.includes('alta') ? 'success' : 'secondary';
   }
 }

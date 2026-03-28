@@ -1,21 +1,37 @@
 <app-employee-section-shell [title]="title()" [subtitle]="subtitle()" [state]="state()">
   <div sectionShellHeaderActions class="editable-slot-section__header-actions">
     @if (showManageAction()) {
-      <button type="button" class="editable-slot-section__manage-action" (click)="onManageStarted()">
-        {{ texts().manageAction }}
-      </button>
+      <app-ui-button
+        type="button"
+        class="editable-slot-section__manage-action"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        [label]="texts().manageAction"
+        (pressed)="onManageStarted()"
+      />
     }
 
     @if (showAddAction()) {
-      <button type="button" class="editable-slot-section__add-action" (click)="onCreateStarted()">
-        {{ texts().addAction }}
-      </button>
+      <app-ui-button
+        type="button"
+        class="editable-slot-section__add-action"
+        size="small"
+        [label]="texts().addAction"
+        (pressed)="onCreateStarted()"
+      />
     }
 
     @if (showExitManageAction()) {
-      <button type="button" class="editable-slot-section__exit-manage-action" (click)="onManageExited()">
-        {{ texts().exitManageAction }}
-      </button>
+      <app-ui-button
+        type="button"
+        class="editable-slot-section__exit-manage-action"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        [label]="texts().exitManageAction"
+        (pressed)="onManageExited()"
+      />
     }
   </div>
 
@@ -35,31 +51,41 @@
             <label>
               <span>{{ texts().keyFieldLabel }}</span>
               @if (canUseKeySelect()) {
-                <select [value]="draft().key ?? ''" (change)="onDraftKeySelect($event)">
+                <app-ui-select [value]="draft().key ?? ''" (valueChanged)="onDraftKeySelect($event)">
                   <option value="">{{ texts().keyFieldLabel }}</option>
                   @for (option of availableKeys(); track option.value) {
                     <option [value]="option.value">{{ option.label }}</option>
                   }
-                </select>
+                </app-ui-select>
               } @else {
-                <input type="text" [value]="draft().key ?? ''" (input)="onDraftKeyInput($event)" />
+                <input pInputText type="text" [value]="draft().key ?? ''" (input)="onDraftKeyInput($event)" />
               }
             </label>
 
             <label>
               <span>{{ texts().valueFieldLabel }}</span>
-              <input type="text" [value]="draft().value" (input)="onDraftValueInput($event)" />
+              <input pInputText type="text" [value]="draft().value" (input)="onDraftValueInput($event)" />
             </label>
           </div>
         }
 
         <div class="editable-slot-section__row-actions">
-          <button type="button" [disabled]="!resolvedCreateSubmitEnabled() || state().busy" (click)="onCreateSubmitted()">
-            {{ texts().saveCreateAction }}
-          </button>
-          <button type="button" class="editable-slot-section__cancel-action" (click)="onCancelled()">
-            {{ texts().cancelAction }}
-          </button>
+          <app-ui-button
+            type="button"
+            size="small"
+            [label]="texts().saveCreateAction"
+            [disabled]="!resolvedCreateSubmitEnabled() || state().busy"
+            (pressed)="onCreateSubmitted()"
+          />
+          <app-ui-button
+            type="button"
+            class="editable-slot-section__cancel-action"
+            severity="secondary"
+            [outlined]="true"
+            size="small"
+            [label]="texts().cancelAction"
+            (pressed)="onCancelled()"
+          />
         </div>
       </article>
     }
@@ -87,29 +113,51 @@
 
                   <label>
                     <span>{{ texts().valueFieldLabel }}</span>
-                    <input type="text" [value]="draft().value" (input)="onDraftValueInput($event)" />
+                    <input pInputText type="text" [value]="draft().value" (input)="onDraftValueInput($event)" />
                   </label>
                 </div>
               }
 
               <div class="editable-slot-section__row-actions">
-                <button type="button" [disabled]="!resolvedEditSubmitEnabled() || state().busy" (click)="onEditSubmitted(row.key)">
-                  {{ texts().saveEditAction }}
-                </button>
-                <button type="button" class="editable-slot-section__cancel-action" (click)="onCancelled()">
-                  {{ texts().cancelAction }}
-                </button>
+                <app-ui-button
+                  type="button"
+                  size="small"
+                  [label]="texts().saveEditAction"
+                  [disabled]="!resolvedEditSubmitEnabled() || state().busy"
+                  (pressed)="onEditSubmitted(row.key)"
+                />
+                <app-ui-button
+                  type="button"
+                  class="editable-slot-section__cancel-action"
+                  severity="secondary"
+                  [outlined]="true"
+                  size="small"
+                  [label]="texts().cancelAction"
+                  (pressed)="onCancelled()"
+                />
               </div>
             } @else if (isRowDeleteConfirming(row)) {
               <div class="editable-slot-section__delete-confirm">
                 <p>{{ texts().confirmDeleteMessage }}</p>
                 <div class="editable-slot-section__row-actions">
-                  <button type="button" class="editable-slot-section__danger-action" (click)="onDeleteConfirmed(row.key)">
-                    {{ texts().confirmDeleteAction }}
-                  </button>
-                  <button type="button" class="editable-slot-section__cancel-action" (click)="onCancelled()">
-                    {{ texts().cancelAction }}
-                  </button>
+                  <app-ui-button
+                    type="button"
+                    class="editable-slot-section__danger-action"
+                    severity="danger"
+                    [outlined]="true"
+                    size="small"
+                    [label]="texts().confirmDeleteAction"
+                    (pressed)="onDeleteConfirmed(row.key)"
+                  />
+                  <app-ui-button
+                    type="button"
+                    class="editable-slot-section__cancel-action"
+                    severity="secondary"
+                    [outlined]="true"
+                    size="small"
+                    [label]="texts().cancelAction"
+                    (pressed)="onCancelled()"
+                  />
                 </div>
               </div>
             } @else {
@@ -124,7 +172,7 @@
                 @if (row.badges && row.badges.length > 0) {
                   <ul class="editable-slot-section__badges" role="list" aria-label="Row metadata badges">
                     @for (badge of row.badges; track $index) {
-                      <li class="editable-slot-section__badge">{{ badge }}</li>
+                        <li><app-ui-tag class="editable-slot-section__badge" [value]="badge" severity="info" [rounded]="true" /></li>
                     }
                   </ul>
                 }
@@ -133,13 +181,26 @@
               @if (showRowMaintenanceActions() && !isRowReadonly(row) && (canEdit() || canDelete())) {
                 <div class="editable-slot-section__row-actions">
                   @if (canEdit()) {
-                    <button type="button" (click)="onEditStarted(row.key)">{{ texts().editAction }}</button>
+                    <app-ui-button
+                      type="button"
+                      severity="secondary"
+                      [outlined]="true"
+                      size="small"
+                      [label]="texts().editAction"
+                      (pressed)="onEditStarted(row.key)"
+                    />
                   }
 
                   @if (canDelete()) {
-                    <button type="button" class="editable-slot-section__danger-action" (click)="onDeleteRequested(row.key)">
-                      {{ texts().deleteAction }}
-                    </button>
+                    <app-ui-button
+                      type="button"
+                      class="editable-slot-section__danger-action"
+                      severity="danger"
+                      [outlined]="true"
+                      size="small"
+                      [label]="texts().deleteAction"
+                      (pressed)="onDeleteRequested(row.key)"
+                    />
                   }
                 </div>
               }

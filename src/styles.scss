@@ -1,19 +1,23 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
 
 :root {
 	--font-body: 'IBM Plex Sans', 'Segoe UI', sans-serif;
-	--font-heading: 'Space Grotesk', 'Segoe UI', sans-serif;
+	--font-heading: 'IBM Plex Sans', 'Segoe UI', sans-serif;
 	--text-primary: #0f172a;
 	--text-muted: #475569;
-	--accent-strong: #0369a1;
-	--accent-soft: #0ea5b7;
-	--border-subtle: #e6edf3;
-	--border-strong: #cfdbe6;
-	--surface-app: #f5f7f9; /* very light grey page background */
-	--surface-panel: #ffffff; /* main cards */
-	--surface-block: #f2f5f7; /* inner blocks within sections */
-	--surface-block-alt: #f8fafc; /* slight alt for timeline */
+	--text-soft: #64748b;
+	--accent-strong: #0e7490;
+	--accent-soft: #22d3ee;
+	--border-subtle: #e2e8f0;
+	--border-strong: #cbd5e1;
+	--surface-app: #f3f7fb;
+	--surface-panel: #ffffff;
+	--surface-muted: #f8fbff;
+	--surface-block: #eef5fb;
+	--surface-block-alt: #f8fbff;
 	--shadow-panel: 0 8px 20px rgba(15, 23, 42, 0.06);
+	--shadow-soft: 0 18px 45px -30px rgba(14, 116, 144, 0.45);
+	--focus-ring: 0 0 0 3px rgba(34, 211, 238, 0.34);
 }
 
 * {
@@ -29,14 +33,21 @@ body {
 body {
 	font-family: var(--font-body);
 	color: var(--text-primary);
-	background: var(--surface-app);
+	background:
+		radial-gradient(circle at 14% -10%, rgba(34, 211, 238, 0.14), transparent 36%),
+		radial-gradient(circle at 92% 2%, rgba(14, 116, 144, 0.12), transparent 32%),
+		linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(248, 252, 255, 0.72)),
+		var(--surface-app);
 }
 
 h1,
 h2,
-h3 {
+h3,
+h4,
+h5,
+h6 {
 	font-family: var(--font-heading);
-	letter-spacing: -0.01em;
+	letter-spacing: -0.005em;
 }
 
 p {
@@ -48,4 +59,37 @@ input,
 textarea,
 select {
 	font: inherit;
+}
+
+:focus-visible {
+	outline: none;
+	box-shadow: var(--focus-ring);
+	border-radius: 0.5rem;
+}
+
+::selection {
+	background: rgba(34, 211, 238, 0.24);
+	color: #082f49;
+}
+
+.p-button {
+	font-weight: 600;
+	letter-spacing: 0.01em;
+}
+
+.p-component {
+	font-family: var(--font-body);
+}
+
+.p-inputtext,
+.p-select,
+.p-tab {
+	font-family: var(--font-body);
+}
+
+.p-tag {
+	font-family: var(--font-body);
+	font-size: 0.62rem;
+	font-weight: 700;
+	letter-spacing: 0.02em;
 }

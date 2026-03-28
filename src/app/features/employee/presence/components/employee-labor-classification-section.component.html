@@ -27,39 +27,38 @@
   <div temporalCreateForm class="employee-labor-classification-section__form-grid employee-labor-classification-section__form-grid--create">
     <label class="employee-labor-classification-section__field employee-labor-classification-section__field--effective-date">
       <span>{{ texts.laborClassificationSectionEffectiveDateLabel }}</span>
-      <input
-        type="date"
+      <app-ui-date-input
         [value]="replaceDraft().effectiveDate"
-        (input)="updateReplaceField('effectiveDate', $any($event.target).value)"
+        (valueChanged)="updateReplaceField('effectiveDate', $event)"
       />
     </label>
 
     <label class="employee-labor-classification-section__field employee-labor-classification-section__field--agreement">
       <span>{{ texts.laborClassificationSectionAgreementLabel }}</span>
-      <select
+      <app-ui-select
         [value]="replaceDraft().agreementCode"
         [disabled]="agreementOptionsLoading()"
-        (change)="updateReplaceField('agreementCode', $any($event.target).value)"
+        (valueChanged)="updateReplaceField('agreementCode', $event)"
       >
         <option value="">{{ texts.laborClassificationSectionAgreementLabel }}</option>
         @for (option of agreementOptions(); track option.value) {
           <option [value]="option.value">{{ option.label }}</option>
         }
-      </select>
+      </app-ui-select>
     </label>
 
     <label class="employee-labor-classification-section__field employee-labor-classification-section__field--category">
       <span>{{ texts.laborClassificationSectionCategoryLabel }}</span>
-      <select
+      <app-ui-select
         [value]="replaceDraft().agreementCategoryCode"
         [disabled]="replaceCategoryDisabled()"
-        (change)="updateReplaceField('agreementCategoryCode', $any($event.target).value)"
+        (valueChanged)="updateReplaceField('agreementCategoryCode', $event)"
       >
         <option value="">{{ texts.laborClassificationSectionCategoryLabel }}</option>
         @for (option of replaceCategoryOptions(); track option.value) {
           <option [value]="option.value">{{ option.label }}</option>
         }
-      </select>
+      </app-ui-select>
     </label>
   </div>
 
@@ -73,30 +72,30 @@
 
     <label class="employee-labor-classification-section__field employee-labor-classification-section__field--agreement">
       <span>{{ texts.laborClassificationSectionAgreementLabel }}</span>
-      <select
+      <app-ui-select
         [value]="correctDraft().agreementCode"
         [disabled]="agreementOptionsLoading()"
-        (change)="updateCorrectField('agreementCode', $any($event.target).value)"
+        (valueChanged)="updateCorrectField('agreementCode', $event)"
       >
         <option value="">{{ texts.laborClassificationSectionAgreementLabel }}</option>
         @for (option of agreementOptions(); track option.value) {
           <option [value]="option.value">{{ option.label }}</option>
         }
-      </select>
+      </app-ui-select>
     </label>
 
     <label class="employee-labor-classification-section__field employee-labor-classification-section__field--category">
       <span>{{ texts.laborClassificationSectionCategoryLabel }}</span>
-      <select
+      <app-ui-select
         [value]="correctDraft().agreementCategoryCode"
         [disabled]="correctCategoryDisabled()"
-        (change)="updateCorrectField('agreementCategoryCode', $any($event.target).value)"
+        (valueChanged)="updateCorrectField('agreementCategoryCode', $event)"
       >
         <option value="">{{ texts.laborClassificationSectionCategoryLabel }}</option>
         @for (option of correctCategoryOptions(); track option.value) {
           <option [value]="option.value">{{ option.label }}</option>
         }
-      </select>
+      </app-ui-select>
     </label>
   </div>
 
@@ -105,10 +104,9 @@
 
     <label class="employee-labor-classification-section__field employee-labor-classification-section__field--close-date">
       <span>{{ texts.laborClassificationSectionCloseDateLabel }}</span>
-      <input
-        type="date"
+      <app-ui-date-input
         [value]="closeDraft().endDate"
-        (input)="updateCloseField('endDate', $any($event.target).value)"
+        (valueChanged)="updateCloseField('endDate', $event)"
       />
     </label>
   </div>

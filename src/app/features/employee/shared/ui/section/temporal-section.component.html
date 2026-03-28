@@ -1,21 +1,37 @@
 <app-employee-section-shell [title]="title()" [subtitle]="subtitle()" [state]="state()">
   <div sectionShellHeaderActions class="temporal-section__header-actions">
     @if (showManageAction()) {
-      <button type="button" class="temporal-section__manage-action" (click)="onManageStarted()">
-        {{ texts().manageAction }}
-      </button>
+      <app-ui-button
+        type="button"
+        class="temporal-section__manage-action"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        [label]="texts().manageAction"
+        (pressed)="onManageStarted()"
+      />
     }
 
     @if (showAddAction()) {
-      <button type="button" class="temporal-section__add-action" (click)="onCreateStarted()">
-        {{ texts().addAction }}
-      </button>
+      <app-ui-button
+        type="button"
+        class="temporal-section__add-action"
+        size="small"
+        [label]="texts().addAction"
+        (pressed)="onCreateStarted()"
+      />
     }
 
     @if (showExitManageAction()) {
-      <button type="button" class="temporal-section__exit-manage-action" (click)="onManageExited()">
-        {{ texts().exitManageAction }}
-      </button>
+      <app-ui-button
+        type="button"
+        class="temporal-section__exit-manage-action"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        [label]="texts().exitManageAction"
+        (pressed)="onManageExited()"
+      />
     }
   </div>
 
@@ -31,12 +47,22 @@
         </div>
 
         <div class="temporal-section__row-actions">
-          <button type="button" [disabled]="!createSubmitEnabled() || state().busy" (click)="onCreateSubmitted()">
-            {{ texts().saveCreateAction }}
-          </button>
-          <button type="button" class="temporal-section__cancel-action" (click)="onCancelled()">
-            {{ texts().cancelAction }}
-          </button>
+          <app-ui-button
+            type="button"
+            size="small"
+            [label]="texts().saveCreateAction"
+            [disabled]="!createSubmitEnabled() || state().busy"
+            (pressed)="onCreateSubmitted()"
+          />
+          <app-ui-button
+            type="button"
+            class="temporal-section__cancel-action"
+            severity="secondary"
+            [outlined]="true"
+            size="small"
+            [label]="texts().cancelAction"
+            (pressed)="onCancelled()"
+          />
         </div>
       </article>
     }
@@ -56,12 +82,22 @@
               </div>
 
               <div class="temporal-section__row-actions">
-                <button type="button" [disabled]="!editSubmitEnabled() || state().busy" (click)="onEditCurrentSubmitted(row.key)">
-                  {{ texts().saveEditCurrentAction }}
-                </button>
-                <button type="button" class="temporal-section__cancel-action" (click)="onCancelled()">
-                  {{ texts().cancelAction }}
-                </button>
+                <app-ui-button
+                  type="button"
+                  size="small"
+                  [label]="texts().saveEditCurrentAction"
+                  [disabled]="!editSubmitEnabled() || state().busy"
+                  (pressed)="onEditCurrentSubmitted(row.key)"
+                />
+                <app-ui-button
+                  type="button"
+                  class="temporal-section__cancel-action"
+                  severity="secondary"
+                  [outlined]="true"
+                  size="small"
+                  [label]="texts().cancelAction"
+                  (pressed)="onCancelled()"
+                />
               </div>
             } @else if (isRowCorrecting(row)) {
               <div class="temporal-section__edit-current-form">
@@ -69,36 +105,70 @@
               </div>
 
               <div class="temporal-section__row-actions">
-                <button type="button" [disabled]="!correctSubmitEnabled() || state().busy" (click)="onCorrectSubmitted(row.key)">
-                  {{ texts().saveCorrectAction }}
-                </button>
-                <button type="button" class="temporal-section__cancel-action" (click)="onCancelled()">
-                  {{ texts().cancelAction }}
-                </button>
+                <app-ui-button
+                  type="button"
+                  size="small"
+                  [label]="texts().saveCorrectAction"
+                  [disabled]="!correctSubmitEnabled() || state().busy"
+                  (pressed)="onCorrectSubmitted(row.key)"
+                />
+                <app-ui-button
+                  type="button"
+                  class="temporal-section__cancel-action"
+                  severity="secondary"
+                  [outlined]="true"
+                  size="small"
+                  [label]="texts().cancelAction"
+                  (pressed)="onCancelled()"
+                />
               </div>
             } @else if (isRowCloseConfirming(row)) {
               <div class="temporal-section__confirm-close">
                 <p>{{ texts().confirmCloseMessage }}</p>
                 <ng-content select="[temporalConfirmCloseForm]"></ng-content>
                 <div class="temporal-section__row-actions">
-                  <button type="button" class="temporal-section__danger-action" (click)="onCloseConfirmed(row.key)">
-                    {{ texts().confirmCloseAction }}
-                  </button>
-                  <button type="button" class="temporal-section__cancel-action" (click)="onCancelled()">
-                    {{ texts().cancelAction }}
-                  </button>
+                  <app-ui-button
+                    type="button"
+                    class="temporal-section__danger-action"
+                    severity="danger"
+                    [outlined]="true"
+                    size="small"
+                    [label]="texts().confirmCloseAction"
+                    (pressed)="onCloseConfirmed(row.key)"
+                  />
+                  <app-ui-button
+                    type="button"
+                    class="temporal-section__cancel-action"
+                    severity="secondary"
+                    [outlined]="true"
+                    size="small"
+                    [label]="texts().cancelAction"
+                    (pressed)="onCancelled()"
+                  />
                 </div>
               </div>
             } @else if (isRowDeleteConfirming(row)) {
               <div class="temporal-section__confirm-close">
                 <p>{{ texts().confirmDeleteMessage }}</p>
                 <div class="temporal-section__row-actions">
-                  <button type="button" class="temporal-section__danger-action" (click)="onDeleteConfirmed(row.key)">
-                    {{ texts().confirmDeleteAction }}
-                  </button>
-                  <button type="button" class="temporal-section__cancel-action" (click)="onCancelled()">
-                    {{ texts().cancelAction }}
-                  </button>
+                  <app-ui-button
+                    type="button"
+                    class="temporal-section__danger-action"
+                    severity="danger"
+                    [outlined]="true"
+                    size="small"
+                    [label]="texts().confirmDeleteAction"
+                    (pressed)="onDeleteConfirmed(row.key)"
+                  />
+                  <app-ui-button
+                    type="button"
+                    class="temporal-section__cancel-action"
+                    severity="secondary"
+                    [outlined]="true"
+                    size="small"
+                    [label]="texts().cancelAction"
+                    (pressed)="onCancelled()"
+                  />
                 </div>
               </div>
             } @else {
@@ -149,39 +219,65 @@
               ) {
                 <div class="temporal-section__row-actions">
                   @if (showRowEditCurrentAction() && row.isCurrent === true) {
-                    <button type="button" class="temporal-section__edit-current-action" (click)="onEditCurrentStarted(row.key)">
-                      {{ texts().editCurrentAction }}
-                    </button>
+                    <app-ui-button
+                      type="button"
+                      class="temporal-section__edit-current-action"
+                      severity="secondary"
+                      [outlined]="true"
+                      size="small"
+                      [label]="texts().editCurrentAction"
+                      (pressed)="onEditCurrentStarted(row.key)"
+                    />
                   }
 
                   @if (showRowCloseAction() && (row.canClose ?? row.closeable ?? (row.isCurrent === true))) {
-                    <button type="button" class="temporal-section__danger-action" (click)="onCloseRequested(row.key)">
-                      {{ texts().closeAction }}
-                    </button>
+                    <app-ui-button
+                      type="button"
+                      class="temporal-section__danger-action"
+                      severity="danger"
+                      [outlined]="true"
+                      size="small"
+                      [label]="texts().closeAction"
+                      (pressed)="onCloseRequested(row.key)"
+                    />
                   }
 
                   @if (showRowCorrectAction() && (row.canCorrect ?? true)) {
-                  <button type="button" class="temporal-section__edit-current-action" (click)="onCorrectStarted(row.key)">
-                    {{ texts().correctAction }}
-                  </button>
+                    <app-ui-button
+                      type="button"
+                      class="temporal-section__edit-current-action"
+                      severity="secondary"
+                      [outlined]="true"
+                      size="small"
+                      [label]="texts().correctAction"
+                      (pressed)="onCorrectStarted(row.key)"
+                    />
                   }
 
                   @if (showRowDeleteAction() && (row.canDelete ?? row.deletable ?? false)) {
-                    <button type="button" class="temporal-section__delete-action" (click)="onDeleteRequested(row.key)">
-                      {{ texts().deleteAction }}
-                    </button>
+                    <app-ui-button
+                      type="button"
+                      class="temporal-section__delete-action"
+                      severity="danger"
+                      [outlined]="true"
+                      size="small"
+                      [label]="texts().deleteAction"
+                      (pressed)="onDeleteRequested(row.key)"
+                    />
                   }
 
                   @if (showRowDeleteAction() && !(row.canDelete ?? row.deletable ?? false) && row.deleteDisabledReason) {
-                    <button
+                    <app-ui-button
                       type="button"
                       class="temporal-section__delete-action"
+                      severity="danger"
+                      [outlined]="true"
+                      size="small"
                       [title]="row.deleteDisabledReason"
-                      [attr.aria-label]="row.deleteDisabledReason"
+                      [ariaLabel]="row.deleteDisabledReason"
                       [disabled]="true"
-                    >
-                      {{ texts().deleteAction }}
-                    </button>
+                      [label]="texts().deleteAction"
+                    />
                     <span class="temporal-section__disabled-action-reason">{{ row.deleteDisabledReason }}</span>
                   }
                 </div>

@@ -30,14 +30,8 @@
   color: var(--text-muted);
 }
 
-.rule-system-list-page__header button {
-  border-radius: 0.5rem;
-  border: 1px solid var(--accent-strong);
-  background: var(--accent-strong);
-  color: #ffffff;
-  min-height: 2rem;
-  padding: 0 0.8rem;
-  font-weight: 600;
+.rule-system-list-page__header :where(app-ui-button) {
+  min-width: 7.4rem;
 }
 
 .rule-system-list-page__feedback {
@@ -99,42 +93,15 @@
 }
 
 .rule-system-list-page__link-button {
-  border: 0;
-  padding: 0;
-  background: transparent;
-  color: #0f4f7f;
-  font-weight: 700;
-  cursor: pointer;
+  min-width: 4.8rem;
 }
 
 .rule-system-list-page__open-button {
-  border: 1px solid #bfd0e2;
-  background: #edf4fb;
-  color: #1f3346;
-  border-radius: 0.4rem;
-  min-height: 1.75rem;
-  padding: 0 0.55rem;
-  font-size: 0.74rem;
-  font-weight: 600;
+  min-width: 5.8rem;
 }
 
 .rule-system-list-page__status {
-  display: inline-flex;
-  align-items: center;
-  border-radius: 999px;
-  border: 1px solid #9fceb4;
-  background: #ebf9f1;
-  color: #14532d;
   font-size: 0.69rem;
-  font-weight: 700;
-  line-height: 1;
-  padding: 0.22rem 0.46rem;
-}
-
-.rule-system-list-page__status--inactive {
-  border-color: #d4dce5;
-  background: #f3f6f9;
-  color: #475569;
 }
 
 @media (max-width: 800px) {
@@ -142,7 +109,7 @@
     flex-direction: column;
   }
 
-  .rule-system-list-page__header button {
+  .rule-system-list-page__header :where(app-ui-button) {
     width: 100%;
   }
 }

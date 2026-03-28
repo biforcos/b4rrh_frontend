@@ -5,7 +5,7 @@
       <p>{{ texts.listSubtitle }}</p>
     </div>
 
-    <button type="button" (click)="openCreate()">{{ texts.listCreateAction }}</button>
+    <app-ui-button type="button" [label]="texts.listCreateAction" (pressed)="openCreate()" />
   </header>
 
   @if (loading()) {
@@ -42,21 +42,36 @@
           @for (item of items(); track item.code) {
             <tr>
               <td>
-                <button type="button" class="rule-system-list-page__link-button" (click)="openDetail(item.code)">
-                  {{ item.code }}
-                </button>
+                <app-ui-button
+                  type="button"
+                  class="rule-system-list-page__link-button"
+                  severity="secondary"
+                  [text]="true"
+                  size="small"
+                  [label]="item.code"
+                  (pressed)="openDetail(item.code)"
+                />
               </td>
               <td>{{ item.name }}</td>
               <td>{{ item.countryCode }}</td>
               <td>
-                <span class="rule-system-list-page__status" [class.rule-system-list-page__status--inactive]="!item.active">
-                  {{ item.active ? texts.activeLabel : texts.inactiveLabel }}
-                </span>
+                <app-ui-tag
+                  class="rule-system-list-page__status"
+                  [value]="item.active ? texts.activeLabel : texts.inactiveLabel"
+                  [severity]="item.active ? 'success' : 'secondary'"
+                  [rounded]="true"
+                />
               </td>
               <td>
-                <button type="button" class="rule-system-list-page__open-button" (click)="openDetail(item.code)">
-                  {{ texts.listOpenAction }}
-                </button>
+                <app-ui-button
+                  type="button"
+                  class="rule-system-list-page__open-button"
+                  size="small"
+                  severity="secondary"
+                  [outlined]="true"
+                  [label]="texts.listOpenAction"
+                  (pressed)="openDetail(item.code)"
+                />
               </td>
             </tr>
           }

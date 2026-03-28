@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 
+import { UiButtonComponent } from '../../../../../shared/ui/button/ui-button.component';
 import { EmployeeSectionShellComponent } from './employee-section-shell.component';
 import { SectionUiState } from './section-ui-state.model';
 import { TemporalDisplayMode, TemporalRowViewModel, TemporalSectionTexts } from './temporal-section.model';
@@ -26,7 +27,7 @@ const emptyTexts: TemporalSectionTexts = {
 @Component({
   selector: 'app-temporal-section',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [EmployeeSectionShellComponent],
+  imports: [EmployeeSectionShellComponent, UiButtonComponent],
   templateUrl: './temporal-section.component.html',
   styleUrl: './temporal-section.component.scss',
 })

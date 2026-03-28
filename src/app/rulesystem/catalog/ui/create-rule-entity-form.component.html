@@ -1,7 +1,7 @@
 <form class="create-rule-entity-form" [formGroup]="form" (ngSubmit)="submit()">
   <label>
     <span>{{ texts.createCodeLabel }}</span>
-    <input type="text" formControlName="code" maxlength="30" (input)="markInteraction()" [disabled]="disabled()" />
+    <input pInputText type="text" formControlName="code" maxlength="30" (input)="markInteraction()" [disabled]="disabled()" />
     @if (form.controls.code.touched && form.controls.code.hasError('required')) {
       <small class="create-rule-entity-form__error">{{ texts.createCodeRequired }}</small>
     }
@@ -12,7 +12,7 @@
 
   <label>
     <span>{{ texts.createNameLabel }}</span>
-    <input type="text" formControlName="name" maxlength="100" (input)="markInteraction()" [disabled]="disabled()" />
+    <input pInputText type="text" formControlName="name" maxlength="100" (input)="markInteraction()" [disabled]="disabled()" />
     @if (form.controls.name.touched && form.controls.name.hasError('required')) {
       <small class="create-rule-entity-form__error">{{ texts.createNameRequired }}</small>
     }
@@ -31,7 +31,11 @@
 
   <label>
     <span>{{ texts.createStartDateLabel }}</span>
-    <input type="date" formControlName="startDate" (change)="markInteraction()" [disabled]="disabled()" />
+    <app-ui-date-input
+      [value]="form.controls.startDate.value"
+      [disabled]="disabled()"
+      (valueChanged)="updateDateField('startDate', $event)"
+    />
     @if (form.controls.startDate.touched && form.controls.startDate.hasError('required')) {
       <small class="create-rule-entity-form__error">{{ texts.createStartDateRequired }}</small>
     }
@@ -39,7 +43,11 @@
 
   <label>
     <span>{{ texts.createEndDateLabel }}</span>
-    <input type="date" formControlName="endDate" (change)="markInteraction()" [disabled]="disabled()" />
+    <app-ui-date-input
+      [value]="form.controls.endDate.value"
+      [disabled]="disabled()"
+      (valueChanged)="updateDateField('endDate', $event)"
+    />
   </label>
 
   @if (hasRangeError()) {
@@ -47,12 +55,10 @@
   }
 
   <div class="create-rule-entity-form__actions">
-    <button type="submit" [disabled]="creating() || disabled()">
-      @if (creating()) {
-        {{ texts.creatingMessage }}
-      } @else {
-        {{ texts.createSubmitAction }}
-      }
-    </button>
+    <app-ui-button
+      type="submit"
+      [disabled]="creating() || disabled()"
+      [label]="creating() ? texts.creatingMessage : texts.createSubmitAction"
+    />
   </div>
 </form>

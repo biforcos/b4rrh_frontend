@@ -49,12 +49,6 @@
   padding-top: 0.2rem;
 }
 
-.create-rule-entity-form__actions button {
-  border-radius: 0.48rem;
-  border: 1px solid var(--accent-strong);
-  background: var(--accent-strong);
-  color: #ffffff;
-  min-height: 2rem;
-  padding: 0 0.78rem;
-  font-weight: 600;
+.create-rule-entity-form__actions :where(app-ui-button) {
+  min-width: 7rem;
 }

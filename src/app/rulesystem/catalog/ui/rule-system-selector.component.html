@@ -1,9 +1,9 @@
 <label class="rule-system-selector">
   <span>{{ texts.selectorLabel }}</span>
-  <select
+  <app-ui-select
     [value]="selectedCode() ?? ''"
     [disabled]="disabled()"
-    (change)="onSelectionChange($event)"
+    (valueChanged)="onSelectionChange($event)"
   >
     @if (ruleSystems().length === 0) {
       <option value="">{{ texts.selectorPlaceholder }}</option>
@@ -11,5 +11,5 @@
     @for (item of ruleSystems(); track item.code) {
       <option [value]="item.code">{{ item.code }} · {{ item.name }}</option>
     }
-  </select>
+  </app-ui-select>
 </label>

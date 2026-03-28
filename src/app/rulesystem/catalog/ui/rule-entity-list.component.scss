@@ -36,28 +36,14 @@
   flex-wrap: wrap;
 }
 
-.rule-entity-list__actions button {
-  border: 1px solid #c7d4e3;
-  background: #ffffff;
-  color: #334558;
-  border-radius: 0.38rem;
-  min-height: 1.65rem;
-  padding: 0 0.5rem;
-  font-size: 0.69rem;
-  font-weight: 600;
-}
-
-.rule-entity-list__actions button:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
+.rule-entity-list__actions :where(app-ui-button) {
+  min-width: 5.2rem;
 }
 
 .rule-entity-list__danger-action {
-  border-color: #f2c8a8;
-  color: #8a3b00;
+  min-width: 5rem;
 }
 
 .rule-entity-list__delete-action {
-  border-color: #efb4b4;
-  color: #9f1d1d;
+  min-width: 5rem;
 }

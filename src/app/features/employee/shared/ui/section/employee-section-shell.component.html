@@ -10,12 +10,14 @@
     <div class="employee-section-shell__header-actions">
       @if (hasActions()) {
         @for (action of actions(); track action.label) {
-          <button type="button" [disabled]="action.disabled ?? false">
-            @if (action.icon) {
-              <span class="employee-section-shell__action-icon" aria-hidden="true">{{ action.icon }}</span>
-            }
-            <span>{{ action.label }}</span>
-          </button>
+          <app-ui-button
+            type="button"
+            size="small"
+            severity="secondary"
+            [outlined]="true"
+            [disabled]="action.disabled ?? false"
+            [label]="(action.icon ? action.icon + ' ' : '') + action.label"
+          />
         }
       }
       <ng-content select="[sectionShellHeaderActions]"></ng-content>

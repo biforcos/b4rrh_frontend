@@ -13,15 +13,18 @@
         >
           <span class="employee-directory-list__topline">
             <span class="employee-directory-list__name">{{ employee.displayName }}</span>
-            <span class="employee-directory-list__status-chip">{{ employee.statusLabel }}</span>
+            <app-ui-tag
+              class="employee-directory-list__status-chip"
+              [value]="employee.statusLabel"
+              [severity]="resolveStatusSeverity(employee.statusLabel)"
+              [rounded]="true"
+            />
           </span>
 
           <span class="employee-directory-list__identity" [attr.aria-label]="texts.currentEmployeeKeyLabel">
-            <span class="employee-directory-list__identity-chip employee-directory-list__identity-chip--primary">
-              {{ employee.employeeNumber }}
-            </span>
-            <span class="employee-directory-list__identity-chip">{{ employee.employeeTypeCode }}</span>
-            <span class="employee-directory-list__identity-chip">{{ employee.ruleSystemCode }}</span>
+            <app-ui-tag class="employee-directory-list__identity-chip employee-directory-list__identity-chip--primary" [value]="employee.employeeNumber" severity="contrast" [rounded]="true" />
+            <app-ui-tag class="employee-directory-list__identity-chip" [value]="employee.employeeTypeCode" severity="secondary" [rounded]="true" />
+            <app-ui-tag class="employee-directory-list__identity-chip" [value]="employee.ruleSystemCode" severity="secondary" [rounded]="true" />
           </span>
 
           <span class="employee-directory-list__context">

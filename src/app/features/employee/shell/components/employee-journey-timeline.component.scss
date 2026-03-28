@@ -1,69 +1,69 @@
 .employee-journey-timeline {
   display: grid;
-  gap: 0.16rem;
+  gap: 0.42rem;
 }
 
 .employee-journey-timeline__toggle {
   width: 100%;
-  border: 1px solid rgba(15,23,42,0.04);
-  border-radius: 0.48rem;
-  background: #ffffff;
-  padding: 0.28rem 0.36rem;
+  border: 1px solid rgba(148, 163, 184, 0.36);
+  border-radius: 0.72rem;
+  background: linear-gradient(180deg, #ffffff 0%, #f4f9ff 100%);
+  padding: 0.46rem 0.54rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   text-align: left;
   cursor: pointer;
+  transition: border-color 140ms ease, background-color 140ms ease;
 }
 
 .employee-journey-timeline__toggle:hover {
-  background: #f8fbfd;
+  border-color: rgba(14, 116, 144, 0.5);
+  background: linear-gradient(180deg, #fbfeff 0%, #ecf6ff 100%);
 }
 
 .employee-journey-timeline__toggle:focus-visible {
-  outline: 2px solid #7ea0c3;
+  outline: 2px solid #0ea5b7;
 }
 
 .employee-journey-timeline__title {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 0.94rem;
   font-weight: 700;
   line-height: 1.15;
-  color: #16262f;
+  color: #12364d;
 }
 
 .employee-journey-timeline__summary {
   margin: 0;
-  font-size: 0.62rem;
+  font-size: 0.64rem;
   line-height: 1.2;
-  color: rgba(45,65,85,0.6);
+  color: rgba(47, 74, 101, 0.68);
 }
 
 .employee-journey-timeline__chevron {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.68rem;
-  color: #50687f;
+  font-size: 0.76rem;
+  color: #45637f;
 }
 
-/* legacy flat day-list removed in favor of presence grouping */
-
-/* Presence grouping styles */
 .employee-journey-timeline__presence-list {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 0.9rem;
+  gap: 0.5rem;
 }
 
 .employee-journey-timeline__presence {
-  display: block;
-  background: rgba(15,23,42,0.02);
-  border: 1px solid rgba(15,23,42,0.03);
-  border-radius: 0.56rem;
-  padding: 0.5rem 0.6rem;
+  display: grid;
+  gap: 0.14rem;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(246, 251, 255, 0.96));
+  border: 1px solid rgba(148, 163, 184, 0.34);
+  border-radius: 0.74rem;
+  padding: 0.5rem 0.58rem;
   transition: background-color 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
   position: relative;
 }
@@ -72,66 +72,53 @@
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 0.5rem;
+  gap: 0.38rem;
   padding: 0;
 }
 
 .employee-journey-timeline__presence-company {
-  font-size: 0.78rem;
+  font-size: 0.74rem;
   font-weight: 700;
-  color: rgba(10,20,30,0.9);
+  color: rgba(13, 39, 61, 0.92);
 }
 
 .employee-journey-timeline__presence-meta {
   display: flex;
-  gap: 0.4rem;
+  gap: 0.34rem;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .employee-journey-timeline__presence-period {
-  font-size: 0.66rem;
-  color: rgba(20,40,50,0.6);
+  font-size: 0.62rem;
+  color: rgba(43, 71, 93, 0.72);
   font-weight: 700;
-}
-
-.employee-journey-timeline__events {
-  list-style: none;
-  margin: 0.32rem 0 0 0;
-  padding: 0 0 0 0.8rem; /* indent content and provide guide */
-  display: grid;
-  gap: 0.16rem;
-  border-left: 2px solid rgba(10,20,30,0.04); /* subtle vertical guide */
-}
-
-.employee-journey-timeline__event {
-  padding: 0.18rem 0.28rem;
-  position: relative;
 }
 
 .employee-journey-timeline__event-row {
   display: flex;
   justify-content: space-between;
-  gap: 0.6rem;
+  gap: 0.5rem;
   align-items: baseline;
 }
 
 .employee-journey-timeline__event-title {
   margin: 0;
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 500;
-  color: rgba(10,20,30,0.86);
+  color: rgba(18, 44, 65, 0.84);
 }
 
 .employee-journey-timeline__event-date-small {
   margin: 0;
-  font-size: 0.62rem;
-  color: rgba(30,50,65,0.46);
+  font-size: 0.58rem;
+  color: rgba(44, 69, 94, 0.56);
 }
 
 .employee-journey-timeline__event-sub {
   margin: 0.08rem 0 0 0;
-  font-size: 0.6rem;
-  color: rgba(30,50,65,0.45);
+  font-size: 0.58rem;
+  color: rgba(44, 69, 94, 0.62);
   max-width: 28rem;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -139,189 +126,151 @@
 }
 
 .employee-journey-timeline__presence--active .employee-journey-timeline__presence-company {
-  color: rgba(8,35,28,0.95);
+  color: rgba(17, 83, 53, 0.95);
 }
 
 .employee-journey-timeline__presence--active {
-  background: rgba(34,97,68,0.03);
-  border-color: rgba(34,97,68,0.12);
-  box-shadow: 0 6px 18px rgba(8,24,32,0.02);
+  background: linear-gradient(180deg, #f1fcf6 0%, #e8f8ef 100%);
+  border-color: rgba(34, 122, 80, 0.32);
+  box-shadow: 0 14px 28px -24px rgba(21, 128, 61, 0.82);
 }
 
 .employee-journey-timeline__presence:not(.employee-journey-timeline__presence--active) {
   opacity: 0.96;
 }
 
-/* event marker dot */
-.employee-journey-timeline__event::before {
-  content: '';
-  position: absolute;
-  left: -1.02rem; /* aligns with border-left guide */
-  top: 0.68rem;
-  width: 0.46rem;
-  height: 0.46rem;
-  border-radius: 50%;
-  background: rgba(10,20,30,0.12);
-  border: 1px solid rgba(10,20,30,0.06);
-}
-
-/* reduce emphasis on raw codes or dense metadata */
-.employee-journey-timeline__meta-code,
-.employee-journey-timeline__raw-code {
-  display: none;
-}
-
-/* removed legacy day/date styles to avoid mixing flat list and presence grouping */
-
 .employee-journey-timeline__status-chip {
   display: inline-flex;
   align-items: center;
   border-radius: 999px;
-  border: 1px solid rgba(15,23,42,0.04);
-  background: rgba(15,23,42,0.02);
-  font-size: 0.6rem;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: rgba(241, 245, 249, 0.9);
+  font-size: 0.56rem;
   line-height: 1;
-  padding: 0.1rem 0.26rem;
-  color: rgba(20,30,40,0.6);
+  padding: 0.14rem 0.28rem;
+  color: rgba(35, 61, 83, 0.72);
   font-weight: 700;
   white-space: nowrap;
+  letter-spacing: 0.03em;
 }
 
 .employee-journey-timeline__status-chip--current {
-  border-color: rgba(34,97,68,0.12);
-  background: rgba(34,97,68,0.03);
-  color: rgba(20,60,40,0.8);
+  border-color: rgba(34, 122, 80, 0.34);
+  background: rgba(234, 255, 244, 0.86);
+  color: rgba(21, 98, 64, 0.9);
 }
-
-.employee-journey-timeline__status-chip--future {
-  border-color: #dbe3eb;
-  background: #f7f9fb;
-  color: #708296;
-  font-weight: 600;
-}
-
-/* removed legacy grouped/day detail lists as we're using presence->events nesting */
 
 .employee-journey-timeline__loading {
   display: grid;
-  gap: 0.28rem;
+  gap: 0.32rem;
 }
 
 .employee-journey-timeline__presence-toggle {
   background: transparent;
   border: none;
-  padding: 0.18rem 0;
+  padding: 0.18rem 0 0.12rem;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.38rem;
   cursor: pointer;
 }
 
 .employee-journey-timeline__presence-toggle-label {
-  font-size: 0.68rem;
-  color: rgba(30,50,65,0.6);
+  font-size: 0.62rem;
+  color: rgba(42, 67, 91, 0.74);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
 }
 
 .employee-journey-timeline__date-group-list {
   list-style: none;
-  margin: 0.24rem 0 0 0;
+  margin: 0.06rem 0 0 0;
   padding: 0;
   display: grid;
-  gap: 0.36rem;
+  gap: 0.24rem;
 }
 
 .employee-journey-timeline__date-group {
-  padding: 0.24rem 0 0 0;
+  border-top: 1px dashed rgba(148, 163, 184, 0.34);
+  padding-top: 0.24rem;
+}
+
+.employee-journey-timeline__date-group:first-child {
+  border-top: 0;
+  padding-top: 0.04rem;
 }
 
 .employee-journey-timeline__date-group-header {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.34rem;
   align-items: baseline;
 }
 
 .employee-journey-timeline__date {
-  font-size: 0.66rem;
-  color: rgba(30,50,65,0.64);
+  font-size: 0.6rem;
+  color: rgba(43, 71, 93, 0.72);
   font-weight: 700;
+  letter-spacing: 0.03em;
 }
 
 .employee-journey-timeline__date-label {
-  font-size: 0.66rem;
-  color: rgba(30,50,65,0.5);
+  font-size: 0.58rem;
+  color: rgba(43, 71, 93, 0.58);
 }
 
 .employee-journey-timeline__group-events {
   list-style: none;
-  margin: 0.26rem 0 0 0;
-  padding: 0 0 0 0.6rem;
+  margin: 0.2rem 0 0 0;
+  padding: 0 0 0 0.5rem;
   display: grid;
-  gap: 0.14rem;
+  gap: 0.18rem;
 }
 
 .employee-journey-timeline__event--nested .employee-journey-timeline__event-title {
   font-weight: 500;
-  color: rgba(10,20,30,0.78);
+  color: rgba(16, 44, 65, 0.82);
 }
 
 .employee-journey-timeline__event--nested .employee-journey-timeline__event-sub {
-  color: rgba(30,50,65,0.44);
+  color: rgba(34, 63, 88, 0.58);
   font-size: 0.58rem;
 }
 
 .employee-journey-timeline__loading-row {
-  height: 2.2rem;
-  border-radius: 0.5rem;
-  background: #eef4f9;
+  height: 2rem;
+  border-radius: 0.62rem;
+  background: linear-gradient(90deg, #ebf4fc 0%, #f3f8fd 50%, #ebf4fc 100%);
+  background-size: 160% 100%;
+  animation: journey-shimmer 1.4s infinite ease-in-out;
 }
 
 .employee-journey-timeline__error,
 .employee-journey-timeline__empty {
   margin: 0;
-  border-radius: 0.5rem;
-  padding: 0.44rem 0.52rem;
-  font-size: 0.72rem;
+  border-radius: 0.64rem;
+  padding: 0.46rem 0.56rem;
+  font-size: 0.7rem;
 }
 
 .employee-journey-timeline__error {
-  border: 1px solid #e7c9c9;
-  background: #fff5f5;
+  border: 1px solid #e9c9c9;
+  background: #fff4f4;
   color: #7b1f1f;
 }
 
 .employee-journey-timeline__empty {
-  border: 1px dashed #cad5e3;
-  background: #f8fbfe;
-  color: #607284;
+  border: 1px dashed #cad9e7;
+  background: #f7fbff;
+  color: #5e768d;
 }
 
-@media (max-width: 900px) {
-  .employee-journey-timeline__day-list::before {
-    left: 0.44rem;
+@keyframes journey-shimmer {
+  0% {
+    background-position: 100% 50%;
   }
 
-  .employee-journey-timeline__day {
-    grid-template-columns: 1fr;
-    gap: 0.2rem;
-    padding-left: 1.08rem;
-  }
-
-  .employee-journey-timeline__dot {
-    left: 0.3rem;
-    top: 0.56rem;
-  }
-
-  .employee-journey-timeline__day-date {
-    font-size: 0.64rem;
-    padding-top: 0;
-  }
-
-  .employee-journey-timeline__day-content {
-    padding: 0.4rem 0.46rem;
-  }
-
-  .employee-journey-timeline__primary-row {
-    flex-wrap: wrap;
-    gap: 0.2rem;
+  100% {
+    background-position: 0 50%;
   }
 }

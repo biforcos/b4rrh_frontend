@@ -17,6 +17,8 @@ import { EmployeeLaborClassificationStore } from '../../data-access/employee-lab
 import { employeeTexts } from '../../employee.texts';
 import { EmployeeLaborClassificationCatalogItemModel } from '../../models/employee-labor-classification-catalog-item.model';
 import { EmployeeBusinessKey } from '../../models/employee-business-key.model';
+import { UiDateInputComponent } from '../../../../shared/ui/date-input/ui-date-input.component';
+import { UiSelectComponent } from '../../../../shared/ui/select/ui-select.component';
 import { SlotKeyOption } from '../../shared/ui/section/editable-slot-section.model';
 import { TemporalSectionComponent } from '../../shared/ui/section/temporal-section.component';
 import {
@@ -29,7 +31,7 @@ import { SectionMode, SectionUiState } from '../../shared/ui/section/section-ui-
 @Component({
   selector: 'app-employee-labor-classification-section',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TemporalSectionComponent],
+  imports: [TemporalSectionComponent, UiDateInputComponent, UiSelectComponent],
   templateUrl: './employee-labor-classification-section.component.html',
   styleUrl: './employee-labor-classification-section.component.scss',
 })

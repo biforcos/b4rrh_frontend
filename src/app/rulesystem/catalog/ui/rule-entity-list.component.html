@@ -21,21 +21,41 @@
           <td>
             <div class="rule-entity-list__actions">
               @if (item.canCorrect) {
-                <button type="button" (click)="requestCorrect(item.occurrenceKey)" [disabled]="actionsDisabled()">
-                  {{ texts.actionCorrect }}
-                </button>
+                <app-ui-button
+                  type="button"
+                  size="small"
+                  severity="secondary"
+                  [outlined]="true"
+                  [label]="texts.actionCorrect"
+                  [disabled]="actionsDisabled()"
+                  (pressed)="requestCorrect(item.occurrenceKey)"
+                />
               }
 
               @if (item.canClose) {
-                <button type="button" class="rule-entity-list__danger-action" (click)="requestClose(item.occurrenceKey)" [disabled]="actionsDisabled()">
-                  {{ texts.actionClose }}
-                </button>
+                <app-ui-button
+                  type="button"
+                  class="rule-entity-list__danger-action"
+                  size="small"
+                  severity="danger"
+                  [outlined]="true"
+                  [label]="texts.actionClose"
+                  [disabled]="actionsDisabled()"
+                  (pressed)="requestClose(item.occurrenceKey)"
+                />
               }
 
               @if (item.canDelete) {
-                <button type="button" class="rule-entity-list__delete-action" (click)="requestDelete(item.occurrenceKey)" [disabled]="actionsDisabled()">
-                  {{ texts.actionDelete }}
-                </button>
+                <app-ui-button
+                  type="button"
+                  class="rule-entity-list__delete-action"
+                  size="small"
+                  severity="danger"
+                  [outlined]="true"
+                  [label]="texts.actionDelete"
+                  [disabled]="actionsDisabled()"
+                  (pressed)="requestDelete(item.occurrenceKey)"
+                />
               }
             </div>
           </td>

@@ -1,12 +1,12 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
 import { employeeTexts } from '../../employee.texts';
 import { EmployeeBusinessKey } from '../../models/employee-business-key.model';
 import {
-  buildEmployeeDetailRouteCommands,
   EmployeeRouteSection,
 } from '../../routing/employee-route-builder.util';
+import { buildEmployeeDetailRouteCommands } from '../../routing/employee-route-builder.util';
+import { UiTabsNavComponent, UiTabsNavItem } from '../../../../shared/ui/tabs-nav/ui-tabs-nav.component';
 
 interface DetailAreaLink {
   section: EmployeeRouteSection;
@@ -39,7 +39,7 @@ const disabledDetailAreas = [
 @Component({
   selector: 'app-employee-detail-nav',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink],
+  imports: [UiTabsNavComponent],
   templateUrl: './employee-detail-nav.component.html',
   styleUrl: './employee-detail-nav.component.scss',
 })
@@ -50,12 +50,21 @@ export class EmployeeDetailNavComponent {
   protected readonly texts = employeeTexts;
   protected readonly routedAreas = routedDetailAreas;
   protected readonly disabledAreas = disabledDetailAreas;
+  protected readonly navItems = computed<ReadonlyArray<UiTabsNavItem>>(() => {
+    const employeeKey = this.employeeKey();
 
-  protected buildLinkCommands(section: EmployeeRouteSection): ReadonlyArray<string> {
-    return buildEmployeeDetailRouteCommands(this.employeeKey(), section);
-  }
+    const routedItems = this.routedAreas.map((area) => ({
+      value: area.section,
+      label: area.label,
+      routeCommands: buildEmployeeDetailRouteCommands(employeeKey, area.section),
+    }));
 
-  protected isAreaActive(section: EmployeeRouteSection): boolean {
-    return this.activeSection() === section;
-  }
+    const disabledItems = this.disabledAreas.map((area, index) => ({
+      value: `disabled-${index}`,
+      label: area.label,
+      disabled: true,
+    }));
+
+    return [...routedItems, ...disabledItems];
+  });
 }

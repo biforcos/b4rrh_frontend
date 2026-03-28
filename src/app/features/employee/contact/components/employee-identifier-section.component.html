@@ -1,8 +1,12 @@
 <app-employee-section-shell [title]="sectionTitle" [subtitle]="sectionSubtitle" [state]="sectionState()">
   <div sectionShellHeaderActions class="employee-identifier-section__header-actions">
-    <button type="button" [disabled]="sectionState().busy || creating()" (click)="startCreate()">
-      {{ texts.identifiersSectionAddAction }}
-    </button>
+    <app-ui-button
+      type="button"
+      size="small"
+      [label]="texts.identifiersSectionAddAction"
+      [disabled]="sectionState().busy || creating()"
+      (pressed)="startCreate()"
+    />
   </div>
 
   <div class="employee-identifier-section__body">
@@ -11,21 +15,22 @@
         <div class="employee-identifier-section__form-grid">
           <label class="employee-identifier-section__field employee-identifier-section__field--key">
             <span>{{ texts.identifiersSectionKeyFieldLabel }}</span>
-            <select
+            <app-ui-select
               [disabled]="catalogOptionsLoading() || sectionState().busy"
               [value]="createDraft().key ?? ''"
-              (change)="updateCreateDraftKey($any($event.target).value || null)"
+              (valueChanged)="updateCreateDraftKey($event || null)"
             >
               <option value="">{{ texts.identifiersSectionKeyFieldLabel }}</option>
               @for (option of availableKeys(); track option.value) {
                 <option [value]="option.value">{{ option.label }}</option>
               }
-            </select>
+            </app-ui-select>
           </label>
 
           <label class="employee-identifier-section__field employee-identifier-section__field--value">
             <span>{{ texts.identifiersSectionValueFieldLabel }}</span>
             <input
+              pInputText
               type="text"
               [class.employee-identifier-section__input--invalid]="isCreateDniInvalid()"
               [value]="createDraft().value"
@@ -39,6 +44,7 @@
           <label class="employee-identifier-section__field employee-identifier-section__field--country">
             <span>{{ texts.identifiersSectionIssuingCountryLabel }}</span>
             <input
+              pInputText
               type="text"
               [value]="createDraft().issuingCountryCode"
               (input)="updateCreateDraftIssuingCountryCode($any($event.target).value)"
@@ -47,10 +53,9 @@
 
           <label class="employee-identifier-section__field employee-identifier-section__field--date">
             <span>{{ texts.identifiersSectionExpirationDateLabel }}</span>
-            <input
-              type="date"
+            <app-ui-date-input
               [value]="createDraft().expirationDate"
-              (input)="updateCreateDraftExpirationDate($any($event.target).value)"
+              (valueChanged)="updateCreateDraftExpirationDate($event)"
             />
           </label>
 
@@ -65,12 +70,22 @@
         </div>
 
         <div class="employee-identifier-section__row-actions">
-          <button type="button" [disabled]="!canSaveCreate() || sectionState().busy" (click)="submitCreate()">
-            {{ texts.identifiersSectionSaveCreateAction }}
-          </button>
-          <button type="button" class="employee-identifier-section__secondary-action" [disabled]="sectionState().busy" (click)="cancelCreate()">
-            {{ texts.identifiersSectionCancelAction }}
-          </button>
+          <app-ui-button
+            type="button"
+            size="small"
+            [label]="texts.identifiersSectionSaveCreateAction"
+            [disabled]="!canSaveCreate() || sectionState().busy"
+            (pressed)="submitCreate()"
+          />
+          <app-ui-button
+            type="button"
+            size="small"
+            severity="secondary"
+            [outlined]="true"
+            [label]="texts.identifiersSectionCancelAction"
+            [disabled]="sectionState().busy"
+            (pressed)="cancelCreate()"
+          />
         </div>
       </article>
     }
@@ -83,7 +98,7 @@
               <div class="employee-identifier-section__row-heading">
                 <p class="employee-identifier-section__row-type">{{ row.typeLabel }}</p>
                 @for (badge of row.badges; track badge) {
-                  <span class="employee-identifier-section__badge">{{ badge }}</span>
+                  <app-ui-tag class="employee-identifier-section__badge" [value]="badge" severity="info" [rounded]="true" />
                 }
               </div>
 
@@ -97,6 +112,7 @@
                   <label class="employee-identifier-section__field employee-identifier-section__field--value">
                     <span>{{ texts.identifiersSectionValueFieldLabel }}</span>
                     <input
+                      pInputText
                       type="text"
                       [class.employee-identifier-section__input--invalid]="isEditDniInvalid()"
                       [value]="editDraft().value"
@@ -110,6 +126,7 @@
                   <label class="employee-identifier-section__field employee-identifier-section__field--country">
                     <span>{{ texts.identifiersSectionIssuingCountryLabel }}</span>
                     <input
+                      pInputText
                       type="text"
                       [value]="editDraft().issuingCountryCode"
                       (input)="updateEditDraftIssuingCountryCode($any($event.target).value)"
@@ -118,10 +135,9 @@
 
                   <label class="employee-identifier-section__field employee-identifier-section__field--date">
                     <span>{{ texts.identifiersSectionExpirationDateLabel }}</span>
-                    <input
-                      type="date"
+                    <app-ui-date-input
                       [value]="editDraft().expirationDate"
-                      (input)="updateEditDraftExpirationDate($any($event.target).value)"
+                      (valueChanged)="updateEditDraftExpirationDate($event)"
                     />
                   </label>
 
@@ -148,26 +164,59 @@
 
             <div class="employee-identifier-section__row-actions">
               @if (editingKey() === row.key) {
-                <button type="button" [disabled]="!canSaveEdit() || sectionState().busy" (click)="submitEdit(row.key)">
-                  {{ texts.identifiersSectionSaveEditAction }}
-                </button>
-                <button type="button" class="employee-identifier-section__secondary-action" [disabled]="sectionState().busy" (click)="cancelEdit()">
-                  {{ texts.identifiersSectionCancelAction }}
-                </button>
+                <app-ui-button
+                  type="button"
+                  size="small"
+                  [label]="texts.identifiersSectionSaveEditAction"
+                  [disabled]="!canSaveEdit() || sectionState().busy"
+                  (pressed)="submitEdit(row.key)"
+                />
+                <app-ui-button
+                  type="button"
+                  size="small"
+                  severity="secondary"
+                  [outlined]="true"
+                  [label]="texts.identifiersSectionCancelAction"
+                  [disabled]="sectionState().busy"
+                  (pressed)="cancelEdit()"
+                />
               } @else if (deletingKey() === row.key) {
-                <button type="button" class="employee-identifier-section__danger-action" [disabled]="sectionState().busy" (click)="confirmDelete(row.key)">
-                  {{ texts.identifiersSectionDeleteAction }}
-                </button>
-                <button type="button" class="employee-identifier-section__secondary-action" [disabled]="sectionState().busy" (click)="cancelDelete()">
-                  {{ texts.identifiersSectionCancelAction }}
-                </button>
+                <app-ui-button
+                  type="button"
+                  size="small"
+                  severity="danger"
+                  [label]="texts.identifiersSectionDeleteAction"
+                  [disabled]="sectionState().busy"
+                  (pressed)="confirmDelete(row.key)"
+                />
+                <app-ui-button
+                  type="button"
+                  size="small"
+                  severity="secondary"
+                  [outlined]="true"
+                  [label]="texts.identifiersSectionCancelAction"
+                  [disabled]="sectionState().busy"
+                  (pressed)="cancelDelete()"
+                />
               } @else {
-                <button type="button" [disabled]="sectionState().busy" (click)="startEdit(row.key)">
-                  {{ texts.identifiersSectionEditAction }}
-                </button>
-                <button type="button" class="employee-identifier-section__danger-action" [disabled]="sectionState().busy" (click)="requestDelete(row.key)">
-                  {{ texts.identifiersSectionDeleteAction }}
-                </button>
+                <app-ui-button
+                  type="button"
+                  size="small"
+                  severity="secondary"
+                  [outlined]="true"
+                  [label]="texts.identifiersSectionEditAction"
+                  [disabled]="sectionState().busy"
+                  (pressed)="startEdit(row.key)"
+                />
+                <app-ui-button
+                  type="button"
+                  size="small"
+                  severity="danger"
+                  [outlined]="true"
+                  [label]="texts.identifiersSectionDeleteAction"
+                  [disabled]="sectionState().busy"
+                  (pressed)="requestDelete(row.key)"
+                />
               }
             </div>
           </li>

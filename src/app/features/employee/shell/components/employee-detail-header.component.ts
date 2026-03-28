@@ -12,15 +12,17 @@ import {
   untracked,
 } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { InputTextModule } from 'primeng/inputtext';
 
 import { employeeTexts } from '../../employee.texts';
 import { EmployeeCoreIdentityDraft } from '../../models/employee-core-identity-draft.model';
 import { EmployeeDetailModel } from '../../models/employee-detail.model';
+import { UiButtonComponent } from '../../../../shared/ui/button/ui-button.component';
 
 @Component({
   selector: 'app-employee-detail-header',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, InputTextModule, UiButtonComponent],
   templateUrl: './employee-detail-header.component.html',
   styleUrl: './employee-detail-header.component.scss',
 })

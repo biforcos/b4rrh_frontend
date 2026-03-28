@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
+import { UiButtonComponent } from '../../../../../shared/ui/button/ui-button.component';
 import { SectionUiState } from './section-ui-state.model';
 
 export type EmployeeSectionShellState = 'idle' | 'loading' | 'error' | 'success';
@@ -13,6 +14,7 @@ export interface EmployeeSectionShellAction {
 @Component({
   selector: 'app-employee-section-shell',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [UiButtonComponent],
   templateUrl: './employee-section-shell.component.html',
   styleUrl: './employee-section-shell.component.scss',
 })

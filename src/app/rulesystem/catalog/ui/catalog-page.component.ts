@@ -1,5 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { InputTextModule } from 'primeng/inputtext';
 
+import { UiButtonComponent } from '../../../shared/ui/button/ui-button.component';
+import { UiDateInputComponent } from '../../../shared/ui/date-input/ui-date-input.component';
 import { mapCreateRuleEntityFormToRequest } from '../mapper/create-rule-entity-form.mapper';
 import { CreateRuleEntityFormModel } from '../models/create-rule-entity-form.model';
 import { CatalogStore } from '../store/catalog.store';
@@ -13,6 +16,9 @@ import { RuleSystemSelectorComponent } from './rule-system-selector.component';
   selector: 'app-catalog-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    InputTextModule,
+    UiButtonComponent,
+    UiDateInputComponent,
     RuleSystemSelectorComponent,
     RuleEntityTypeListComponent,
     RuleEntityListComponent,

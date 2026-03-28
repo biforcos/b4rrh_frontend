@@ -1,49 +1,49 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { RouterLink, RouterOutlet } from '@angular/router';
+import { MenuItem } from 'primeng/api';
+import { PanelMenuModule } from 'primeng/panelmenu';
 
 import { appTexts } from '../../i18n/app-texts';
-
-interface AppNavItem {
-  label: string;
-  route: string;
-  exact?: boolean;
-}
-
-interface AppNavGroup {
-  label: string;
-  items: ReadonlyArray<AppNavItem>;
-}
 
 @Component({
   selector: 'app-shell',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, RouterLinkActive, RouterOutlet],
+  imports: [RouterLink, RouterOutlet, PanelMenuModule],
   templateUrl: './app-shell.component.html',
   styleUrl: './app-shell.component.scss',
 })
 export class AppShellComponent {
   protected readonly texts = appTexts;
-  protected readonly navGroups: ReadonlyArray<AppNavGroup> = [
+
+  protected readonly sideNavItems: MenuItem[] = [
     {
-      label: this.texts.sectionHome,
-      items: [{ label: this.texts.sectionHome, route: '/inicio', exact: true }],
+      label: this.texts.sectionGeneral,
+      icon: 'pi pi-compass',
+      expanded: true,
+      items: [{ label: this.texts.sectionHome, icon: 'pi pi-home', routerLink: '/inicio' }],
     },
     {
       label: this.texts.sectionPeople,
-      items: [{ label: this.texts.sectionEmployees, route: '/personas/empleados' }],
+      icon: 'pi pi-users',
+      expanded: true,
+      items: [{ label: this.texts.sectionEmployees, icon: 'pi pi-id-card', routerLink: '/personas/empleados' }],
     },
     {
       label: this.texts.sectionOrganization,
+      icon: 'pi pi-sitemap',
+      expanded: true,
       items: [
-        { label: this.texts.sectionCompanies, route: '/organizacion/empresas' },
-        { label: this.texts.sectionWorkCenters, route: '/organizacion/centros-trabajo' },
-        { label: this.texts.sectionCostCenters, route: '/organizacion/centros-coste' },
-        { label: this.texts.sectionCatalogs, route: '/organizacion/catalogos' },
+        { label: this.texts.sectionCompanies, icon: 'pi pi-building', routerLink: '/organizacion/empresas' },
+        { label: this.texts.sectionWorkCenters, icon: 'pi pi-map-marker', routerLink: '/organizacion/centros-trabajo' },
+        { label: this.texts.sectionCostCenters, icon: 'pi pi-wallet', routerLink: '/organizacion/centros-coste' },
+        { label: this.texts.sectionCatalogs, icon: 'pi pi-book', routerLink: '/organizacion/catalogos' },
       ],
     },
     {
       label: this.texts.sectionSettings,
-      items: [{ label: this.texts.sectionRuleSystems, route: '/configuracion/rule-systems' }],
+      icon: 'pi pi-sliders-h',
+      expanded: true,
+      items: [{ label: this.texts.sectionRuleSystems, icon: 'pi pi-cog', routerLink: '/configuracion/rule-systems' }],
     },
   ];
 }

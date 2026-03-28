@@ -1,0 +1,44 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.ui-select {
+  position: relative;
+  width: 100%;
+}
+
+.ui-select__control {
+  appearance: none;
+  width: 100%;
+  min-height: 2rem;
+  border: 1px solid var(--border-strong, #c2d4e6);
+  border-radius: 0.5rem;
+  background: #ffffff;
+  color: var(--text-primary, #1f3246);
+  font: inherit;
+  line-height: 1.2;
+  padding: 0.34rem 2rem 0.34rem 0.42rem;
+}
+
+.ui-select__control:focus-visible {
+  outline: none;
+  border-color: #7ea6cc;
+  box-shadow: 0 0 0 2px rgba(126, 166, 204, 0.2);
+}
+
+.ui-select__control:disabled {
+  background: #f3f6fa;
+  color: #7b8ea2;
+  cursor: not-allowed;
+}
+
+.ui-select__icon {
+  position: absolute;
+  right: 0.62rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.68rem;
+  color: #5f7386;
+  pointer-events: none;
+}

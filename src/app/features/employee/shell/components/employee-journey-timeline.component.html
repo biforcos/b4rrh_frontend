@@ -53,7 +53,7 @@
                 <button
                   type="button"
                   class="employee-journey-timeline__presence-toggle"
-                  aria-controls="presence-{{ presence.id }}-content"
+                  [attr.aria-controls]="'presence-' + presence.id + '-content'"
                   [attr.aria-expanded]="isPresenceExpanded(presence.id, presence.isActive)"
                   (click)="togglePresence(presence.id)"
                 >
@@ -62,7 +62,7 @@
                 </button>
 
                 @if (isPresenceExpanded(presence.id, presence.isActive)) {
-                  <ol id="presence-{{ presence.id }}-content" class="employee-journey-timeline__date-group-list" role="list">
+                  <ol [attr.id]="'presence-' + presence.id + '-content'" class="employee-journey-timeline__date-group-list" role="list">
                     @for (group of presence.groupedEvents; track group.eventDate) {
                       <li class="employee-journey-timeline__date-group" role="listitem">
                         <div class="employee-journey-timeline__date-group-header">

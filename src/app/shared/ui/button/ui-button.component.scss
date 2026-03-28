@@ -1,0 +1,24 @@
+:host {
+  display: inline-flex;
+}
+
+:host :where(button.p-button) {
+  font-size: 0.74rem;
+  border-radius: 0.58rem;
+  line-height: 1;
+  min-height: 2rem;
+  padding-inline: 0.72rem;
+}
+
+:host :where(button.p-button .p-button-label) {
+  font-weight: 700;
+}
+
+:host(.app-ui-button--fluid) {
+  display: flex;
+  width: 100%;
+}
+
+:host(.app-ui-button--fluid) :where(button.p-button) {
+  width: 100%;
+}

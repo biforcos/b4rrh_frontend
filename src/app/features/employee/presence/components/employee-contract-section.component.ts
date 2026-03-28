@@ -17,6 +17,8 @@ import { EmployeeContractStore } from '../../data-access/employee-contract.store
 import { employeeTexts } from '../../employee.texts';
 import { EmployeeBusinessKey } from '../../models/employee-business-key.model';
 import { EmployeeContractCatalogItemModel } from '../../models/employee-contract-catalog-item.model';
+import { UiDateInputComponent } from '../../../../shared/ui/date-input/ui-date-input.component';
+import { UiSelectComponent } from '../../../../shared/ui/select/ui-select.component';
 import { SlotKeyOption } from '../../shared/ui/section/editable-slot-section.model';
 import { SectionMode, SectionUiState } from '../../shared/ui/section/section-ui-state.model';
 import { TemporalSectionComponent } from '../../shared/ui/section/temporal-section.component';
@@ -29,7 +31,7 @@ import {
 @Component({
   selector: 'app-employee-contract-section',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TemporalSectionComponent],
+  imports: [TemporalSectionComponent, UiDateInputComponent, UiSelectComponent],
   templateUrl: './employee-contract-section.component.html',
   styleUrl: './employee-contract-section.component.scss',
 })

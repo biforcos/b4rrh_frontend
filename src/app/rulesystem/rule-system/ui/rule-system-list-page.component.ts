@@ -1,12 +1,15 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 
+import { UiButtonComponent } from '../../../shared/ui/button/ui-button.component';
+import { UiTagComponent } from '../../../shared/ui/tag/ui-tag.component';
 import { RuleSystemStore } from '../store/rule-system.store';
 import { ruleSystemTexts } from '../rule-system.texts';
 
 @Component({
   selector: 'app-rule-system-list-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [UiButtonComponent, UiTagComponent],
   templateUrl: './rule-system-list-page.component.html',
   styleUrl: './rule-system-list-page.component.scss',
 })

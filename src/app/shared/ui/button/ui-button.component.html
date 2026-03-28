@@ -1,0 +1,18 @@
+<button
+  pButton
+  [type]="type()"
+  [severity]="severity()"
+  [size]="size()"
+  [outlined]="outlined()"
+  [text]="text()"
+  [rounded]="rounded()"
+  [icon]="icon() ?? ''"
+  [iconPos]="iconPos()"
+  [disabled]="disabled()"
+  [fluid]="fluid()"
+  [ariaLabel]="ariaLabel()"
+  [attr.title]="title() ?? null"
+  (click)="emitPressed($event)"
+>
+  {{ label() }}
+</button>

@@ -1,11 +1,13 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 
+import { UiSelectComponent } from '../../../shared/ui/select/ui-select.component';
 import { catalogTexts } from '../catalog.texts';
 import { RuleSystemModel } from '../models/rule-system.model';
 
 @Component({
   selector: 'app-rule-system-selector',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [UiSelectComponent],
   templateUrl: './rule-system-selector.component.html',
   styleUrl: './rule-system-selector.component.scss',
 })
@@ -17,12 +19,7 @@ export class RuleSystemSelectorComponent {
 
   protected readonly texts = catalogTexts;
 
-  protected onSelectionChange(event: Event): void {
-    const target = event.target;
-    if (!(target instanceof HTMLSelectElement)) {
-      return;
-    }
-
-    this.selectionChanged.emit(target.value);
+  protected onSelectionChange(code: string): void {
+    this.selectionChanged.emit(code);
   }
 }

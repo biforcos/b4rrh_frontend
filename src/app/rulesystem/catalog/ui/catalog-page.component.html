@@ -77,6 +77,7 @@
               <label>
                 <span>{{ texts.createNameLabel }}</span>
                 <input
+                  pInputText
                   type="text"
                   maxlength="100"
                   [value]="correctDraft().name"
@@ -98,21 +99,29 @@
 
               <label>
                 <span>{{ texts.createEndDateLabel }}</span>
-                <input
-                  type="date"
+                <app-ui-date-input
                   [value]="correctDraft().endDate"
                   [disabled]="mutating()"
-                  (change)="updateCorrectField('endDate', $any($event.target).value)"
+                  (valueChanged)="updateCorrectField('endDate', $event)"
                 />
               </label>
 
               <div class="catalog-page__operation-actions">
-                <button type="button" [disabled]="!correctDraftValid() || mutating()" (click)="submitCorrect()">
-                  {{ texts.operationSubmitCorrectAction }}
-                </button>
-                <button type="button" class="catalog-page__operation-cancel" [disabled]="mutating()" (click)="cancelOperation()">
-                  {{ texts.actionCancel }}
-                </button>
+                <app-ui-button
+                  type="button"
+                  [label]="texts.operationSubmitCorrectAction"
+                  [disabled]="!correctDraftValid() || mutating()"
+                  (pressed)="submitCorrect()"
+                />
+                <app-ui-button
+                  type="button"
+                  class="catalog-page__operation-cancel"
+                  severity="secondary"
+                  [outlined]="true"
+                  [label]="texts.actionCancel"
+                  [disabled]="mutating()"
+                  (pressed)="cancelOperation()"
+                />
               </div>
             </div>
           </section>
@@ -132,21 +141,31 @@
             <div class="catalog-page__operation-form">
               <label>
                 <span>{{ texts.createEndDateLabel }}</span>
-                <input
-                  type="date"
+                <app-ui-date-input
                   [value]="closeEndDate()"
                   [disabled]="mutating()"
-                  (change)="updateCloseEndDate($any($event.target).value)"
+                  (valueChanged)="updateCloseEndDate($event)"
                 />
               </label>
 
               <div class="catalog-page__operation-actions">
-                <button type="button" class="catalog-page__operation-danger" [disabled]="!closeDraftValid() || mutating()" (click)="confirmClose()">
-                  {{ texts.operationSubmitCloseAction }}
-                </button>
-                <button type="button" class="catalog-page__operation-cancel" [disabled]="mutating()" (click)="cancelOperation()">
-                  {{ texts.actionCancel }}
-                </button>
+                <app-ui-button
+                  type="button"
+                  class="catalog-page__operation-danger"
+                  severity="danger"
+                  [label]="texts.operationSubmitCloseAction"
+                  [disabled]="!closeDraftValid() || mutating()"
+                  (pressed)="confirmClose()"
+                />
+                <app-ui-button
+                  type="button"
+                  class="catalog-page__operation-cancel"
+                  severity="secondary"
+                  [outlined]="true"
+                  [label]="texts.actionCancel"
+                  [disabled]="mutating()"
+                  (pressed)="cancelOperation()"
+                />
               </div>
             </div>
           </section>
@@ -165,16 +184,23 @@
             <p class="catalog-page__operation-warning">{{ texts.operationDeleteMessage }}</p>
 
             <div class="catalog-page__operation-actions">
-              <button type="button" class="catalog-page__operation-danger" [disabled]="mutating()" (click)="confirmDelete()">
-                @if (mutating()) {
-                  {{ texts.operationDeletingMessage }}
-                } @else {
-                  {{ texts.operationConfirmDeleteAction }}
-                }
-              </button>
-              <button type="button" class="catalog-page__operation-cancel" [disabled]="mutating()" (click)="cancelOperation()">
-                {{ texts.actionCancel }}
-              </button>
+              <app-ui-button
+                type="button"
+                class="catalog-page__operation-danger"
+                severity="danger"
+                [disabled]="mutating()"
+                [label]="mutating() ? texts.operationDeletingMessage : texts.operationConfirmDeleteAction"
+                (pressed)="confirmDelete()"
+              />
+              <app-ui-button
+                type="button"
+                class="catalog-page__operation-cancel"
+                severity="secondary"
+                [outlined]="true"
+                [label]="texts.actionCancel"
+                [disabled]="mutating()"
+                (pressed)="cancelOperation()"
+              />
             </div>
           </section>
         }

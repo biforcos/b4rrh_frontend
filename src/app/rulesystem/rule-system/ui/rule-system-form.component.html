@@ -2,6 +2,7 @@
   <label class="rule-system-form__field">
     <span>{{ texts.formCodeLabel }}</span>
     <input
+      pInputText
       type="text"
       formControlName="code"
       maxlength="5"
@@ -22,6 +23,7 @@
   <label class="rule-system-form__field">
     <span>{{ texts.formNameLabel }}</span>
     <input
+      pInputText
       type="text"
       formControlName="name"
       maxlength="100"
@@ -39,6 +41,7 @@
   <label class="rule-system-form__field">
     <span>{{ texts.formCountryCodeLabel }}</span>
     <input
+      pInputText
       type="text"
       formControlName="countryCode"
       maxlength="3"
@@ -72,15 +75,18 @@
   }
 
   <div class="rule-system-form__actions">
-    <button type="button" (click)="cancel()" [disabled]="saving()">{{ texts.formCancelAction }}</button>
-    <button type="submit" [disabled]="saving()">
-      @if (saving()) {
-        {{ texts.saveBusyMessage }}
-      } @else if (isEditMode()) {
-        {{ texts.formSaveEditAction }}
-      } @else {
-        {{ texts.formSaveCreateAction }}
-      }
-    </button>
+    <app-ui-button
+      type="button"
+      severity="secondary"
+      [outlined]="true"
+      [label]="texts.formCancelAction"
+      [disabled]="saving()"
+      (pressed)="cancel()"
+    />
+    <app-ui-button
+      type="submit"
+      [disabled]="saving()"
+      [label]="saving() ? texts.saveBusyMessage : (isEditMode() ? texts.formSaveEditAction : texts.formSaveCreateAction)"
+    />
   </div>
 </form>

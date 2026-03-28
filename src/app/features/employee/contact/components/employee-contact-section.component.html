@@ -1,8 +1,12 @@
 <app-employee-section-shell [title]="sectionTitle" [subtitle]="sectionSubtitle" [state]="sectionState()">
   <div sectionShellHeaderActions class="employee-contact-section__header-actions">
-    <button type="button" [disabled]="sectionState().busy || creating()" (click)="startCreate()">
-      {{ texts.contactsSectionAddAction }}
-    </button>
+    <app-ui-button
+      type="button"
+      size="small"
+      [label]="texts.contactsSectionAddAction"
+      [disabled]="sectionState().busy || creating()"
+      (pressed)="startCreate()"
+    />
   </div>
 
   <div class="employee-contact-section__body">
@@ -11,23 +15,24 @@
         <div class="employee-contact-section__form-grid">
           <div class="employee-contact-section__form-field">
             <label class="employee-contact-section__form-label" for="contactTypeInput">{{ texts.contactsSectionKeyFieldLabel }}</label>
-            <select
-              id="contactTypeInput"
+            <app-ui-select
               class="employee-contact-section__form-input"
+              inputId="contactTypeInput"
               [disabled]="catalogOptionsLoading() || sectionState().busy"
               [value]="createDraft().key ?? ''"
-              (change)="updateCreateDraftKey($any($event.target).value || null)"
+              (valueChanged)="updateCreateDraftKey($event || null)"
             >
               <option value="">{{ texts.contactsSectionKeyFieldLabel }}</option>
               @for (option of availableContactTypeOptions(); track option.value) {
                 <option [value]="option.value">{{ option.label }}</option>
               }
-            </select>
+            </app-ui-select>
           </div>
 
           <div class="employee-contact-section__form-field">
             <label class="employee-contact-section__form-label" for="contactValueInput">{{ texts.contactsSectionValueFieldLabel }}</label>
             <input
+              pInputText
               id="contactValueInput"
               class="employee-contact-section__form-input"
               type="text"
@@ -38,12 +43,23 @@
         </div>
 
         <div class="employee-contact-section__row-actions">
-          <button type="button" [disabled]="!canSaveCreate() || sectionState().busy" (click)="submitCreate()">
-            {{ texts.contactsSectionSaveCreateAction }}
-          </button>
-          <button type="button" class="employee-contact-section__secondary-action" [disabled]="sectionState().busy" (click)="cancelCreate()">
-            {{ texts.contactsSectionCancelAction }}
-          </button>
+          <app-ui-button
+            type="button"
+            size="small"
+            [label]="texts.contactsSectionSaveCreateAction"
+            [disabled]="!canSaveCreate() || sectionState().busy"
+            (pressed)="submitCreate()"
+          />
+          <app-ui-button
+            type="button"
+            class="employee-contact-section__secondary-action"
+            severity="secondary"
+            [outlined]="true"
+            size="small"
+            [label]="texts.contactsSectionCancelAction"
+            [disabled]="sectionState().busy"
+            (pressed)="cancelCreate()"
+          />
         </div>
       </article>
     }
@@ -57,6 +73,7 @@
 
               @if (editingKey() === row.key) {
                 <input
+                  pInputText
                   class="employee-contact-section__inline-input"
                   type="text"
                   aria-label="{{ texts.contactsSectionValueFieldLabel }}"
@@ -76,26 +93,64 @@
 
             <div class="employee-contact-section__row-actions">
               @if (editingKey() === row.key) {
-                <button type="button" [disabled]="!canSaveEdit() || sectionState().busy" (click)="submitEdit(row.key)">
-                  {{ texts.contactsSectionSaveEditAction }}
-                </button>
-                <button type="button" class="employee-contact-section__secondary-action" [disabled]="sectionState().busy" (click)="cancelEdit()">
-                  {{ texts.contactsSectionCancelAction }}
-                </button>
+                <app-ui-button
+                  type="button"
+                  size="small"
+                  [label]="texts.contactsSectionSaveEditAction"
+                  [disabled]="!canSaveEdit() || sectionState().busy"
+                  (pressed)="submitEdit(row.key)"
+                />
+                <app-ui-button
+                  type="button"
+                  class="employee-contact-section__secondary-action"
+                  severity="secondary"
+                  [outlined]="true"
+                  size="small"
+                  [label]="texts.contactsSectionCancelAction"
+                  [disabled]="sectionState().busy"
+                  (pressed)="cancelEdit()"
+                />
               } @else if (deletingKey() === row.key) {
-                <button type="button" class="employee-contact-section__danger-action" [disabled]="sectionState().busy" (click)="confirmDelete(row.key)">
-                  {{ texts.contactsSectionDeleteAction }}
-                </button>
-                <button type="button" class="employee-contact-section__secondary-action" [disabled]="sectionState().busy" (click)="cancelDelete()">
-                  {{ texts.contactsSectionCancelAction }}
-                </button>
+                <app-ui-button
+                  type="button"
+                  class="employee-contact-section__danger-action"
+                  severity="danger"
+                  [outlined]="true"
+                  size="small"
+                  [label]="texts.contactsSectionDeleteAction"
+                  [disabled]="sectionState().busy"
+                  (pressed)="confirmDelete(row.key)"
+                />
+                <app-ui-button
+                  type="button"
+                  class="employee-contact-section__secondary-action"
+                  severity="secondary"
+                  [outlined]="true"
+                  size="small"
+                  [label]="texts.contactsSectionCancelAction"
+                  [disabled]="sectionState().busy"
+                  (pressed)="cancelDelete()"
+                />
               } @else {
-                <button type="button" [disabled]="sectionState().busy" (click)="startEdit(row.key)">
-                  {{ texts.contactsSectionEditAction }}
-                </button>
-                <button type="button" class="employee-contact-section__danger-action" [disabled]="sectionState().busy" (click)="requestDelete(row.key)">
-                  {{ texts.contactsSectionDeleteAction }}
-                </button>
+                <app-ui-button
+                  type="button"
+                  severity="secondary"
+                  [outlined]="true"
+                  size="small"
+                  [label]="texts.contactsSectionEditAction"
+                  [disabled]="sectionState().busy"
+                  (pressed)="startEdit(row.key)"
+                />
+                <app-ui-button
+                  type="button"
+                  class="employee-contact-section__danger-action"
+                  severity="danger"
+                  [outlined]="true"
+                  size="small"
+                  [label]="texts.contactsSectionDeleteAction"
+                  [disabled]="sectionState().busy"
+                  (pressed)="requestDelete(row.key)"
+                />
               }
             </div>
           </li>

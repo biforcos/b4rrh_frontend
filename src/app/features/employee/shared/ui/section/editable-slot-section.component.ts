@@ -1,6 +1,10 @@
 import { NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, TemplateRef, computed, contentChild, input, output } from '@angular/core';
+import { InputTextModule } from 'primeng/inputtext';
 
+import { UiButtonComponent } from '../../../../../shared/ui/button/ui-button.component';
+import { UiSelectComponent } from '../../../../../shared/ui/select/ui-select.component';
+import { UiTagComponent } from '../../../../../shared/ui/tag/ui-tag.component';
 import { EmployeeSectionShellComponent } from './employee-section-shell.component';
 import {
   SlotDraft,
@@ -36,7 +40,7 @@ const emptyDraft: SlotDraft<string> = {
 @Component({
   selector: 'app-editable-slot-section',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [EmployeeSectionShellComponent, NgTemplateOutlet],
+  imports: [EmployeeSectionShellComponent, UiButtonComponent, UiTagComponent, UiSelectComponent, InputTextModule, NgTemplateOutlet],
   templateUrl: './editable-slot-section.component.html',
   styleUrl: './editable-slot-section.component.scss',
 })
@@ -173,13 +177,8 @@ export class EditableSlotSectionComponent {
     this.draftKeyChanged.emit(this.normalizeKey(target.value));
   }
 
-  protected onDraftKeySelect(event: Event): void {
-    const target = event.target;
-    if (!(target instanceof HTMLSelectElement)) {
-      return;
-    }
-
-    this.draftKeyChanged.emit(this.normalizeKey(target.value));
+  protected onDraftKeySelect(value: string): void {
+    this.draftKeyChanged.emit(this.normalizeKey(value));
   }
 
   protected onCreateSubmitted(): void {

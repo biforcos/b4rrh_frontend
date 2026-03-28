@@ -27,39 +27,38 @@
   <div temporalCreateForm class="employee-contract-section__form-grid employee-contract-section__form-grid--create">
     <label class="employee-contract-section__field employee-contract-section__field--effective-date">
       <span>{{ texts.contractSectionEffectiveDateLabel }}</span>
-      <input
-        type="date"
+      <app-ui-date-input
         [value]="replaceDraft().effectiveDate"
-        (input)="updateReplaceField('effectiveDate', $any($event.target).value)"
+        (valueChanged)="updateReplaceField('effectiveDate', $event)"
       />
     </label>
 
     <label class="employee-contract-section__field employee-contract-section__field--contract">
       <span>{{ texts.contractSectionContractLabel }}</span>
-      <select
+      <app-ui-select
         [value]="replaceDraft().contractCode"
         [disabled]="contractTypeOptionsLoading()"
-        (change)="updateReplaceField('contractCode', $any($event.target).value)"
+        (valueChanged)="updateReplaceField('contractCode', $event)"
       >
         <option value="">{{ texts.contractSectionContractLabel }}</option>
         @for (option of contractTypeOptions(); track option.value) {
           <option [value]="option.value">{{ option.label }}</option>
         }
-      </select>
+      </app-ui-select>
     </label>
 
     <label class="employee-contract-section__field employee-contract-section__field--subtype">
       <span>{{ texts.contractSectionSubtypeLabel }}</span>
-      <select
+      <app-ui-select
         [value]="replaceDraft().contractSubtypeCode"
         [disabled]="replaceSubtypeDisabled()"
-        (change)="updateReplaceField('contractSubtypeCode', $any($event.target).value)"
+        (valueChanged)="updateReplaceField('contractSubtypeCode', $event)"
       >
         <option value="">{{ texts.contractSectionSubtypeLabel }}</option>
         @for (option of replaceSubtypeOptions(); track option.value) {
           <option [value]="option.value">{{ option.label }}</option>
         }
-      </select>
+      </app-ui-select>
     </label>
   </div>
 
@@ -73,30 +72,30 @@
 
     <label class="employee-contract-section__field employee-contract-section__field--contract">
       <span>{{ texts.contractSectionContractLabel }}</span>
-      <select
+      <app-ui-select
         [value]="correctDraft().contractCode"
         [disabled]="contractTypeOptionsLoading()"
-        (change)="updateCorrectField('contractCode', $any($event.target).value)"
+        (valueChanged)="updateCorrectField('contractCode', $event)"
       >
         <option value="">{{ texts.contractSectionContractLabel }}</option>
         @for (option of contractTypeOptions(); track option.value) {
           <option [value]="option.value">{{ option.label }}</option>
         }
-      </select>
+      </app-ui-select>
     </label>
 
     <label class="employee-contract-section__field employee-contract-section__field--subtype">
       <span>{{ texts.contractSectionSubtypeLabel }}</span>
-      <select
+      <app-ui-select
         [value]="correctDraft().contractSubtypeCode"
         [disabled]="correctSubtypeDisabled()"
-        (change)="updateCorrectField('contractSubtypeCode', $any($event.target).value)"
+        (valueChanged)="updateCorrectField('contractSubtypeCode', $event)"
       >
         <option value="">{{ texts.contractSectionSubtypeLabel }}</option>
         @for (option of correctSubtypeOptions(); track option.value) {
           <option [value]="option.value">{{ option.label }}</option>
         }
-      </select>
+      </app-ui-select>
     </label>
   </div>
 
@@ -105,10 +104,9 @@
 
     <label class="employee-contract-section__field employee-contract-section__field--close-date">
       <span>{{ texts.contractSectionCloseDateLabel }}</span>
-      <input
-        type="date"
+      <app-ui-date-input
         [value]="closeDraft().endDate"
-        (input)="updateCloseField('endDate', $any($event.target).value)"
+        (valueChanged)="updateCloseField('endDate', $event)"
       />
     </label>
   </div>

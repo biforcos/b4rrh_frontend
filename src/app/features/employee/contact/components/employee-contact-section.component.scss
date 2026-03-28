@@ -1,18 +1,5 @@
-.employee-contact-section__header-actions button {
-  border: 1px solid #bfcfe0;
-  border-radius: 0.45rem;
-  background: #eef4fb;
-  color: #274055;
-  font-size: 0.72rem;
-  font-weight: 600;
-  line-height: 1;
-  padding: 0.34rem 0.56rem;
-  cursor: pointer;
-}
-
-.employee-contact-section__header-actions button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+.employee-contact-section__header-actions :where(app-ui-button) {
+  min-width: 7.2rem;
 }
 
 .employee-contact-section__body {
@@ -48,17 +35,24 @@
 
 .employee-contact-section__form-input {
   width: 100%;
+  font-size: 0.75rem;
+  min-height: 2rem;
+}
+
+.employee-contact-section__form-input:where(.p-inputtext) {
+  width: 100%;
+}
+
+.employee-contact-section__form-field :where(select.employee-contact-section__form-input) {
   border: 1px solid #cedae7;
   border-radius: 0.42rem;
   background: #ffffff;
   color: #1f3246;
-  font-size: 0.75rem;
   line-height: 1.2;
   padding: 0.34rem 0.42rem;
-  min-height: 2rem;
 }
 
-.employee-contact-section__form-input:focus-visible {
+.employee-contact-section__form-field :where(select.employee-contact-section__form-input:focus-visible) {
   outline: none;
   border-color: #7ea6cc;
   box-shadow: 0 0 0 2px rgba(126, 166, 204, 0.2);
@@ -103,11 +97,7 @@
 
 .employee-contact-section__inline-input {
   width: min(24rem, 100%);
-  border: 1px solid #c7d7e8;
-  border-radius: 0.45rem;
   font-size: 0.78rem;
-  color: #1f3246;
-  padding: 0.34rem 0.42rem;
 }
 
 .employee-contact-section__confirm-text {
@@ -124,31 +114,15 @@
   gap: 0.32rem;
 }
 
-.employee-contact-section__row-actions button {
-  border: 1px solid #c6d4e3;
-  border-radius: 0.45rem;
-  background: #f5f9fe;
-  color: #264052;
-  font-size: 0.72rem;
-  font-weight: 600;
-  line-height: 1;
-  padding: 0.34rem 0.56rem;
-  cursor: pointer;
+.employee-contact-section__row-actions :where(app-ui-button) {
+  min-width: 5.8rem;
 }
 
-.employee-contact-section__row-actions button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+.employee-contact-section__secondary-action :where(button.p-button) {
+  color: #3f5d78;
 }
 
-.employee-contact-section__secondary-action {
-  background: #fbfcff;
-  color: #4b6073;
-}
-
-.employee-contact-section__danger-action {
-  border-color: #d8bdc2;
-  background: #fbf3f4;
+.employee-contact-section__danger-action :where(button.p-button) {
   color: #8a1f2e;
 }
 

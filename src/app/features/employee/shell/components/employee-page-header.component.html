@@ -3,21 +3,41 @@
   <div class="employee-page-header__row employee-page-header__row--primary">
     <div class="employee-page-header__headline">
       <h1>{{ fullName() }}</h1>
-      <span
+      <app-ui-tag
         class="employee-page-header__status-badge"
-        [class.employee-page-header__status-badge--active]="isActive()"
-        [class.employee-page-header__status-badge--inactive]="!isActive()"
-      >
-        {{ status() }}
-      </span>
+        [value]="status()"
+        [severity]="isActive() ? 'success' : 'secondary'"
+        [rounded]="true"
+      />
     </div>
 
     <div class="employee-page-header__actions" [attr.aria-label]="texts.employeePageHeaderActionsAriaLabel">
-      <button type="button" (click)="requestEditIdentity()">{{ texts.employeePageHeaderEditIdentityAction }}</button>
+      <app-ui-button
+        type="button"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        [label]="texts.employeePageHeaderEditIdentityAction"
+        (pressed)="requestEditIdentity()"
+      />
       @if (isActive()) {
-        <button type="button" class="employee-page-header__danger-action">{{ texts.employeePageHeaderTerminateAction }}</button>
+        <app-ui-button
+          type="button"
+          class="employee-page-header__danger-action"
+          severity="danger"
+          size="small"
+          [label]="texts.employeePageHeaderTerminateAction"
+          (pressed)="requestTerminate()"
+        />
       } @else {
-        <button type="button" class="employee-page-header__neutral-action">{{ texts.employeePageHeaderRehireAction }}</button>
+        <app-ui-button
+          type="button"
+          class="employee-page-header__neutral-action"
+          severity="contrast"
+          [outlined]="true"
+          size="small"
+          [label]="texts.employeePageHeaderRehireAction"
+        />
       }
     </div>
   </div>

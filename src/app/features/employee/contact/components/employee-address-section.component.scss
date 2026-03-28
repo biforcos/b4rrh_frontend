@@ -1,20 +1,6 @@
-.employee-address-section__header-actions button,
-.employee-address-section__actions button {
-  border: 1px solid #bfcfe0;
-  border-radius: 0.45rem;
-  background: #eef4fb;
-  color: #274055;
-  font-size: 0.72rem;
-  font-weight: 600;
-  line-height: 1;
-  padding: 0.34rem 0.56rem;
-  cursor: pointer;
-}
-
-.employee-address-section__header-actions button:disabled,
-.employee-address-section__actions button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+.employee-address-section__header-actions :where(app-ui-button),
+.employee-address-section__actions :where(app-ui-button) {
+  min-width: 5.6rem;
 }
 
 .employee-address-section__body {
@@ -66,15 +52,6 @@
 
 .employee-address-section__current-badge {
   display: inline-flex;
-  align-items: center;
-  border: 1px solid #b9d0e8;
-  border-radius: 999px;
-  background: #e8f2fc;
-  color: #2a4a67;
-  font-size: 0.66rem;
-  font-weight: 700;
-  line-height: 1;
-  padding: 0.18rem 0.42rem;
 }
 
 .employee-address-section__current-street,
@@ -141,17 +118,6 @@
   gap: 0.32rem;
 }
 
-.employee-address-section__secondary-action {
-  background: #fbfcff;
-  color: #4b6073;
-}
-
-.employee-address-section__danger-action {
-  border-color: #d8bdc2;
-  background: #fbf3f4;
-  color: #8a1f2e;
-}
-
 .employee-address-section__form-grid {
   display: grid;
   gap: 0.4rem;
@@ -173,6 +139,7 @@
 
 .employee-address-section__form-grid input,
 .employee-address-section__form-grid select {
+  width: 100%;
   border: 1px solid #cedae7;
   border-radius: 0.42rem;
   background: #ffffff;

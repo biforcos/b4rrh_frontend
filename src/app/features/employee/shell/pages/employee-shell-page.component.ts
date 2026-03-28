@@ -2,8 +2,10 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { InputTextModule } from 'primeng/inputtext';
 import { filter, startWith } from 'rxjs';
 
+import { UiButtonComponent } from '../../../../shared/ui/button/ui-button.component';
 import { PanelComponent } from '../../../../shared/ui/panel/panel.component';
 import { EmployeeDetailStore } from '../../data-access/employee-detail.store';
 import { EmployeeDirectoryStore } from '../../data-access/employee-directory.store';
@@ -23,11 +25,8 @@ import {
   EmployeeRouteSection,
   employeeRouteSections,
 } from '../../routing/employee-route-builder.util';
-import {
-  areEmployeeBusinessKeysEqual,
-  readEmployeeBusinessKeyFromParamMap,
-  toEmployeeBusinessKey,
-} from '../../routing/employee-route-key.util';
+import { areEmployeeBusinessKeysEqual, readEmployeeBusinessKeyFromParamMap, toEmployeeBusinessKey } from '../../routing/employee-route-key.util';
+import { EmployeeTerminatePanelComponent } from '../components/employee-terminate-panel.component';
 import { EmployeePageHeaderComponent } from '../components/employee-page-header.component';
 import { EmployeeDetailHeaderComponent } from '../components/employee-detail-header.component';
 import { EmployeeJourneyTimelineComponent } from '../components/employee-journey-timeline.component';
@@ -39,13 +38,16 @@ import { EmployeeDirectoryListComponent } from '../components/employee-directory
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ReactiveFormsModule,
+    InputTextModule,
     RouterOutlet,
+    UiButtonComponent,
     PanelComponent,
     EmployeeDirectoryListComponent,
     EmployeePageHeaderComponent,
     EmployeeDetailHeaderComponent,
     EmployeeJourneyTimelineComponent,
     EmployeeDetailNavComponent,
+    EmployeeTerminatePanelComponent,
   ],
   templateUrl: './employee-shell-page.component.html',
   styleUrl: './employee-shell-page.component.scss',
@@ -80,6 +82,7 @@ export class EmployeeShellPageComponent {
   protected readonly updateIdentityError = computed(() => this.detailStore.mutationError() === 'request-failed');
   protected readonly updateIdentitySuccess = computed(() => this.detailStore.mutationSuccess() === 'updated');
   protected readonly openIdentityEditorRequestId = signal(0);
+  protected readonly terminatePanelOpen = signal(false);
   protected readonly selectedEmployee = computed<EmployeeDetailModel | null>(() => {
     const activeEmployeeKey = this.activeEmployeeKey();
     if (!activeEmployeeKey) {
@@ -98,7 +101,6 @@ export class EmployeeShellPageComponent {
 
     return this.toUnknownDetail(activeEmployeeKey);
   });
-  protected readonly foundationMarker = 'FOUNDATION INTEGRATED';
   protected readonly headerStatus = computed<'ACTIVE' | 'INACTIVE'>(() => {
     const employee = this.selectedEmployee();
     if (!employee) {
@@ -167,6 +169,14 @@ export class EmployeeShellPageComponent {
   protected openIdentityEditorFromHeader(): void {
     this.detailStore.clearMutationFeedback();
     this.openIdentityEditorRequestId.update((value) => value + 1);
+  }
+
+  protected openTerminatePanel(): void {
+    this.terminatePanelOpen.set(true);
+  }
+
+  protected closeTerminatePanel(): void {
+    this.terminatePanelOpen.set(false);
   }
 
   protected submitIdentityUpdate(draft: EmployeeCoreIdentityDraft): void {

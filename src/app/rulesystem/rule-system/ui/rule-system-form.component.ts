@@ -1,13 +1,15 @@
 import { ChangeDetectionStrategy, Component, computed, effect, input, output } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { InputTextModule } from 'primeng/inputtext';
 
+import { UiButtonComponent } from '../../../shared/ui/button/ui-button.component';
 import { RuleSystemFormModel } from '../models/rule-system-form.model';
 import { ruleSystemTexts } from '../rule-system.texts';
 
 @Component({
   selector: 'app-rule-system-form',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, InputTextModule, UiButtonComponent],
   templateUrl: './rule-system-form.component.html',
   styleUrl: './rule-system-form.component.scss',
 })

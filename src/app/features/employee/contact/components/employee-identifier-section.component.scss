@@ -1,18 +1,6 @@
-.employee-identifier-section__header-actions button {
-  border: 1px solid #bfcfe0;
-  border-radius: 0.45rem;
-  background: #eef4fb;
-  color: #274055;
-  font-size: 0.72rem;
-  font-weight: 600;
-  line-height: 1;
-  padding: 0.34rem 0.56rem;
-  cursor: pointer;
-}
-
-.employee-identifier-section__header-actions button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+.employee-identifier-section__header-actions :where(app-ui-button),
+.employee-identifier-section__row-actions :where(app-ui-button) {
+  min-width: 5.6rem;
 }
 
 .employee-identifier-section__body {
@@ -49,6 +37,7 @@
 .employee-identifier-section__form-grid input[type='text'],
 .employee-identifier-section__form-grid input[type='date'],
 .employee-identifier-section__form-grid select {
+  width: 100%;
   border: 1px solid #cedae7;
   border-radius: 0.42rem;
   background: #ffffff;
@@ -149,15 +138,6 @@
 
 .employee-identifier-section__badge {
   display: inline-flex;
-  align-items: center;
-  border: 1px solid #bfd4ea;
-  border-radius: 999px;
-  background: #edf5fd;
-  color: #2d4b67;
-  font-size: 0.66rem;
-  font-weight: 700;
-  line-height: 1;
-  padding: 0.16rem 0.42rem;
 }
 
 .employee-identifier-section__row-value {
@@ -184,34 +164,6 @@
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: 0.32rem;
-}
-
-.employee-identifier-section__row-actions button {
-  border: 1px solid #c6d4e3;
-  border-radius: 0.45rem;
-  background: #f5f9fe;
-  color: #264052;
-  font-size: 0.72rem;
-  font-weight: 600;
-  line-height: 1;
-  padding: 0.34rem 0.56rem;
-  cursor: pointer;
-}
-
-.employee-identifier-section__row-actions button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.employee-identifier-section__secondary-action {
-  background: #fbfcff;
-  color: #4b6073;
-}
-
-.employee-identifier-section__danger-action {
-  border-color: #d8bdc2;
-  background: #fbf3f4;
-  color: #8a1f2e;
 }
 
 .employee-identifier-section__empty {

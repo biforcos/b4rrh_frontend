@@ -1,36 +1,43 @@
 .panel {
-  border: 1px solid rgba(15,23,42,0.03);
-  border-radius: 0.85rem;
+  border: 1px solid rgba(148, 163, 184, 0.26);
+  border-radius: 0.96rem;
   background: var(--surface-panel);
-  box-shadow: var(--shadow-panel);
+  box-shadow:
+    0 24px 42px -40px rgba(14, 116, 144, 0.6),
+    0 5px 14px -10px rgba(15, 23, 42, 0.32);
+  overflow: clip;
 }
 
 .panel__header {
-  border-bottom: 1px solid rgba(15,23,42,0.028);
-  padding: 0.7rem 0.72rem 0.6rem;
-  background: rgba(15,23,42,0.015);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.22);
+  padding: 0.76rem 0.8rem 0.62rem;
+  background:
+    linear-gradient(180deg, rgba(248, 252, 255, 0.95) 0%, rgba(241, 248, 255, 0.82) 100%),
+    rgba(15, 23, 42, 0.015);
 }
 
 .panel__title {
   margin: 0;
-  font-size: 0.96rem;
+  font-size: 0.98rem;
   font-weight: 700;
+  line-height: 1.2;
 }
 
 .panel__subtitle {
-  margin: 0.24rem 0 0;
-  color: var(--text-muted);
-  font-size: 0.82rem;
+  margin: 0.2rem 0 0;
+  color: var(--text-soft);
+  font-size: 0.8rem;
+  line-height: 1.35;
 }
 
 .panel__content {
-  padding: 0.72rem;
+  padding: 0.78rem;
   background: transparent;
 }
 
 /* Reduce visual weight for nested panels by default (used in main content)
    Specific panels can override when a stronger border is needed. */
 .panel.panel--light {
-  border: 1px solid rgba(15,23,42,0.02);
+  border: 1px solid rgba(203, 213, 225, 0.42);
   box-shadow: none;
 }

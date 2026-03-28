@@ -4,14 +4,16 @@
       <div class="employee-detail-header__identity-main">
         <div class="employee-detail-header__name-row">
           <h2>{{ employee().displayName }}</h2>
-          <button
+          <app-ui-button
             type="button"
             class="employee-detail-header__edit-trigger"
+            severity="secondary"
+            [outlined]="true"
+            size="small"
+            [label]="texts.detailHeaderEditAction"
             [disabled]="updating()"
-            (click)="openIdentityEditor()"
-          >
-            {{ texts.detailHeaderEditAction }}
-          </button>
+            (pressed)="openIdentityEditor()"
+          />
         </div>
 
         <div class="employee-detail-header__keyline" [attr.aria-label]="texts.currentEmployeeKeyLabel">
@@ -36,22 +38,22 @@
       <form class="employee-detail-header__edit-form" [formGroup]="identityForm" (ngSubmit)="submitIdentityUpdate()">
         <label>
           <span>{{ texts.detailHeaderFirstNameLabel }}</span>
-          <input type="text" formControlName="firstName" autocomplete="off" />
+          <input pInputText type="text" formControlName="firstName" autocomplete="off" />
         </label>
 
         <label>
           <span>{{ texts.detailHeaderLastName1Label }}</span>
-          <input type="text" formControlName="lastName1" autocomplete="off" />
+          <input pInputText type="text" formControlName="lastName1" autocomplete="off" />
         </label>
 
         <label>
           <span>{{ texts.detailHeaderLastName2Label }}</span>
-          <input type="text" formControlName="lastName2" autocomplete="off" />
+          <input pInputText type="text" formControlName="lastName2" autocomplete="off" />
         </label>
 
         <label>
           <span>{{ texts.detailHeaderPreferredNameLabel }}</span>
-          <input type="text" formControlName="preferredName" autocomplete="off" />
+          <input pInputText type="text" formControlName="preferredName" autocomplete="off" />
         </label>
 
         @if (updateError()) {
@@ -67,16 +69,19 @@
         }
 
         <div class="employee-detail-header__edit-actions">
-          <button type="button" (click)="cancelIdentityEditor()" [disabled]="updating()">
-            {{ texts.detailHeaderCancelAction }}
-          </button>
-          <button type="submit" [disabled]="identityForm.invalid || updating()">
-            @if (updating()) {
-              {{ texts.sectionShellBusyMessage }}
-            } @else {
-              {{ texts.detailHeaderSaveAction }}
-            }
-          </button>
+          <app-ui-button
+            type="button"
+            severity="secondary"
+            [outlined]="true"
+            [label]="texts.detailHeaderCancelAction"
+            (pressed)="cancelIdentityEditor()"
+            [disabled]="updating()"
+          />
+          <app-ui-button
+            type="submit"
+            [label]="updating() ? texts.sectionShellBusyMessage : texts.detailHeaderSaveAction"
+            [disabled]="identityForm.invalid || updating()"
+          />
         </div>
       </form>
     </section>

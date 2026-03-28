@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
+import { InputTextModule } from 'primeng/inputtext';
 import { take } from 'rxjs';
 
 import {
@@ -15,6 +16,10 @@ import { EmployeeSectionShellComponent } from '../../shared/ui/section/employee-
 import { isValidSpanishDni } from '../../shared/utils/spanish-dni.util';
 import { SlotKeyOption } from '../../shared/ui/section/editable-slot-section.model';
 import { SectionMode, SectionUiState } from '../../shared/ui/section/section-ui-state.model';
+import { UiButtonComponent } from '../../../../shared/ui/button/ui-button.component';
+import { UiDateInputComponent } from '../../../../shared/ui/date-input/ui-date-input.component';
+import { UiSelectComponent } from '../../../../shared/ui/select/ui-select.component';
+import { UiTagComponent } from '../../../../shared/ui/tag/ui-tag.component';
 
 interface IdentifierRowViewModel {
   key: string;
@@ -27,7 +32,7 @@ interface IdentifierRowViewModel {
 @Component({
   selector: 'app-employee-identifier-section',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [EmployeeSectionShellComponent],
+  imports: [EmployeeSectionShellComponent, UiButtonComponent, UiTagComponent, UiDateInputComponent, UiSelectComponent, InputTextModule],
   templateUrl: './employee-identifier-section.component.html',
   styleUrl: './employee-identifier-section.component.scss',
 })

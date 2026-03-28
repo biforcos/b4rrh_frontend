@@ -5,15 +5,20 @@
         <label class="employee-shell__label" for="employee-number-search">{{ texts.searchLabel }}</label>
         <div class="employee-shell__search-row">
           <input
+            pInputText
             id="employee-number-search"
+            class="employee-shell__search-input"
             type="text"
             formControlName="searchTerm"
             [placeholder]="texts.searchPlaceholder"
             autocomplete="off"
           />
-          <button type="submit" [disabled]="filteredEmployees().length === 0">
-            {{ texts.openAction }}
-          </button>
+          <app-ui-button
+            type="submit"
+            size="small"
+            [label]="texts.openAction"
+            [disabled]="filteredEmployees().length === 0"
+          />
         </div>
       </form>
 
@@ -64,6 +69,7 @@
             [email]="headerEmail()"
             [phone]="headerPhone()"
             (editIdentityRequested)="openIdentityEditorFromHeader()"
+            (terminateRequested)="openTerminatePanel()"
           />
 
           <app-employee-detail-header
@@ -95,12 +101,21 @@
           </section>
 
           <aside class="employee-shell__timeline-zone" aria-label="Employee timeline contextual panel">
-            <app-employee-journey-timeline
-              [journey]="journey()"
-              [loading]="loadingJourney()"
-              [error]="journeyError()"
-              [presences]="presences()"
-            />
+            @if (!terminatePanelOpen()) {
+              <app-employee-journey-timeline
+                [journey]="journey()"
+                [loading]="loadingJourney()"
+                [error]="journeyError()"
+                [presences]="presences()"
+              />
+            } @else {
+                @if (activeEmployeeKey(); as key) {
+                  <app-employee-terminate-panel
+                    [employeeKey]="key"
+                    (closed)="closeTerminatePanel()"
+                  />
+                }
+            }
           </aside>
         </div>
       } @else {

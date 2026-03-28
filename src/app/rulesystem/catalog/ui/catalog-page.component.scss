@@ -126,29 +126,16 @@
   justify-content: flex-end;
 }
 
-.catalog-page__operation-actions button {
-  border-radius: 0.42rem;
-  border: 1px solid #c4d2e2;
-  background: #ffffff;
-  color: #334558;
-  min-height: 1.95rem;
-  padding: 0 0.72rem;
-  font-weight: 600;
-}
-
-.catalog-page__operation-actions button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+.catalog-page__operation-actions :where(app-ui-button) {
+  min-width: 6.2rem;
 }
 
 .catalog-page__operation-danger {
-  border-color: #dd5f5f;
-  background: #dd5f5f;
-  color: #ffffff;
+  min-width: 7rem;
 }
 
 .catalog-page__operation-cancel {
-  border-color: #d1d9e3;
+  min-width: 5.8rem;
 }
 
 .catalog-page__feedback,
