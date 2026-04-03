@@ -134,7 +134,7 @@ export class EmployeeCostCenterDistributionEditorComponent {
 
   readonly form = this.fb.group({
     startDate: ['', Validators.required],
-    items: this.fb.array<any>([], [Validators.required, Validators.minLength(1)]),
+    items: this.fb.array([], [Validators.required, Validators.minLength(1)]),
   });
 
   constructor() {
@@ -176,10 +176,10 @@ export class EmployeeCostCenterDistributionEditorComponent {
   }
 
   getValue(): CostCenterDistributionDraft {
-    const raw = this.form.getRawValue();
+    const raw = this.form.getRawValue() as { startDate: string; items: CostCenterDistributionItemDraft[] };
     return {
       startDate: raw.startDate,
-      items: raw.items as CostCenterDistributionItemDraft[],
+      items: raw.items,
     };
   }
 

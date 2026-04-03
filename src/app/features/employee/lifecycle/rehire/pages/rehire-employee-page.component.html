@@ -1,0 +1,111 @@
+<div class="rehire-employee-container p-4">
+  <div class="flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="text-3xl font-bold m-0">Recontratar empleado</h1>
+      <p class="text-600 m-0">Reapertura del ciclo laboral para un empleado existente</p>
+    </div>
+    <div class="flex gap-2">
+      <p-button
+        label="Cancelar"
+        icon="pi pi-times"
+        severity="secondary"
+        (click)="onCancel()"
+        [disabled]="rehiring()"
+      ></p-button>
+      <p-button
+        label="Recontratar empleado"
+        icon="pi pi-check"
+        (click)="onSubmit()"
+        [loading]="rehiring()"
+      ></p-button>
+    </div>
+  </div>
+
+  <p-message *ngIf="error()" severity="error" [text]="mapErrorMessage(error())" class="w-full mb-4 block"></p-message>
+
+  <div class="grid">
+    <!-- Employee context read-only -->
+    <div class="col-12 lg:col-6">
+      <p-card header="Contexto de empleado" class="h-full">
+        <div class="flex flex-column gap-3">
+          <div *ngIf="detail() as emp; else missing">
+            <div><strong>Nombre:</strong> {{ emp.displayName }}</div>
+            <div><strong>Clave:</strong> {{ emp.ruleSystemCode }} / {{ emp.employeeTypeCode }} / {{ emp.employeeNumber }}</div>
+            <div><strong>Estado:</strong> {{ emp.statusLabel }}</div>
+          </div>
+          <ng-template #missing>
+            <div>No se pudo cargar el contexto del empleado. Comprueba la clave en la ruta.</div>
+          </ng-template>
+        </div>
+      </p-card>
+    </div>
+
+    <!-- Rehire data -->
+    <div class="col-12 lg:col-6">
+      <p-card header="Datos de reincorporación" class="h-full">
+        <div class="flex flex-column gap-3">
+          <div class="flex flex-column gap-2">
+            <label for="rehireDate">Fecha de reincorporación *</label>
+            <p-datepicker id="rehireDate" formControlName="rehireDate" dateFormat="yy-mm-dd" [fluid]="true" appendTo="body" [showIcon]="true"></p-datepicker>
+          </div>
+
+          <div class="flex flex-column gap-2">
+            <label for="companyCode">Empresa *</label>
+            <p-select id="companyCode" formControlName="companyCode" [options]="companies()" optionLabel="label" optionValue="value" placeholder="Selecciona empresa" [fluid]="true" appendTo="body"></p-select>
+          </div>
+
+          <div class="flex flex-column gap-2">
+            <label for="entryReasonCode">Motivo *</label>
+            <p-select id="entryReasonCode" formControlName="entryReasonCode" [options]="entryReasons()" optionLabel="label" optionValue="value" placeholder="Selecciona motivo" [fluid]="true" appendTo="body"></p-select>
+          </div>
+        </div>
+      </p-card>
+    </div>
+
+    <!-- Organization -->
+    <div class="col-12 lg:col-6 mt-4">
+      <p-card header="Contexto organizativo inicial" class="h-full">
+        <div class="flex flex-column gap-3">
+          <div class="flex flex-column gap-2">
+            <label for="workCenterCode">Centro de trabajo *</label>
+            <p-select id="workCenterCode" formControlName="workCenterCode" [options]="workCenters()" optionLabel="label" optionValue="value" placeholder="Selecciona centro" [fluid]="true" appendTo="body"></p-select>
+          </div>
+
+          <div class="mt-3">
+            <label>Distribución de centros de coste (opcional)</label>
+            <app-employee-cost-center-distribution-editor #ccEditor [initialValue]="null" [options]="costCenterOptions()" [dateLabel]="texts.costCenterSectionStartDateLabel"></app-employee-cost-center-distribution-editor>
+          </div>
+        </div>
+      </p-card>
+    </div>
+
+    <!-- Labor Context -->
+    <div class="col-12 lg:col-6 mt-4">
+      <p-card header="Contexto laboral inicial" class="h-full">
+        <div class="flex flex-column gap-3">
+          <div class="grid">
+            <div class="col-12 sm:col-6 flex flex-column gap-2">
+              <label for="contractTypeCode">Tipo de contrato *</label>
+              <p-select id="contractTypeCode" formControlName="contractTypeCode" [options]="contractTypes()" optionLabel="label" optionValue="value" placeholder="Selecciona tipo" [fluid]="true" appendTo="body"></p-select>
+            </div>
+            <div class="col-12 sm:col-6 flex flex-column gap-2">
+              <label for="contractSubtypeCode">Subtipo</label>
+              <p-select id="contractSubtypeCode" formControlName="contractSubtypeCode" [options]="contractSubtypes()" optionLabel="label" optionValue="value" placeholder="Selecciona subtipo" [fluid]="true" appendTo="body"></p-select>
+            </div>
+          </div>
+
+          <div class="grid">
+            <div class="col-12 sm:col-6 flex flex-column gap-2">
+              <label for="agreementCode">Convenio *</label>
+              <p-select id="agreementCode" formControlName="agreementCode" [options]="agreements()" optionLabel="label" optionValue="value" placeholder="Selecciona convenio" [fluid]="true" appendTo="body"></p-select>
+            </div>
+            <div class="col-12 sm:col-6 flex flex-column gap-2">
+              <label for="agreementCategoryCode">Categoría *</label>
+              <p-select id="agreementCategoryCode" formControlName="agreementCategoryCode" [options]="agreementCategories()" optionLabel="label" optionValue="value" placeholder="Selecciona categoria" [fluid]="true" appendTo="body"></p-select>
+            </div>
+          </div>
+        </div>
+      </p-card>
+    </div>
+  </div>
+</div>

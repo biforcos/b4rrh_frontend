@@ -46,6 +46,13 @@ export const employeeRoutes: Routes = [
           ),
       },
       {
+        path: `${buildEmployeeKeyRoutePath()}/rehire`,
+        loadComponent: () =>
+          import('./lifecycle/rehire/pages/rehire-employee-page.component').then(
+            (m) => m.RehireEmployeePageComponent,
+          ),
+      },
+      {
         path: buildEmployeeKeyRoutePath(),
         pathMatch: 'full',
         redirectTo: buildEmployeeDetailRoutePath('contact'),
