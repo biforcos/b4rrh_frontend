@@ -18,7 +18,6 @@ import { EmployeeBusinessKey } from '../../models/employee-business-key.model';
 import { EmployeeContactModel } from '../../models/employee-contact.model';
 import { EmployeeCoreIdentityDraft } from '../../models/employee-core-identity-draft.model';
 import { EmployeeDetailModel } from '../../models/employee-detail.model';
-import { EmployeeListItemModel } from '../../models/employee-list-item.model';
 import { EmployeePresenceModel } from '../../models/employee-presence.model';
 import {
   buildEmployeeDetailRouteCommands,
@@ -35,6 +34,7 @@ import { EmployeeDirectoryListComponent } from '../components/employee-directory
 
 @Component({
   selector: 'app-employee-shell-page',
+  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ReactiveFormsModule,
@@ -67,6 +67,8 @@ export class EmployeeShellPageComponent {
     searchTerm: new FormControl('', { nonNullable: true }),
   });
   protected readonly filteredEmployees = this.directoryStore.filteredEmployees;
+  protected readonly loadingDirectory = this.directoryStore.loading;
+  protected readonly directoryError = this.directoryStore.error;
   protected readonly activeEmployeeKey = signal<EmployeeBusinessKey | null>(null);
   protected readonly activeDetailSection = signal<EmployeeRouteSection>('contact');
   protected readonly selectedEmployeeDetail = this.detailStore.selectedEmployeeDetail;
@@ -94,12 +96,7 @@ export class EmployeeShellPageComponent {
       return selectedEmployeeDetail;
     }
 
-    const directoryEmployee = this.directoryStore.findEmployeeByBusinessKey(activeEmployeeKey);
-    if (directoryEmployee) {
-      return this.toFallbackDetailFromDirectory(directoryEmployee);
-    }
-
-    return this.toUnknownDetail(activeEmployeeKey);
+    return null;
   });
   protected readonly headerStatus = computed<'ACTIVE' | 'INACTIVE'>(() => {
     const employee = this.selectedEmployee();
@@ -235,38 +232,6 @@ export class EmployeeShellPageComponent {
     }
 
     return 'contact';
-  }
-
-  private toFallbackDetailFromDirectory(source: EmployeeListItemModel): EmployeeDetailModel {
-    return {
-      id: -1,
-      ruleSystemCode: source.ruleSystemCode,
-      employeeTypeCode: source.employeeTypeCode,
-      employeeNumber: source.employeeNumber,
-      firstName: source.displayName,
-      lastName1: '',
-      lastName2: null,
-      preferredName: source.displayName,
-      displayName: source.displayName,
-      statusLabel: source.statusLabel,
-      workCenter: source.workCenter,
-    };
-  }
-
-  private toUnknownDetail(key: EmployeeBusinessKey): EmployeeDetailModel {
-    return {
-      id: -1,
-      ruleSystemCode: key.ruleSystemCode,
-      employeeTypeCode: key.employeeTypeCode,
-      employeeNumber: key.employeeNumber,
-      firstName: this.texts.unknownEmployeeName,
-      lastName1: '',
-      lastName2: null,
-      preferredName: this.texts.unknownEmployeeName,
-      displayName: this.texts.unknownEmployeeName,
-      statusLabel: this.texts.unknownEmployeeStatus,
-      workCenter: this.texts.unknownEmployeeWorkCenter,
-    };
   }
 
   private resolveActivePresence(presences: ReadonlyArray<EmployeePresenceModel>): EmployeePresenceModel | null {

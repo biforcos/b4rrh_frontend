@@ -67,7 +67,6 @@ export class EmployeeLaborClassificationCatalogStore {
             return;
           }
 
-          this.agreementsState.set([]);
           this.loadingAgreementsState.set(false);
           this.errorState.set('request-failed');
         },
@@ -108,7 +107,6 @@ export class EmployeeLaborClassificationCatalogStore {
             return;
           }
 
-          this.agreementCategoriesState.set([]);
           this.loadingCategoriesState.set(false);
           this.errorState.set('request-failed');
         },

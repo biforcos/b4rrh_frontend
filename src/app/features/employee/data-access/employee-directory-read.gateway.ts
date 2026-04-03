@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, catchError, map, of } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
 import { EmployeeReadClient } from '../../../core/api/clients/employee-read.client';
 import {
@@ -7,7 +7,6 @@ import {
   EmployeeDirectoryReadModel,
 } from '../../../core/api/mappers/employee-directory.mapper';
 import { EmployeeListItemModel } from '../models/employee-list-item.model';
-import { employeeDirectorySeed } from './employee-directory.seed';
 
 @Injectable({
   providedIn: 'root',
@@ -22,7 +21,6 @@ export class EmployeeDirectoryReadGateway {
           this.toEmployeeListItemModel(mapEmployeeDirectoryApiToDirectoryModel(employee)),
         ),
       ),
-      catchError(() => of(employeeDirectorySeed)),
     );
   }
 

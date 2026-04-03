@@ -396,14 +396,24 @@ export class EmployeeAddressSectionComponent {
     this.fieldCatalogService
       .loadAddressTypeOptions(normalizedRuleSystemCode)
       .pipe(take(1))
-      .subscribe((options) => {
-        if (requestId !== this.catalogRequestId) {
-          return;
-        }
+      .subscribe({
+        next: (options) => {
+          if (requestId !== this.catalogRequestId) {
+            return;
+          }
 
-        this.catalogLoadingState.set(false);
-        this.availableAddressTypeOptionsState.set(options);
-        this.syncCreateDraftTypeWithAvailableOptions(options);
+          this.catalogLoadingState.set(false);
+          this.availableAddressTypeOptionsState.set(options);
+          this.syncCreateDraftTypeWithAvailableOptions(options);
+        },
+        error: () => {
+          if (requestId !== this.catalogRequestId) {
+            return;
+          }
+
+          this.catalogLoadingState.set(false);
+          this.localErrorMessageState.set(this.texts.catalogLoadFailedMessage);
+        },
       });
   }
 

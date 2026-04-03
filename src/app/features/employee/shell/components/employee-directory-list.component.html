@@ -1,4 +1,12 @@
-@if (employees().length === 0) {
+@if (loading()) {
+  <p class="employee-directory-list__feedback employee-directory-list__feedback--loading">
+    {{ texts.directoryLoadingMessage }}
+  </p>
+} @else if (error()) {
+  <p class="employee-directory-list__feedback employee-directory-list__feedback--error">
+    {{ texts.directoryLoadFailedMessage }}
+  </p>
+} @else if (employees().length === 0) {
   <p class="employee-directory-list__empty">{{ texts.noResultEmployeesDescription }}</p>
 } @else {
   <div class="employee-directory-list" role="list" [attr.aria-label]="texts.resultEmployeesTitle">

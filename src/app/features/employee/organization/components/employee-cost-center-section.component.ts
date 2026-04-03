@@ -148,6 +148,7 @@ export class EmployeeCostCenterSectionComponent {
   readonly availableCostCenterOptionsState = signal<ReadonlyArray<SlotKeyOption<string>>>([]);
   readonly catalogLoadingState = signal(false);
 
+  private readonly localErrorMessageState = signal<string | null>(null);
   private readonly fieldCatalogService = inject(EmployeeFieldCatalogService);
   private catalogRequestId = 0;
 
@@ -167,7 +168,7 @@ export class EmployeeCostCenterSectionComponent {
       mode: isBusy ? 'submitting' : (this.isViewMode() ? 'view' : 'editing'),
       dirty: !this.isViewMode(),
       busy: isBusy,
-      errorMessage: this.mapErrorCode(this.store.error()),
+      errorMessage: this.localErrorMessageState() || this.mapErrorCode(this.store.error()),
       successMessage: this.mapSuccessType(this.store.success()),
     };
   });
@@ -205,7 +206,10 @@ export class EmployeeCostCenterSectionComponent {
     // Reset feedback on mode change
     effect(() => {
       this.displayMode();
-      untracked(() => this.store.clearFeedback());
+      untracked(() => {
+        this.store.clearFeedback();
+        this.localErrorMessageState.set(null);
+      });
     });
   }
 
@@ -297,13 +301,23 @@ export class EmployeeCostCenterSectionComponent {
     this.fieldCatalogService
       .loadCostCenterOptions(normalizedRuleSystemCode)
       .pipe(take(1))
-      .subscribe((options) => {
-        if (requestId !== this.catalogRequestId) {
-          return;
-        }
+      .subscribe({
+        next: (options) => {
+          if (requestId !== this.catalogRequestId) {
+            return;
+          }
 
-        this.availableCostCenterOptionsState.set(options);
-        this.catalogLoadingState.set(false);
+          this.availableCostCenterOptionsState.set(options);
+          this.catalogLoadingState.set(false);
+        },
+        error: () => {
+          if (requestId !== this.catalogRequestId) {
+            return;
+          }
+
+          this.catalogLoadingState.set(false);
+          this.localErrorMessageState.set(this.texts.catalogLoadFailedMessage);
+        }
       });
   }
 }

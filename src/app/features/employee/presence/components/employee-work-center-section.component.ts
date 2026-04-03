@@ -563,13 +563,23 @@ export class EmployeeWorkCenterSectionComponent {
     this.fieldCatalogService
       .loadWorkCenterOptions(normalizedRuleSystemCode)
       .pipe(take(1))
-      .subscribe((options) => {
-        if (requestId !== this.catalogRequestId) {
-          return;
-        }
+      .subscribe({
+        next: (options) => {
+          if (requestId !== this.catalogRequestId) {
+            return;
+          }
 
-        this.availableWorkCenterOptionsState.set(options);
-        this.catalogLoadingState.set(false);
+          this.availableWorkCenterOptionsState.set(options);
+          this.catalogLoadingState.set(false);
+        },
+        error: () => {
+          if (requestId !== this.catalogRequestId) {
+            return;
+          }
+
+          this.catalogLoadingState.set(false);
+          this.localErrorMessageState.set(this.texts.catalogLoadFailedMessage);
+        },
       });
   }
 

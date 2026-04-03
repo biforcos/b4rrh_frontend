@@ -112,6 +112,7 @@ export class EmployeeTerminatePanelComponent {
         error: (e) => {
           this.options.set([]);
           this.optionsLoading.set(false);
+          this.errorMsg.set('Failed to load exit reasons. Please try again.');
           if (isDevMode()) {
             console.warn('[TerminatePanel] failed loading exit reasons', e);
           }

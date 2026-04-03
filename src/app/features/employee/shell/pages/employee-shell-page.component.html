@@ -36,6 +36,8 @@
         <app-employee-directory-list
           [employees]="filteredEmployees()"
           [selectedEmployeeKey]="activeEmployeeKey()"
+          [loading]="loadingDirectory()"
+          [error]="directoryError()"
           (employeeSelected)="openEmployeeDetail($event)"
         />
       </section>

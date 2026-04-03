@@ -4,8 +4,9 @@ import { take } from 'rxjs';
 import { EmployeeBusinessKey } from '../models/employee-business-key.model';
 import { EmployeeListItemModel } from '../models/employee-list-item.model';
 import { areEmployeeBusinessKeysEqual } from '../routing/employee-route-key.util';
-import { employeeDirectorySeed } from './employee-directory.seed';
 import { EmployeeDirectoryReadGateway } from './employee-directory-read.gateway';
+
+export type EmployeeDirectoryErrorCode = 'request-failed';
 
 @Injectable({
   providedIn: 'root',
@@ -13,9 +14,13 @@ import { EmployeeDirectoryReadGateway } from './employee-directory-read.gateway'
 export class EmployeeDirectoryStore {
   private readonly employeeDirectoryReadGateway = inject(EmployeeDirectoryReadGateway);
   private readonly employeesState = signal<ReadonlyArray<EmployeeListItemModel>>([]);
+  private readonly loadingState = signal(false);
+  private readonly errorState = signal<EmployeeDirectoryErrorCode | null>(null);
 
   readonly query = signal('');
   readonly employees = this.employeesState.asReadonly();
+  readonly loading = this.loadingState.asReadonly();
+  readonly error = this.errorState.asReadonly();
 
   constructor() {
     this.loadDirectory();
@@ -56,15 +61,20 @@ export class EmployeeDirectoryStore {
   }
 
   private loadDirectory(): void {
+    this.loadingState.set(true);
+    this.errorState.set(null);
+
     this.employeeDirectoryReadGateway
       .readDirectory()
       .pipe(take(1))
       .subscribe({
         next: (employees) => {
           this.employeesState.set(employees);
+          this.loadingState.set(false);
         },
         error: () => {
-          this.employeesState.set(employeeDirectorySeed);
+          this.loadingState.set(false);
+          this.errorState.set('request-failed');
         },
       });
   }

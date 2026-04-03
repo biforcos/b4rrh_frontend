@@ -1,5 +1,5 @@
 import { Injectable, inject, isDevMode } from '@angular/core';
-import { Observable, catchError, map, of, shareReplay, switchMap } from 'rxjs';
+import { Observable, map, of, shareReplay, switchMap, throwError } from 'rxjs';
 
 import { DefaultService } from '../../../core/api/generated/api/default.service';
 import {
@@ -24,13 +24,6 @@ const employeeCatalogFields = {
 } as const;
 
 type CatalogFieldSpec = (typeof employeeCatalogFields)[keyof typeof employeeCatalogFields];
-
-interface DirectCatalogContext {
-  ruleSystemCode: string;
-  resourceCode: string;
-  fieldCode: string;
-  ruleEntityTypeCode?: string;
-}
 
 @Injectable({
   providedIn: 'root',
@@ -87,25 +80,19 @@ export class EmployeeFieldCatalogService {
   ): Observable<ReadonlyArray<SlotKeyOption<string>>> {
     const normalizedRuleSystemCode = this.normalizeRequiredValue(ruleSystemCode);
     if (!normalizedRuleSystemCode) {
-      return of([]);
+      return throwError(() => new Error('Rule system code is required to load direct catalog options.'));
     }
 
     return this.getBindingsByResource(fieldSpec.resourceCode).pipe(
       map((bindings) => this.findDirectBinding(bindings, fieldSpec.fieldCode)),
       switchMap((binding) => {
         if (!binding?.ruleEntityTypeCode) {
-          this.reportDevWarning(
-            `Missing active DIRECT binding for ${fieldSpec.resourceCode}.${fieldSpec.fieldCode}; falling back to empty options.`,
-          );
-          return of([]);
+          const message = `Missing active DIRECT binding for ${fieldSpec.resourceCode}.${fieldSpec.fieldCode}.`;
+          this.reportDevWarning(message);
+          return throwError(() => new Error(message));
         }
 
-        return this.getDirectOptions(normalizedRuleSystemCode, binding.ruleEntityTypeCode, {
-          ruleSystemCode: normalizedRuleSystemCode,
-          resourceCode: fieldSpec.resourceCode,
-          fieldCode: fieldSpec.fieldCode,
-          ruleEntityTypeCode: binding.ruleEntityTypeCode,
-        });
+        return this.getDirectOptions(normalizedRuleSystemCode, binding.ruleEntityTypeCode);
       }),
     );
   }
@@ -121,12 +108,6 @@ export class EmployeeFieldCatalogService {
       .getCatalogBindingsByResourceCode({ resourceCode: normalizedResourceCode })
       .pipe(
         map((response) => response.fields ?? []),
-        catchError(() => {
-          this.reportDevWarning(
-            `Failed to load catalog bindings for ${normalizedResourceCode}; falling back to empty bindings.`,
-          );
-          return of([]);
-        }),
         shareReplay(1),
       );
 
@@ -137,7 +118,6 @@ export class EmployeeFieldCatalogService {
   private getDirectOptions(
     ruleSystemCode: string,
     ruleEntityTypeCode: string,
-    context: DirectCatalogContext,
   ): Observable<ReadonlyArray<SlotKeyOption<string>>> {
     const normalizedRuleEntityTypeCode = this.normalizeRequiredValue(ruleEntityTypeCode);
     if (!normalizedRuleEntityTypeCode) {
@@ -158,12 +138,6 @@ export class EmployeeFieldCatalogService {
       .pipe(
         map((response) => response.items ?? []),
         map((items) => this.mapOptions(items)),
-        catchError(() => {
-          this.reportDevWarning(
-            `Failed to load direct options for ${context.resourceCode}.${context.fieldCode} (${context.ruleEntityTypeCode}) in ${context.ruleSystemCode}; falling back to empty options.`,
-          );
-          return of([]);
-        }),
         shareReplay(1),
       );
 

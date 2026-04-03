@@ -332,14 +332,24 @@ export class EmployeeContactSectionComponent {
     this.fieldCatalogService
       .loadContactTypeOptions(normalizedRuleSystemCode)
       .pipe(take(1))
-      .subscribe((options) => {
-        if (requestId !== this.catalogRequestId) {
-          return;
-        }
+      .subscribe({
+        next: (options) => {
+          if (requestId !== this.catalogRequestId) {
+            return;
+          }
 
-        this.catalogLoadingState.set(false);
-        this.availableContactTypeOptionsState.set(options);
-        this.syncDraftKeyWithAvailableOptions(options);
+          this.catalogLoadingState.set(false);
+          this.availableContactTypeOptionsState.set(options);
+          this.syncDraftKeyWithAvailableOptions(options);
+        },
+        error: () => {
+          if (requestId !== this.catalogRequestId) {
+            return;
+          }
+
+          this.catalogLoadingState.set(false);
+          this.localErrorMessageState.set(this.texts.catalogLoadFailedMessage);
+        },
       });
   }
 

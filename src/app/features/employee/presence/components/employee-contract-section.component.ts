@@ -544,13 +544,23 @@ export class EmployeeContractSectionComponent {
     this.fieldCatalogService
       .loadContractTypeOptions(normalizedRuleSystemCode)
       .pipe(take(1))
-      .subscribe((options) => {
-        if (requestId !== this.contractTypeOptionsRequestId) {
-          return;
-        }
+      .subscribe({
+        next: (options) => {
+          if (requestId !== this.contractTypeOptionsRequestId) {
+            return;
+          }
 
-        this.contractTypeOptionsState.set(options);
-        this.contractTypeOptionsLoadingState.set(false);
+          this.contractTypeOptionsState.set(options);
+          this.contractTypeOptionsLoadingState.set(false);
+        },
+        error: () => {
+          if (requestId !== this.contractTypeOptionsRequestId) {
+            return;
+          }
+
+          this.contractTypeOptionsLoadingState.set(false);
+          this.localErrorMessageState.set(this.texts.catalogLoadFailedMessage);
+        },
       });
   }
 
@@ -611,6 +621,7 @@ export class EmployeeContractSectionComponent {
 
           this.replaceSubtypeOptionsState.set([]);
           this.replaceSubtypeLoadingState.set(false);
+          this.localErrorMessageState.set(this.texts.catalogLoadFailedMessage);
         },
       });
   }
@@ -672,6 +683,7 @@ export class EmployeeContractSectionComponent {
 
           this.correctSubtypeOptionsState.set([]);
           this.correctSubtypeLoadingState.set(false);
+          this.localErrorMessageState.set(this.texts.catalogLoadFailedMessage);
         },
       });
   }

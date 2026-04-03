@@ -600,13 +600,23 @@ export class EmployeeLaborClassificationSectionComponent {
     this.fieldCatalogService
       .loadLaborClassificationAgreementOptions(normalizedRuleSystemCode)
       .pipe(take(1))
-      .subscribe((options) => {
-        if (requestId !== this.agreementOptionsRequestId) {
-          return;
-        }
+      .subscribe({
+        next: (options) => {
+          if (requestId !== this.agreementOptionsRequestId) {
+            return;
+          }
 
-        this.agreementOptionsState.set(options);
-        this.agreementOptionsLoadingState.set(false);
+          this.agreementOptionsState.set(options);
+          this.agreementOptionsLoadingState.set(false);
+        },
+        error: () => {
+          if (requestId !== this.agreementOptionsRequestId) {
+            return;
+          }
+
+          this.agreementOptionsLoadingState.set(false);
+          this.localErrorMessageState.set(this.texts.catalogLoadFailedMessage);
+        },
       });
   }
 
@@ -667,6 +677,7 @@ export class EmployeeLaborClassificationSectionComponent {
 
           this.replaceCategoryOptionsState.set([]);
           this.replaceCategoryLoadingState.set(false);
+          this.localErrorMessageState.set(this.texts.catalogLoadFailedMessage);
         },
       });
   }
@@ -728,6 +739,7 @@ export class EmployeeLaborClassificationSectionComponent {
 
           this.correctCategoryOptionsState.set([]);
           this.correctCategoryLoadingState.set(false);
+          this.localErrorMessageState.set(this.texts.catalogLoadFailedMessage);
         },
       });
   }

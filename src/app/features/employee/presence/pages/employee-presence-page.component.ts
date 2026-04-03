@@ -124,13 +124,22 @@ export class EmployeePresencePageComponent {
   ): void {
     startLoading();
 
-    options$.pipe(take(1)).subscribe((options) => {
-      if (requestId !== this.presenceCatalogRequestId) {
-        return;
-      }
+    options$.pipe(take(1)).subscribe({
+      next: (options) => {
+        if (requestId !== this.presenceCatalogRequestId) {
+          return;
+        }
 
-      setTarget(this.toLabelMapByCode(options));
-      stopLoading();
+        setTarget(this.toLabelMapByCode(options));
+        stopLoading();
+      },
+      error: () => {
+        if (requestId !== this.presenceCatalogRequestId) {
+          return;
+        }
+
+        stopLoading();
+      },
     });
   }
 

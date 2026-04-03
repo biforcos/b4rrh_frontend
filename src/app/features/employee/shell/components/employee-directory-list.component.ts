@@ -5,6 +5,7 @@ import { employeeTexts } from '../../employee.texts';
 import { EmployeeBusinessKey } from '../../models/employee-business-key.model';
 import { EmployeeListItemModel } from '../../models/employee-list-item.model';
 import { areEmployeeBusinessKeysEqual, toEmployeeBusinessKey } from '../../routing/employee-route-key.util';
+import { EmployeeDirectoryErrorCode } from '../../data-access/employee-directory.store';
 
 @Component({
   selector: 'app-employee-directory-list',
@@ -17,6 +18,8 @@ import { areEmployeeBusinessKeysEqual, toEmployeeBusinessKey } from '../../routi
 export class EmployeeDirectoryListComponent {
   readonly employees = input<ReadonlyArray<EmployeeListItemModel>>([]);
   readonly selectedEmployeeKey = input<EmployeeBusinessKey | null>(null);
+  readonly loading = input(false);
+  readonly error = input<EmployeeDirectoryErrorCode | null>(null);
   readonly employeeSelected = output<EmployeeBusinessKey>();
 
   protected readonly texts = employeeTexts;

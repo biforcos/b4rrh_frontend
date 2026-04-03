@@ -70,6 +70,8 @@ export class HireEmployeePageComponent {
   readonly agreements = signal<any[]>([]);
   readonly agreementCategories = signal<any[]>([]);
 
+  readonly catalogError = signal<string | null>(null);
+
   readonly hiring = (this.hiringStore as any).hiring;
   readonly error = (this.hiringStore as any).error;
 
@@ -113,37 +115,57 @@ export class HireEmployeePageComponent {
   }
 
   private loadInitialCatalogs() {
+    this.catalogError.set(null);
     (this.api as any)
       .listRuleSystems()
       .pipe(take(1))
-      .subscribe((rss: any) => {
-        this.ruleSystems.set((rss || []).map((rs: any) => ({ value: rs.code, label: `${rs.name} · ${rs.code}` })));
+      .subscribe({
+        next: (rss: any) => {
+          this.ruleSystems.set((rss || []).map((rs: any) => ({ value: rs.code, label: `${rs.name} · ${rs.code}` })));
+        },
+        error: () => this.catalogError.set(this.texts.catalogLoadFailedMessage)
       });
   }
 
   private loadDependentCatalogs(ruleSystemCode: string) {
-    (this.catalogService as any).loadWorkCenterOptions(ruleSystemCode).subscribe((opts: any) => this.workCenters.set([...opts]));
-    (this.catalogService as any).loadPresenceCompanyOptions(ruleSystemCode).subscribe((opts: any) => this.companies.set([...opts]));
-    (this.catalogService as any).loadPresenceEntryReasonOptions(ruleSystemCode).subscribe((opts: any) => this.entryReasons.set([...opts]));
-    (this.catalogService as any).loadContractTypeOptions(ruleSystemCode).subscribe((opts: any) => this.contractTypes.set([...opts]));
-    (this.catalogService as any).loadLaborClassificationAgreementOptions(ruleSystemCode).subscribe((opts: any) => this.agreements.set([...opts]));
-  }
-
-  private loadContractSubtypes(ruleSystemCode: string, contractTypeCode: string) {
-    (this.api as any).listContractCatalogSubtypes({ ruleSystemCode, contractTypeCode }).subscribe((resp: any) => {
-      this.contractSubtypes.set((resp || []).map((i: any) => ({ value: i.code, label: `${i.name} · ${i.code}` })));
+    this.catalogError.set(null);
+    (this.catalogService as any).loadWorkCenterOptions(ruleSystemCode).subscribe({
+      next: (opts: any) => this.workCenters.set([...opts]),
+      error: () => this.catalogError.set(this.texts.catalogLoadFailedMessage)
+    });
+    (this.catalogService as any).loadPresenceCompanyOptions(ruleSystemCode).subscribe({
+      next: (opts: any) => this.companies.set([...opts]),
+      error: () => this.catalogError.set(this.texts.catalogLoadFailedMessage)
+    });
+    (this.catalogService as any).loadPresenceEntryReasonOptions(ruleSystemCode).subscribe({
+      next: (opts: any) => this.entryReasons.set([...opts]),
+      error: () => this.catalogError.set(this.texts.catalogLoadFailedMessage)
+    });
+    (this.catalogService as any).loadContractTypeOptions(ruleSystemCode).subscribe({
+      next: (opts: any) => this.contractTypes.set([...opts]),
+      error: () => this.catalogError.set(this.texts.catalogLoadFailedMessage)
+    });
+    (this.catalogService as any).loadLaborClassificationAgreementOptions(ruleSystemCode).subscribe({
+      next: (opts: any) => this.agreements.set([...opts]),
+      error: () => this.catalogError.set(this.texts.catalogLoadFailedMessage)
     });
   }
 
-  private loadContractSubtypesOld(ruleSystemCode: string, contractTypeCode: string) {
-    (this.api as any).listContractCatalogSubtypes({ ruleSystemCode, contractTypeCode }).subscribe((resp: any) => {
-      this.contractSubtypes.set((resp || []).map((i: any) => ({ value: i.code, label: `${i.name} · ${i.code}` })));
+  private loadContractSubtypes(ruleSystemCode: string, contractTypeCode: string) {
+    (this.api as any).listContractCatalogSubtypes({ ruleSystemCode, contractTypeCode }).subscribe({
+      next: (resp: any) => {
+        this.contractSubtypes.set((resp || []).map((i: any) => ({ value: i.code, label: `${i.name} · ${i.code}` })));
+      },
+      error: () => this.catalogError.set(this.texts.catalogLoadFailedMessage)
     });
   }
 
   private loadAgreementCategories(ruleSystemCode: string, agreementCode: string) {
-    (this.api as any).listLaborClassificationAgreementCategories({ ruleSystemCode, agreementCode }).subscribe((resp: any) => {
-      this.agreementCategories.set((resp || []).map((i: any) => ({ value: i.code, label: `${i.name} · ${i.code}` })));
+    (this.api as any).listLaborClassificationAgreementCategories({ ruleSystemCode, agreementCode }).subscribe({
+      next: (resp: any) => {
+        this.agreementCategories.set((resp || []).map((i: any) => ({ value: i.code, label: `${i.name} · ${i.code}` })));
+      },
+      error: () => this.catalogError.set(this.texts.catalogLoadFailedMessage)
     });
   }
 
