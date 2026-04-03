@@ -20,6 +20,7 @@ import { SlotKeyOption } from '../../../features/employee/shared/ui/section/edit
       (ngModelChange)="onSelectionChange($event)"
       [placeholder]="placeholder() ?? undefined"
       [fluid]="true"
+      appendTo="body"
     />
   `,
   styles: [`
