@@ -8,6 +8,7 @@ import { EmployeeDetailStore } from '../../data-access/employee-detail.store';
 import { EmployeeJourneyStore } from '../../data-access/employee-journey.store';
 import { EmployeePresenceStore } from '../../data-access/employee-presence.store';
 import { EmployeeWorkCenterStore } from '../../data-access/employee-work-center.store';
+import { EmployeeCostCenterStore } from '../../data-access/employee-cost-center.store';
 import { BASE_PATH } from '../../../../core/api/generated/variables';
 import { PanelComponent } from '../../../../shared/ui/panel/panel.component';
 import { SlotKeyOption } from '../../shared/ui/section/editable-slot-section.model';
@@ -59,6 +60,7 @@ export class EmployeeTerminatePanelComponent {
   private readonly journeyStore = inject(EmployeeJourneyStore);
   private readonly presenceStore = inject(EmployeePresenceStore);
   private readonly workCenterStore = inject(EmployeeWorkCenterStore);
+  private readonly costCenterStore = inject(EmployeeCostCenterStore);
 
   readonly form = new FormGroup({
     terminationDate: new FormControl('', { nonNullable: true }),
@@ -161,6 +163,7 @@ export class EmployeeTerminatePanelComponent {
         this.journeyStore.loadJourneyByBusinessKey(key);
         this.presenceStore.loadPresencesByBusinessKey(key);
         this.workCenterStore.loadWorkCenters(key);
+        this.costCenterStore.loadCostCenters(key);
         this.closed.emit();
       },
       error: (err: HttpErrorResponse) => {

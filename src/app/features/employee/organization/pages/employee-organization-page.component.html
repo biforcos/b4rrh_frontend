@@ -4,7 +4,7 @@
       <p class="employee-area__state">{{ texts.organizationLoadingMessage }}</p>
     }
 
-    @if (workCentersError() === 'request-failed') {
+    @if (workCentersError() === 'request-failed' || costCentersError() === 'request-failed') {
       <p class="employee-area__state employee-area__state--error">
         {{ texts.workCenterSectionLoadFailedMessage }}
       </p>
@@ -16,11 +16,14 @@
       <app-employee-work-center-section [employeeKey]="activeEmployeeKey()" />
     </section>
 
+    <section class="employee-area__module">
+      <app-employee-cost-center-section [employeeKey]="activeEmployeeKey()" />
+    </section>
+
     <section class="employee-area__module employee-area__module--future" aria-live="polite">
       <h3>{{ texts.organizationFutureTitle }}</h3>
       <p>{{ texts.organizationFutureDescription }}</p>
       <ul>
-        <li>{{ texts.organizationCostCenterAreaLabel }}</li>
         <li>{{ texts.organizationAssignmentAreaLabel }}</li>
         <li>{{ texts.organizationLocationAreaLabel }}</li>
         <li>{{ texts.organizationDepartmentAreaLabel }}</li>
