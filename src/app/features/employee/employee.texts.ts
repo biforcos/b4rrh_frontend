@@ -522,4 +522,18 @@ export const employeeTexts = {
   currentEmployeeKeyLabel: 'Employee business key',
   currentEmployeeLabel: 'Employee number',
   placeholderMessage: 'This section is intentionally minimal and ready for OpenAPI integration.',
+  hireEmployeeTitle: 'Nueva contratación',
+  hireEmployeeSubtitle:
+    'Inicia el ciclo de vida de un nuevo empleado en el sistema de reglas seleccionado.',
+  hireEmployeeIdentitySectionTitle: 'Identidad del empleado',
+  hireEmployeeHiringSectionTitle: 'Datos de contratación',
+  hireEmployeeOrganizationSectionTitle: 'Contexto organizativo inicial',
+  hireEmployeeLaborSectionTitle: 'Contexto laboral inicial',
+  hireEmployeeAction: 'Contratar empleado',
+  hireEmployeeCancelAction: 'Cancelar',
+  hireEmployeeSuccessMessage: 'Empleado contratado correctamente.',
+  hireEmployeeErrorMessage: 'No se pudo completar la contratación. Reintenta.',
+  hireEmployeeConflictMessage: 'El empleado ya existe en el sistema.',
+  hireEmployeeInvalidCatalogMessage:
+    'Uno o más valores de catálogo son inválidos para la fecha seleccionada.',
 } as const;

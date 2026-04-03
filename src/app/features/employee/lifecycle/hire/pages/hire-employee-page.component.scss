@@ -1,0 +1,52 @@
+.hire-employee-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: -0.5rem;
+  margin-left: -0.5rem;
+  margin-top: -0.5rem;
+}
+
+.col-12 {
+  flex: 0 0 100%;
+  padding: 0.5rem;
+  width: 100%;
+}
+
+@media screen and (min-width: 576px) {
+  .sm\:col-6 {
+    flex: 0 0 50%;
+    padding: 0.5rem;
+  }
+}
+
+@media screen and (min-width: 992px) {
+  .lg\:col-6 {
+    flex: 0 0 50%;
+    padding: 0.5rem;
+  }
+}
+
+.flex { display: flex; }
+.flex-column { flex-direction: column; }
+.gap-3 { gap: 1rem; }
+.gap-2 { gap: 0.5rem; }
+.justify-content-between { justify-content: space-between; }
+.align-items-center { align-items: center; }
+.mb-4 { margin-bottom: 1.5rem; }
+.mt-4 { margin-top: 1.5rem; }
+.m-0 { margin: 0; }
+.text-3xl { font-size: 1.875rem; }
+.font-bold { font-weight: 700; }
+.text-600 { color: #475569; }
+.w-full { width: 100%; }
+
+:host ::ng-deep {
+  .w-full.p-dropdown, .w-full.p-calendar, .w-full.p-inputtext {
+    width: 100% !important;
+  }
+}

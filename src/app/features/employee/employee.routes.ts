@@ -8,6 +8,13 @@ import {
 
 export const employeeRoutes: Routes = [
   {
+    path: 'hire',
+    loadComponent: () =>
+      import('./lifecycle/hire/pages/hire-employee-page.component').then(
+        (m) => m.HireEmployeePageComponent,
+      ),
+  },
+  {
     path: '',
     loadComponent: () =>
       import('./shell/pages/employee-shell-page.component').then((m) => m.EmployeeShellPageComponent),

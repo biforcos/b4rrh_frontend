@@ -201,6 +201,10 @@ export class EmployeeShellPageComponent {
     void this.openEmployeeDetail(toEmployeeBusinessKey(firstEmployee), 'contact');
   }
 
+  protected onHireClick(): void {
+    void this.router.navigate(['hire'], { relativeTo: this.route });
+  }
+
   protected openEmployeeDetail(
     employeeKey: EmployeeBusinessKey,
     section: EmployeeRouteSection = 'contact',

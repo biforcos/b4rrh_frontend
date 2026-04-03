@@ -1,0 +1,216 @@
+<div class="hire-employee-container p-4">
+  <div class="flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="text-3xl font-bold m-0">{{ texts.hireEmployeeTitle }}</h1>
+      <p class="text-600 m-0">{{ texts.hireEmployeeSubtitle }}</p>
+    </div>
+    <div class="flex gap-2">
+      <p-button
+        [label]="texts.hireEmployeeCancelAction"
+        icon="pi pi-times"
+        severity="secondary"
+        (click)="onCancel()"
+        [disabled]="hiring()"
+      ></p-button>
+      <p-button
+        [label]="texts.hireEmployeeAction"
+        icon="pi pi-check"
+        (click)="onSubmit()"
+        [loading]="hiring()"
+      ></p-button>
+    </div>
+  </div>
+
+  @if (error()) {
+    <p-message severity="error" [text]="texts.hireEmployeeErrorMessage" class="w-full mb-4 block"></p-message>
+  }
+
+  <form [formGroup]="form" class="grid">
+    <!-- Identity Section -->
+    <div class="col-12 lg:col-6">
+      <p-card [header]="texts.hireEmployeeIdentitySectionTitle" class="h-full">
+        <div class="flex flex-column gap-3">
+          <div class="flex flex-column gap-2">
+            <label for="ruleSystemCode">{{ texts.detailHeaderRuleSystemLabel }} *</label>
+            <p-select
+              id="ruleSystemCode"
+              formControlName="ruleSystemCode"
+              [options]="ruleSystems()"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Selecciona sistema"
+              [fluid]="true"
+              appendTo="body"
+            ></p-select>
+          </div>
+
+          <div class="flex flex-column gap-2">
+            <label for="employeeNumber">{{ texts.detailHeaderEmployeeNumberLabel }} *</label>
+            <input pInputText id="employeeNumber" formControlName="employeeNumber" class="w-full" />
+          </div>
+
+          <div class="flex flex-column gap-2">
+            <label for="firstName">{{ texts.detailHeaderFirstNameLabel }} *</label>
+            <input pInputText id="firstName" formControlName="firstName" class="w-full" />
+          </div>
+
+          <div class="grid">
+            <div class="col-12 sm:col-6 flex flex-column gap-2">
+              <label for="lastName1">{{ texts.detailHeaderLastName1Label }} *</label>
+              <input pInputText id="lastName1" formControlName="lastName1" class="w-full" />
+            </div>
+            <div class="col-12 sm:col-6 flex flex-column gap-2">
+              <label for="lastName2">{{ texts.detailHeaderLastName2Label }}</label>
+              <input pInputText id="lastName2" formControlName="lastName2" class="w-full" />
+            </div>
+          </div>
+
+          <div class="flex flex-column gap-2">
+            <label for="preferredName">{{ texts.detailHeaderPreferredNameLabel }}</label>
+            <input pInputText id="preferredName" formControlName="preferredName" class="w-full" />
+          </div>
+        </div>
+      </p-card>
+    </div>
+
+    <!-- Hiring Data -->
+    <div class="col-12 lg:col-6">
+      <p-card [header]="texts.hireEmployeeHiringSectionTitle" class="h-full">
+        <div class="flex flex-column gap-3">
+          <div class="flex flex-column gap-2">
+            <label for="hireDate">{{ texts.employeePageHeaderHireDateLabel }} *</label>
+            <p-datepicker
+              id="hireDate"
+              formControlName="hireDate"
+              dateFormat="yy-mm-dd"
+              [fluid]="true"
+              appendTo="body"
+              [showIcon]="true"
+            ></p-datepicker>
+          </div>
+
+          <div class="flex flex-column gap-2">
+            <label for="companyCode">{{ texts.presenceBlockCompanyLabel }} *</label>
+            <p-select
+              id="companyCode"
+              formControlName="companyCode"
+              [options]="companies()"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Selecciona empresa"
+              [fluid]="true"
+              [disabled]="!form.get('ruleSystemCode')?.value"
+              appendTo="body"
+            ></p-select>
+          </div>
+
+          <div class="flex flex-column gap-2">
+            <label for="entryReasonCode">{{ texts.presenceBlockEntryReasonLabel }} *</label>
+            <p-select
+              id="entryReasonCode"
+              formControlName="entryReasonCode"
+              [options]="entryReasons()"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Selecciona motivo"
+              [fluid]="true"
+              [disabled]="!form.get('ruleSystemCode')?.value"
+              appendTo="body"
+            ></p-select>
+          </div>
+        </div>
+      </p-card>
+    </div>
+
+    <!-- Organization -->
+    <div class="col-12 lg:col-6 mt-4">
+      <p-card [header]="texts.hireEmployeeOrganizationSectionTitle" class="h-full">
+        <div class="flex flex-column gap-3">
+          <div class="flex flex-column gap-2">
+            <label for="workCenterCode">{{ texts.workCenterSectionCodeLabel }} *</label>
+            <p-select
+              id="workCenterCode"
+              formControlName="workCenterCode"
+              [options]="workCenters()"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Selecciona centro"
+              [fluid]="true"
+              [disabled]="!form.get('ruleSystemCode')?.value"
+              appendTo="body"
+            ></p-select>
+          </div>
+        </div>
+      </p-card>
+    </div>
+
+    <!-- Labor Context -->
+    <div class="col-12 lg:col-6 mt-4">
+      <p-card [header]="texts.hireEmployeeLaborSectionTitle" class="h-full">
+        <div class="flex flex-column gap-3">
+          <div class="grid">
+            <div class="col-12 sm:col-6 flex flex-column gap-2">
+              <label for="contractTypeCode">{{ texts.contractSectionContractLabel }} *</label>
+              <p-select
+                id="contractTypeCode"
+                formControlName="contractTypeCode"
+                [options]="contractTypes()"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Selecciona tipo"
+                [fluid]="true"
+                [disabled]="!form.get('ruleSystemCode')?.value"
+                appendTo="body"
+              ></p-select>
+            </div>
+            <div class="col-12 sm:col-6 flex flex-column gap-2">
+              <label for="contractSubtypeCode">{{ texts.contractSectionSubtypeLabel }}</label>
+              <p-select
+                id="contractSubtypeCode"
+                formControlName="contractSubtypeCode"
+                [options]="contractSubtypes()"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Selecciona subtipo"
+                [fluid]="true"
+                [disabled]="!form.get('contractTypeCode')?.value"
+                appendTo="body"
+              ></p-select>
+            </div>
+          </div>
+
+          <div class="grid">
+            <div class="col-12 sm:col-6 flex flex-column gap-2">
+              <label for="agreementCode">{{ texts.laborClassificationSectionAgreementLabel }} *</label>
+              <p-select
+                id="agreementCode"
+                formControlName="agreementCode"
+                [options]="agreements()"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Selecciona convenio"
+                [fluid]="true"
+                [disabled]="!form.get('ruleSystemCode')?.value"
+                appendTo="body"
+              ></p-select>
+            </div>
+            <div class="col-12 sm:col-6 flex flex-column gap-2">
+              <label for="agreementCategoryCode">{{ texts.laborClassificationSectionCategoryLabel }} *</label>
+              <p-select
+                id="agreementCategoryCode"
+                formControlName="agreementCategoryCode"
+                [options]="agreementCategories()"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Selecciona categoria"
+                [fluid]="true"
+                [disabled]="!form.get('agreementCode')?.value"
+                appendTo="body"
+              ></p-select>
+            </div>
+          </div>
+        </div>
+      </p-card>
+    </div>
+  </form>
+</div>
