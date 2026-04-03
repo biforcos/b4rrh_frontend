@@ -28,10 +28,12 @@ import {
   TemporalSectionTexts,
 } from '../../shared/ui/section/temporal-section.model';
 
+import { InputTextModule } from 'primeng/inputtext';
+
 @Component({
   selector: 'app-employee-contract-section',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TemporalSectionComponent, UiDateInputComponent, UiSelectComponent],
+  imports: [TemporalSectionComponent, UiDateInputComponent, UiSelectComponent, InputTextModule],
   templateUrl: './employee-contract-section.component.html',
   styleUrl: './employee-contract-section.component.scss',
 })

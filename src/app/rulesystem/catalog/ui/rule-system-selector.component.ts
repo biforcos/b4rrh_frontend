@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { SlotKeyOption } from '../../../features/employee/shared/ui/section/editable-slot-section.model';
 
 import { UiSelectComponent } from '../../../shared/ui/select/ui-select.component';
 import { catalogTexts } from '../catalog.texts';
@@ -18,6 +19,12 @@ export class RuleSystemSelectorComponent {
   readonly selectionChanged = output<string>();
 
   protected readonly texts = catalogTexts;
+  protected readonly options = computed<ReadonlyArray<SlotKeyOption<string>>>(() =>
+    this.ruleSystems().map((rs) => ({
+      value: rs.code,
+      label: `${rs.code} · ${rs.name}`,
+    })),
+  );
 
   protected onSelectionChange(code: string): void {
     this.selectionChanged.emit(code);

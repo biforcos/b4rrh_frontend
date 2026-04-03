@@ -1,29 +1,32 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import { InputTextModule } from 'primeng/inputtext';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { DatePickerModule } from 'primeng/datepicker';
 
 @Component({
   selector: 'app-ui-date-input',
+  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [InputTextModule],
+  imports: [DatePickerModule, FormsModule],
   template: `
-    <input
-      pInputText
-      type="date"
-      class="ui-date-input__control"
-      [id]="inputId() ?? null"
-      [value]="value() ?? ''"
-      [min]="min() ?? null"
-      [max]="max() ?? null"
+    <p-datepicker
+      [id]="inputId() ?? undefined"
+      [ngModel]="value()"
+      [minDate]="minDate()"
+      [maxDate]="maxDate()"
       [disabled]="disabled()"
-      [readonly]="readonly()"
-      [attr.aria-label]="ariaLabel() ?? null"
-      (input)="onInput($event)"
+      [readonlyInput]="readonly()"
+      [ariaLabel]="ariaLabel() ?? undefined"
+      (ngModelChange)="onDateChange($event)"
+      dateFormat="yy-mm-dd"
+      [showIcon]="true"
+      [fluid]="true"
+      appendTo="body"
     />
   `,
-  styles: [
-    ':host { display: block; width: 100%; }',
-    ':host :where(.ui-date-input__control) { width: 100%; }',
-  ],
+  styles: [`
+    :host { display: block; width: 100%; }
+    :host ::ng-deep .p-datepicker { width: 100%; }
+  `],
 })
 export class UiDateInputComponent {
   readonly value = input<string | null>('');
@@ -36,12 +39,16 @@ export class UiDateInputComponent {
 
   readonly valueChanged = output<string>();
 
-  protected onInput(event: Event): void {
-    const target = event.target;
-    if (!(target instanceof HTMLInputElement)) {
-      return;
-    }
+  protected readonly minDate = () => this.min() ? new Date(this.min()!) : null;
+  protected readonly maxDate = () => this.max() ? new Date(this.max()!) : null;
 
-    this.valueChanged.emit(target.value);
+  protected onDateChange(newDate: Date | string | null): void {
+    if (newDate instanceof Date) {
+      this.valueChanged.emit(newDate.toISOString().slice(0, 10));
+    } else if (typeof newDate === 'string') {
+      this.valueChanged.emit(newDate);
+    } else {
+      this.valueChanged.emit('');
+    }
   }
 }

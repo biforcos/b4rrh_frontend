@@ -51,12 +51,12 @@
             <label>
               <span>{{ texts().keyFieldLabel }}</span>
               @if (canUseKeySelect()) {
-                <app-ui-select [value]="draft().key ?? ''" (valueChanged)="onDraftKeySelect($event)">
-                  <option value="">{{ texts().keyFieldLabel }}</option>
-                  @for (option of availableKeys(); track option.value) {
-                    <option [value]="option.value">{{ option.label }}</option>
-                  }
-                </app-ui-select>
+                <app-ui-select
+                  [value]="draft().key ?? ''"
+                  [options]="availableKeys()"
+                  [placeholder]="texts().keyFieldLabel"
+                  (valueChanged)="onDraftKeySelect($event)"
+                />
               } @else {
                 <input pInputText type="text" [value]="draft().key ?? ''" (input)="onDraftKeyInput($event)" />
               }

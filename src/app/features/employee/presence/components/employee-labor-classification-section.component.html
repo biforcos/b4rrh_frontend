@@ -37,28 +37,22 @@
       <span>{{ texts.laborClassificationSectionAgreementLabel }}</span>
       <app-ui-select
         [value]="replaceDraft().agreementCode"
+        [options]="agreementOptions()"
+        [placeholder]="texts.laborClassificationSectionAgreementLabel"
         [disabled]="agreementOptionsLoading()"
         (valueChanged)="updateReplaceField('agreementCode', $event)"
-      >
-        <option value="">{{ texts.laborClassificationSectionAgreementLabel }}</option>
-        @for (option of agreementOptions(); track option.value) {
-          <option [value]="option.value">{{ option.label }}</option>
-        }
-      </app-ui-select>
+      />
     </label>
 
     <label class="employee-labor-classification-section__field employee-labor-classification-section__field--category">
       <span>{{ texts.laborClassificationSectionCategoryLabel }}</span>
       <app-ui-select
         [value]="replaceDraft().agreementCategoryCode"
+        [options]="replaceCategoryOptions()"
+        [placeholder]="texts.laborClassificationSectionCategoryLabel"
         [disabled]="replaceCategoryDisabled()"
         (valueChanged)="updateReplaceField('agreementCategoryCode', $event)"
-      >
-        <option value="">{{ texts.laborClassificationSectionCategoryLabel }}</option>
-        @for (option of replaceCategoryOptions(); track option.value) {
-          <option [value]="option.value">{{ option.label }}</option>
-        }
-      </app-ui-select>
+      />
     </label>
   </div>
 
@@ -66,7 +60,7 @@
     @if (correctingOccurrence(); as correctingOccurrence) {
       <label class="employee-labor-classification-section__field employee-labor-classification-section__field--start-readonly">
         <span>{{ texts.laborClassificationSectionOccurrenceStartDateLabel }}</span>
-        <input type="text" [value]="correctingOccurrence.startDate" readonly />
+        <input pInputText type="text" [value]="correctingOccurrence.startDate" readonly />
       </label>
     }
 
@@ -74,28 +68,22 @@
       <span>{{ texts.laborClassificationSectionAgreementLabel }}</span>
       <app-ui-select
         [value]="correctDraft().agreementCode"
+        [options]="agreementOptions()"
+        [placeholder]="texts.laborClassificationSectionAgreementLabel"
         [disabled]="agreementOptionsLoading()"
         (valueChanged)="updateCorrectField('agreementCode', $event)"
-      >
-        <option value="">{{ texts.laborClassificationSectionAgreementLabel }}</option>
-        @for (option of agreementOptions(); track option.value) {
-          <option [value]="option.value">{{ option.label }}</option>
-        }
-      </app-ui-select>
+      />
     </label>
 
     <label class="employee-labor-classification-section__field employee-labor-classification-section__field--category">
       <span>{{ texts.laborClassificationSectionCategoryLabel }}</span>
       <app-ui-select
         [value]="correctDraft().agreementCategoryCode"
+        [options]="correctCategoryOptions()"
+        [placeholder]="texts.laborClassificationSectionCategoryLabel"
         [disabled]="correctCategoryDisabled()"
         (valueChanged)="updateCorrectField('agreementCategoryCode', $event)"
-      >
-        <option value="">{{ texts.laborClassificationSectionCategoryLabel }}</option>
-        @for (option of correctCategoryOptions(); track option.value) {
-          <option [value]="option.value">{{ option.label }}</option>
-        }
-      </app-ui-select>
+      />
     </label>
   </div>
 

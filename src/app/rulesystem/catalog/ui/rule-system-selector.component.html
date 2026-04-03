@@ -2,14 +2,9 @@
   <span>{{ texts.selectorLabel }}</span>
   <app-ui-select
     [value]="selectedCode() ?? ''"
+    [options]="options()"
+    [placeholder]="texts.selectorPlaceholder"
     [disabled]="disabled()"
     (valueChanged)="onSelectionChange($event)"
-  >
-    @if (ruleSystems().length === 0) {
-      <option value="">{{ texts.selectorPlaceholder }}</option>
-    }
-    @for (item of ruleSystems(); track item.code) {
-      <option [value]="item.code">{{ item.code }} · {{ item.name }}</option>
-    }
-  </app-ui-select>
+  />
 </label>

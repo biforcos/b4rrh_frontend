@@ -7,6 +7,7 @@ import { UiDateInputComponent } from '../../../../shared/ui/date-input/ui-date-i
 import { employeeTexts } from '../../employee.texts';
 import { CostCenterDistributionItemDraft } from '../../data-access/employee-cost-center.mapper';
 import { UiSelectComponent } from '../../../../shared/ui/select/ui-select.component';
+import { UiInputNumberComponent } from '../../../../shared/ui/input-number/ui-input-number.component';
 import { SlotKeyOption } from '../../shared/ui/section/editable-slot-section.model';
 
 export interface CostCenterDistributionDraft {
@@ -17,7 +18,7 @@ export interface CostCenterDistributionDraft {
 @Component({
   selector: 'app-employee-cost-center-distribution-editor',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, UiButtonComponent, UiDateInputComponent, UiSelectComponent],
+  imports: [CommonModule, ReactiveFormsModule, UiButtonComponent, UiDateInputComponent, UiSelectComponent, UiInputNumberComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <form [formGroup]="form" class="cost-center-editor">
@@ -43,21 +44,20 @@ export interface CostCenterDistributionDraft {
             <div class="cost-center-editor__col-code">
               <app-ui-select
                 [value]="item.get('costCenterCode')?.value"
+                [options]="getRowOptions(item.get('costCenterCode')?.value)"
+                [placeholder]="texts.costCenterSectionCodeLabel"
                 [disabled]="loading()"
                 (valueChanged)="$event ? item.get('costCenterCode')?.setValue($event) : null"
-              >
-                <option value="">{{ texts.costCenterSectionCodeLabel }}</option>
-                @for (option of getRowOptions(item.get('costCenterCode')?.value); track option.value) {
-                  <option [value]="option.value">{{ option.label }}</option>
-                }
-              </app-ui-select>
+              />
             </div>
             <div class="cost-center-editor__col-perc">
-              <input
-                class="cost-center-editor__input"
-                type="number"
-                formControlName="allocationPercentage"
-                [placeholder]="'0'"
+              <app-ui-input-number
+                [value]="item.get('allocationPercentage')?.value"
+                [min]="0"
+                [max]="100"
+                suffix="%"
+                [disabled]="loading()"
+                (valueChanged)="item.get('allocationPercentage')?.setValue($event)"
               />
             </div>
             <div class="cost-center-editor__col-actions">

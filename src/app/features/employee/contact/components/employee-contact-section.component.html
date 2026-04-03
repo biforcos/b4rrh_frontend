@@ -20,13 +20,10 @@
               inputId="contactTypeInput"
               [disabled]="catalogOptionsLoading() || sectionState().busy"
               [value]="createDraft().key ?? ''"
+              [options]="availableContactTypeOptions()"
+              [placeholder]="texts.contactsSectionKeyFieldLabel"
               (valueChanged)="updateCreateDraftKey($event || null)"
-            >
-              <option value="">{{ texts.contactsSectionKeyFieldLabel }}</option>
-              @for (option of availableContactTypeOptions(); track option.value) {
-                <option [value]="option.value">{{ option.label }}</option>
-              }
-            </app-ui-select>
+            />
           </div>
 
           <div class="employee-contact-section__form-field">
