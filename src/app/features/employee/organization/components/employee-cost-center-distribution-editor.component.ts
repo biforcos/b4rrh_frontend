@@ -6,6 +6,8 @@ import { UiButtonComponent } from '../../../../shared/ui/button/ui-button.compon
 import { UiDateInputComponent } from '../../../../shared/ui/date-input/ui-date-input.component';
 import { employeeTexts } from '../../employee.texts';
 import { CostCenterDistributionItemDraft } from '../../data-access/employee-cost-center.mapper';
+import { UiSelectComponent } from '../../../../shared/ui/select/ui-select.component';
+import { SlotKeyOption } from '../../shared/ui/section/editable-slot-section.model';
 
 export interface CostCenterDistributionDraft {
   startDate: string;
@@ -15,7 +17,7 @@ export interface CostCenterDistributionDraft {
 @Component({
   selector: 'app-employee-cost-center-distribution-editor',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, UiButtonComponent, UiDateInputComponent],
+  imports: [CommonModule, ReactiveFormsModule, UiButtonComponent, UiDateInputComponent, UiSelectComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <form [formGroup]="form" class="cost-center-editor">
@@ -39,12 +41,16 @@ export interface CostCenterDistributionDraft {
         @for (item of items.controls; track $index) {
           <div class="cost-center-editor__item-row" [formGroupName]="$index">
             <div class="cost-center-editor__col-code">
-              <input
-                class="cost-center-editor__input"
-                type="text"
-                formControlName="costCenterCode"
-                [placeholder]="texts.costCenterSectionCodeLabel"
-              />
+              <app-ui-select
+                [value]="item.get('costCenterCode')?.value"
+                [disabled]="loading()"
+                (valueChanged)="$event ? item.get('costCenterCode')?.setValue($event) : null"
+              >
+                <option value="">{{ texts.costCenterSectionCodeLabel }}</option>
+                @for (option of getRowOptions(item.get('costCenterCode')?.value); track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </app-ui-select>
             </div>
             <div class="cost-center-editor__col-perc">
               <input
@@ -123,6 +129,8 @@ export class EmployeeCostCenterDistributionEditorComponent {
 
   readonly dateLabel = input<string>(this.texts.costCenterSectionStartDateLabel);
   readonly initialValue = input<CostCenterDistributionDraft | null>(null);
+  readonly options = input<ReadonlyArray<SlotKeyOption<string>>>([]);
+  readonly loading = input(false);
 
   readonly form = this.fb.group({
     startDate: ['', Validators.required],
@@ -173,5 +181,21 @@ export class EmployeeCostCenterDistributionEditorComponent {
       startDate: raw.startDate,
       items: raw.items as CostCenterDistributionItemDraft[],
     };
+  }
+
+  protected getRowOptions(currentCode: string | null | undefined): ReadonlyArray<SlotKeyOption<string>> {
+    const options = this.options();
+    const normalizedCurrentCode = currentCode?.trim() ?? '';
+
+    if (!normalizedCurrentCode) {
+      return options;
+    }
+
+    if (options.some((option) => option.value === normalizedCurrentCode)) {
+      return options;
+    }
+
+    // Fallback if current code is not in the catalog
+    return [{ value: normalizedCurrentCode, label: normalizedCurrentCode }, ...options];
   }
 }

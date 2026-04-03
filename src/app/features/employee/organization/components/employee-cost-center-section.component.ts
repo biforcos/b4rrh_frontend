@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal, viewChild, effect, input, untracked } from '@angular/core';
+import { take } from 'rxjs';
 
 import { UiButtonComponent } from '../../../../shared/ui/button/ui-button.component';
 import { UiDateInputComponent } from '../../../../shared/ui/date-input/ui-date-input.component';
@@ -10,6 +11,8 @@ import { EmployeeSectionShellComponent } from '../../shared/ui/section/employee-
 import { SectionUiState } from '../../shared/ui/section/section-ui-state.model';
 import { EmployeeCostCenterDistributionEditorComponent } from './employee-cost-center-distribution-editor.component';
 import { EmployeeCostCenterWindowDisplayComponent } from './employee-cost-center-window-display.component';
+import { EmployeeFieldCatalogService } from '../../data-access/employee-field-catalog.service';
+import { SlotKeyOption } from '../../shared/ui/section/editable-slot-section.model';
 
 export type CostCenterDisplayMode = 'view' | 'manage' | 'creating' | 'replacing' | 'closing';
 
@@ -94,6 +97,8 @@ export type CostCenterDisplayMode = 'view' | 'manage' | 'creating' | 'replacing'
               #editor
               [dateLabel]="isCreating() ? texts.costCenterSectionStartDateLabel : texts.costCenterSectionEffectiveDateLabel"
               [initialValue]="editorInitialValue()"
+              [options]="availableCostCenterOptions()"
+              [loading]="catalogOptionsLoading()"
             />
             <div class="cost-center-section__form-actions">
               <app-ui-button [label]="texts.costCenterSectionSaveAction" [disabled]="store.mutating()" (pressed)="submitForm()" />
@@ -140,6 +145,11 @@ export class EmployeeCostCenterSectionComponent {
 
   readonly displayMode = signal<CostCenterDisplayMode>('view');
   readonly closeDate = signal<string>('');
+  readonly availableCostCenterOptionsState = signal<ReadonlyArray<SlotKeyOption<string>>>([]);
+  readonly catalogLoadingState = signal(false);
+
+  private readonly fieldCatalogService = inject(EmployeeFieldCatalogService);
+  private catalogRequestId = 0;
 
   private readonly editor = viewChild(EmployeeCostCenterDistributionEditorComponent);
 
@@ -148,6 +158,8 @@ export class EmployeeCostCenterSectionComponent {
   protected readonly isCreating = computed(() => this.displayMode() === 'creating');
   protected readonly isReplacing = computed(() => this.displayMode() === 'replacing');
   protected readonly isClosing = computed(() => this.displayMode() === 'closing');
+  protected readonly availableCostCenterOptions = this.availableCostCenterOptionsState.asReadonly();
+  protected readonly catalogOptionsLoading = this.catalogLoadingState.asReadonly();
 
   protected readonly sectionState = computed<SectionUiState>(() => {
     const isBusy = this.store.loading() || this.store.mutating();
@@ -178,6 +190,7 @@ export class EmployeeCostCenterSectionComponent {
       const key = this.employeeKey();
       untracked(() => {
         this.store.loadCostCenters(key);
+        this.loadCatalogOptions(key?.ruleSystemCode ?? null);
         this.displayMode.set('view');
       });
     });
@@ -266,5 +279,31 @@ export class EmployeeCostCenterSectionComponent {
       case 'replaced': return this.texts.costCenterSectionReplaceSuccessMessage;
       case 'closed': return this.texts.costCenterSectionCloseSuccessMessage;
     }
+  }
+
+  private loadCatalogOptions(ruleSystemCode: string | null): void {
+    const normalizedRuleSystemCode = ruleSystemCode?.trim() ?? '';
+
+    if (!normalizedRuleSystemCode) {
+      this.catalogRequestId += 1;
+      this.catalogLoadingState.set(false);
+      this.availableCostCenterOptionsState.set([]);
+      return;
+    }
+
+    const requestId = ++this.catalogRequestId;
+    this.catalogLoadingState.set(true);
+
+    this.fieldCatalogService
+      .loadCostCenterOptions(normalizedRuleSystemCode)
+      .pipe(take(1))
+      .subscribe((options) => {
+        if (requestId !== this.catalogRequestId) {
+          return;
+        }
+
+        this.availableCostCenterOptionsState.set(options);
+        this.catalogLoadingState.set(false);
+      });
   }
 }

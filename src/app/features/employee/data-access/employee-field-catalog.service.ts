@@ -20,6 +20,7 @@ const employeeCatalogFields = {
   presenceCompany: { resourceCode: 'employee.presence', fieldCode: 'companyCode' },
   presenceEntryReason: { resourceCode: 'employee.presence', fieldCode: 'entryReasonCode' },
   presenceExitReason: { resourceCode: 'employee.presence', fieldCode: 'exitReasonCode' },
+  costCenter: { resourceCode: 'employee.cost_center', fieldCode: 'costCenterCode' },
 } as const;
 
 type CatalogFieldSpec = (typeof employeeCatalogFields)[keyof typeof employeeCatalogFields];
@@ -74,6 +75,10 @@ export class EmployeeFieldCatalogService {
 
   loadPresenceExitReasonOptions(ruleSystemCode: string): Observable<ReadonlyArray<SlotKeyOption<string>>> {
     return this.loadDirectOptionsByField(ruleSystemCode, employeeCatalogFields.presenceExitReason);
+  }
+
+  loadCostCenterOptions(ruleSystemCode: string): Observable<ReadonlyArray<SlotKeyOption<string>>> {
+    return this.loadDirectOptionsByField(ruleSystemCode, employeeCatalogFields.costCenter);
   }
 
   private loadDirectOptionsByField(
