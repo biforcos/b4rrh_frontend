@@ -81,6 +81,7 @@
             [phone]="headerPhone()"
             (editIdentityRequested)="openIdentityEditorFromHeader()"
             (terminateRequested)="openTerminatePanel()"
+            (rehireRequested)="onRehireRequested()"
           />
 
           <app-employee-detail-header
@@ -97,37 +98,40 @@
 
         <div class="employee-shell__content-layout">
           <section class="employee-shell__main-zone">
-            @if (activeEmployeeKey(); as activeEmployeeKey) {
-              <section class="employee-shell__nav-zone">
-                <app-employee-detail-nav
-                  [employeeKey]="activeEmployeeKey"
-                  [activeSection]="activeDetailSection()"
-                />
-              </section>
+            @if (!isRehireWorkflow()) {
+              @if (activeEmployeeKey(); as activeEmployeeKey) {
+                <section class="employee-shell__nav-zone">
+                  <app-employee-detail-nav
+                    [employeeKey]="activeEmployeeKey"
+                    [activeSection]="activeDetailSection()"
+                  />
+                </section>
+              }
             }
-
             <section class="employee-shell__detail-content-zone">
               <router-outlet />
             </section>
           </section>
 
-          <aside class="employee-shell__timeline-zone" aria-label="Employee timeline contextual panel">
-            @if (!terminatePanelOpen()) {
-              <app-employee-journey-timeline
-                [journey]="journey()"
-                [loading]="loadingJourney()"
-                [error]="journeyError()"
-                [presences]="presences()"
-              />
-            } @else {
-                @if (activeEmployeeKey(); as key) {
-                  <app-employee-terminate-panel
-                    [employeeKey]="key"
-                    (closed)="closeTerminatePanel()"
-                  />
-                }
-            }
-          </aside>
+          @if (!isRehireWorkflow()) {
+            <aside class="employee-shell__timeline-zone" aria-label="Employee timeline contextual panel">
+              @if (!terminatePanelOpen()) {
+                <app-employee-journey-timeline
+                  [journey]="journey()"
+                  [loading]="loadingJourney()"
+                  [error]="journeyError()"
+                  [presences]="presences()"
+                />
+              } @else {
+                  @if (activeEmployeeKey(); as key) {
+                    <app-employee-terminate-panel
+                      [employeeKey]="key"
+                      (closed)="closeTerminatePanel()"
+                    />
+                  }
+              }
+            </aside>
+          }
         </div>
       } @else {
         <section class="employee-shell__detail-content-zone employee-shell__detail-content-zone--standalone">

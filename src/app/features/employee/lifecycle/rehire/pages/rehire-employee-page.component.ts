@@ -16,6 +16,7 @@ import { EmployeeCostCenterDistributionEditorComponent } from '../../../organiza
 import { EmployeeDetailStore } from '../../../data-access/employee-detail.store';
 import { RehireEmployeeDraft } from '../../../models/employee-rehire.model';
 import { readEmployeeBusinessKeyFromParamMap } from '../../../routing/employee-route-key.util';
+import { formatLocalDate } from '../../../shared/utils/local-date-string.util';
 
 @Component({
   selector: 'app-rehire-employee-page',
@@ -141,7 +142,7 @@ export class RehireEmployeePageComponent {
       ruleSystemCode: key.ruleSystemCode,
       employeeTypeCode: key.employeeTypeCode,
       employeeNumber: key.employeeNumber,
-      rehireDate: (val.rehireDate as Date).toISOString().split('T')[0],
+      rehireDate: formatLocalDate(val.rehireDate as Date),
       entryReasonCode: val.entryReasonCode ?? '',
       companyCode: val.companyCode ?? '',
       workCenterCode: val.workCenterCode ?? '',

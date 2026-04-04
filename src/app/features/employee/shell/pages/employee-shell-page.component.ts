@@ -1,3 +1,4 @@
+
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
@@ -53,6 +54,11 @@ import { EmployeeDirectoryListComponent } from '../components/employee-directory
   styleUrl: './employee-shell-page.component.scss',
 })
 export class EmployeeShellPageComponent {
+    protected readonly isRehireWorkflow = computed(() => {
+      let snapshot = this.route.snapshot;
+      while (snapshot.firstChild) snapshot = snapshot.firstChild;
+      return snapshot.url.some((seg: any) => seg.path === 'rehire');
+    });
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly directoryStore = inject(EmployeeDirectoryStore);
@@ -281,5 +287,17 @@ export class EmployeeShellPageComponent {
     const value = directMatch?.value?.trim() ?? '';
 
     return value.length > 0 ? value : this.texts.employeePageHeaderEmptyValue;
+  }
+
+  protected onRehireRequested(): void {
+    const key = this.activeEmployeeKey();
+    if (!key) return;
+    void this.router.navigate([
+      '/personas/empleados',
+      key.ruleSystemCode,
+      key.employeeTypeCode,
+      key.employeeNumber,
+      'rehire',
+    ]);
   }
 }

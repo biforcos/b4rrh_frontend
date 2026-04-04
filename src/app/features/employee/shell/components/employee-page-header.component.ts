@@ -25,6 +25,7 @@ export class EmployeePageHeaderComponent {
   readonly phone = input('+34 600 123 456');
   readonly editIdentityRequested = output<void>();
   readonly terminateRequested = output<void>();
+  readonly rehireRequested = output<void>();
 
   protected readonly texts = employeeTexts;
   protected readonly isActive = computed(() => this.status() === 'ACTIVE');
@@ -35,5 +36,9 @@ export class EmployeePageHeaderComponent {
 
   protected requestTerminate(): void {
     this.terminateRequested.emit();
+  }
+
+  protected requestRehire(): void {
+    this.rehireRequested.emit();
   }
 }

@@ -15,6 +15,7 @@ import { ButtonModule } from 'primeng/button';
 import { MessageModule } from 'primeng/message';
 import { CardModule } from 'primeng/card';
 import { HIRE_EMPLOYEE_DEFAULTS } from '../../../models/hire-employee.defaults';
+import { formatLocalDate } from '../../../shared/utils/local-date-string.util';
 
 @Component({
   selector: 'app-hire-employee-page',
@@ -189,7 +190,7 @@ export class HireEmployeePageComponent {
     const draft: any = {
       ...val,
       employeeTypeCode: HIRE_EMPLOYEE_DEFAULTS.employeeTypeCode,
-      hireDate: (val.hireDate as Date).toISOString().split('T')[0],
+      hireDate: formatLocalDate(val.hireDate as Date),
       costCenterDistribution: null,
     };
 
