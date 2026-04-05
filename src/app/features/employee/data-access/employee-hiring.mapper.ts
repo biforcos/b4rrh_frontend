@@ -12,10 +12,9 @@ export function mapDraftToHireRequest(draft: HireEmployeeDraft): HireEmployeeReq
     lastName2: draft.lastName2 || null,
     preferredName: draft.preferredName || null,
     hireDate: draft.hireDate,
-    presence: {
-      companyCode: draft.companyCode,
-      entryReasonCode: draft.entryReasonCode,
-    },
+    entryReasonCode: draft.entryReasonCode,
+    companyCode: draft.companyCode,
+    workCenterCode: draft.workCenterCode,
     laborClassification: {
       agreementCode: draft.agreementCode,
       agreementCategoryCode: draft.agreementCategoryCode,
@@ -24,20 +23,17 @@ export function mapDraftToHireRequest(draft: HireEmployeeDraft): HireEmployeeReq
       contractTypeCode: draft.contractTypeCode,
       contractSubtypeCode: draft.contractSubtypeCode || null,
     },
-    workCenter: {
-      workCenterCode: draft.workCenterCode,
-    },
     ...(draft.costCenterDistribution && { costCenterDistribution: draft.costCenterDistribution })
-  } as any;
+  };
 }
 
 export function mapResponseToResult(response: HireEmployeeResponse): HireEmployeeResult {
   return {
     employeeKey: {
-      ruleSystemCode: response.ruleSystemCode,
-      employeeTypeCode: response.employeeTypeCode,
-      employeeNumber: response.employeeNumber
+      ruleSystemCode: response.employee.ruleSystemCode,
+      employeeTypeCode: response.employee.employeeTypeCode,
+      employeeNumber: response.employee.employeeNumber
     },
-    displayName: `${response.firstName} ${response.lastName1}`
+    displayName: response.employee.displayName
   };
 }

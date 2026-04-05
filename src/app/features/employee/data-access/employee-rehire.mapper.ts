@@ -1,21 +1,8 @@
 import { RehireEmployeeRequest, RehireEmployeeResponse } from '../../../core/api/generated/model/models';
 import { RehireEmployeeDraft, RehireEmployeeResult } from '../models/employee-rehire.model';
 
-export interface CostCenterDistributionItemRequest {
-  costCenterCode: string;
-  allocationPercentage: number;
-}
-
-export interface CostCenterDistributionRequest {
-  items: CostCenterDistributionItemRequest[];
-}
-
-export interface ExtendedRehireEmployeeRequest extends RehireEmployeeRequest {
-  costCenterDistribution?: CostCenterDistributionRequest | null;
-}
-
-export function mapDraftToRehireRequest(draft: RehireEmployeeDraft): ExtendedRehireEmployeeRequest {
-  const req: ExtendedRehireEmployeeRequest = {
+export function mapDraftToRehireRequest(draft: RehireEmployeeDraft): RehireEmployeeRequest {
+  const req: RehireEmployeeRequest = {
     rehireDate: draft.rehireDate,
     entryReasonCode: draft.entryReasonCode,
     companyCode: draft.companyCode,
@@ -34,7 +21,7 @@ export function mapDraftToRehireRequest(draft: RehireEmployeeDraft): ExtendedReh
 
   if (draft.costCenterDistribution && draft.costCenterDistribution.items.length > 0) {
     req.costCenterDistribution = {
-      items: draft.costCenterDistribution.items.map<CostCenterDistributionItemRequest>((it) => ({
+      items: draft.costCenterDistribution.items.map((it) => ({
         costCenterCode: it.costCenterCode.trim(),
         allocationPercentage: Number(it.allocationPercentage),
       })),
