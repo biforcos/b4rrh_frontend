@@ -7,8 +7,7 @@ import { CompanyFormValue } from '../models/company-form-value.model';
 import { CompanyListComponent } from './company-list.component';
 import { CompanyDetailPanelComponent } from './company-detail-panel.component';
 import { MasterDetailPageShellComponent } from '../../../shared/ui/master-detail-page-shell/master-detail-page-shell.component';
-import { PanelComponent } from '../../../shared/ui/panel/panel.component';
-import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.component';
+import { SectionCardComponent } from '../../../shared/ui/section-card/section-card.component';
 
 @Component({
   selector: 'app-company-page',
@@ -16,8 +15,7 @@ import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.
   standalone: true,
   imports: [
     MasterDetailPageShellComponent,
-    PanelComponent,
-    EmptyStateComponent,
+    SectionCardComponent,
     CompanyListComponent,
     CompanyDetailPanelComponent,
   ],

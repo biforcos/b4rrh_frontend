@@ -1,0 +1,44 @@
+<header class="entity-header">
+  <div class="entity-header__main">
+    <div class="entity-header__copy">
+      @if (eyebrow()) {
+        <p class="entity-header__eyebrow">{{ eyebrow() }}</p>
+      }
+
+      <div class="entity-header__headline-row">
+        <div class="entity-header__headline-copy">
+          <h2 class="entity-header__title">{{ title() }}</h2>
+          @if (subtitle()) {
+            <p class="entity-header__subtitle">{{ subtitle() }}</p>
+          }
+        </div>
+
+        <div class="entity-header__actions">
+          @if (status(); as currentStatus) {
+            <app-ui-tag
+              [value]="currentStatus.label"
+              [severity]="currentStatus.severity ?? 'secondary'"
+              [rounded]="true"
+            />
+          }
+          <ng-content select="[entityHeaderActions]"></ng-content>
+        </div>
+      </div>
+
+      @if (hasMetadata()) {
+        <dl class="entity-header__metadata">
+          @for (item of metadata(); track item.label) {
+            <div class="entity-header__metadata-item">
+              <dt>{{ item.label }}</dt>
+              <dd>{{ item.value }}</dd>
+            </div>
+          }
+        </dl>
+      }
+    </div>
+
+    <div class="entity-header__visual">
+      <ng-content select="[entityHeaderVisual]"></ng-content>
+    </div>
+  </div>
+</header>

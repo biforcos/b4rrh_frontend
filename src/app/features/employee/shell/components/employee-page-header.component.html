@@ -1,77 +1,38 @@
-<header class="employee-page-header" aria-label="Employee page header">
-  <!-- Row 1: name, status, actions -->
-  <div class="employee-page-header__row employee-page-header__row--primary">
-    <div class="employee-page-header__headline">
-      <h1>{{ fullName() }}</h1>
-      <app-ui-tag
-        class="employee-page-header__status-badge"
-        [value]="status()"
-        [severity]="isActive() ? 'success' : 'secondary'"
-        [rounded]="true"
-      />
-    </div>
-
-    <div class="employee-page-header__actions" [attr.aria-label]="texts.employeePageHeaderActionsAriaLabel">
+<app-entity-header
+  class="employee-page-header"
+  [title]="fullName()"
+  [subtitle]="subtitle()"
+  [metadata]="metadata()"
+  [status]="statusBadge()"
+>
+  <div entityHeaderActions class="employee-page-header__actions" [attr.aria-label]="texts.employeePageHeaderActionsAriaLabel">
+    <app-ui-button
+      type="button"
+      severity="secondary"
+      [outlined]="true"
+      size="small"
+      [label]="texts.employeePageHeaderEditIdentityAction"
+      (pressed)="requestEditIdentity()"
+    />
+    @if (isActive()) {
       <app-ui-button
         type="button"
-        severity="secondary"
+        class="employee-page-header__danger-action"
+        severity="danger"
+        size="small"
+        [label]="texts.employeePageHeaderTerminateAction"
+        (pressed)="requestTerminate()"
+      />
+    } @else {
+      <app-ui-button
+        type="button"
+        class="employee-page-header__neutral-action"
+        severity="contrast"
         [outlined]="true"
         size="small"
-        [label]="texts.employeePageHeaderEditIdentityAction"
-        (pressed)="requestEditIdentity()"
+        [label]="texts.employeePageHeaderRehireAction"
+        (pressed)="requestRehire()"
       />
-      @if (isActive()) {
-        <app-ui-button
-          type="button"
-          class="employee-page-header__danger-action"
-          severity="danger"
-          size="small"
-          [label]="texts.employeePageHeaderTerminateAction"
-          (pressed)="requestTerminate()"
-        />
-      } @else {
-        <app-ui-button
-          type="button"
-          class="employee-page-header__neutral-action"
-          severity="contrast"
-          [outlined]="true"
-          size="small"
-          [label]="texts.employeePageHeaderRehireAction"
-          (pressed)="requestRehire()"
-        />
-      }
-    </div>
+    }
   </div>
-
-  <!-- Row 2: compact identifiers -->
-  <p class="employee-page-header__row employee-page-header__row--identifiers" [attr.aria-label]="texts.employeePageHeaderIdentifiersAriaLabel">
-    <span>{{ employeeNumber() }}</span>
-    <span>{{ employeeTypeCode() }}</span>
-    <span>{{ ruleSystemCode() }}</span>
-  </p>
-
-  <!-- Row 3: compact metadata grid (Empresa · Centro · Alta · Email · Teléfono) -->
-  <dl class="employee-page-header__row employee-page-header__row--metadata" [attr.aria-label]="texts.employeePageHeaderContextAriaLabel">
-    <div class="employee-page-header__meta-block">
-      <dt>{{ texts.employeePageHeaderCompanyLabel }}</dt>
-      <dd>{{ companyCode() }}</dd>
-    </div>
-    <div class="employee-page-header__meta-block">
-      <dt>{{ texts.employeePageHeaderWorkCenterLabel }}</dt>
-      <dd>{{ workCenterCode() }}</dd>
-    </div>
-    <div class="employee-page-header__meta-block">
-      <dt>{{ texts.employeePageHeaderHireDateLabel }}</dt>
-      <dd>{{ hireDate() }}</dd>
-    </div>
-    <div class="employee-page-header__meta-block">
-      <dt>{{ texts.employeePageHeaderEmailLabel }}</dt>
-      <dd>{{ email() }}</dd>
-    </div>
-    <div class="employee-page-header__meta-block">
-      <dt>{{ texts.employeePageHeaderPhoneLabel }}</dt>
-      <dd>{{ phone() }}</dd>
-    </div>
-  </dl>
-
-</header>
+</app-entity-header>

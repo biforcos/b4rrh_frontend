@@ -35,7 +35,7 @@ export type CostCenterDisplayMode = 'view' | 'manage' | 'creating' | 'replacing'
       [state]="sectionState()"
     >
       <app-ui-button
-        sectionShellHeaderActions
+        sectionCardActions
         severity="secondary"
         [outlined]="true"
         size="small"

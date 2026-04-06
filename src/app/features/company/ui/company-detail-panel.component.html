@@ -1,40 +1,22 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()" class="company-detail-panel" novalidate>
-  <section class="company-detail-panel__entity-header">
-    <div class="company-detail-panel__entity-copy">
-      <p class="company-detail-panel__eyebrow">{{ texts.detailPanelTitle }}</p>
-
-      <div class="company-detail-panel__headline-row">
-        <h2>{{ entityTitle }}</h2>
-        <div class="company-detail-panel__headline-actions">
-          <app-ui-tag [value]="entityStatusLabel" [severity]="entityStatusSeverity" [rounded]="true" />
-          @if (isViewMode()) {
-            <app-ui-button
-              [label]="texts.formEditAction"
-              severity="secondary"
-              [outlined]="true"
-              [disabled]="submitting()"
-              (pressed)="requestEdit()"
-            />
-          }
-        </div>
-      </div>
-
-      <dl class="company-detail-panel__keyline">
-        <div class="company-detail-panel__key-item">
-          <dt>{{ texts.detailHeaderCompanyCodeLabel }}</dt>
-          <dd>{{ entityCompanyCode }}</dd>
-        </div>
-        <div class="company-detail-panel__key-item">
-          <dt>{{ texts.detailHeaderRuleSystemLabel }}</dt>
-          <dd>{{ entityRuleSystemCode }}</dd>
-        </div>
-        <div class="company-detail-panel__key-item">
-          <dt>{{ texts.detailHeaderStartDateLabel }}</dt>
-          <dd>{{ entityStartDate }}</dd>
-        </div>
-      </dl>
-    </div>
-  </section>
+  <app-entity-header
+    [eyebrow]="texts.detailPanelTitle"
+    [title]="entityTitle"
+    [subtitle]="entitySubtitle"
+    [metadata]="entityHeaderMetadata"
+    [status]="entityHeaderStatus"
+  >
+    @if (isViewMode()) {
+      <app-ui-button
+        entityHeaderActions
+        [label]="texts.formEditAction"
+        severity="secondary"
+        [outlined]="true"
+        [disabled]="submitting()"
+        (pressed)="requestEdit()"
+      />
+    }
+  </app-entity-header>
 
   @if (submitSuccess()) {
     <p-message severity="success" [text]="successMessage!" styleClass="company-detail-panel__feedback" />
@@ -45,7 +27,7 @@
   }
 
   <div class="company-detail-panel__sections">
-    <app-panel [title]="texts.sectionIdentityTitle" [subtitle]="texts.detailSectionIdentitySubtitle">
+    <app-section-card [title]="texts.sectionIdentityTitle" [description]="texts.detailSectionIdentitySubtitle">
       @if (isViewMode()) {
         <div class="company-detail-panel__view-grid">
           <div class="company-detail-panel__view-item">
@@ -133,9 +115,9 @@
           </div>
         </div>
       }
-    </app-panel>
+    </app-section-card>
 
-    <app-panel [title]="texts.sectionFiscalTitle" [subtitle]="texts.detailSectionFiscalSubtitle">
+    <app-section-card [title]="texts.sectionFiscalTitle" [description]="texts.detailSectionFiscalSubtitle">
       @if (isViewMode()) {
         <div class="company-detail-panel__view-grid">
           <div class="company-detail-panel__view-item company-detail-panel__view-item--full">
@@ -171,9 +153,9 @@
           </div>
         </div>
       }
-    </app-panel>
+    </app-section-card>
 
-    <app-panel [title]="texts.sectionAddressTitle" [subtitle]="texts.detailSectionAddressSubtitle">
+    <app-section-card [title]="texts.sectionAddressTitle" [description]="texts.detailSectionAddressSubtitle">
       @if (isViewMode()) {
         @if (hasAddress) {
           <div class="company-detail-panel__view-grid company-detail-panel__view-grid--address">
@@ -229,7 +211,7 @@
           </div>
         </div>
       }
-    </app-panel>
+    </app-section-card>
   </div>
 
   @if (!isViewMode()) {

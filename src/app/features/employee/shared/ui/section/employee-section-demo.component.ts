@@ -22,7 +22,7 @@ const initialUiState: SectionUiState = {
       [subtitle]="texts.sectionDemoSubtitle"
       [state]="uiState()"
     >
-      <div sectionShellHeaderActions class="employee-section-demo__header-actions">
+      <div sectionCardActions class="employee-section-demo__header-actions">
         @if (uiState().mode === 'view' && !uiState().busy) {
           <button type="button" (click)="startCreate()">{{ texts.sectionShellCreateAction }}</button>
           <button type="button" (click)="startEdit(demoBusinessKey)">{{ texts.sectionShellEditAction }}</button>

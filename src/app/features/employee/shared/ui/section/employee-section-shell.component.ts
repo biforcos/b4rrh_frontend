@@ -1,5 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
+import { SectionCardComponent } from '../../../../../shared/ui/section-card/section-card.component';
+import {
+  SectionCardActionsDirective,
+  SectionCardFooterDirective,
+} from '../../../../../shared/ui/section-card/section-card-slots.directive';
 import { UiButtonComponent } from '../../../../../shared/ui/button/ui-button.component';
 import { SectionUiState } from './section-ui-state.model';
 
@@ -14,7 +19,7 @@ export interface EmployeeSectionShellAction {
 @Component({
   selector: 'app-employee-section-shell',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [UiButtonComponent],
+  imports: [SectionCardComponent, SectionCardActionsDirective, SectionCardFooterDirective, UiButtonComponent],
   templateUrl: './employee-section-shell.component.html',
   styleUrl: './employee-section-shell.component.scss',
 })

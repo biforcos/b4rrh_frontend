@@ -1,75 +1,21 @@
-.employee-section-shell {
-  display: grid;
-  gap: 0.68rem;
-  border: 1px solid #ccdceb;
-  border-radius: 0.82rem;
-  background: linear-gradient(180deg, #ffffff 0%, #f9fcff 100%);
-  padding: 0.7rem;
-  box-shadow: 0 16px 32px -34px rgba(14, 116, 144, 0.82);
-}
-
-.employee-section-shell__header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.58rem;
-}
-
-.employee-section-shell__heading {
-  display: grid;
-  gap: 0.14rem;
-  flex: 1 1 18rem;
-  min-width: 0;
-}
-
-.employee-section-shell__title {
-  margin: 0;
-  font-size: 0.86rem;
-  font-weight: 700;
-  line-height: 1.25;
-  color: #18384f;
-}
-
-.employee-section-shell__subtitle {
-  margin: 0;
-  font-size: 0.72rem;
-  line-height: 1.35;
-  color: #5b748c;
-}
-
 .employee-section-shell__header-actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.26rem;
-  justify-content: flex-end;
-  flex: 0 0 auto;
-  margin-left: auto;
 }
 
 .employee-section-shell__header-actions :where(app-ui-button) {
   min-width: 5.8rem;
 }
 
-.employee-section-shell__action-icon {
-  font-size: 0.63rem;
-  color: #5e7488;
-}
-
 .employee-section-shell__header-actions:empty {
   display: none;
-}
-
-.employee-section-shell__body {
-  min-height: 1.5rem;
 }
 
 .employee-section-shell__footer {
   display: grid;
   gap: 0.3rem;
-  border-top: 1px solid #e1ebf5;
-  padding-top: 0.5rem;
 }
 
 .employee-section-shell__status {
@@ -102,15 +48,6 @@
 }
 
 @media (max-width: 900px) {
-  .employee-section-shell {
-    padding: 0.68rem;
-  }
-
-  .employee-section-shell__header {
-    flex-direction: column;
-    gap: 0.45rem;
-  }
-
   .employee-section-shell__header-actions {
     justify-content: flex-start;
   }

@@ -1,13 +1,13 @@
 
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
-import { InputTextModule } from 'primeng/inputtext';
 import { filter, startWith } from 'rxjs';
 
-import { UiButtonComponent } from '../../../../shared/ui/button/ui-button.component';
-import { PanelComponent } from '../../../../shared/ui/panel/panel.component';
+import { MasterDetailPageShellComponent } from '../../../../shared/ui/master-detail-page-shell/master-detail-page-shell.component';
+import { MasterListPanelComponent, MasterListPanelEmptyState } from '../../../../shared/ui/master-list-panel/master-list-panel.component';
+import { ListItemComponent } from '../../../../shared/ui/list-item/list-item.component';
+import { UiTagComponent } from '../../../../shared/ui/tag/ui-tag.component';
 import { EmployeeDetailStore } from '../../data-access/employee-detail.store';
 import { EmployeeDirectoryStore } from '../../data-access/employee-directory.store';
 import { EmployeeJourneyStore } from '../../data-access/employee-journey.store';
@@ -19,6 +19,7 @@ import { EmployeeBusinessKey } from '../../models/employee-business-key.model';
 import { EmployeeContactModel } from '../../models/employee-contact.model';
 import { EmployeeCoreIdentityDraft } from '../../models/employee-core-identity-draft.model';
 import { EmployeeDetailModel } from '../../models/employee-detail.model';
+import { EmployeeListItemModel } from '../../models/employee-list-item.model';
 import { EmployeePresenceModel } from '../../models/employee-presence.model';
 import {
   buildEmployeeDetailRouteCommands,
@@ -31,19 +32,17 @@ import { EmployeePageHeaderComponent } from '../components/employee-page-header.
 import { EmployeeDetailHeaderComponent } from '../components/employee-detail-header.component';
 import { EmployeeJourneyTimelineComponent } from '../components/employee-journey-timeline.component';
 import { EmployeeDetailNavComponent } from '../components/employee-detail-nav.component';
-import { EmployeeDirectoryListComponent } from '../components/employee-directory-list.component';
 
 @Component({
   selector: 'app-employee-shell-page',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    ReactiveFormsModule,
-    InputTextModule,
     RouterOutlet,
-    UiButtonComponent,
-    PanelComponent,
-    EmployeeDirectoryListComponent,
+    MasterDetailPageShellComponent,
+    MasterListPanelComponent,
+    ListItemComponent,
+    UiTagComponent,
     EmployeePageHeaderComponent,
     EmployeeDetailHeaderComponent,
     EmployeeJourneyTimelineComponent,
@@ -54,11 +53,11 @@ import { EmployeeDirectoryListComponent } from '../components/employee-directory
   styleUrl: './employee-shell-page.component.scss',
 })
 export class EmployeeShellPageComponent {
-    protected readonly isRehireWorkflow = computed(() => {
-      let snapshot = this.route.snapshot;
-      while (snapshot.firstChild) snapshot = snapshot.firstChild;
-      return snapshot.url.some((seg: any) => seg.path === 'rehire');
-    });
+  protected readonly isRehireWorkflow = computed(() => {
+    let snapshot = this.route.snapshot;
+    while (snapshot.firstChild) snapshot = snapshot.firstChild;
+    return snapshot.url.some((seg: any) => seg.path === 'rehire');
+  });
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly directoryStore = inject(EmployeeDirectoryStore);
@@ -69,9 +68,7 @@ export class EmployeeShellPageComponent {
   private readonly journeyStore = inject(EmployeeJourneyStore);
 
   protected readonly texts = employeeTexts;
-  protected readonly searchForm = new FormGroup({
-    searchTerm: new FormControl('', { nonNullable: true }),
-  });
+  protected readonly searchValue = signal('');
   protected readonly filteredEmployees = this.directoryStore.filteredEmployees;
   protected readonly loadingDirectory = this.directoryStore.loading;
   protected readonly directoryError = this.directoryStore.error;
@@ -91,6 +88,27 @@ export class EmployeeShellPageComponent {
   protected readonly updateIdentitySuccess = computed(() => this.detailStore.mutationSuccess() === 'updated');
   protected readonly openIdentityEditorRequestId = signal(0);
   protected readonly terminatePanelOpen = signal(false);
+  protected readonly activeEmployeeListKey = computed(() => {
+    const activeEmployeeKey = this.activeEmployeeKey();
+    if (!activeEmployeeKey) {
+      return null;
+    }
+
+    return this.employeeListKey(activeEmployeeKey);
+  });
+  protected readonly employeeListEmptyState = computed<MasterListPanelEmptyState>(() => {
+    if (this.searchValue().trim()) {
+      return {
+        title: this.texts.noResultEmployeesTitle,
+        description: this.texts.noResultEmployeesDescription,
+      };
+    }
+
+    return {
+      title: this.texts.emptyDirectoryTitle,
+      description: this.texts.emptyDirectoryDescription,
+    };
+  });
   protected readonly selectedEmployee = computed<EmployeeDetailModel | null>(() => {
     const activeEmployeeKey = this.activeEmployeeKey();
     if (!activeEmployeeKey) {
@@ -104,10 +122,10 @@ export class EmployeeShellPageComponent {
 
     return null;
   });
-  protected readonly headerStatus = computed<'ACTIVE' | 'INACTIVE'>(() => {
+  protected readonly headerStatus = computed<'ACTIVE' | 'TERMINATED'>(() => {
     const employee = this.selectedEmployee();
     if (!employee) {
-      return 'INACTIVE';
+      return 'TERMINATED';
     }
 
     const normalizedStatus = employee.statusLabel.trim().toLowerCase();
@@ -115,7 +133,7 @@ export class EmployeeShellPageComponent {
       return 'ACTIVE';
     }
 
-    return 'INACTIVE';
+    return 'TERMINATED';
   });
   protected readonly activePresence = computed(() => this.resolveActivePresence(this.presences()));
   protected readonly headerCompany = computed(() => {
@@ -145,11 +163,7 @@ export class EmployeeShellPageComponent {
   protected readonly headerPhone = computed(() => this.findPreferredContactValue(this.contacts(), 'phone'));
 
   constructor() {
-    this.searchForm.controls.searchTerm.valueChanges
-      .pipe(startWith(this.searchForm.controls.searchTerm.value), takeUntilDestroyed())
-      .subscribe((value) => {
-        this.directoryStore.setQuery(value);
-      });
+    this.directoryStore.setQuery(this.searchValue());
 
     this.router.events
       .pipe(
@@ -195,17 +209,47 @@ export class EmployeeShellPageComponent {
     this.detailStore.clearMutationFeedback();
   }
 
-  protected openEmployeeFromSearch(): void {
-    const firstEmployee = this.filteredEmployees()[0];
-    if (!firstEmployee) {
-      return;
-    }
-
-    void this.openEmployeeDetail(toEmployeeBusinessKey(firstEmployee), 'contact');
-  }
-
   protected onHireClick(): void {
     void this.router.navigate(['hire'], { relativeTo: this.route });
+  }
+
+  protected updateSearchValue(value: string): void {
+    this.searchValue.set(value);
+    this.directoryStore.setQuery(value);
+  }
+
+  protected openEmployeeListItem(employee: EmployeeListItemModel): void {
+    void this.openEmployeeDetail(toEmployeeBusinessKey(employee), 'contact');
+  }
+
+  protected employeeListKey(employee: Pick<EmployeeBusinessKey, 'ruleSystemCode' | 'employeeTypeCode' | 'employeeNumber'>): string {
+    return `${employee.ruleSystemCode}::${employee.employeeTypeCode}::${employee.employeeNumber}`;
+  }
+
+  protected resolveEmployeeStatusLabel(statusLabel: string): string {
+    const normalizedStatus = statusLabel.trim().toLowerCase();
+    if (normalizedStatus.includes('active') || normalizedStatus.includes('alta')) {
+      return this.texts.employeeStatusActiveLabel;
+    }
+
+    if (normalizedStatus.includes('pending') || normalizedStatus.includes('draft')) {
+      return this.texts.employeeStatusPendingLabel;
+    }
+
+    return this.texts.employeeStatusInactiveLabel;
+  }
+
+  protected resolveEmployeeStatusSeverity(statusLabel: string): 'success' | 'secondary' | 'warn' {
+    const normalizedStatus = statusLabel.trim().toLowerCase();
+    if (normalizedStatus.includes('active') || normalizedStatus.includes('alta')) {
+      return 'success';
+    }
+
+    if (normalizedStatus.includes('pending') || normalizedStatus.includes('draft')) {
+      return 'warn';
+    }
+
+    return 'secondary';
   }
 
   protected openEmployeeDetail(

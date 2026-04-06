@@ -1,35 +1,25 @@
-<section class="employee-section-shell">
-  <header class="employee-section-shell__header">
-    <div class="employee-section-shell__heading">
-      <h3 class="employee-section-shell__title">{{ title() }}</h3>
-      @if (hasSubtitle()) {
-        <p class="employee-section-shell__subtitle">{{ subtitle() }}</p>
+<app-section-card [title]="title()" [description]="hasSubtitle() ? subtitle() : null">
+  @if (hasActions()) {
+    <div sectionCardActions class="employee-section-shell__header-actions">
+      @for (action of actions(); track action.label) {
+        <app-ui-button
+          type="button"
+          size="small"
+          severity="secondary"
+          [outlined]="true"
+          [disabled]="action.disabled ?? false"
+          [label]="(action.icon ? action.icon + ' ' : '') + action.label"
+        />
       }
     </div>
+  }
 
-    <div class="employee-section-shell__header-actions">
-      @if (hasActions()) {
-        @for (action of actions(); track action.label) {
-          <app-ui-button
-            type="button"
-            size="small"
-            severity="secondary"
-            [outlined]="true"
-            [disabled]="action.disabled ?? false"
-            [label]="(action.icon ? action.icon + ' ' : '') + action.label"
-          />
-        }
-      }
-      <ng-content select="[sectionShellHeaderActions]"></ng-content>
-    </div>
-  </header>
+  <ng-content select="[sectionCardActions]"></ng-content>
 
-  <div class="employee-section-shell__body">
-    <ng-content></ng-content>
-  </div>
+  <ng-content></ng-content>
 
   @if (hasFooterState()) {
-    <footer class="employee-section-shell__footer" role="status" aria-live="polite">
+    <footer sectionCardFooter class="employee-section-shell__footer" role="status" aria-live="polite">
       @if (showBusy()) {
         <p class="employee-section-shell__status employee-section-shell__status--busy">Procesando cambios...</p>
       }
@@ -47,4 +37,4 @@
       }
     </footer>
   }
-</section>
+</app-section-card>

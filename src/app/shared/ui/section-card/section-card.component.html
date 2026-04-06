@@ -1,0 +1,28 @@
+<section class="section-card">
+  @if (hasHeader()) {
+    <header class="section-card__header">
+      <div class="section-card__heading">
+        @if (title()) {
+          <h3 class="section-card__title">{{ title() }}</h3>
+        }
+        @if (description()) {
+          <p class="section-card__description">{{ description() }}</p>
+        }
+      </div>
+
+      <div class="section-card__actions">
+        <ng-content select="[sectionCardActions]"></ng-content>
+      </div>
+    </header>
+  }
+
+  @if (hasFooter()) {
+    <footer class="section-card__footer">
+      <ng-content select="[sectionCardFooter]"></ng-content>
+    </footer>
+  }
+
+  <div class="section-card__body">
+    <ng-content></ng-content>
+  </div>
+</section>

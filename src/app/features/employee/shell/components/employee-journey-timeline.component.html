@@ -42,10 +42,10 @@
                     @if (presence.end) {
                       <span> → {{ presence.end }}</span>
                     } @else {
-                      <span> · actual</span>
+                      <span> · {{ texts.timelineCurrentPeriodLabel }}</span>
                     }
                   </span>
-                  <span class="employee-journey-timeline__status-chip" [class.employee-journey-timeline__status-chip--current]="presence.isActive">{{ presence.isActive ? 'ACTIVE' : 'CLOSED' }}</span>
+                  <span class="employee-journey-timeline__status-chip" [class.employee-journey-timeline__status-chip--current]="presence.isActive">{{ presence.isActive ? texts.timelineCurrentPresenceLabel : texts.timelineClosedPresenceLabel }}</span>
                 </div>
               </div>
 

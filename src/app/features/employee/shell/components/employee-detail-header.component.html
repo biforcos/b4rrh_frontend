@@ -1,4 +1,4 @@
-<header class="employee-detail-header" aria-label="Employee detail header">
+<section class="employee-detail-header" [attr.aria-label]="editorOnly() ? texts.detailHeaderEditPopoverTitle : texts.detailPanelTitle">
   @if (!editorOnly()) {
     <div class="employee-detail-header__identity-row">
       <div class="employee-detail-header__identity-main">
@@ -108,4 +108,4 @@
       </div>
     </dl>
   }
-</header>
+</section>

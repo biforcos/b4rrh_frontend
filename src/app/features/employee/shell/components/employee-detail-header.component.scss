@@ -99,13 +99,12 @@
 }
 
 .employee-detail-header__edit-popover {
-  margin-top: 0.22rem;
   border: 1px solid #cfdceb;
   border-radius: 0.82rem;
   background: linear-gradient(180deg, #fbfeff 0%, #f4f9ff 100%);
   padding: 0.74rem;
   display: grid;
-  gap: 0.42rem;
+  gap: 0.38rem;
 }
 
 .employee-detail-header__edit-popover h3 {
@@ -149,11 +148,6 @@
 
 .employee-detail-header__edit-actions :where(app-ui-button) {
   min-width: 6.3rem;
-}
-
-.employee-detail-header__edit-actions button:disabled {
-  cursor: not-allowed;
-  opacity: 0.65;
 }
 
 .employee-detail-header__edit-feedback {
@@ -240,6 +234,10 @@
 @media (max-width: 640px) {
   .employee-detail-header {
     padding: 0;
+  }
+
+  .employee-detail-header__edit-popover {
+    padding: 0.68rem;
   }
 
   .employee-detail-header__identity-row {

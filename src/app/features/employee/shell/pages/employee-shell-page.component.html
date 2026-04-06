@@ -1,51 +1,48 @@
-<div class="employee-shell">
-  <aside class="employee-shell__master">
-    <div class="employee-shell__actions p-3">
-      <app-ui-button
-        [label]="texts.hireEmployeeTitle"
-        icon="pi pi-plus"
-        [fluid]="true"
-        severity="success"
-        (pressed)="onHireClick()"
-      />
-    </div>
-    <app-panel [title]="texts.masterTitle" [subtitle]="texts.masterSubtitle">
-      <form class="employee-shell__search-form" [formGroup]="searchForm" (ngSubmit)="openEmployeeFromSearch()">
-        <label class="employee-shell__label" for="employee-number-search">{{ texts.searchLabel }}</label>
-        <div class="employee-shell__search-row">
-          <input
-            pInputText
-            id="employee-number-search"
-            class="employee-shell__search-input"
-            type="text"
-            formControlName="searchTerm"
-            [placeholder]="texts.searchPlaceholder"
-            autocomplete="off"
-          />
-          <app-ui-button
-            type="submit"
-            size="small"
-            [label]="texts.openAction"
-            [disabled]="filteredEmployees().length === 0"
-          />
-        </div>
-      </form>
+<app-master-detail-shell [title]="texts.masterTitle" [subtitle]="''">
+  <aside slot="list" class="employee-shell__master">
+    <app-master-list-panel
+      [title]="''"
+      [subtitle]="texts.masterSubtitle"
+      [items]="filteredEmployees()"
+      [emptyState]="employeeListEmptyState()"
+      [loading]="loadingDirectory()"
+      [errorMessage]="directoryError() ? texts.directoryLoadFailedMessage : null"
+      [primaryActionLabel]="texts.hireEmployeeTitle"
+      [searchPlaceholder]="texts.searchPlaceholder"
+      [searchValue]="searchValue()"
+      [selectedItemKey]="activeEmployeeListKey()"
+      [itemKey]="employeeListKey"
+      [listAriaLabel]="texts.masterTitle"
+      (createNew)="onHireClick()"
+      (itemSelected)="openEmployeeListItem($event)"
+      (searchValueChange)="updateSearchValue($event)"
+    >
+      <ng-template let-employee let-selected="selected">
+        <app-list-item
+          [selected]="selected"
+          [status]="resolveEmployeeStatusLabel(employee.statusLabel)"
+          [statusSeverity]="resolveEmployeeStatusSeverity(employee.statusLabel)"
+        >
+          <div listItemHeader class="employee-shell__list-headline">
+            <span class="employee-shell__list-name">{{ employee.displayName }}</span>
+          </div>
 
-      <section class="employee-shell__result-block">
-        <h3>{{ texts.resultEmployeesTitle }}</h3>
-        <app-employee-directory-list
-          [employees]="filteredEmployees()"
-          [selectedEmployeeKey]="activeEmployeeKey()"
-          [loading]="loadingDirectory()"
-          [error]="directoryError()"
-          (employeeSelected)="openEmployeeDetail($event)"
-        />
-      </section>
-    </app-panel>
+          <div class="employee-shell__list-chips" [attr.aria-label]="texts.currentEmployeeKeyLabel">
+            <app-ui-tag [value]="employee.employeeNumber" severity="contrast" [rounded]="true" />
+            <app-ui-tag [value]="employee.employeeTypeCode" severity="secondary" [rounded]="true" />
+            <app-ui-tag [value]="employee.ruleSystemCode" severity="secondary" [rounded]="true" />
+          </div>
+
+          <p class="employee-shell__list-context">
+            <span class="employee-shell__list-context-label">{{ texts.detailHeaderWorkCenterLabel }}:</span>
+            <span class="employee-shell__list-context-value">{{ employee.workCenter }}</span>
+          </p>
+        </app-list-item>
+      </ng-template>
+    </app-master-list-panel>
   </aside>
 
-  <section class="employee-shell__detail">
-    <app-panel>
+  <section slot="detail" class="employee-shell__detail">
       @if (activeEmployeeKey()) {
         @if (loadingDetail()) {
           <p class="employee-shell__detail-feedback employee-shell__detail-feedback--loading">
@@ -68,14 +65,14 @@
 
       @if (selectedEmployee(); as employee) {
         <section class="employee-shell__identity-zone">
-            <app-employee-page-header
+          <app-employee-page-header
             [fullName]="employee.displayName"
             [employeeNumber]="employee.employeeNumber"
             [ruleSystemCode]="employee.ruleSystemCode"
             [employeeTypeCode]="employee.employeeTypeCode"
             [status]="headerStatus()"
             [companyCode]="headerCompany()"
-              [workCenterCode]="headerWorkCenter()"
+            [workCenterCode]="headerWorkCenter()"
             [hireDate]="headerHireDate()"
             [email]="headerEmail()"
             [phone]="headerPhone()"
@@ -85,6 +82,7 @@
           />
 
           <app-employee-detail-header
+            class="employee-shell__identity-editor"
             [employee]="employee"
             [editorOnly]="true"
             [openEditorRequestId]="openIdentityEditorRequestId()"
@@ -114,7 +112,7 @@
           </section>
 
           @if (!isRehireWorkflow()) {
-            <aside class="employee-shell__timeline-zone" aria-label="Employee timeline contextual panel">
+            <aside class="employee-shell__timeline-zone" aria-label="Panel contextual del historial del empleado">
               @if (!terminatePanelOpen()) {
                 <app-employee-journey-timeline
                   [journey]="journey()"
@@ -138,6 +136,5 @@
           <router-outlet />
         </section>
       }
-    </app-panel>
   </section>
-</div>
+</app-master-detail-shell>

@@ -1,22 +1,28 @@
 <section class="master-list-panel">
-  <header class="master-list-panel__header">
-    <div class="master-list-panel__header-copy">
-      <h2 class="master-list-panel__title">{{ title() }}</h2>
-      @if (subtitle()) {
-        <p class="master-list-panel__subtitle">{{ subtitle() }}</p>
+  @if (title() || subtitle() || primaryActionLabel()) {
+    <header class="master-list-panel__header">
+      @if (title() || subtitle()) {
+        <div class="master-list-panel__header-copy">
+          @if (title()) {
+            <h2 class="master-list-panel__title">{{ title() }}</h2>
+          }
+          @if (subtitle()) {
+            <p class="master-list-panel__subtitle">{{ subtitle() }}</p>
+          }
+        </div>
       }
-    </div>
 
-    @if (primaryActionLabel()) {
-      <app-ui-button
-        [label]="primaryActionLabel()!"
-        icon="pi pi-plus"
-        [fluid]="true"
-        [disabled]="primaryActionDisabled()"
-        (pressed)="emitPrimaryAction()"
-      />
-    }
-  </header>
+      @if (primaryActionLabel()) {
+        <app-ui-button
+          [label]="primaryActionLabel()!"
+          icon="pi pi-plus"
+          [fluid]="true"
+          [disabled]="primaryActionDisabled()"
+          (pressed)="emitPrimaryAction()"
+        />
+      }
+    </header>
+  }
 
   @if (searchPlaceholder()) {
     <div class="master-list-panel__search">
@@ -27,7 +33,7 @@
         type="search"
         class="master-list-panel__search-input"
         [placeholder]="searchPlaceholder()!"
-        [value]="searchQuery()"
+        [value]="searchValue()"
         (input)="onSearchInput($event)"
         autocomplete="off"
       />
@@ -39,11 +45,11 @@
       <p class="master-list-panel__feedback master-list-panel__feedback--loading">Cargando...</p>
     } @else if (errorMessage()) {
       <p class="master-list-panel__feedback master-list-panel__feedback--error">{{ errorMessage() }}</p>
-    } @else if (filteredItems().length === 0) {
-      <app-empty-state [title]="emptyTitle()" [description]="emptyDescription()" />
+    } @else if (items().length === 0) {
+      <app-empty-state [title]="emptyState().title" [description]="emptyState().description" />
     } @else {
       <div class="master-list-panel__items" role="list" [attr.aria-label]="listAriaLabel()">
-        @for (item of filteredItems(); track trackByKey($index, item)) {
+        @for (item of items(); track trackByKey($index, item)) {
           <div class="master-list-panel__row" role="listitem">
             <button
               type="button"

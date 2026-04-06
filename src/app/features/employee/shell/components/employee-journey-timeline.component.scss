@@ -1,25 +1,18 @@
 .employee-journey-timeline {
   display: grid;
-  gap: 0.42rem;
+  gap: 0.68rem;
 }
 
 .employee-journey-timeline__toggle {
   width: 100%;
-  border: 1px solid rgba(148, 163, 184, 0.36);
-  border-radius: 0.72rem;
-  background: linear-gradient(180deg, #ffffff 0%, #f4f9ff 100%);
-  padding: 0.46rem 0.54rem;
+  border: 0;
+  border-bottom: 1px solid rgba(225, 235, 245, 0.9);
+  background: transparent;
+  padding: 0 0 0.7rem;
   display: flex;
-  align-items: center;
   justify-content: space-between;
   text-align: left;
   cursor: pointer;
-  transition: border-color 140ms ease, background-color 140ms ease;
-}
-
-.employee-journey-timeline__toggle:hover {
-  border-color: rgba(14, 116, 144, 0.5);
-  background: linear-gradient(180deg, #fbfeff 0%, #ecf6ff 100%);
 }
 
 .employee-journey-timeline__toggle:focus-visible {
@@ -28,24 +21,22 @@
 
 .employee-journey-timeline__title {
   margin: 0;
-  font-size: 0.94rem;
+  font-size: 0.86rem;
   font-weight: 700;
   line-height: 1.15;
-  color: #12364d;
+  color: #18384f;
 }
 
 .employee-journey-timeline__summary {
   margin: 0;
-  font-size: 0.64rem;
-  line-height: 1.2;
-  color: rgba(47, 74, 101, 0.68);
+  font-size: 0.72rem;
+  line-height: 1.35;
+  color: #5b748c;
 }
 
 .employee-journey-timeline__chevron {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  font-size: 0.76rem;
   color: #45637f;
 }
 
@@ -59,13 +50,11 @@
 
 .employee-journey-timeline__presence {
   display: grid;
-  gap: 0.14rem;
+  gap: 0.24rem;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(246, 251, 255, 0.96));
   border: 1px solid rgba(148, 163, 184, 0.34);
-  border-radius: 0.74rem;
-  padding: 0.5rem 0.58rem;
-  transition: background-color 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
-  position: relative;
+  border-radius: 0.82rem;
+  padding: 0.7rem 0.78rem;
 }
 
 .employee-journey-timeline__presence-header {
@@ -79,7 +68,7 @@
 .employee-journey-timeline__presence-company {
   font-size: 0.74rem;
   font-weight: 700;
-  color: rgba(13, 39, 61, 0.92);
+  color: #19354d;
 }
 
 .employee-journey-timeline__presence-meta {
@@ -91,7 +80,7 @@
 
 .employee-journey-timeline__presence-period {
   font-size: 0.62rem;
-  color: rgba(43, 71, 93, 0.72);
+  color: #597085;
   font-weight: 700;
 }
 
@@ -99,26 +88,24 @@
   display: flex;
   justify-content: space-between;
   gap: 0.5rem;
-  align-items: baseline;
 }
 
 .employee-journey-timeline__event-title {
   margin: 0;
   font-size: 0.68rem;
-  font-weight: 500;
-  color: rgba(18, 44, 65, 0.84);
+  color: #233d53;
 }
 
 .employee-journey-timeline__event-date-small {
   margin: 0;
   font-size: 0.58rem;
-  color: rgba(44, 69, 94, 0.56);
+  color: #647b90;
 }
 
 .employee-journey-timeline__event-sub {
   margin: 0.08rem 0 0 0;
   font-size: 0.58rem;
-  color: rgba(44, 69, 94, 0.62);
+  color: #5f7488;
   max-width: 28rem;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -135,10 +122,6 @@
   box-shadow: 0 14px 28px -24px rgba(21, 128, 61, 0.82);
 }
 
-.employee-journey-timeline__presence:not(.employee-journey-timeline__presence--active) {
-  opacity: 0.96;
-}
-
 .employee-journey-timeline__status-chip {
   display: inline-flex;
   align-items: center;
@@ -148,10 +131,9 @@
   font-size: 0.56rem;
   line-height: 1;
   padding: 0.14rem 0.28rem;
-  color: rgba(35, 61, 83, 0.72);
+  color: #50677b;
   font-weight: 700;
   white-space: nowrap;
-  letter-spacing: 0.03em;
 }
 
 .employee-journey-timeline__status-chip--current {
@@ -170,16 +152,14 @@
   border: none;
   padding: 0.18rem 0 0.12rem;
   display: flex;
-  align-items: center;
   gap: 0.38rem;
   cursor: pointer;
 }
 
 .employee-journey-timeline__presence-toggle-label {
   font-size: 0.62rem;
-  color: rgba(42, 67, 91, 0.74);
+  color: #556c80;
   font-weight: 700;
-  letter-spacing: 0.03em;
   text-transform: uppercase;
 }
 
@@ -204,19 +184,17 @@
 .employee-journey-timeline__date-group-header {
   display: flex;
   gap: 0.34rem;
-  align-items: baseline;
 }
 
 .employee-journey-timeline__date {
   font-size: 0.6rem;
-  color: rgba(43, 71, 93, 0.72);
+  color: #597085;
   font-weight: 700;
-  letter-spacing: 0.03em;
 }
 
 .employee-journey-timeline__date-label {
   font-size: 0.58rem;
-  color: rgba(43, 71, 93, 0.58);
+  color: #6c8194;
 }
 
 .employee-journey-timeline__group-events {
@@ -225,16 +203,6 @@
   padding: 0 0 0 0.5rem;
   display: grid;
   gap: 0.18rem;
-}
-
-.employee-journey-timeline__event--nested .employee-journey-timeline__event-title {
-  font-weight: 500;
-  color: rgba(16, 44, 65, 0.82);
-}
-
-.employee-journey-timeline__event--nested .employee-journey-timeline__event-sub {
-  color: rgba(34, 63, 88, 0.58);
-  font-size: 0.58rem;
 }
 
 .employee-journey-timeline__loading-row {

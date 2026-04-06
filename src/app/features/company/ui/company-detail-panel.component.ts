@@ -18,9 +18,9 @@ import { companyTexts } from '../company.texts';
 import { buildCompanyFormValueFromDetail, buildEmptyCompanyFormValue } from '../mapper/company-form.mapper';
 import { CompanyDetailModel } from '../models/company-detail.model';
 import { CompanyFormValue } from '../models/company-form-value.model';
-import { PanelComponent } from '../../../shared/ui/panel/panel.component';
 import { UiButtonComponent } from '../../../shared/ui/button/ui-button.component';
-import { UiTagComponent } from '../../../shared/ui/tag/ui-tag.component';
+import { EntityHeaderComponent, EntityHeaderMetadataItem, EntityHeaderStatus } from '../../../shared/ui/entity-header/entity-header.component';
+import { SectionCardComponent } from '../../../shared/ui/section-card/section-card.component';
 
 export type CompanyFormMode = 'create' | 'edit';
 export type CompanyDetailMode = 'create' | 'view' | 'edit';
@@ -35,9 +35,9 @@ export type CompanyDetailMode = 'create' | 'view' | 'edit';
     DatePickerModule,
     TextareaModule,
     MessageModule,
-    PanelComponent,
     UiButtonComponent,
-    UiTagComponent,
+    EntityHeaderComponent,
+    SectionCardComponent,
   ],
   templateUrl: './company-detail-panel.component.html',
   styleUrl: './company-detail-panel.component.scss',
@@ -130,6 +130,26 @@ export class CompanyDetailPanelComponent implements OnChanges {
     }
 
     return detail.active ? 'success' : 'warn';
+  }
+
+  protected get entityHeaderStatus(): EntityHeaderStatus {
+    return {
+      label: this.entityStatusLabel,
+      severity: this.entityStatusSeverity,
+    };
+  }
+
+  protected get entityHeaderMetadata(): ReadonlyArray<EntityHeaderMetadataItem> {
+    return [
+      { label: this.texts.detailHeaderCompanyCodeLabel, value: this.entityCompanyCode },
+      { label: this.texts.detailHeaderRuleSystemLabel, value: this.entityRuleSystemCode },
+      { label: this.texts.detailHeaderStartDateLabel, value: this.entityStartDate },
+    ];
+  }
+
+  protected get entitySubtitle(): string | null {
+    const description = this.detail()?.description?.trim() ?? '';
+    return description || null;
   }
 
   protected get entityRuleSystemCode(): string {

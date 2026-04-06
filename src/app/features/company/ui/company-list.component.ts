@@ -1,16 +1,17 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 
 import { companyTexts } from '../company.texts';
 import { CompanyListItemModel } from '../models/company-list-item.model';
 import { CompanyBusinessKey } from '../models/company-ui-state.model';
 import { MasterListPanelComponent } from '../../../shared/ui/master-list-panel/master-list-panel.component';
+import { ListItemComponent } from '../../../shared/ui/list-item/list-item.component';
 import { UiTagComponent } from '../../../shared/ui/tag/ui-tag.component';
 
 @Component({
   selector: 'app-company-list',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [MasterListPanelComponent, UiTagComponent],
+  imports: [MasterListPanelComponent, ListItemComponent, UiTagComponent],
   templateUrl: './company-list.component.html',
   styleUrl: './company-list.component.scss',
 })
@@ -24,28 +25,35 @@ export class CompanyListComponent {
   readonly newRequested = output<void>();
 
   protected readonly texts = companyTexts;
+  protected readonly searchValue = signal('');
   protected readonly selectedListKey = computed(() => {
     const key = this.selectedKey();
     return key ? this.companyKey(key.ruleSystemCode, key.companyCode) : null;
   });
+  protected readonly visibleCompanies = computed(() => {
+    const normalizedQuery = this.searchValue().trim().toLowerCase();
+    if (!normalizedQuery) {
+      return this.companies();
+    }
+
+    return this.companies().filter((item) => {
+      const haystack = [
+        item.companyCode,
+        item.ruleSystemCode,
+        item.name,
+        item.legalName,
+        item.taxIdentifier ?? '',
+        item.countryCode ?? '',
+      ]
+        .join(' ')
+        .toLowerCase();
+
+      return haystack.includes(normalizedQuery);
+    });
+  });
 
   protected readonly companyKeyOf = (item: CompanyListItemModel): string =>
     this.companyKey(item.ruleSystemCode, item.companyCode);
-
-  protected readonly matchesCompanyQuery = (item: CompanyListItemModel, normalizedQuery: string): boolean => {
-    const haystack = [
-      item.companyCode,
-      item.ruleSystemCode,
-      item.name,
-      item.legalName,
-      item.taxIdentifier ?? '',
-      item.countryCode ?? '',
-    ]
-      .join(' ')
-      .toLowerCase();
-
-    return haystack.includes(normalizedQuery);
-  };
 
   protected requestSelect(company: CompanyListItemModel): void {
     this.companySelected.emit({
@@ -56,6 +64,10 @@ export class CompanyListComponent {
 
   protected requestCreate(): void {
     this.newRequested.emit();
+  }
+
+  protected updateSearchValue(value: string): void {
+    this.searchValue.set(value);
   }
 
   private companyKey(ruleSystemCode: string, companyCode: string): string {

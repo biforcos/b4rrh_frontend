@@ -1,10 +1,10 @@
 export const companyTexts = {
   pageTitle: 'Empresas',
-  pageSubtitle: 'Gestión del catálogo de empresas. Crea y edita empresas directamente desde esta pantalla.',
+  pageSubtitle: '',
   newCompanyAction: 'Nueva empresa',
 
-  listTitle: 'Listado de empresas',
-  listSubtitle: 'Explora el catálogo y abre la ficha de la empresa seleccionada.',
+  listTitle: 'Empresas',
+  listSubtitle: '',
   listSearchPlaceholder: 'Buscar por código, nombre o razón social',
   listLoadingMessage: 'Cargando empresas...',
   listLoadFailedMessage: 'No se pudo cargar el listado de empresas. Reintenta.',
@@ -38,11 +38,11 @@ export const companyTexts = {
   detailHeaderCompanyCodeLabel: 'Código empresa',
   detailHeaderStartDateLabel: 'Fecha inicio',
   detailViewEmptyValue: '—',
-  detailSectionIdentitySubtitle: 'Datos base de identificación y vigencia de la empresa.',
-  detailSectionFiscalSubtitle: 'Razón social y datos fiscales que enriquecen el agregado.',
-  detailSectionAddressSubtitle: 'Información de localización usada en la ficha de empresa.',
-  detailDescriptionEmpty: 'Sin descripción informada',
-  detailAddressEmpty: 'No hay dirección informada para esta empresa.',
+  detailSectionIdentitySubtitle: '',
+  detailSectionFiscalSubtitle: '',
+  detailSectionAddressSubtitle: '',
+  detailDescriptionEmpty: 'Sin descripción',
+  detailAddressEmpty: 'Sin dirección informada.',
 
   sectionIdentityTitle: 'Identificación',
   fieldRuleSystemCodeLabel: 'Sistema de reglas',
@@ -70,7 +70,7 @@ export const companyTexts = {
   submitSuccessUpdated: 'Empresa actualizada correctamente.',
 
   emptyDetailTitle: 'Selecciona o crea una empresa',
-  emptyDetailDescription: 'Selecciona una empresa de la lista para editarla, o pulsa "Nueva empresa" para crear una.',
+  emptyDetailDescription: 'Selecciona una empresa o crea una nueva.',
 
   activeLabel: 'Activa',
   inactiveLabel: 'Inactiva',

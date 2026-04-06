@@ -1,0 +1,15 @@
+<article class="list-item" [class.list-item--selected]="selected()">
+  <header class="list-item__header">
+    <div class="list-item__header-content">
+      <ng-content select="[listItemHeader]"></ng-content>
+    </div>
+
+    @if (status()) {
+      <app-ui-tag [value]="status()!" [severity]="statusSeverity()" [rounded]="true" />
+    }
+  </header>
+
+  <div class="list-item__body">
+    <ng-content></ng-content>
+  </div>
+</article>

@@ -1,5 +1,5 @@
-<app-master-detail-page-shell [title]="texts.pageTitle" [subtitle]="texts.pageSubtitle">
-  <section shellMaster>
+<app-master-detail-shell [title]="texts.pageTitle" [subtitle]="texts.pageSubtitle">
+  <section slot="list">
     <app-company-list
       [companies]="store.companies()"
       [selectedKey]="store.selectedKey()"
@@ -10,20 +10,20 @@
     />
   </section>
 
-  <section shellDetail class="company-page__detail-slot">
+  <section slot="detail" class="company-page__detail-slot">
     @if (store.hasActiveDetail()) {
       @if (store.detailLoading()) {
-        <app-panel [title]="texts.detailPanelTitle" [subtitle]="texts.detailLoadingMessage">
+        <app-section-card [title]="texts.detailPanelTitle" [description]="texts.detailLoadingMessage">
           <p class="company-page__feedback company-page__feedback--loading">{{ texts.detailLoadingMessage }}</p>
-        </app-panel>
+        </app-section-card>
       } @else if (store.detailError() === 'not-found') {
-        <app-panel [title]="texts.detailPanelTitle">
+        <app-section-card [title]="texts.detailPanelTitle">
           <p class="company-page__feedback company-page__feedback--error">{{ texts.detailNotFoundMessage }}</p>
-        </app-panel>
+        </app-section-card>
       } @else if (store.detailError()) {
-        <app-panel [title]="texts.detailPanelTitle">
+        <app-section-card [title]="texts.detailPanelTitle">
           <p class="company-page__feedback company-page__feedback--error">{{ texts.detailLoadFailedMessage }}</p>
-        </app-panel>
+        </app-section-card>
       } @else {
         <app-company-detail-panel
           [mode]="detailMode"
@@ -37,9 +37,9 @@
         />
       }
     } @else {
-      <app-panel [title]="texts.detailPanelTitle" [subtitle]="texts.emptyDetailDescription">
-        <app-empty-state [title]="texts.emptyDetailTitle" [description]="texts.emptyDetailDescription" />
-      </app-panel>
+      <app-section-card [title]="texts.detailPanelTitle">
+        <p class="company-page__feedback">{{ texts.emptyDetailDescription }}</p>
+      </app-section-card>
     }
   </section>
-</app-master-detail-page-shell>
+</app-master-detail-shell>

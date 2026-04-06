@@ -1,56 +1,54 @@
 <app-master-list-panel
-  [title]="texts.listTitle"
+  [title]="''"
   [subtitle]="texts.listSubtitle"
-  [items]="companies()"
+  [items]="visibleCompanies()"
   [loading]="loading()"
   [errorMessage]="errorMessage()"
-  [emptyTitle]="texts.listTitle"
-  [emptyDescription]="texts.listEmptyMessage"
+  [emptyState]="{ title: texts.listTitle, description: texts.listEmptyMessage }"
   [primaryActionLabel]="texts.newCompanyAction"
   [searchPlaceholder]="texts.listSearchPlaceholder"
-  [selectedKey]="selectedListKey()"
-  [keyOf]="companyKeyOf"
-  [matchesQuery]="matchesCompanyQuery"
+  [searchValue]="searchValue()"
+  [selectedItemKey]="selectedListKey()"
+  [itemKey]="companyKeyOf"
   [listAriaLabel]="texts.listTitle"
-  (primaryAction)="requestCreate()"
+  (createNew)="requestCreate()"
   (itemSelected)="requestSelect($event)"
+  (searchValueChange)="updateSearchValue($event)"
 >
-  <ng-template let-company>
-    <div class="company-list__item-topline">
-      <div class="company-list__identity-block">
+  <ng-template let-company let-selected="selected">
+    <app-list-item
+      [selected]="selected"
+      [status]="company.active ? texts.activeLabel : texts.inactiveLabel"
+      [statusSeverity]="company.active ? 'success' : 'warn'"
+    >
+      <div listItemHeader class="company-list__identity-block">
         <span class="company-list__name">{{ company.name }}</span>
         <span class="company-list__legal-name">{{ company.legalName }}</span>
       </div>
 
-      <app-ui-tag
-        [value]="company.active ? texts.activeLabel : texts.inactiveLabel"
-        [severity]="company.active ? 'success' : 'warn'"
-        [rounded]="true"
-      />
-    </div>
-
-    <div class="company-list__chips">
-      <app-ui-tag [value]="company.companyCode" severity="contrast" [rounded]="true" />
-      <app-ui-tag [value]="company.ruleSystemCode" severity="secondary" [rounded]="true" />
-    </div>
-
-    <dl class="company-list__meta-grid">
-      @if (company.taxIdentifier) {
-        <div class="company-list__meta-item">
-          <dt>{{ texts.listMetaTaxIdLabel }}</dt>
-          <dd>{{ company.taxIdentifier }}</dd>
-        </div>
-      }
-      @if (company.countryCode) {
-        <div class="company-list__meta-item">
-          <dt>{{ texts.listMetaCountryLabel }}</dt>
-          <dd>{{ company.countryCode }}</dd>
-        </div>
-      }
-      <div class="company-list__meta-item company-list__meta-item--full">
-        <dt>{{ texts.listMetaStartDateLabel }}</dt>
-        <dd>{{ company.startDate }}</dd>
+      <div class="company-list__chips">
+        <app-ui-tag [value]="company.companyCode" severity="contrast" [rounded]="true" />
+        <app-ui-tag [value]="company.ruleSystemCode" severity="secondary" [rounded]="true" />
       </div>
-    </dl>
+
+      <dl class="company-list__meta-grid">
+        @if (company.taxIdentifier) {
+          <div class="company-list__meta-item">
+            <dt>{{ texts.listMetaTaxIdLabel }}</dt>
+            <dd>{{ company.taxIdentifier }}</dd>
+          </div>
+        }
+        @if (company.countryCode) {
+          <div class="company-list__meta-item">
+            <dt>{{ texts.listMetaCountryLabel }}</dt>
+            <dd>{{ company.countryCode }}</dd>
+          </div>
+        }
+        <div class="company-list__meta-item company-list__meta-item--full">
+          <dt>{{ texts.listMetaStartDateLabel }}</dt>
+          <dd>{{ company.startDate }}</dd>
+        </div>
+      </dl>
+    </app-list-item>
   </ng-template>
 </app-master-list-panel>

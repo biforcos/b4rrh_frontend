@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
 @Component({
-  selector: 'app-master-detail-page-shell',
+  selector: 'app-master-detail-shell',
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './master-detail-page-shell.component.html',
   styleUrl: './master-detail-page-shell.component.scss',

@@ -1,0 +1,24 @@
+:host {
+  display: block;
+}
+
+.list-item {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.list-item--selected .list-item__header-content {
+  color: #0e3a52;
+}
+
+.list-item__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.list-item__header-content,
+.list-item__body {
+  min-width: 0;
+}
