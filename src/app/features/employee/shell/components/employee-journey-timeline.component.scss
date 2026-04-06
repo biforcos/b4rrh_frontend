@@ -1,6 +1,6 @@
 .employee-journey-timeline {
   display: grid;
-  gap: 0.68rem;
+  gap: .82rem;
 }
 
 .employee-journey-timeline__toggle {
@@ -8,7 +8,7 @@
   border: 0;
   border-bottom: 1px solid rgba(225, 235, 245, 0.9);
   background: transparent;
-  padding: 0 0 0.7rem;
+  padding: 0 0 .7rem;
   display: flex;
   justify-content: space-between;
   text-align: left;
@@ -21,7 +21,7 @@
 
 .employee-journey-timeline__title {
   margin: 0;
-  font-size: 0.86rem;
+  font-size: .94rem;
   font-weight: 700;
   line-height: 1.15;
   color: #18384f;
@@ -29,15 +29,9 @@
 
 .employee-journey-timeline__summary {
   margin: 0;
-  font-size: 0.72rem;
+  font-size: .74rem;
   line-height: 1.35;
   color: #5b748c;
-}
-
-.employee-journey-timeline__chevron {
-  display: inline-flex;
-  align-items: center;
-  color: #45637f;
 }
 
 .employee-journey-timeline__presence-list {
@@ -45,16 +39,16 @@
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 0.5rem;
+  gap: .72rem;
 }
 
 .employee-journey-timeline__presence {
   display: grid;
-  gap: 0.24rem;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(246, 251, 255, 0.96));
-  border: 1px solid rgba(148, 163, 184, 0.34);
+  gap: .46rem;
+  background: #f8fbff;
+  border: 1px solid rgba(148, 163, 184, 0.28);
   border-radius: 0.82rem;
-  padding: 0.7rem 0.78rem;
+  padding: .82rem .88rem;
 }
 
 .employee-journey-timeline__presence-header {
@@ -66,7 +60,7 @@
 }
 
 .employee-journey-timeline__presence-company {
-  font-size: 0.74rem;
+  font-size: .8rem;
   font-weight: 700;
   color: #19354d;
 }
@@ -79,47 +73,21 @@
 }
 
 .employee-journey-timeline__presence-period {
-  font-size: 0.62rem;
+  font-size: 0.66rem;
   color: #597085;
   font-weight: 700;
 }
 
-.employee-journey-timeline__event-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 0.5rem;
-}
-
 .employee-journey-timeline__event-title {
   margin: 0;
-  font-size: 0.68rem;
+  font-size: 0.74rem;
+  font-weight: 600;
   color: #233d53;
 }
 
-.employee-journey-timeline__event-date-small {
-  margin: 0;
-  font-size: 0.58rem;
-  color: #647b90;
-}
-
-.employee-journey-timeline__event-sub {
-  margin: 0.08rem 0 0 0;
-  font-size: 0.58rem;
-  color: #5f7488;
-  max-width: 28rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.employee-journey-timeline__presence--active .employee-journey-timeline__presence-company {
-  color: rgba(17, 83, 53, 0.95);
-}
-
 .employee-journey-timeline__presence--active {
-  background: linear-gradient(180deg, #f1fcf6 0%, #e8f8ef 100%);
+  background: #eef9f1;
   border-color: rgba(34, 122, 80, 0.32);
-  box-shadow: 0 14px 28px -24px rgba(21, 128, 61, 0.82);
 }
 
 .employee-journey-timeline__status-chip {
@@ -150,7 +118,7 @@
 .employee-journey-timeline__presence-toggle {
   background: transparent;
   border: none;
-  padding: 0.18rem 0 0.12rem;
+  padding: 0.04rem 0 0;
   display: flex;
   gap: 0.38rem;
   cursor: pointer;
@@ -165,44 +133,85 @@
 
 .employee-journey-timeline__date-group-list {
   list-style: none;
-  margin: 0.06rem 0 0 0;
-  padding: 0;
+  margin: .26rem 0 0;
+  padding: 0 0 0 1.08rem;
   display: grid;
-  gap: 0.24rem;
+  gap: .72rem;
 }
 
-.employee-journey-timeline__date-group {
-  border-top: 1px dashed rgba(148, 163, 184, 0.34);
-  padding-top: 0.24rem;
-}
-
-.employee-journey-timeline__date-group:first-child {
-  border-top: 0;
-  padding-top: 0.04rem;
-}
-
-.employee-journey-timeline__date-group-header {
-  display: flex;
-  gap: 0.34rem;
+.employee-journey-timeline__date-card {
+  display: grid;
+  gap: .42rem;
+  padding: .64rem .7rem;
+  border-radius: 0.72rem;
+  background: #f3f8ff;
+  border: 1px solid rgba(191, 211, 230, 0.68);
 }
 
 .employee-journey-timeline__date {
-  font-size: 0.6rem;
-  color: #597085;
+  margin: 0;
+  font-size: .76rem;
+  color: #35546d;
   font-weight: 700;
+  white-space: nowrap;
 }
 
-.employee-journey-timeline__date-label {
-  font-size: 0.58rem;
-  color: #6c8194;
+.employee-journey-timeline__date-main-row {
+  display: flex;
+  align-items: center;
+  gap: .42rem;
+  min-width: 0;
+  flex-wrap: nowrap;
+}
+
+.employee-journey-timeline__date-main-bullet {
+  width: .52rem;
+  height: .52rem;
+  border-radius: 999px;
+  background: #0e7490;
+  flex: 0 0 auto;
+}
+
+.employee-journey-timeline__date-separator {
+  color: #7a93a8;
+  flex: 0 0 auto;
+}
+
+.employee-journey-timeline__date-main-title {
+  margin: 0;
+  font-size: .86rem;
+  font-weight: 700;
+  color: #18384f;
+  min-width: 0;
 }
 
 .employee-journey-timeline__group-events {
   list-style: none;
-  margin: 0.2rem 0 0 0;
-  padding: 0 0 0 0.5rem;
+  margin: 0;
+  padding: 0 0 0 1.36rem;
   display: grid;
-  gap: 0.18rem;
+  gap: .26rem;
+}
+
+.employee-journey-timeline__event {
+  display: flex;
+  align-items: flex-start;
+  gap: .42rem;
+}
+
+.employee-journey-timeline__event-bullet {
+  width: .28rem;
+  height: .28rem;
+  border-radius: 999px;
+  background: rgba(125, 163, 192, 0.88);
+  margin-top: .34rem;
+  flex: 0 0 auto;
+}
+
+.employee-journey-timeline__event--secondary .employee-journey-timeline__event-title {
+  font-size: .7rem;
+  font-weight: 500;
+  color: rgba(35, 61, 83, 0.84);
 }
 
 .employee-journey-timeline__loading-row {

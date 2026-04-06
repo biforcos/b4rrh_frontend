@@ -31,7 +31,14 @@ interface GroupedJourneyEventViewModel {
 interface PresenceDateGroupViewModel {
   eventDate: string;
   semanticLabel: string | null;
-  events: ReadonlyArray<EmployeeJourneyEventModel>;
+  primaryEventLabel: string;
+  secondaryEvents: ReadonlyArray<GroupedJourneySecondaryEventViewModel>;
+}
+
+interface TimelineSummaryViewModel {
+  totalEvents: number;
+  latestEventLabel: string | null;
+  latestEventDate: string | null;
 }
 
 interface PresenceGroupViewModel {
@@ -56,6 +63,12 @@ const secondaryTrackLabelByCode: Readonly<Record<string, string>> = {
   LABOR_CLASSIFICATION: 'Clasificacion',
 };
 
+const compactEventLabelByTrackCode: Readonly<Record<string, string>> = {
+  PRESENCE: 'Alta',
+  CONTRACT: 'Contrato',
+  LABOR_CLASSIFICATION: 'Clasificación',
+};
+
 @Component({
   selector: 'app-employee-journey-timeline',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -77,6 +90,20 @@ export class EmployeeJourneyTimelineComponent {
   protected readonly presenceGroups = computed(() =>
     this.groupEventsByPresence(this.journey()?.events ?? [], this.presences() ?? []),
   );
+  protected readonly summary = computed<TimelineSummaryViewModel>(() => {
+    const events = this.journey()?.events ?? [];
+    if (events.length === 0) {
+      return { totalEvents: 0, latestEventLabel: null, latestEventDate: null };
+    }
+
+    const latestEvent = [...events].sort((left, right) => right.eventDate.localeCompare(left.eventDate))[0] ?? null;
+
+    return {
+      totalEvents: events.length,
+      latestEventLabel: latestEvent ? this.resolveCompactEventLabel(latestEvent) : null,
+      latestEventDate: latestEvent?.eventDate ?? null,
+    };
+  });
   protected readonly collapsedSummary = computed(() => {
     if (this.loading()) {
       return this.texts.timelineLoadingMessage;
@@ -86,22 +113,20 @@ export class EmployeeJourneyTimelineComponent {
       return this.texts.timelineLoadFailedMessage;
     }
 
-    const totalEvents = this.journey()?.events.length ?? 0;
+    const summary = this.summary();
+    const totalEvents = summary.totalEvents;
     if (totalEvents === 0) {
       return this.texts.timelineNoEventsMessage;
     }
 
-    const presenceGroups = this.presenceGroups();
-    const latestGroup = presenceGroups[0];
-    const latestGroupedEvent = latestGroup ? latestGroup.events[latestGroup.events.length - 1] : null;
     const eventsLabel =
       totalEvents === 1 ? this.texts.timelineEventsSingularLabel : this.texts.timelineEventsPluralLabel;
 
-    if (!latestGroupedEvent) {
+    if (!summary.latestEventLabel || !summary.latestEventDate) {
       return `${totalEvents} ${eventsLabel}`;
     }
 
-    return `${totalEvents} ${eventsLabel} · ${this.texts.timelineLastEventLabel}: ${latestGroupedEvent.title} (${latestGroupedEvent.eventDate})`;
+    return `${totalEvents} ${eventsLabel} · ${this.texts.timelineLastEventLabel}: ${summary.latestEventLabel} (${summary.latestEventDate})`;
   });
   protected readonly toggleAriaLabel = computed(() =>
     this.isExpanded() ? this.texts.timelineCollapseActionLabel : this.texts.timelineExpandActionLabel,
@@ -144,6 +169,30 @@ export class EmployeeJourneyTimelineComponent {
 
   protected trackPresenceBy(_index: number, presence: { id: string }): string {
     return presence.id;
+  }
+
+  protected resolveCompactEventLabel(event: EmployeeJourneyEventModel): string {
+    const normalizedTrackCode = (event.trackCode ?? '').trim().toUpperCase();
+    const haystack = `${event.eventType} ${event.title} ${event.subtitle ?? ''}`.toLowerCase();
+
+    if (haystack.includes('work center') || haystack.includes('assignment') || haystack.includes('centro')) {
+      return this.texts.timelineEventWorkCenterLabel;
+    }
+
+    if (haystack.includes('termination') || haystack.includes('despido') || haystack.includes('baja') || haystack.includes('finish')) {
+      return this.texts.timelineEventTerminationLabel;
+    }
+
+    if (haystack.includes('rehire') || haystack.includes('reincorp') || haystack.includes('reingres')) {
+      return this.texts.timelineEventRehireLabel;
+    }
+
+    if (normalizedTrackCode in compactEventLabelByTrackCode) {
+      return compactEventLabelByTrackCode[normalizedTrackCode]!;
+    }
+
+    const normalizedTitle = event.title.trim();
+    return normalizedTitle || this.texts.timelineEventGenericLabel;
   }
 
   private groupEventsByDate(
@@ -377,7 +426,8 @@ export class EmployeeJourneyTimelineComponent {
       const dateGroups: PresenceDateGroupViewModel[] = Array.from(byDate.entries()).map(([date, evs]) => ({
         eventDate: date,
         semanticLabel: null,
-        events: evs,
+        primaryEventLabel: this.resolvePrimaryEventLabel(evs),
+        secondaryEvents: this.resolveSecondaryEvents(evs),
       }));
 
       // STEP 4: sort date groups DESC
@@ -387,7 +437,7 @@ export class EmployeeJourneyTimelineComponent {
 
       // STEP 6: semantic labels strict rules
       for (const dg of dateGroups) {
-        const evs = dg.events;
+        const evs = byDate.get(dg.eventDate) ?? [];
         const hasContract = evs.some((e) => this.isContractTrack(e.trackCode));
         const hasClassification = evs.some((e) => this.isLaborClassificationTrack(e.trackCode));
         const hasAssignment = evs.some((e) => {
@@ -405,21 +455,27 @@ export class EmployeeJourneyTimelineComponent {
         });
 
         if (isRehire) {
-          dg.semanticLabel = 'Rehire';
+          dg.semanticLabel = this.texts.timelineSemanticRehireLabel;
           continue;
         }
 
         if (isTermination) {
-          dg.semanticLabel = 'Termination';
+          dg.semanticLabel = this.texts.timelineSemanticTerminationLabel;
           continue;
         }
 
         if (hasContract && hasClassification && hasAssignment) {
-          dg.semanticLabel = 'Hire';
+          dg.semanticLabel = this.texts.timelineSemanticHireLabel;
           continue;
         }
 
         dg.semanticLabel = null;
+      }
+
+      for (const dg of dateGroups) {
+        if (dg.semanticLabel) {
+          dg.primaryEventLabel = dg.semanticLabel;
+        }
       }
 
       result.push({
@@ -438,70 +494,38 @@ export class EmployeeJourneyTimelineComponent {
 
     return result;
   }
-  
 
-  private detectSemanticLabel(events: ReadonlyArray<EmployeeJourneyEventModel>): string | null {
-    // simple heuristics based on event type or title/subtitle keywords
-    const hay = events.map((e) => `${e.eventType} ${e.title} ${e.subtitle ?? ''}`.toLowerCase()).join(' ');
-
-    if (hay.includes('hire') || hay.includes('alta') || hay.includes('contrat') || hay.includes('incorp')) {
-      return 'Hire';
-    }
-
-    if (hay.includes('termination') || hay.includes('despido') || hay.includes('baja') || hay.includes('finish')) {
-      return 'Termination';
-    }
-
-    if (hay.includes('rehire') || hay.includes('reincorp') || hay.includes('reingres')) {
-      return 'Rehire';
-    }
-
-    if (hay.includes('change') || hay.includes('cambio') || hay.includes('modific') || hay.includes('update')) {
-      return 'Change';
-    }
-
-    return null;
+  private resolvePrimaryEventLabel(events: ReadonlyArray<EmployeeJourneyEventModel>): string {
+    const primaryEvent = this.pickPrimaryEvent(events);
+    return this.resolveCompactEventLabel(primaryEvent);
   }
 
-  private detectSemanticLabelForPresenceGroup(
-    group: PresenceDateGroupViewModel,
-    context: { start: string; end: string | null; isActive: boolean; events: ReadonlyArray<EmployeeJourneyEventModel> },
-  ): string | null {
-    // Conservative rules:
-    // - Hire: when the group's date equals presence start and presence contains at least PRESENCE + CONTRACT (or labor classification)
-    // - Termination: when group's date equals presence end and presence is closed
-    // - Rehire: when any event in group has explicit 'rehire' keyword
+  private resolveSecondaryEvents(
+    events: ReadonlyArray<EmployeeJourneyEventModel>,
+  ): ReadonlyArray<GroupedJourneySecondaryEventViewModel> {
+    const primaryEvent = this.pickPrimaryEvent(events);
 
-    const hay = group.events.map((e) => `${e.eventType} ${e.title} ${e.subtitle ?? ''}`.toLowerCase()).join(' ');
+    return events
+      .filter((event) => event !== primaryEvent)
+      .map((event, index) => ({
+        id: `${event.eventDate}-${event.eventType}-${index}`,
+        summary: this.resolveCompactEventLabel(event),
+      }));
+  }
 
-    // Rehire explicit
-    if (hay.includes('rehire') || hay.includes('reincorp') || hay.includes('reingres')) {
-      return 'Rehire';
-    }
+  private pickPrimaryEvent(events: ReadonlyArray<EmployeeJourneyEventModel>): EmployeeJourneyEventModel {
+    let primaryEvent = events[0]!;
+    let primaryPriority = Number.MAX_SAFE_INTEGER;
 
-    // Termination: only if presence is closed and group date equals context.end
-    if (!context.isActive && context.end && group.eventDate === context.end) {
-      const hasEndSignal = group.events.some((e) => {
-        const txt = `${e.title} ${e.subtitle ?? ''}`.toLowerCase();
-        return txt.includes('baja') || txt.includes('termination') || txt.includes('despido') || txt.includes('finish');
-      });
-
-      if (hasEndSignal) return 'Termination';
-    }
-
-    // Hire: only when group's date equals presence start and the presence has clear start-related tracks
-    if (group.eventDate === context.start) {
-      const trackSet = new Set(context.events.map((e) => e.trackCode.trim().toUpperCase()));
-      const hasPresence = trackSet.has('PRESENCE');
-      const hasContract = trackSet.has('CONTRACT');
-      const hasClassification = trackSet.has('LABOR_CLASSIFICATION');
-
-      // require at least PRESENCE + one of CONTRACT or LABOR_CLASSIFICATION
-      if (hasPresence && (hasContract || hasClassification)) {
-        return 'Hire';
+    for (const event of events) {
+      const normalizedTrackCode = (event.trackCode ?? '').toString().trim().toUpperCase();
+      const priority = trackPriorityByCode[normalizedTrackCode] ?? 99;
+      if (priority < primaryPriority) {
+        primaryPriority = priority;
+        primaryEvent = event;
       }
     }
 
-    return null;
+    return primaryEvent;
   }
 }

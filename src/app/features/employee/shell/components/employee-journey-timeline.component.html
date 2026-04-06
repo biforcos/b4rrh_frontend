@@ -8,7 +8,7 @@
       aria-controls="employee-journey-timeline-content"
       (click)="toggle()"
     >
-      <span>
+      <span class="employee-journey-timeline__headline">
         <h2 id="employee-journey-timeline-title" class="employee-journey-timeline__title">{{ texts.timelineTitle }}</h2>
         <p class="employee-journey-timeline__summary">{{ collapsedSummary() }}</p>
       </span>
@@ -36,7 +36,7 @@
           @for (presence of presenceGroups(); track trackPresenceBy($index, presence)) {
             <li class="employee-journey-timeline__presence" role="listitem" [class.employee-journey-timeline__presence--active]="presence.isActive">
               <div class="employee-journey-timeline__presence-header">
-                <div class="employee-journey-timeline__presence-company">{{ presence.company || '' }}</div>
+                <div class="employee-journey-timeline__presence-company">{{ presence.company || texts.timelineNoCompanyLabel }}</div>
                 <div class="employee-journey-timeline__presence-meta">
                   <span class="employee-journey-timeline__presence-period">{{ presence.start }}
                     @if (presence.end) {
@@ -65,26 +65,27 @@
                   <ol [attr.id]="'presence-' + presence.id + '-content'" class="employee-journey-timeline__date-group-list" role="list">
                     @for (group of presence.groupedEvents; track group.eventDate) {
                       <li class="employee-journey-timeline__date-group" role="listitem">
-                        <div class="employee-journey-timeline__date-group-header">
-                          <div class="employee-journey-timeline__date">{{ group.eventDate }}</div>
-                          @if (group.semanticLabel) {
-                            <div class="employee-journey-timeline__date-label">— {{ group.semanticLabel }}</div>
+                        <div class="employee-journey-timeline__date-card">
+                          <header class="employee-journey-timeline__date-card-header">
+                            <div class="employee-journey-timeline__date-main-row">
+                              <span class="employee-journey-timeline__date-main-bullet" aria-hidden="true"></span>
+                              <p class="employee-journey-timeline__date">{{ group.eventDate }}</p>
+                              <span class="employee-journey-timeline__date-separator" aria-hidden="true">-</span>
+                              <p class="employee-journey-timeline__date-main-title">{{ group.primaryEventLabel }}</p>
+                            </div>
+                          </header>
+
+                          @if (group.secondaryEvents.length > 0) {
+                            <ul class="employee-journey-timeline__group-events" role="list">
+                              @for (event of group.secondaryEvents; track event.id) {
+                                <li class="employee-journey-timeline__event employee-journey-timeline__event--secondary">
+                                  <span class="employee-journey-timeline__event-bullet" aria-hidden="true"></span>
+                                  <p class="employee-journey-timeline__event-title">{{ event.summary }}</p>
+                                </li>
+                              }
+                            </ul>
                           }
                         </div>
-
-                        <ul class="employee-journey-timeline__group-events" role="list">
-                          @for (ev of group.events; track ev.eventDate + '-' + ev.title) {
-                            <li class="employee-journey-timeline__event employee-journey-timeline__event--nested">
-                              <div class="employee-journey-timeline__event-row">
-                                <p class="employee-journey-timeline__event-title">{{ ev.title }}</p>
-                                <p class="employee-journey-timeline__event-date-small">{{ ev.eventDate }}</p>
-                              </div>
-                              @if (ev.subtitle) {
-                                <p class="employee-journey-timeline__event-sub">{{ ev.subtitle }}</p>
-                              }
-                            </li>
-                          }
-                        </ul>
                       </li>
                     }
                   </ol>
