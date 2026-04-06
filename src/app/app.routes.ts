@@ -22,15 +22,7 @@ export const routes: Routes = [
 			},
 			{
 				path: 'organizacion/empresas',
-				loadComponent: () =>
-					import('./core/layout/pages/section-placeholder-page.component').then(
-						(m) => m.SectionPlaceholderPageComponent,
-					),
-				data: {
-					title: 'Empresas',
-					description:
-						'Seccion base preparada para integrar mantenimiento y consulta de empresas.',
-				},
+				loadChildren: () => import('./features/company/company.routes').then((m) => m.companyRoutes),
 			},
 			{
 				path: 'organizacion/centros-trabajo',
