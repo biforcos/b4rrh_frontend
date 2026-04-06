@@ -1,0 +1,65 @@
+<section class="master-list-panel">
+  <header class="master-list-panel__header">
+    <div class="master-list-panel__header-copy">
+      <h2 class="master-list-panel__title">{{ title() }}</h2>
+      @if (subtitle()) {
+        <p class="master-list-panel__subtitle">{{ subtitle() }}</p>
+      }
+    </div>
+
+    @if (primaryActionLabel()) {
+      <app-ui-button
+        [label]="primaryActionLabel()!"
+        icon="pi pi-plus"
+        [fluid]="true"
+        [disabled]="primaryActionDisabled()"
+        (pressed)="emitPrimaryAction()"
+      />
+    }
+  </header>
+
+  @if (searchPlaceholder()) {
+    <div class="master-list-panel__search">
+      <label class="master-list-panel__search-label" for="master-list-search">Buscar</label>
+      <input
+        pInputText
+        id="master-list-search"
+        type="search"
+        class="master-list-panel__search-input"
+        [placeholder]="searchPlaceholder()!"
+        [value]="searchQuery()"
+        (input)="onSearchInput($event)"
+        autocomplete="off"
+      />
+    </div>
+  }
+
+  <div class="master-list-panel__body">
+    @if (loading()) {
+      <p class="master-list-panel__feedback master-list-panel__feedback--loading">Cargando...</p>
+    } @else if (errorMessage()) {
+      <p class="master-list-panel__feedback master-list-panel__feedback--error">{{ errorMessage() }}</p>
+    } @else if (filteredItems().length === 0) {
+      <app-empty-state [title]="emptyTitle()" [description]="emptyDescription()" />
+    } @else {
+      <div class="master-list-panel__items" role="list" [attr.aria-label]="listAriaLabel()">
+        @for (item of filteredItems(); track trackByKey($index, item)) {
+          <div class="master-list-panel__row" role="listitem">
+            <button
+              type="button"
+              class="master-list-panel__item"
+              [class.master-list-panel__item--selected]="isSelected(item)"
+              [attr.aria-pressed]="isSelected(item)"
+              (click)="emitItemSelected(item)"
+            >
+              <ng-container
+                [ngTemplateOutlet]="resolveItemTemplate()"
+                [ngTemplateOutletContext]="{ $implicit: item, selected: isSelected(item) }"
+              />
+            </button>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</section>

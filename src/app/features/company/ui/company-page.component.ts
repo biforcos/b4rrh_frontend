@@ -1,18 +1,26 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
 
 import { companyTexts } from '../company.texts';
 import { CompanyStore } from '../store/company.store';
 import { CompanyBusinessKey } from '../models/company-ui-state.model';
 import { CompanyFormValue } from '../models/company-form-value.model';
 import { CompanyListComponent } from './company-list.component';
-import { CompanyFormComponent } from './company-form.component';
+import { CompanyDetailPanelComponent } from './company-detail-panel.component';
+import { MasterDetailPageShellComponent } from '../../../shared/ui/master-detail-page-shell/master-detail-page-shell.component';
+import { PanelComponent } from '../../../shared/ui/panel/panel.component';
+import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.component';
 
 @Component({
   selector: 'app-company-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [ButtonModule, CompanyListComponent, CompanyFormComponent],
+  imports: [
+    MasterDetailPageShellComponent,
+    PanelComponent,
+    EmptyStateComponent,
+    CompanyListComponent,
+    CompanyDetailPanelComponent,
+  ],
   templateUrl: './company-page.component.html',
   styleUrl: './company-page.component.scss',
 })
@@ -24,8 +32,15 @@ export class CompanyPageComponent {
     this.store.startCreate();
   }
 
-  protected onEditRequested(key: CompanyBusinessKey): void {
-    this.store.startEdit(key);
+  protected onCompanySelected(key: CompanyBusinessKey): void {
+    this.store.selectCompany(key);
+  }
+
+  protected onEditRequested(): void {
+    const key = this.store.selectedKey();
+    if (key) {
+      this.store.startEdit(key);
+    }
   }
 
   protected onFormSubmit(formValue: CompanyFormValue): void {
@@ -42,7 +57,15 @@ export class CompanyPageComponent {
     this.store.cancelForm();
   }
 
-  protected get formMode(): 'create' | 'edit' {
-    return this.store.isCreating() ? 'create' : 'edit';
+  protected get detailMode(): 'create' | 'view' | 'edit' {
+    if (this.store.isCreating()) {
+      return 'create';
+    }
+
+    if (this.store.isEditing()) {
+      return 'edit';
+    }
+
+    return 'view';
   }
 }

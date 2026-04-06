@@ -1,0 +1,24 @@
+<section class="master-detail-page-shell">
+  <header class="master-detail-page-shell__toolbar">
+    <div class="master-detail-page-shell__toolbar-copy">
+      <h1 class="master-detail-page-shell__title">{{ title() }}</h1>
+      @if (subtitle()) {
+        <p class="master-detail-page-shell__subtitle">{{ subtitle() }}</p>
+      }
+    </div>
+
+    <div class="master-detail-page-shell__toolbar-actions">
+      <ng-content select="[shellToolbar]" />
+    </div>
+  </header>
+
+  <div class="master-detail-page-shell__layout">
+    <aside class="master-detail-page-shell__master">
+      <ng-content select="[shellMaster]" />
+    </aside>
+
+    <section class="master-detail-page-shell__detail">
+      <ng-content select="[shellDetail]" />
+    </section>
+  </div>
+</section>

@@ -1,0 +1,247 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="company-detail-panel" novalidate>
+  <section class="company-detail-panel__entity-header">
+    <div class="company-detail-panel__entity-copy">
+      <p class="company-detail-panel__eyebrow">{{ texts.detailPanelTitle }}</p>
+
+      <div class="company-detail-panel__headline-row">
+        <h2>{{ entityTitle }}</h2>
+        <div class="company-detail-panel__headline-actions">
+          <app-ui-tag [value]="entityStatusLabel" [severity]="entityStatusSeverity" [rounded]="true" />
+          @if (isViewMode()) {
+            <app-ui-button
+              [label]="texts.formEditAction"
+              severity="secondary"
+              [outlined]="true"
+              [disabled]="submitting()"
+              (pressed)="requestEdit()"
+            />
+          }
+        </div>
+      </div>
+
+      <dl class="company-detail-panel__keyline">
+        <div class="company-detail-panel__key-item">
+          <dt>{{ texts.detailHeaderCompanyCodeLabel }}</dt>
+          <dd>{{ entityCompanyCode }}</dd>
+        </div>
+        <div class="company-detail-panel__key-item">
+          <dt>{{ texts.detailHeaderRuleSystemLabel }}</dt>
+          <dd>{{ entityRuleSystemCode }}</dd>
+        </div>
+        <div class="company-detail-panel__key-item">
+          <dt>{{ texts.detailHeaderStartDateLabel }}</dt>
+          <dd>{{ entityStartDate }}</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  @if (submitSuccess()) {
+    <p-message severity="success" [text]="successMessage!" styleClass="company-detail-panel__feedback" />
+  }
+
+  @if (submitError()) {
+    <p-message severity="error" [text]="submitError()!" styleClass="company-detail-panel__feedback" />
+  }
+
+  <div class="company-detail-panel__sections">
+    <app-panel [title]="texts.sectionIdentityTitle" [subtitle]="texts.detailSectionIdentitySubtitle">
+      @if (isViewMode()) {
+        <div class="company-detail-panel__view-grid">
+          <div class="company-detail-panel__view-item">
+            <span class="company-detail-panel__view-label">{{ texts.fieldNameLabel }}</span>
+            <span class="company-detail-panel__view-value">{{ displayValue(detail()?.name) }}</span>
+          </div>
+          <div class="company-detail-panel__view-item">
+            <span class="company-detail-panel__view-label">{{ texts.fieldStartDateLabel }}</span>
+            <span class="company-detail-panel__view-value">{{ displayValue(detail()?.startDate) }}</span>
+          </div>
+          <div class="company-detail-panel__view-item company-detail-panel__view-item--full">
+            <span class="company-detail-panel__view-label">{{ texts.fieldDescriptionLabel }}</span>
+            <span class="company-detail-panel__view-value company-detail-panel__view-value--soft">
+              {{ detail()?.description?.trim() || texts.detailDescriptionEmpty }}
+            </span>
+          </div>
+        </div>
+      } @else {
+        <div class="company-detail-panel__grid">
+          <div class="company-detail-panel__field">
+            <label for="ruleSystemCode" class="company-detail-panel__label">
+              {{ texts.fieldRuleSystemCodeLabel }} <span class="company-detail-panel__required">*</span>
+            </label>
+            <input
+              pInputText
+              id="ruleSystemCode"
+              formControlName="ruleSystemCode"
+              [class.ng-invalid]="hasError('ruleSystemCode')"
+              placeholder="ESP"
+              maxlength="5"
+            />
+            @if (hasError('ruleSystemCode')) {
+              <small class="company-detail-panel__error">{{ texts.fieldRuleSystemCodeLabel }} es obligatorio.</small>
+            }
+          </div>
+
+          <div class="company-detail-panel__field">
+            <label for="companyCode" class="company-detail-panel__label">
+              {{ texts.fieldCompanyCodeLabel }} <span class="company-detail-panel__required">*</span>
+            </label>
+            <input
+              pInputText
+              id="companyCode"
+              formControlName="companyCode"
+              [class.ng-invalid]="hasError('companyCode')"
+              placeholder="ACME"
+              maxlength="30"
+            />
+            @if (hasError('companyCode')) {
+              <small class="company-detail-panel__error">{{ texts.fieldCompanyCodeLabel }} es obligatorio.</small>
+            }
+          </div>
+
+          <div class="company-detail-panel__field company-detail-panel__field--full">
+            <label for="name" class="company-detail-panel__label">
+              {{ texts.fieldNameLabel }} <span class="company-detail-panel__required">*</span>
+            </label>
+            <input pInputText id="name" formControlName="name" [class.ng-invalid]="hasError('name')" maxlength="100" />
+            @if (hasError('name')) {
+              <small class="company-detail-panel__error">{{ texts.fieldNameLabel }} es obligatorio.</small>
+            }
+          </div>
+
+          <div class="company-detail-panel__field company-detail-panel__field--full">
+            <label for="description" class="company-detail-panel__label">{{ texts.fieldDescriptionLabel }}</label>
+            <textarea pTextarea id="description" formControlName="description" rows="3" maxlength="500"></textarea>
+          </div>
+
+          <div class="company-detail-panel__field">
+            <label for="startDate" class="company-detail-panel__label">
+              {{ texts.fieldStartDateLabel }} <span class="company-detail-panel__required">*</span>
+            </label>
+            <p-datepicker
+              inputId="startDate"
+              formControlName="startDate"
+              [showIcon]="true"
+              dateFormat="yy-mm-dd"
+              [class.ng-invalid]="hasError('startDate')"
+              appendTo="body"
+              [fluid]="true"
+            />
+            @if (hasError('startDate')) {
+              <small class="company-detail-panel__error">{{ texts.fieldStartDateLabel }} es obligatoria.</small>
+            }
+          </div>
+        </div>
+      }
+    </app-panel>
+
+    <app-panel [title]="texts.sectionFiscalTitle" [subtitle]="texts.detailSectionFiscalSubtitle">
+      @if (isViewMode()) {
+        <div class="company-detail-panel__view-grid">
+          <div class="company-detail-panel__view-item company-detail-panel__view-item--full">
+            <span class="company-detail-panel__view-label">{{ texts.fieldLegalNameLabel }}</span>
+            <span class="company-detail-panel__view-value">{{ displayValue(detail()?.legalName) }}</span>
+          </div>
+          <div class="company-detail-panel__view-item">
+            <span class="company-detail-panel__view-label">{{ texts.fieldTaxIdLabel }}</span>
+            <span class="company-detail-panel__view-value">{{ displayValue(detail()?.taxIdentifier) }}</span>
+          </div>
+        </div>
+      } @else {
+        <div class="company-detail-panel__grid">
+          <div class="company-detail-panel__field company-detail-panel__field--full">
+            <label for="legalName" class="company-detail-panel__label">
+              {{ texts.fieldLegalNameLabel }} <span class="company-detail-panel__required">*</span>
+            </label>
+            <input
+              pInputText
+              id="legalName"
+              formControlName="legalName"
+              [class.ng-invalid]="hasError('legalName')"
+              maxlength="200"
+            />
+            @if (hasError('legalName')) {
+              <small class="company-detail-panel__error">{{ texts.fieldLegalNameLabel }} es obligatoria.</small>
+            }
+          </div>
+
+          <div class="company-detail-panel__field">
+            <label for="taxIdentifier" class="company-detail-panel__label">{{ texts.fieldTaxIdLabel }}</label>
+            <input pInputText id="taxIdentifier" formControlName="taxIdentifier" maxlength="50" />
+          </div>
+        </div>
+      }
+    </app-panel>
+
+    <app-panel [title]="texts.sectionAddressTitle" [subtitle]="texts.detailSectionAddressSubtitle">
+      @if (isViewMode()) {
+        @if (hasAddress) {
+          <div class="company-detail-panel__view-grid company-detail-panel__view-grid--address">
+            <div class="company-detail-panel__view-item company-detail-panel__view-item--full">
+              <span class="company-detail-panel__view-label">{{ texts.fieldStreetLabel }}</span>
+              <span class="company-detail-panel__view-value">{{ displayValue(detail()?.address?.street) }}</span>
+            </div>
+            <div class="company-detail-panel__view-item">
+              <span class="company-detail-panel__view-label">{{ texts.fieldCityLabel }}</span>
+              <span class="company-detail-panel__view-value">{{ displayValue(detail()?.address?.city) }}</span>
+            </div>
+            <div class="company-detail-panel__view-item">
+              <span class="company-detail-panel__view-label">{{ texts.fieldPostalCodeLabel }}</span>
+              <span class="company-detail-panel__view-value">{{ displayValue(detail()?.address?.postalCode) }}</span>
+            </div>
+            <div class="company-detail-panel__view-item">
+              <span class="company-detail-panel__view-label">{{ texts.fieldRegionCodeLabel }}</span>
+              <span class="company-detail-panel__view-value">{{ displayValue(detail()?.address?.regionCode) }}</span>
+            </div>
+            <div class="company-detail-panel__view-item">
+              <span class="company-detail-panel__view-label">{{ texts.fieldCountryCodeLabel }}</span>
+              <span class="company-detail-panel__view-value">{{ displayValue(detail()?.address?.countryCode) }}</span>
+            </div>
+          </div>
+        } @else {
+          <p class="company-detail-panel__empty-copy">{{ texts.detailAddressEmpty }}</p>
+        }
+      } @else {
+        <div class="company-detail-panel__grid company-detail-panel__grid--address">
+          <div class="company-detail-panel__field company-detail-panel__field--full">
+            <label for="street" class="company-detail-panel__label">{{ texts.fieldStreetLabel }}</label>
+            <input pInputText id="street" formControlName="street" maxlength="300" />
+          </div>
+
+          <div class="company-detail-panel__field">
+            <label for="city" class="company-detail-panel__label">{{ texts.fieldCityLabel }}</label>
+            <input pInputText id="city" formControlName="city" maxlength="120" />
+          </div>
+
+          <div class="company-detail-panel__field">
+            <label for="postalCode" class="company-detail-panel__label">{{ texts.fieldPostalCodeLabel }}</label>
+            <input pInputText id="postalCode" formControlName="postalCode" maxlength="20" />
+          </div>
+
+          <div class="company-detail-panel__field">
+            <label for="regionCode" class="company-detail-panel__label">{{ texts.fieldRegionCodeLabel }}</label>
+            <input pInputText id="regionCode" formControlName="regionCode" maxlength="30" />
+          </div>
+
+          <div class="company-detail-panel__field">
+            <label for="countryCode" class="company-detail-panel__label">{{ texts.fieldCountryCodeLabel }}</label>
+            <input pInputText id="countryCode" formControlName="countryCode" placeholder="ESP" maxlength="3" />
+          </div>
+        </div>
+      }
+    </app-panel>
+  </div>
+
+  @if (!isViewMode()) {
+    <footer class="company-detail-panel__actions">
+      <app-ui-button
+        [label]="texts.formCancelAction"
+        severity="secondary"
+        [outlined]="true"
+        [disabled]="submitting()"
+        (pressed)="onCancel()"
+      />
+      <app-ui-button [type]="'submit'" [label]="texts.formSaveAction" [disabled]="submitting()" />
+    </footer>
+  }
+</form>

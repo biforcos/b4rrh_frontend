@@ -1,39 +1,64 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
-import { TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
-import { ButtonModule } from 'primeng/button';
 
 import { companyTexts } from '../company.texts';
 import { CompanyListItemModel } from '../models/company-list-item.model';
 import { CompanyBusinessKey } from '../models/company-ui-state.model';
+import { MasterListPanelComponent } from '../../../shared/ui/master-list-panel/master-list-panel.component';
+import { UiTagComponent } from '../../../shared/ui/tag/ui-tag.component';
 
 @Component({
   selector: 'app-company-list',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [TableModule, TagModule, ButtonModule],
+  imports: [MasterListPanelComponent, UiTagComponent],
   templateUrl: './company-list.component.html',
+  styleUrl: './company-list.component.scss',
 })
 export class CompanyListComponent {
   readonly companies = input.required<ReadonlyArray<CompanyListItemModel>>();
   readonly selectedKey = input<CompanyBusinessKey | null>(null);
   readonly loading = input(false);
+  readonly errorMessage = input<string | null>(null);
 
-  readonly editRequested = output<CompanyBusinessKey>();
+  readonly companySelected = output<CompanyBusinessKey>();
+  readonly newRequested = output<void>();
 
   protected readonly texts = companyTexts;
-  protected readonly tableCompanies = computed(() => [...this.companies()]);
-
-  protected isSelected(company: CompanyListItemModel): boolean {
+  protected readonly selectedListKey = computed(() => {
     const key = this.selectedKey();
-    if (!key) return false;
-    return key.ruleSystemCode === company.ruleSystemCode && key.companyCode === company.companyCode;
-  }
+    return key ? this.companyKey(key.ruleSystemCode, key.companyCode) : null;
+  });
 
-  protected requestEdit(company: CompanyListItemModel): void {
-    this.editRequested.emit({
+  protected readonly companyKeyOf = (item: CompanyListItemModel): string =>
+    this.companyKey(item.ruleSystemCode, item.companyCode);
+
+  protected readonly matchesCompanyQuery = (item: CompanyListItemModel, normalizedQuery: string): boolean => {
+    const haystack = [
+      item.companyCode,
+      item.ruleSystemCode,
+      item.name,
+      item.legalName,
+      item.taxIdentifier ?? '',
+      item.countryCode ?? '',
+    ]
+      .join(' ')
+      .toLowerCase();
+
+    return haystack.includes(normalizedQuery);
+  };
+
+  protected requestSelect(company: CompanyListItemModel): void {
+    this.companySelected.emit({
       ruleSystemCode: company.ruleSystemCode,
       companyCode: company.companyCode,
     });
+  }
+
+  protected requestCreate(): void {
+    this.newRequested.emit();
+  }
+
+  private companyKey(ruleSystemCode: string, companyCode: string): string {
+    return `${ruleSystemCode}::${companyCode}`;
   }
 }

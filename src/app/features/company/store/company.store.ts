@@ -50,7 +50,9 @@ export class CompanyStore {
 
   readonly isCreating = computed(() => this.draftState()?.mode === 'create');
   readonly isEditing = computed(() => this.draftState()?.mode === 'edit');
+  readonly isViewing = computed(() => this.selectedKeyState() !== null && this.draftState() === null);
   readonly hasActiveForm = computed(() => this.draftState() !== null);
+  readonly hasActiveDetail = computed(() => this.selectedKeyState() !== null || this.draftState() !== null);
 
   constructor() {
     this.loadList();
@@ -85,6 +87,16 @@ export class CompanyStore {
     this.modeState.set('creating');
   }
 
+  selectCompany(key: CompanyBusinessKey): void {
+    this.selectedKeyState.set(key);
+    this.draftState.set(null);
+    this.submitErrorState.set(null);
+    this.submitSuccessState.set(null);
+    this.modeState.set('viewing');
+
+    this.loadDetail(key);
+  }
+
   startEdit(key: CompanyBusinessKey): void {
     this.selectedKeyState.set(key);
     this.draftState.set({ mode: 'edit', key });
@@ -92,7 +104,9 @@ export class CompanyStore {
     this.submitSuccessState.set(null);
     this.modeState.set('editing');
 
-    this.loadDetail(key);
+    if (!this.selectedDetailState()) {
+      this.loadDetail(key);
+    }
   }
 
   cancelForm(): void {
@@ -101,7 +115,8 @@ export class CompanyStore {
 
     const currentDraft = this.draftState();
     if (currentDraft?.mode === 'edit' && currentDraft.key) {
-      this.modeState.set('editing');
+      this.draftState.set(null);
+      this.modeState.set('viewing');
       this.loadDetail(currentDraft.key);
       return;
     }
@@ -130,11 +145,11 @@ export class CompanyStore {
         next: (created) => {
           this.submittingState.set(false);
           this.submitSuccessState.set('created');
-          this.modeState.set('editing');
+          this.modeState.set('viewing');
           const key = { ruleSystemCode: created.ruleSystemCode, companyCode: created.companyCode };
           this.selectedKeyState.set(key);
           this.selectedDetailState.set(created);
-          this.draftState.set({ mode: 'edit', key });
+          this.draftState.set(null);
           this.loadList();
           this.loadDetail(key);
         },
@@ -163,8 +178,9 @@ export class CompanyStore {
         next: (updated) => {
           this.submittingState.set(false);
           this.submitSuccessState.set('updated');
-          this.modeState.set('editing');
+          this.modeState.set('viewing');
           this.selectedDetailState.set(updated);
+          this.draftState.set(null);
           this.loadList();
           this.loadDetail(key);
         },
@@ -193,6 +209,9 @@ export class CompanyStore {
         next: (detail) => {
           this.selectedDetailState.set(detail);
           this.detailLoadingState.set(false);
+          if (this.draftState() === null) {
+            this.modeState.set('viewing');
+          }
         },
         error: (err: HttpErrorResponse) => {
           this.detailLoadingState.set(false);

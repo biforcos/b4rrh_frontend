@@ -4,9 +4,17 @@ export const companyTexts = {
   newCompanyAction: 'Nueva empresa',
 
   listTitle: 'Listado de empresas',
+  listSubtitle: 'Explora el catálogo y abre la ficha de la empresa seleccionada.',
+  listSearchPlaceholder: 'Buscar por código, nombre o razón social',
   listLoadingMessage: 'Cargando empresas...',
   listLoadFailedMessage: 'No se pudo cargar el listado de empresas. Reintenta.',
   listEmptyMessage: 'No hay empresas registradas. Crea la primera empresa.',
+  listEmptySearchMessage: 'No hay empresas que coincidan con la búsqueda actual.',
+
+  listMetaTaxIdLabel: 'CIF/NIF',
+  listMetaCountryLabel: 'País',
+  listMetaStartDateLabel: 'Inicio',
+  emptyValueLabel: 'Sin dato',
 
   columnCodeLabel: 'Código',
   columnNameLabel: 'Nombre',
@@ -19,8 +27,22 @@ export const companyTexts = {
 
   formCreateTitle: 'Nueva empresa',
   formEditTitle: 'Editar empresa',
+  formViewTitle: 'Detalle de empresa',
   formSaveAction: 'Guardar',
   formCancelAction: 'Cancelar',
+  formEditAction: 'Editar',
+  draftLabel: 'Borrador',
+
+  detailPanelTitle: 'Ficha de empresa',
+  detailHeaderRuleSystemLabel: 'Sistema de reglas',
+  detailHeaderCompanyCodeLabel: 'Código empresa',
+  detailHeaderStartDateLabel: 'Fecha inicio',
+  detailViewEmptyValue: '—',
+  detailSectionIdentitySubtitle: 'Datos base de identificación y vigencia de la empresa.',
+  detailSectionFiscalSubtitle: 'Razón social y datos fiscales que enriquecen el agregado.',
+  detailSectionAddressSubtitle: 'Información de localización usada en la ficha de empresa.',
+  detailDescriptionEmpty: 'Sin descripción informada',
+  detailAddressEmpty: 'No hay dirección informada para esta empresa.',
 
   sectionIdentityTitle: 'Identificación',
   fieldRuleSystemCodeLabel: 'Sistema de reglas',

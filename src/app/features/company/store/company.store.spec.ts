@@ -95,11 +95,21 @@ describe('CompanyStore', () => {
     expect(store.submitSuccess()).toBe('created');
     expect(store.selectedKey()).toEqual({ ruleSystemCode: 'ESP', companyCode: 'ACME' });
     expect(store.selectedDetail()).toEqual(companyDetailFixture);
-    expect(store.isEditing()).toBe(true);
+    expect(store.isViewing()).toBe(true);
     expect(store.submitting()).toBe(false);
   });
 
+  it('loads company detail in view mode when selecting an item', () => {
+    store.selectCompany({ ruleSystemCode: 'ESP', companyCode: 'ACME' });
+
+    expect(gatewayMock.getCompany).toHaveBeenCalledWith({ ruleSystemCode: 'ESP', companyCode: 'ACME' });
+    expect(store.selectedDetail()).toEqual(companyDetailFixture);
+    expect(store.isViewing()).toBe(true);
+    expect(store.isEditing()).toBe(false);
+  });
+
   it('handles update success by refreshing list and detail from backend', () => {
+    store.selectCompany({ ruleSystemCode: 'ESP', companyCode: 'ACME' });
     store.startEdit({ ruleSystemCode: 'ESP', companyCode: 'ACME' });
 
     store.submitUpdate(
@@ -125,7 +135,19 @@ describe('CompanyStore', () => {
     expect(gatewayMock.getCompany).toHaveBeenCalledTimes(2);
     expect(store.submitSuccess()).toBe('updated');
     expect(store.selectedDetail()).toEqual(companyDetailFixture);
+    expect(store.isViewing()).toBe(true);
     expect(store.submitting()).toBe(false);
+  });
+
+  it('cancelForm returns from edit mode to view mode and reloads backend detail', () => {
+    store.selectCompany({ ruleSystemCode: 'ESP', companyCode: 'ACME' });
+    store.startEdit({ ruleSystemCode: 'ESP', companyCode: 'ACME' });
+
+    store.cancelForm();
+
+    expect(gatewayMock.getCompany).toHaveBeenCalledTimes(2);
+    expect(store.isViewing()).toBe(true);
+    expect(store.isEditing()).toBe(false);
   });
 
   it('exposes backend validation error message on create failure', () => {

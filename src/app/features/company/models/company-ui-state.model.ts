@@ -1,4 +1,4 @@
-export type CompanyUiMode = 'idle' | 'creating' | 'editing' | 'submitting' | 'error';
+export type CompanyUiMode = 'idle' | 'viewing' | 'creating' | 'editing' | 'submitting' | 'error';
 
 export interface CompanyBusinessKey {
   ruleSystemCode: string;

@@ -1,108 +1,33 @@
-.company-page {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  padding: 1.5rem;
+:host {
+  display: block;
+  min-height: 0;
   height: 100%;
 }
 
-.company-page__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.company-page__title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin: 0;
-}
-
-.company-page__subtitle {
-  margin: 0.25rem 0 0;
-  color: var(--p-text-muted-color, #6c757d);
-  font-size: 0.875rem;
-}
-
 .company-page__feedback {
-  padding: 0.5rem 0.75rem;
-  border-radius: 4px;
-  font-size: 0.875rem;
+  margin: 0;
+  padding: 0.7rem 0.82rem;
+  border-radius: 0.72rem;
+  font-size: 0.82rem;
+  line-height: 1.4;
 
   &--loading {
-    color: var(--p-text-muted-color, #6c757d);
+    color: #365169;
+    border: 1px solid #d5e2ef;
+    background: #f5faff;
   }
 
   &--error {
-    color: var(--p-red-500, #ef4444);
-    background-color: var(--p-red-50, #fef2f2);
-    border: 1px solid var(--p-red-200, #fecaca);
+    color: #7b1f1f;
+    background-color: #fff5f5;
+    border: 1px solid #fecaca;
   }
 }
 
-.company-page__layout {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
+.company-page__detail-slot {
   min-height: 0;
-  flex: 1;
-
-  @media (max-width: 1024px) {
-    grid-template-columns: 1fr;
-  }
 }
 
-.company-page__panel-title {
-  font-size: 1rem;
-  font-weight: 600;
-  margin: 0 0 1rem;
-}
-
-.company-page__list-panel,
-.company-page__form-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  overflow: auto;
-}
-
-.company-page__empty-form {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding: 2rem;
-  text-align: center;
-  color: var(--p-text-muted-color, #6c757d);
-  border: 1px dashed var(--p-content-border-color, #dee2e6);
-  border-radius: 6px;
-}
-
-.company-page__empty-form-title {
-  font-size: 1rem;
-  font-weight: 500;
-  margin: 0;
-}
-
-.company-page__empty-form-desc {
-  font-size: 0.875rem;
-  margin: 0;
-}
-
-// company-list styles
-::ng-deep .company-list__row--selected > td {
-  background-color: var(--p-highlight-bg, #e8f4fd) !important;
-}
-
-::ng-deep .company-list__code {
-  font-family: monospace;
-  font-size: 0.875rem;
-}
-
-::ng-deep .company-list__empty {
-  text-align: center;
-  color: var(--p-text-muted-color, #6c757d);
-  padding: 1.5rem;
-  font-style: italic;
+.company-page__detail-slot app-panel {
+  display: block;
 }
