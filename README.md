@@ -51,7 +51,7 @@ El frontend usa [proxy.conf.json](proxy.conf.json) para reenviar rutas de backen
 
 El contrato fuente de verdad esta en el backend:
 
-- ../b4rrh_backend/openapi/personnel-administration-api.yaml
+- ../b4rrhh_backend/openapi/personnel-administration-api.yaml
 
 No se copia manualmente.
 Se sincroniza automaticamente en:

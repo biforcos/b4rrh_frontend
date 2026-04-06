@@ -6,7 +6,7 @@ const scriptDirectory = path.dirname(fileURLToPath(import.meta.url));
 const workspaceRoot = path.resolve(scriptDirectory, '../..');
 const backendContractPath = path.resolve(
   workspaceRoot,
-  '../b4rrh_backend/openapi/personnel-administration-api.yaml',
+  '../b4rrhh_backend/openapi/personnel-administration-api.yaml',
 );
 const localContractDirectory = path.resolve(workspaceRoot, 'openapi');
 const localContractPath = path.resolve(localContractDirectory, 'personnel-administration-api.yaml');
