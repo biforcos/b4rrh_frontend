@@ -26,19 +26,19 @@ describe('EmployeeFieldCatalogService', () => {
         {
           fieldCode: 'companyCode',
           catalogKind: CatalogFieldBindingResponseCatalogKindEnum.Direct,
-          ruleEntityTypeCode: 'EMPLOYEE_COMPANY',
+          ruleEntityTypeCode: 'COMPANY',
           active: true,
         },
         {
           fieldCode: 'entryReasonCode',
           catalogKind: CatalogFieldBindingResponseCatalogKindEnum.Direct,
-          ruleEntityTypeCode: 'EMPLOYEE_ENTRY_REASON',
+          ruleEntityTypeCode: 'EMPLOYEE_PRESENCE_ENTRY_REASON',
           active: true,
         },
         {
           fieldCode: 'exitReasonCode',
           catalogKind: CatalogFieldBindingResponseCatalogKindEnum.Direct,
-          ruleEntityTypeCode: 'EMPLOYEE_EXIT_REASON',
+          ruleEntityTypeCode: 'EMPLOYEE_PRESENCE_EXIT_REASON',
           active: true,
         },
       ],
@@ -46,7 +46,7 @@ describe('EmployeeFieldCatalogService', () => {
         {
           fieldCode: 'workCenterCode',
           catalogKind: CatalogFieldBindingResponseCatalogKindEnum.Direct,
-          ruleEntityTypeCode: 'EMPLOYEE_WORK_CENTER',
+          ruleEntityTypeCode: 'WORK_CENTER',
           active: true,
         },
       ],
@@ -85,7 +85,7 @@ describe('EmployeeFieldCatalogService', () => {
           endDate: null,
         },
       ],
-      EMPLOYEE_COMPANY: [
+      COMPANY: [
         {
           code: 'COMP-ES',
           name: 'Compania Espana',
@@ -94,7 +94,7 @@ describe('EmployeeFieldCatalogService', () => {
           endDate: null,
         },
       ],
-      EMPLOYEE_ENTRY_REASON: [
+      EMPLOYEE_PRESENCE_ENTRY_REASON: [
         {
           code: 'HIRE',
           name: 'Alta inicial',
@@ -103,7 +103,7 @@ describe('EmployeeFieldCatalogService', () => {
           endDate: null,
         },
       ],
-      EMPLOYEE_EXIT_REASON: [
+      EMPLOYEE_PRESENCE_EXIT_REASON: [
         {
           code: 'END',
           name: 'Fin de relacion',
@@ -112,7 +112,7 @@ describe('EmployeeFieldCatalogService', () => {
           endDate: null,
         },
       ],
-      EMPLOYEE_WORK_CENTER: [
+      WORK_CENTER: [
         {
           code: 'MADRID-01',
           name: 'Madrid Centro',
@@ -197,7 +197,7 @@ describe('EmployeeFieldCatalogService', () => {
     expect(apiMock.getDirectCatalogOptions).toHaveBeenCalledTimes(1);
   });
 
-  it('returns empty options when binding is missing for expected field', () => {
+  it('emits an error when binding is missing for expected field', () => {
     apiMock.getCatalogBindingsByResourceCode.mockReturnValue(
       of({
         resourceCode: 'employee.contact',
@@ -206,25 +206,39 @@ describe('EmployeeFieldCatalogService', () => {
     );
 
     let result: ReadonlyArray<{ value: string; label: string }> = [];
+    let thrownMessage: string | null = null;
 
-    service.loadContactTypeOptions('PA-ES').subscribe((options) => {
-      result = options;
+    service.loadContactTypeOptions('PA-ES').subscribe({
+      next: (options) => {
+        result = options;
+      },
+      error: (error: Error) => {
+        thrownMessage = error.message;
+      },
     });
 
     expect(result).toEqual([]);
+    expect(thrownMessage).toBe('Missing active DIRECT binding for employee.contact.contactTypeCode.');
     expect(apiMock.getDirectCatalogOptions).not.toHaveBeenCalled();
   });
 
-  it('returns empty options when direct catalog request fails', () => {
+  it('emits an error when direct catalog request fails', () => {
     apiMock.getDirectCatalogOptions.mockReturnValue(throwError(() => new Error('backend unavailable')));
 
     let result: ReadonlyArray<{ value: string; label: string }> = [];
+    let thrownMessage: string | null = null;
 
-    service.loadContactTypeOptions('PA-ES').subscribe((options) => {
-      result = options;
+    service.loadContactTypeOptions('PA-ES').subscribe({
+      next: (options) => {
+        result = options;
+      },
+      error: (error: Error) => {
+        thrownMessage = error.message;
+      },
     });
 
     expect(result).toEqual([]);
+    expect(thrownMessage).toBe('backend unavailable');
   });
 
   it('loads presence DIRECT options for company, entry reason and exit reason from employee.presence bindings', () => {
@@ -249,15 +263,15 @@ describe('EmployeeFieldCatalogService', () => {
     });
     expect(apiMock.getDirectCatalogOptions).toHaveBeenCalledWith({
       ruleSystemCode: 'PA-ES',
-      ruleEntityTypeCode: 'EMPLOYEE_COMPANY',
+      ruleEntityTypeCode: 'COMPANY',
     });
     expect(apiMock.getDirectCatalogOptions).toHaveBeenCalledWith({
       ruleSystemCode: 'PA-ES',
-      ruleEntityTypeCode: 'EMPLOYEE_ENTRY_REASON',
+      ruleEntityTypeCode: 'EMPLOYEE_PRESENCE_ENTRY_REASON',
     });
     expect(apiMock.getDirectCatalogOptions).toHaveBeenCalledWith({
       ruleSystemCode: 'PA-ES',
-      ruleEntityTypeCode: 'EMPLOYEE_EXIT_REASON',
+      ruleEntityTypeCode: 'EMPLOYEE_PRESENCE_EXIT_REASON',
     });
 
     expect(companyResult).toEqual([{ value: 'COMP-ES', label: 'Compania Espana · COMP-ES' }]);
@@ -284,7 +298,7 @@ describe('EmployeeFieldCatalogService', () => {
   it('returns empty options for one presence field without affecting the others', () => {
     apiMock.getDirectCatalogOptions.mockImplementation(
       ({ ruleSystemCode, ruleEntityTypeCode }: { ruleSystemCode: string; ruleEntityTypeCode: string }) => {
-        if (ruleEntityTypeCode === 'EMPLOYEE_EXIT_REASON') {
+        if (ruleEntityTypeCode === 'EMPLOYEE_PRESENCE_EXIT_REASON') {
           return of({
             ruleSystemCode,
             ruleEntityTypeCode,
@@ -294,7 +308,7 @@ describe('EmployeeFieldCatalogService', () => {
         }
 
         const itemsByEntity: Record<string, ReadonlyArray<unknown>> = {
-          EMPLOYEE_COMPANY: [
+          COMPANY: [
             {
               code: 'COMP-ES',
               name: 'Compania Espana',
@@ -303,7 +317,7 @@ describe('EmployeeFieldCatalogService', () => {
               endDate: null,
             },
           ],
-          EMPLOYEE_ENTRY_REASON: [
+          EMPLOYEE_PRESENCE_ENTRY_REASON: [
             {
               code: 'HIRE',
               name: 'Alta inicial',
@@ -356,7 +370,7 @@ describe('EmployeeFieldCatalogService', () => {
     });
     expect(apiMock.getDirectCatalogOptions).toHaveBeenCalledWith({
       ruleSystemCode: 'PA-ES',
-      ruleEntityTypeCode: 'EMPLOYEE_WORK_CENTER',
+      ruleEntityTypeCode: 'WORK_CENTER',
     });
     expect(result).toEqual([{ value: 'MADRID-01', label: 'Madrid Centro · MADRID-01' }]);
   });
