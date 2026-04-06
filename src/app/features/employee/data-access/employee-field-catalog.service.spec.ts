@@ -18,7 +18,7 @@ describe('EmployeeFieldCatalogService', () => {
         {
           fieldCode: 'contactTypeCode',
           catalogKind: CatalogFieldBindingResponseCatalogKindEnum.Direct,
-          ruleEntityTypeCode: 'EMPLOYEE_CONTACT_TYPE',
+          ruleEntityTypeCode: 'CONTACT_TYPE',
           active: true,
         },
       ],
@@ -69,7 +69,7 @@ describe('EmployeeFieldCatalogService', () => {
     };
 
     const directItemsByEntity: Record<string, ReadonlyArray<unknown>> = {
-      EMPLOYEE_CONTACT_TYPE: [
+      CONTACT_TYPE: [
         {
           code: 'WORK_EMAIL',
           name: 'Correo laboral',
@@ -179,7 +179,7 @@ describe('EmployeeFieldCatalogService', () => {
     });
     expect(apiMock.getDirectCatalogOptions).toHaveBeenCalledWith({
       ruleSystemCode: 'PA-ES',
-      ruleEntityTypeCode: 'EMPLOYEE_CONTACT_TYPE',
+      ruleEntityTypeCode: 'CONTACT_TYPE',
     });
     expect(result).toEqual([
       {
