@@ -1,7 +1,8 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, forkJoin, map, switchMap, throwError } from 'rxjs';
+import { Observable, map, throwError } from 'rxjs';
 
 import { DefaultService as PersonnelApiService } from '../../../core/api/generated/api/default.service';
+import { CostCenterDistributionWindowResponse } from '../../../core/api/generated/model/models';
 import { EmployeeBusinessKey } from '../models/employee-business-key.model';
 import {
   EmployeeCostCenterHistoryModel,
@@ -25,64 +26,62 @@ export class EmployeeCostCenterGateway {
 
   readCurrentDistribution(key: EmployeeBusinessKey): Observable<EmployeeCostCenterWindowModel | null> {
     return this.personnelApiService
-      .listEmployeeCostCentersByBusinessKey({
+      .getCurrentCostCenterDistribution({
         ruleSystemCode: key.ruleSystemCode,
         employeeTypeCode: key.employeeTypeCode,
         employeeNumber: key.employeeNumber,
       })
-      .pipe(map((response) => mapCostCenterResponsesToHistoryModel(response).currentDistribution ?? null));
+      .pipe(
+        map((response) =>
+          response.currentDistribution ? mapCostCenterResponsesToWindowModel(response.currentDistribution) : null,
+        ),
+      );
   }
 
   readDistributionHistory(key: EmployeeBusinessKey): Observable<EmployeeCostCenterHistoryModel> {
     return this.personnelApiService
-      .listEmployeeCostCentersByBusinessKey({
+      .listCostCenterDistributionHistory({
         ruleSystemCode: key.ruleSystemCode,
         employeeTypeCode: key.employeeTypeCode,
         employeeNumber: key.employeeNumber,
       })
-      .pipe(map((response) => mapCostCenterResponsesToHistoryModel(response)));
+      .pipe(map((response) => mapCostCenterResponsesToHistoryModel(response.windows)));
   }
 
   createDistribution(
     key: EmployeeBusinessKey,
     draft: CostCenterDistributionCreateDraft,
   ): Observable<EmployeeCostCenterWindowModel> {
-    const requests = mapCostCenterDistributionCreateDraftToRequests(draft);
-    if (!requests.length) {
+    if (!draft.items.length) {
       return throwError(() => new Error('Cost center distribution requires at least one item.'));
     }
 
-    return forkJoin(
-      requests.map((request) =>
-        this.personnelApiService.createCostCenterByBusinessKey({
-          ruleSystemCode: key.ruleSystemCode,
-          employeeTypeCode: key.employeeTypeCode,
-          employeeNumber: key.employeeNumber,
-          createCostCenterRequest: request,
-        }),
-      ),
-    ).pipe(map((responses) => mapCostCenterResponsesToWindowModel(responses, draft.startDate, null)));
+    return this.personnelApiService
+      .createCostCenterDistribution({
+        ruleSystemCode: key.ruleSystemCode,
+        employeeTypeCode: key.employeeTypeCode,
+        employeeNumber: key.employeeNumber,
+        createCostCenterDistributionRequest: mapCostCenterDistributionCreateDraftToRequests(draft),
+      })
+      .pipe(map((response) => mapCostCenterResponsesToWindowModel(response)));
   }
 
   replaceDistribution(
     key: EmployeeBusinessKey,
     draft: CostCenterDistributionReplaceDraft,
   ): Observable<EmployeeCostCenterWindowModel> {
-    const requests = mapCostCenterDistributionReplaceDraftToRequests(draft);
-    if (!requests.length) {
+    if (!draft.items.length) {
       return throwError(() => new Error('Cost center distribution requires at least one item.'));
     }
 
-    return forkJoin(
-      requests.map((request) =>
-        this.personnelApiService.createCostCenterByBusinessKey({
-          ruleSystemCode: key.ruleSystemCode,
-          employeeTypeCode: key.employeeTypeCode,
-          employeeNumber: key.employeeNumber,
-          createCostCenterRequest: request,
-        }),
-      ),
-    ).pipe(map((responses) => mapCostCenterResponsesToWindowModel(responses, draft.effectiveDate, null)));
+    return this.personnelApiService
+      .replaceCostCenterDistributionFromDate({
+        ruleSystemCode: key.ruleSystemCode,
+        employeeTypeCode: key.employeeTypeCode,
+        employeeNumber: key.employeeNumber,
+        replaceCostCenterDistributionFromDateRequest: mapCostCenterDistributionReplaceDraftToRequests(draft),
+      })
+      .pipe(map((response) => mapCostCenterResponsesToWindowModel(response)));
   }
 
   closeDistribution(
@@ -91,37 +90,13 @@ export class EmployeeCostCenterGateway {
     endDate: string,
   ): Observable<EmployeeCostCenterWindowModel> {
     return this.personnelApiService
-      .listEmployeeCostCentersByBusinessKey({
+      .closeCostCenterDistribution({
         ruleSystemCode: key.ruleSystemCode,
         employeeTypeCode: key.employeeTypeCode,
         employeeNumber: key.employeeNumber,
+        startDate,
+        closeCostCenterDistributionRequest: mapCostCenterDistributionCloseDateToRequest(endDate),
       })
-      .pipe(
-        map((responses) =>
-          responses.filter((response) => {
-            const responseEndDate = response.endDate ?? null;
-            return response.startDate === startDate && responseEndDate === null;
-          }),
-        ),
-        switchMap((openWindowItems) => {
-          if (!openWindowItems.length) {
-            return throwError(() => new Error(`No active cost center window found for startDate ${startDate}.`));
-          }
-
-          return forkJoin(
-            openWindowItems.map((item) =>
-              this.personnelApiService.closeCostCenterByBusinessKey({
-                ruleSystemCode: key.ruleSystemCode,
-                employeeTypeCode: key.employeeTypeCode,
-                employeeNumber: key.employeeNumber,
-                costCenterCode: item.costCenterCode,
-                startDate,
-                closeCostCenterRequest: mapCostCenterDistributionCloseDateToRequest(endDate),
-              }),
-            ),
-          );
-        }),
-        map((responses) => mapCostCenterResponsesToWindowModel(responses, startDate, endDate)),
-      );
+      .pipe(map((response: CostCenterDistributionWindowResponse) => mapCostCenterResponsesToWindowModel(response)));
   }
 }
