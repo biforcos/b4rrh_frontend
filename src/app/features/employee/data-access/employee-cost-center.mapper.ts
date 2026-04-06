@@ -1,12 +1,7 @@
 import {
-  CostCenterCurrentDistributionResponse,
-  CostCenterDistributionHistoryResponse,
-  CostCenterDistributionWindowResponse,
-  CreateCostCenterDistributionRequest,
-  ReplaceCostCenterDistributionFromDateRequest,
-  CloseCostCenterDistributionRequest,
-  CostCenterDistributionItemResponse,
-  CostCenterDistributionItemRequest,
+  CostCenterResponse,
+  CreateCostCenterRequest,
+  CloseCostCenterRequest,
 } from '../../../core/api/generated/model/models';
 import {
   EmployeeCostCenterHistoryModel,
@@ -29,16 +24,35 @@ export interface CostCenterDistributionReplaceDraft {
   items: ReadonlyArray<CostCenterDistributionItemDraft>;
 }
 
-export function mapCostCenterCurrentDistributionResponseToModel(
-  response: CostCenterCurrentDistributionResponse,
-): EmployeeCostCenterWindowModel | null {
-  return response.currentDistribution ? mapCostCenterDistributionWindowResponseToModel(response.currentDistribution) : null;
-}
-
-export function mapCostCenterDistributionHistoryResponseToModel(
-  response: CostCenterDistributionHistoryResponse,
+export function mapCostCenterResponsesToHistoryModel(
+  responses: ReadonlyArray<CostCenterResponse>,
 ): EmployeeCostCenterHistoryModel {
-  const history = response.windows.map((window) => mapCostCenterDistributionWindowResponseToModel(window));
+  const windowsByPeriod = new Map<string, EmployeeCostCenterWindowModel>();
+
+  for (const response of responses) {
+    const key = `${response.startDate}|${response.endDate ?? ''}`;
+    const existing = windowsByPeriod.get(key);
+
+    if (existing) {
+      existing.totalAllocationPercentage += response.allocationPercentage;
+      existing.items = [...existing.items, mapCostCenterResponseToItemModel(response)];
+      continue;
+    }
+
+    windowsByPeriod.set(key, {
+      startDate: response.startDate,
+      endDate: response.endDate ?? null,
+      totalAllocationPercentage: response.allocationPercentage,
+      items: [mapCostCenterResponseToItemModel(response)],
+    });
+  }
+
+  const history = Array.from(windowsByPeriod.values()).sort((a, b) => {
+    if (a.startDate !== b.startDate) return b.startDate.localeCompare(a.startDate);
+    const aEnd = a.endDate ?? '';
+    const bEnd = b.endDate ?? '';
+    return bEnd.localeCompare(aEnd);
+  });
   const current = history.find((w) => !w.endDate) ?? null;
 
   return {
@@ -47,55 +61,61 @@ export function mapCostCenterDistributionHistoryResponseToModel(
   };
 }
 
-export function mapCostCenterDistributionWindowResponseToModel(
-  response: CostCenterDistributionWindowResponse,
+export function mapCostCenterResponsesToWindowModel(
+  responses: ReadonlyArray<CostCenterResponse>,
+  startDate: string,
+  endDate: string | null,
 ): EmployeeCostCenterWindowModel {
+  const items = responses.map((response) => mapCostCenterResponseToItemModel(response));
+
   return {
-    startDate: response.startDate,
-    endDate: response.endDate ?? null,
-    totalAllocationPercentage: response.totalAllocationPercentage,
-    items: response.items.map((item) => mapCostCenterDistributionItemResponseToModel(item)),
+    startDate,
+    endDate,
+    totalAllocationPercentage: items.reduce((acc, item) => acc + item.allocationPercentage, 0),
+    items,
   };
 }
 
-function mapCostCenterDistributionItemResponseToModel(
-  response: CostCenterDistributionItemResponse,
+function mapCostCenterResponseToItemModel(
+  response: CostCenterResponse,
 ): EmployeeCostCenterItemModel {
   return {
     costCenterCode: response.costCenterCode,
-    costCenterName: response.costCenterName ?? '',
+    costCenterName: '',
     allocationPercentage: response.allocationPercentage,
   };
 }
 
-export function mapCostCenterDistributionCreateDraftToRequest(
+export function mapCostCenterDistributionCreateDraftToRequests(
   draft: CostCenterDistributionCreateDraft,
-): CreateCostCenterDistributionRequest {
-  return {
+): ReadonlyArray<CreateCostCenterRequest> {
+  return draft.items.map((item) => ({
+    ...mapCostCenterDistributionItemDraftToRequest(item),
     startDate: draft.startDate,
-    items: draft.items.map((item) => mapCostCenterDistributionItemDraftToRequest(item)),
-  };
+    endDate: null,
+  }));
 }
 
-export function mapCostCenterDistributionReplaceDraftToRequest(
+export function mapCostCenterDistributionReplaceDraftToRequests(
   draft: CostCenterDistributionReplaceDraft,
-): ReplaceCostCenterDistributionFromDateRequest {
-  return {
-    effectiveDate: draft.effectiveDate,
-    items: draft.items.map((item) => mapCostCenterDistributionItemDraftToRequest(item)),
-  };
+): ReadonlyArray<CreateCostCenterRequest> {
+  return draft.items.map((item) => ({
+    ...mapCostCenterDistributionItemDraftToRequest(item),
+    startDate: draft.effectiveDate,
+    endDate: null,
+  }));
 }
 
 function mapCostCenterDistributionItemDraftToRequest(
   draft: CostCenterDistributionItemDraft,
-): CostCenterDistributionItemRequest {
+): Pick<CreateCostCenterRequest, 'costCenterCode' | 'allocationPercentage'> {
   return {
     costCenterCode: draft.costCenterCode.trim().toUpperCase(),
     allocationPercentage: draft.allocationPercentage,
   };
 }
 
-export function mapCostCenterDistributionCloseDateToRequest(endDate: string): CloseCostCenterDistributionRequest {
+export function mapCostCenterDistributionCloseDateToRequest(endDate: string): CloseCostCenterRequest {
   return {
     endDate: endDate.trim(),
   };

@@ -12,28 +12,33 @@ export function mapDraftToHireRequest(draft: HireEmployeeDraft): HireEmployeeReq
     lastName2: draft.lastName2 || null,
     preferredName: draft.preferredName || null,
     hireDate: draft.hireDate,
-    entryReasonCode: draft.entryReasonCode,
-    companyCode: draft.companyCode,
-    workCenterCode: draft.workCenterCode,
+    presence: {
+      entryReasonCode: draft.entryReasonCode,
+      companyCode: draft.companyCode,
+    },
     laborClassification: {
       agreementCode: draft.agreementCode,
       agreementCategoryCode: draft.agreementCategoryCode,
     },
     contract: {
       contractTypeCode: draft.contractTypeCode,
-      contractSubtypeCode: draft.contractSubtypeCode || null,
+      contractSubtypeCode: draft.contractSubtypeCode || '',
     },
-    ...(draft.costCenterDistribution && { costCenterDistribution: draft.costCenterDistribution })
+    workCenter: {
+      workCenterCode: draft.workCenterCode,
+    },
   };
 }
 
 export function mapResponseToResult(response: HireEmployeeResponse): HireEmployeeResult {
+  const displayNameParts = [response.preferredName ?? response.firstName, response.lastName1, response.lastName2 ?? ''];
+
   return {
     employeeKey: {
-      ruleSystemCode: response.employee.ruleSystemCode,
-      employeeTypeCode: response.employee.employeeTypeCode,
-      employeeNumber: response.employee.employeeNumber
+      ruleSystemCode: response.ruleSystemCode,
+      employeeTypeCode: response.employeeTypeCode,
+      employeeNumber: response.employeeNumber,
     },
-    displayName: response.employee.displayName
+    displayName: displayNameParts.join(' ').trim(),
   };
 }
