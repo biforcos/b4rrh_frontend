@@ -1,0 +1,137 @@
+.work-center-detail-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.work-center-detail-panel__sections {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.work-center-detail-panel__grid,
+.work-center-detail-panel__view-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem 1rem;
+}
+
+.work-center-detail-panel__field,
+.work-center-detail-panel__view-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.work-center-detail-panel__field--full,
+.work-center-detail-panel__view-item--full {
+  grid-column: 1 / -1;
+}
+
+.work-center-detail-panel__label,
+.work-center-detail-panel__view-label {
+  font-size: 0.82rem;
+  color: #64748b;
+}
+
+.work-center-detail-panel__view-value--soft,
+.work-center-detail-panel__empty-copy {
+  color: #64748b;
+}
+
+.work-center-detail-panel__required {
+  color: #be123c;
+}
+
+.work-center-detail-panel__actions,
+.work-center-detail-panel__contact-editor-actions,
+.work-center-detail-panel__contacts-toolbar,
+.work-center-detail-panel__contact-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.work-center-detail-panel__contact-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.work-center-detail-panel__contact-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.9rem;
+  background: #f8fafc;
+}
+
+.work-center-detail-panel__contact-card--editing {
+  border-color: #cbd5e1;
+  background: #eef6ff;
+}
+
+.work-center-detail-panel__contact-main,
+.work-center-detail-panel__contact-labels {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.work-center-detail-panel__contact-main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.work-center-detail-panel__contact-name {
+  font-weight: 600;
+}
+
+.work-center-detail-panel__contact-number {
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.work-center-detail-panel__contact-value {
+  word-break: break-word;
+}
+
+.work-center-detail-panel__contact-editor {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.work-center-detail-panel__contact-editor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.9rem;
+}
+
+.work-center-detail-panel__contact-editor-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.work-center-detail-panel__empty-copy--error {
+  color: #9f1239;
+}
+
+@media (max-width: 900px) {
+  .work-center-detail-panel__grid,
+  .work-center-detail-panel__view-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .work-center-detail-panel__contact-card {
+    flex-direction: column;
+  }
+}

@@ -1,7 +1,7 @@
 import {
   CloseWorkCenterRequest,
-  CreateWorkCenterRequest,
-  UpdateWorkCenterRequest,
+  EmployeeCreateWorkCenterRequest,
+  EmployeeUpdateWorkCenterRequest,
 } from '../../../core/api/generated/model/models';
 import { EmployeeWorkCenterModel } from '../models/employee-work-center.model';
 import { TemporalRowViewModel } from '../shared/ui/section/temporal-section.model';
@@ -51,7 +51,7 @@ export function mapEmployeeWorkCenterModelToTemporalRow(
   };
 }
 
-export function mapWorkCenterCreateDraftToRequest(draft: WorkCenterCreateDraft): CreateWorkCenterRequest {
+export function mapWorkCenterCreateDraftToRequest(draft: WorkCenterCreateDraft): EmployeeCreateWorkCenterRequest {
   return {
     workCenterCode: normalizeCode(draft.workCenterCode),
     startDate: normalizeRequiredValue(draft.startDate),
@@ -59,7 +59,7 @@ export function mapWorkCenterCreateDraftToRequest(draft: WorkCenterCreateDraft):
   };
 }
 
-export function mapWorkCenterCorrectDraftToRequest(draft: WorkCenterCorrectDraft): UpdateWorkCenterRequest {
+export function mapWorkCenterCorrectDraftToRequest(draft: WorkCenterCorrectDraft): EmployeeUpdateWorkCenterRequest {
   return {
     workCenterCode: normalizeCode(draft.workCenterCode),
     startDate: normalizeRequiredValue(draft.startDate),

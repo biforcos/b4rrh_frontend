@@ -26,15 +26,7 @@ export const routes: Routes = [
 			},
 			{
 				path: 'organizacion/centros-trabajo',
-				loadComponent: () =>
-					import('./core/layout/pages/section-placeholder-page.component').then(
-						(m) => m.SectionPlaceholderPageComponent,
-					),
-				data: {
-					title: 'Centros de trabajo',
-					description:
-						'Seccion base preparada para gestionar centros de trabajo por estructura organizativa.',
-				},
+				loadChildren: () => import('./features/work-center/work-center.routes').then((m) => m.workCenterRoutes),
 			},
 			{
 				path: 'organizacion/centros-coste',

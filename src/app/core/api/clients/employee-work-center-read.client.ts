@@ -5,8 +5,10 @@ import { Observable, catchError, map, of, throwError } from 'rxjs';
 import { DefaultService } from '../generated/api/default.service';
 import {
   CloseWorkCenterRequest,
-  CreateWorkCenterRequest,
-  UpdateWorkCenterRequest,
+  CreateWorkCenterRequest as CanonicalCreateWorkCenterRequest,
+  EmployeeCreateWorkCenterRequest,
+  EmployeeUpdateWorkCenterRequest,
+  UpdateWorkCenterRequest as CanonicalUpdateWorkCenterRequest,
   WorkCenterResponse,
 } from '../generated/model/models';
 import { EmployeeBusinessKeyApiQuery } from './employee-read.client';
@@ -68,7 +70,7 @@ export class EmployeeWorkCenterReadClient {
 
   createWorkCenterByBusinessKey(
     key: EmployeeBusinessKeyApiQuery,
-    request: CreateWorkCenterRequest,
+    request: EmployeeCreateWorkCenterRequest,
   ): Observable<EmployeeWorkCenterApiModel> {
     const normalizedKey = this.normalizeKey(key);
 
@@ -79,7 +81,7 @@ export class EmployeeWorkCenterReadClient {
           workCenterCode: request.workCenterCode.trim().toUpperCase(),
           startDate: request.startDate.trim(),
           endDate: this.normalizeOptionalValue(request.endDate),
-        },
+        } as unknown as CanonicalCreateWorkCenterRequest,
       })
       .pipe(map((workCenter) => this.toEmployeeWorkCenterApiModel(workCenter)));
   }
@@ -105,7 +107,7 @@ export class EmployeeWorkCenterReadClient {
   updateWorkCenterByBusinessKey(
     key: EmployeeBusinessKeyApiQuery,
     workCenterAssignmentNumber: number,
-    request: UpdateWorkCenterRequest,
+    request: EmployeeUpdateWorkCenterRequest,
   ): Observable<EmployeeWorkCenterApiModel> {
     const normalizedKey = this.normalizeKey(key);
 
@@ -117,7 +119,7 @@ export class EmployeeWorkCenterReadClient {
           workCenterCode: request.workCenterCode.trim().toUpperCase(),
           startDate: request.startDate.trim(),
           endDate: this.normalizeOptionalValue(request.endDate),
-        },
+        } as unknown as CanonicalUpdateWorkCenterRequest,
       })
       .pipe(map((workCenter) => this.toEmployeeWorkCenterApiModel(workCenter)));
   }
@@ -150,10 +152,15 @@ export class EmployeeWorkCenterReadClient {
   }
 
   private toEmployeeWorkCenterApiModel(source: WorkCenterResponse): EmployeeWorkCenterApiModel {
-    const sourceWithDeleteCapabilities = source as WorkCenterResponseWithDeleteCapabilities;
+    const sourceWithDeleteCapabilities = source as WorkCenterResponseWithDeleteCapabilities & {
+      workCenterAssignmentNumber: number;
+      workCenterCode: string;
+      startDate: string;
+      endDate?: string | null;
+    };
 
     return {
-      workCenterAssignmentNumber: source.workCenterAssignmentNumber,
+      workCenterAssignmentNumber: sourceWithDeleteCapabilities.workCenterAssignmentNumber,
       workCenterCode: source.workCenterCode,
       workCenterName: this.normalizeOptionalValue(sourceWithDeleteCapabilities.workCenterName),
       startDate: source.startDate,

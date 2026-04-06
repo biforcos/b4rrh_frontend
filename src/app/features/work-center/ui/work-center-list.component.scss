@@ -1,0 +1,48 @@
+.work-center-list__identity-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.work-center-list__name {
+  font-weight: 600;
+}
+
+.work-center-list__company {
+  color: #64748b;
+  font-size: 0.92rem;
+}
+
+.work-center-list__chips {
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.work-center-list__meta-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem 1rem;
+  margin: 0;
+}
+
+.work-center-list__meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.work-center-list__meta-item--full {
+  grid-column: 1 / -1;
+}
+
+.work-center-list__meta-item dt {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.work-center-list__meta-item dd {
+  margin: 0;
+}

@@ -1,0 +1,50 @@
+<app-master-list-panel
+  [title]="''"
+  [subtitle]="texts.listSubtitle"
+  [items]="visibleWorkCenters()"
+  [loading]="loading()"
+  [errorMessage]="errorMessage()"
+  [emptyState]="{ title: texts.listTitle, description: texts.listEmptyMessage }"
+  [primaryActionLabel]="texts.newWorkCenterAction"
+  [searchPlaceholder]="texts.listSearchPlaceholder"
+  [searchValue]="searchValue()"
+  [selectedItemKey]="selectedListKey()"
+  [itemKey]="workCenterKeyOf"
+  [listAriaLabel]="texts.listTitle"
+  (createNew)="requestCreate()"
+  (itemSelected)="requestSelect($event)"
+  (searchValueChange)="updateSearchValue($event)"
+>
+  <ng-template let-workCenter let-selected="selected">
+    <app-list-item
+      [selected]="selected"
+      [status]="workCenter.active ? texts.activeLabel : texts.inactiveLabel"
+      [statusSeverity]="workCenter.active ? 'success' : 'warn'"
+    >
+      <div listItemHeader class="work-center-list__identity-block">
+        <span class="work-center-list__name">{{ workCenter.name }}</span>
+        <span class="work-center-list__company">{{ workCenter.companyCode || texts.detailViewEmptyValue }}</span>
+      </div>
+
+      <div class="work-center-list__chips">
+        <app-ui-tag [value]="workCenter.workCenterCode" severity="contrast" [rounded]="true" />
+        <app-ui-tag [value]="workCenter.ruleSystemCode" severity="secondary" [rounded]="true" />
+      </div>
+
+      <dl class="work-center-list__meta-grid">
+        <div class="work-center-list__meta-item">
+          <dt>{{ texts.listMetaCompanyLabel }}</dt>
+          <dd>{{ workCenter.companyCode || texts.detailViewEmptyValue }}</dd>
+        </div>
+        <div class="work-center-list__meta-item">
+          <dt>{{ texts.listMetaLocationLabel }}</dt>
+          <dd>{{ formatLocation(workCenter) }}</dd>
+        </div>
+        <div class="work-center-list__meta-item work-center-list__meta-item--full">
+          <dt>{{ texts.listMetaStartDateLabel }}</dt>
+          <dd>{{ workCenter.startDate }}</dd>
+        </div>
+      </dl>
+    </app-list-item>
+  </ng-template>
+</app-master-list-panel>

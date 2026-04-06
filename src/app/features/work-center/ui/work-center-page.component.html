@@ -1,0 +1,54 @@
+<app-master-detail-shell [title]="texts.pageTitle" [subtitle]="texts.pageSubtitle">
+  <section slot="list">
+    <app-work-center-list
+      [workCenters]="store.workCenters()"
+      [selectedKey]="store.selectedKey()"
+      [loading]="store.listLoading()"
+      [errorMessage]="store.listError() ? texts.listLoadFailedMessage : null"
+      (newRequested)="onNewWorkCenter()"
+      (workCenterSelected)="onWorkCenterSelected($event)"
+    />
+  </section>
+
+  <section slot="detail" class="work-center-page__detail-slot">
+    @if (store.hasActiveDetail()) {
+      @if (store.detailLoading()) {
+        <app-section-card [title]="texts.detailPanelTitle" [description]="texts.detailLoadingMessage">
+          <p class="work-center-page__feedback work-center-page__feedback--loading">{{ texts.detailLoadingMessage }}</p>
+        </app-section-card>
+      } @else if (store.detailError() === 'not-found') {
+        <app-section-card [title]="texts.detailPanelTitle">
+          <p class="work-center-page__feedback work-center-page__feedback--error">{{ texts.detailNotFoundMessage }}</p>
+        </app-section-card>
+      } @else if (store.detailError()) {
+        <app-section-card [title]="texts.detailPanelTitle">
+          <p class="work-center-page__feedback work-center-page__feedback--error">{{ texts.detailLoadFailedMessage }}</p>
+        </app-section-card>
+      } @else {
+        <app-work-center-detail-panel
+          [mode]="detailMode"
+          [detail]="store.selectedDetail()"
+          [contacts]="store.contacts()"
+          [contactsLoading]="store.contactsLoading()"
+          [contactsError]="store.contactsError()"
+          [submitting]="store.submitting()"
+          [submitError]="store.submitError()"
+          [submitSuccess]="store.submitSuccess()"
+          [contactSubmitting]="store.contactSubmitting()"
+          [contactSubmitError]="store.contactSubmitError()"
+          [contactSubmitSuccess]="store.contactSubmitSuccess()"
+          (editRequested)="onEditRequested()"
+          (submitted)="onFormSubmit($event)"
+          (cancelled)="onFormCancel()"
+          (contactCreateSubmitted)="onContactCreate($event)"
+          (contactUpdateSubmitted)="onContactUpdate($event)"
+          (contactDeleteRequested)="onContactDelete($event)"
+        />
+      }
+    } @else {
+      <app-section-card [title]="texts.detailPanelTitle">
+        <p class="work-center-page__feedback">{{ texts.emptyDetailDescription }}</p>
+      </app-section-card>
+    }
+  </section>
+</app-master-detail-shell>
