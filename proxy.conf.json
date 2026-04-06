@@ -39,6 +39,11 @@
     "secure": false,
     "changeOrigin": true
   },
+  "/companies": {
+    "target": "http://localhost:8080",
+    "secure": false,
+    "changeOrigin": true
+  },
   "/actuator": {
     "target": "http://localhost:8080",
     "secure": false,

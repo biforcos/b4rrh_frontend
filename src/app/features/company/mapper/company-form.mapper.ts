@@ -1,4 +1,5 @@
 import { CreateCompanyRequest } from '../../../core/api/generated/model/create-company-request';
+import { CompanyAddress } from '../../../core/api/generated/model/company-address';
 import { UpdateCompanyRequest } from '../../../core/api/generated/model/update-company-request';
 import { CompanyDetailModel } from '../models/company-detail.model';
 import { CompanyFormValue } from '../models/company-form-value.model';
@@ -68,8 +69,8 @@ function buildAddressPayload(form: CompanyFormValue) {
   const countryCode = form.countryCode.trim().toUpperCase() || null;
 
   if (!street && !city && !postalCode && !regionCode && !countryCode) {
-    return null;
+    return undefined;
   }
 
-  return { street, city, postalCode, regionCode, countryCode };
+  return { street, city, postalCode, regionCode, countryCode } satisfies CompanyAddress;
 }
