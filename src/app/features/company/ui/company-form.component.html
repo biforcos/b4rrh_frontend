@@ -1,0 +1,181 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="company-form" novalidate>
+  <header class="company-form__header">
+    <h3 class="company-form__title">{{ formTitle }}</h3>
+  </header>
+
+  @if (submitSuccess()) {
+    <p-message severity="success" [text]="successMessage!" styleClass="company-form__feedback" />
+  }
+
+  @if (submitError()) {
+    <p-message severity="error" [text]="submitError()!" styleClass="company-form__feedback" />
+  }
+
+  <!-- Identity section -->
+  <p-fieldset [legend]="texts.sectionIdentityTitle" [toggleable]="false" styleClass="company-form__section">
+    <div class="company-form__grid">
+      <div class="company-form__field">
+        <label for="ruleSystemCode" class="company-form__label">
+          {{ texts.fieldRuleSystemCodeLabel }} <span class="company-form__required">*</span>
+        </label>
+        <input
+          pInputText
+          id="ruleSystemCode"
+          formControlName="ruleSystemCode"
+          [class.ng-invalid]="hasError('ruleSystemCode')"
+          placeholder="ESP"
+          maxlength="5"
+        />
+        @if (hasError('ruleSystemCode')) {
+          <small class="company-form__error">{{ texts.fieldRuleSystemCodeLabel }} es obligatorio.</small>
+        }
+      </div>
+
+      <div class="company-form__field">
+        <label for="companyCode" class="company-form__label">
+          {{ texts.fieldCompanyCodeLabel }} <span class="company-form__required">*</span>
+        </label>
+        <input
+          pInputText
+          id="companyCode"
+          formControlName="companyCode"
+          [class.ng-invalid]="hasError('companyCode')"
+          placeholder="ACME"
+          maxlength="30"
+        />
+        @if (hasError('companyCode')) {
+          <small class="company-form__error">{{ texts.fieldCompanyCodeLabel }} es obligatorio.</small>
+        }
+      </div>
+
+      <div class="company-form__field company-form__field--full">
+        <label for="name" class="company-form__label">
+          {{ texts.fieldNameLabel }} <span class="company-form__required">*</span>
+        </label>
+        <input
+          pInputText
+          id="name"
+          formControlName="name"
+          [class.ng-invalid]="hasError('name')"
+          maxlength="100"
+        />
+        @if (hasError('name')) {
+          <small class="company-form__error">{{ texts.fieldNameLabel }} es obligatorio.</small>
+        }
+      </div>
+
+      <div class="company-form__field company-form__field--full">
+        <label for="description" class="company-form__label">{{ texts.fieldDescriptionLabel }}</label>
+        <textarea
+          pTextarea
+          id="description"
+          formControlName="description"
+          rows="2"
+          maxlength="500"
+        ></textarea>
+      </div>
+
+      <div class="company-form__field">
+        <label for="startDate" class="company-form__label">
+          {{ texts.fieldStartDateLabel }} <span class="company-form__required">*</span>
+        </label>
+        <p-datepicker
+          inputId="startDate"
+          formControlName="startDate"
+          [showIcon]="true"
+          dateFormat="yy-mm-dd"
+          [class.ng-invalid]="hasError('startDate')"
+          appendTo="body"
+          [fluid]="true"
+        />
+        @if (hasError('startDate')) {
+          <small class="company-form__error">{{ texts.fieldStartDateLabel }} es obligatoria.</small>
+        }
+      </div>
+    </div>
+  </p-fieldset>
+
+  <!-- Fiscal section -->
+  <p-fieldset [legend]="texts.sectionFiscalTitle" [toggleable]="false" styleClass="company-form__section">
+    <div class="company-form__grid">
+      <div class="company-form__field company-form__field--full">
+        <label for="legalName" class="company-form__label">
+          {{ texts.fieldLegalNameLabel }} <span class="company-form__required">*</span>
+        </label>
+        <input
+          pInputText
+          id="legalName"
+          formControlName="legalName"
+          [class.ng-invalid]="hasError('legalName')"
+          maxlength="200"
+        />
+        @if (hasError('legalName')) {
+          <small class="company-form__error">{{ texts.fieldLegalNameLabel }} es obligatoria.</small>
+        }
+      </div>
+
+      <div class="company-form__field">
+        <label for="taxIdentifier" class="company-form__label">{{ texts.fieldTaxIdLabel }}</label>
+        <input
+          pInputText
+          id="taxIdentifier"
+          formControlName="taxIdentifier"
+          maxlength="50"
+        />
+      </div>
+    </div>
+  </p-fieldset>
+
+  <!-- Address section -->
+  <p-fieldset [legend]="texts.sectionAddressTitle" [toggleable]="true" [collapsed]="true" styleClass="company-form__section">
+    <div class="company-form__grid">
+      <div class="company-form__field company-form__field--full">
+        <label for="street" class="company-form__label">{{ texts.fieldStreetLabel }}</label>
+        <input pInputText id="street" formControlName="street" maxlength="300" />
+      </div>
+
+      <div class="company-form__field">
+        <label for="city" class="company-form__label">{{ texts.fieldCityLabel }}</label>
+        <input pInputText id="city" formControlName="city" maxlength="120" />
+      </div>
+
+      <div class="company-form__field">
+        <label for="postalCode" class="company-form__label">{{ texts.fieldPostalCodeLabel }}</label>
+        <input pInputText id="postalCode" formControlName="postalCode" maxlength="20" />
+      </div>
+
+      <div class="company-form__field">
+        <label for="regionCode" class="company-form__label">{{ texts.fieldRegionCodeLabel }}</label>
+        <input pInputText id="regionCode" formControlName="regionCode" maxlength="30" />
+      </div>
+
+      <div class="company-form__field">
+        <label for="countryCode" class="company-form__label">{{ texts.fieldCountryCodeLabel }}</label>
+        <input
+          pInputText
+          id="countryCode"
+          formControlName="countryCode"
+          placeholder="ESP"
+          maxlength="3"
+        />
+      </div>
+    </div>
+  </p-fieldset>
+
+  <div class="company-form__actions">
+    <p-button
+      type="button"
+      [label]="texts.formCancelAction"
+      severity="secondary"
+      [outlined]="true"
+      [disabled]="submitting()"
+      (onClick)="onCancel()"
+    />
+    <p-button
+      type="submit"
+      [label]="texts.formSaveAction"
+      [loading]="submitting()"
+      [disabled]="submitting()"
+    />
+  </div>
+</form>

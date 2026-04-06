@@ -1,0 +1,50 @@
+<p-table
+  [value]="tableCompanies()"
+  [loading]="loading()"
+  [rowHover]="true"
+  styleClass="p-datatable-sm"
+  [tableStyle]="{ 'min-width': '40rem' }"
+>
+  <ng-template #header>
+    <tr>
+      <th>{{ texts.columnCodeLabel }}</th>
+      <th>{{ texts.columnNameLabel }}</th>
+      <th>{{ texts.columnLegalNameLabel }}</th>
+      <th>{{ texts.columnTaxIdLabel }}</th>
+      <th>{{ texts.columnCountryLabel }}</th>
+      <th>{{ texts.columnActiveLabel }}</th>
+      <th>{{ texts.columnActionsLabel }}</th>
+    </tr>
+  </ng-template>
+  <ng-template #body let-company>
+    <tr [class.company-list__row--selected]="isSelected(company)">
+      <td>
+        <span class="company-list__code">{{ company.ruleSystemCode }}/{{ company.companyCode }}</span>
+      </td>
+      <td>{{ company.name }}</td>
+      <td>{{ company.legalName }}</td>
+      <td>{{ company.taxIdentifier ?? '—' }}</td>
+      <td>{{ company.countryCode ?? '—' }}</td>
+      <td>
+        <p-tag
+          [value]="company.active ? texts.activeLabel : texts.inactiveLabel"
+          [severity]="company.active ? 'success' : 'warn'"
+        />
+      </td>
+      <td>
+        <p-button
+          [label]="texts.editAction"
+          severity="secondary"
+          size="small"
+          [outlined]="true"
+          (onClick)="requestEdit(company)"
+        />
+      </td>
+    </tr>
+  </ng-template>
+  <ng-template #emptymessage>
+    <tr>
+      <td colspan="7" class="company-list__empty">{{ texts.listEmptyMessage }}</td>
+    </tr>
+  </ng-template>
+</p-table>

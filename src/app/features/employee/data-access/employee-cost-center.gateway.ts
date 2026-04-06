@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, map, throwError } from 'rxjs';
 
-import { DefaultService as PersonnelApiService } from '../../../core/api/generated/api/default.service';
+import { EmployeeCostCenterService } from '../../../core/api/generated/api/employee-cost-center.service';
 import { CostCenterDistributionWindowResponse } from '../../../core/api/generated/model/models';
 import { EmployeeBusinessKey } from '../models/employee-business-key.model';
 import {
@@ -22,7 +22,7 @@ import {
   providedIn: 'root',
 })
 export class EmployeeCostCenterGateway {
-  private readonly personnelApiService = inject(PersonnelApiService);
+  private readonly personnelApiService = inject(EmployeeCostCenterService);
 
   readCurrentDistribution(key: EmployeeBusinessKey): Observable<EmployeeCostCenterWindowModel | null> {
     return this.personnelApiService

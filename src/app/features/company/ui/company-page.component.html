@@ -1,0 +1,66 @@
+<section class="company-page">
+  <header class="company-page__header">
+    <div class="company-page__header-content">
+      <h2 class="company-page__title">{{ texts.pageTitle }}</h2>
+      <p class="company-page__subtitle">{{ texts.pageSubtitle }}</p>
+    </div>
+    <div class="company-page__header-actions">
+      <p-button
+        [label]="texts.newCompanyAction"
+        icon="pi pi-plus"
+        (onClick)="onNewCompany()"
+        [disabled]="store.submitting()"
+      />
+    </div>
+  </header>
+
+  @if (store.listError()) {
+    <p class="company-page__feedback company-page__feedback--error">{{ texts.listLoadFailedMessage }}</p>
+  }
+
+  <div class="company-page__layout">
+    <!-- LEFT: list panel -->
+    <section class="company-page__list-panel">
+      <h3 class="company-page__panel-title">{{ texts.listTitle }}</h3>
+
+      @if (store.listLoading()) {
+        <p class="company-page__feedback company-page__feedback--loading">{{ texts.listLoadingMessage }}</p>
+      }
+
+      <app-company-list
+        [companies]="store.companies()"
+        [selectedKey]="store.selectedKey()"
+        [loading]="store.listLoading()"
+        (editRequested)="onEditRequested($event)"
+      />
+    </section>
+
+    <!-- RIGHT: form panel -->
+    <section class="company-page__form-panel">
+      @if (store.hasActiveForm()) {
+        @if (store.detailLoading()) {
+          <p class="company-page__feedback company-page__feedback--loading">{{ texts.detailLoadingMessage }}</p>
+        } @else if (store.detailError() === 'not-found') {
+          <p class="company-page__feedback company-page__feedback--error">{{ texts.detailNotFoundMessage }}</p>
+        } @else if (store.detailError()) {
+          <p class="company-page__feedback company-page__feedback--error">{{ texts.detailLoadFailedMessage }}</p>
+        } @else {
+          <app-company-form
+            [mode]="formMode"
+            [detail]="store.selectedDetail()"
+            [submitting]="store.submitting()"
+            [submitError]="store.submitError()"
+            [submitSuccess]="store.submitSuccess()"
+            (submitted)="onFormSubmit($event)"
+            (cancelled)="onFormCancel()"
+          />
+        }
+      } @else {
+        <div class="company-page__empty-form">
+          <p class="company-page__empty-form-title">{{ texts.emptyDetailTitle }}</p>
+          <p class="company-page__empty-form-desc">{{ texts.emptyDetailDescription }}</p>
+        </div>
+      }
+    </section>
+  </div>
+</section>
