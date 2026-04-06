@@ -2,7 +2,7 @@
 
 Source of truth is backend contract:
 
-- ../b4rrrh_backend/openapi/personnel-administration-api.yaml
+- ../b4rrh_backend/openapi/personnel-administration-api.yaml
 
 Do not edit the local YAML manually.
 Always refresh it with:
