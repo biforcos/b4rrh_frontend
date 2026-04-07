@@ -135,7 +135,7 @@ export class EmployeeWorkingTimeSectionComponent {
     }
 
     this.clearInteractionFeedback();
-    this.enterManageMode();
+    this.enterCreateMode();
   }
 
   protected exitManage(): void {

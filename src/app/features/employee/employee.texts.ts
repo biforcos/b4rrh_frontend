@@ -445,7 +445,7 @@ export const employeeTexts = {
   contractSectionCloseSuccessMessage: 'Contrato cerrado correctamente.',
   workingTimeSectionTitle: 'Jornada',
   workingTimeSectionSubtitle: 'Gestiona la jornada actual y su historico dentro del area laboral.',
-  workingTimeSectionManageAction: 'Gestionar jornadas',
+  workingTimeSectionManageAction: 'Nueva jornada',
   workingTimeSectionExitManageAction: 'Salir',
   workingTimeSectionAddAction: 'Nueva jornada',
   workingTimeSectionEditCurrentAction: 'Editar',

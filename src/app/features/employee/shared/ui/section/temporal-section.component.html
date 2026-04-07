@@ -4,8 +4,8 @@
       <app-ui-button
         type="button"
         class="temporal-section__manage-action"
-        severity="secondary"
-        [outlined]="true"
+        [severity]="manageActionSeverity()"
+        [outlined]="manageActionOutlined()"
         size="small"
         [label]="texts().manageAction"
         (pressed)="onManageStarted()"

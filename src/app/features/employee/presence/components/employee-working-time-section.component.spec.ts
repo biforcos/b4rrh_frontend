@@ -52,6 +52,7 @@ describe('EmployeeWorkingTimeSectionComponent', () => {
     const root = fixture.nativeElement as HTMLElement;
 
     expect(root.textContent).toContain(employeeTexts.workingTimeSectionEmptyMessage);
+    expect(root.textContent).toContain(employeeTexts.workingTimeSectionManageAction);
   });
 
   it('renders current plus history and displays derived hours from backend response without technical ids', () => {
@@ -87,7 +88,7 @@ describe('EmployeeWorkingTimeSectionComponent', () => {
     expect(text).toContain('Horas semanales: 32');
     expect(text).toContain('Horas diarias: 6,4');
     expect(text).toContain('Horas mensuales: 133,33');
-    expect(text).toContain('#2');
+    expect(text).not.toContain('#2');
     expect(text).not.toContain('987654');
   });
 
@@ -149,5 +150,25 @@ describe('EmployeeWorkingTimeSectionComponent', () => {
     expect(store.closeWorkingTime).toHaveBeenCalledWith(employeeBusinessKey, 2, {
       endDate: '2026-05-31',
     });
+  });
+
+  it('renders close action for the active working time without entering manage mode', () => {
+    store.workingTimesState.set([
+      {
+        workingTimeNumber: 2,
+        startDate: '2026-01-01',
+        endDate: null,
+        workingTimePercentage: 80,
+        weeklyHours: 32,
+        dailyHours: 6.4,
+        monthlyHours: 133.33,
+        isActive: true,
+      },
+    ]);
+    fixture.detectChanges();
+
+    const root = fixture.nativeElement as HTMLElement;
+
+    expect(root.textContent).toContain(employeeTexts.workingTimeSectionCloseAction);
   });
 });

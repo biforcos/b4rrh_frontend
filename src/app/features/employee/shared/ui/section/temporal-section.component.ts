@@ -5,6 +5,18 @@ import { EmployeeSectionShellComponent } from './employee-section-shell.componen
 import { SectionUiState } from './section-ui-state.model';
 import { TemporalDisplayMode, TemporalRowViewModel, TemporalSectionTexts } from './temporal-section.model';
 
+type TemporalSectionButtonSeverity =
+  | 'success'
+  | 'info'
+  | 'warn'
+  | 'danger'
+  | 'help'
+  | 'primary'
+  | 'secondary'
+  | 'contrast'
+  | undefined
+  | null;
+
 const emptyTexts: TemporalSectionTexts = {
   manageAction: 'Manage',
   exitManageAction: 'Done',
@@ -50,6 +62,9 @@ export class TemporalSectionComponent {
   readonly createSubmitEnabled = input(false);
   readonly editSubmitEnabled = input(false);
   readonly correctSubmitEnabled = input(false);
+  readonly manageActionSeverity = input<TemporalSectionButtonSeverity>('secondary');
+  readonly manageActionOutlined = input(true);
+  readonly showCloseActionInView = input(false);
 
   readonly manageStarted = output<void>();
   readonly manageExited = output<void>();
@@ -95,7 +110,7 @@ export class TemporalSectionComponent {
     () => this.isManageMode() && !this.state().busy,
   );
   protected readonly showRowCloseAction = computed(
-    () => this.canClose() && this.isManageMode() && !this.state().busy,
+    () => this.canClose() && (this.isManageMode() || this.showCloseActionInView()) && !this.state().busy,
   );
   protected readonly showRowEditCurrentAction = computed(
     () => this.canEditCurrent() && this.isManageMode() && !this.state().busy,
