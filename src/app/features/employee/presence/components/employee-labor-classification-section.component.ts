@@ -19,6 +19,7 @@ import { EmployeeLaborClassificationCatalogItemModel } from '../../models/employ
 import { EmployeeBusinessKey } from '../../models/employee-business-key.model';
 import { UiDateInputComponent } from '../../../../shared/ui/date-input/ui-date-input.component';
 import { UiSelectComponent } from '../../../../shared/ui/select/ui-select.component';
+import { currentLocalDate } from '../../../../shared/utils/local-date.util';
 import { SlotKeyOption } from '../../shared/ui/section/editable-slot-section.model';
 import { TemporalSectionComponent } from '../../shared/ui/section/temporal-section.component';
 import {
@@ -577,7 +578,7 @@ export class EmployeeLaborClassificationSectionComponent {
   }
 
   private currentBusinessDate(): string {
-    return new Date().toISOString().slice(0, 10);
+    return currentLocalDate();
   }
 
   private normalizeRequiredValue(value: string | null | undefined): string {

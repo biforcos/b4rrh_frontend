@@ -1,0 +1,93 @@
+import { Injectable, inject } from '@angular/core';
+import { Observable, map } from 'rxjs';
+
+import { EmployeeWorkingTimeReadClient } from '../../../core/api/clients/employee-working-time-read.client';
+import {
+  EmployeeWorkingTimeReadModel,
+  mapEmployeeWorkingTimeApiToReadModel,
+} from '../../../core/api/mappers/employee-working-time.mapper';
+import { EmployeeBusinessKey } from '../models/employee-business-key.model';
+import { EmployeeWorkingTimeModel } from '../models/employee-working-time.model';
+import { toEmployeeBusinessKey } from '../routing/employee-route-key.util';
+import {
+  WorkingTimeCloseDraft,
+  WorkingTimeCreateDraft,
+  mapWorkingTimeCloseDraftToRequest,
+  mapWorkingTimeCreateDraftToRequest,
+} from './employee-working-time.mapper';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class EmployeeWorkingTimeGateway {
+  private readonly workingTimeClient = inject(EmployeeWorkingTimeReadClient);
+
+  getEmployeeWorkingTimes(
+    employeeKey: EmployeeBusinessKey,
+  ): Observable<ReadonlyArray<EmployeeWorkingTimeModel>> {
+    const normalizedKey = toEmployeeBusinessKey(employeeKey);
+
+    return this.workingTimeClient.readEmployeeWorkingTimesByBusinessKey(normalizedKey).pipe(
+      map((items) =>
+        items
+          .map((item) => mapEmployeeWorkingTimeApiToReadModel(item))
+          .filter((item): item is EmployeeWorkingTimeReadModel => item !== null)
+          .map((item) => this.toEmployeeWorkingTimeModel(item)),
+      ),
+      map((items) => this.sortByTimelineRecency(items)),
+    );
+  }
+
+  createEmployeeWorkingTime(
+    employeeKey: EmployeeBusinessKey,
+    draft: WorkingTimeCreateDraft,
+  ): Observable<void> {
+    const normalizedKey = toEmployeeBusinessKey(employeeKey);
+
+    return this.workingTimeClient
+      .createWorkingTimeByBusinessKey(normalizedKey, mapWorkingTimeCreateDraftToRequest(draft))
+      .pipe(map(() => undefined));
+  }
+
+  closeEmployeeWorkingTime(
+    employeeKey: EmployeeBusinessKey,
+    workingTimeNumber: number,
+    draft: WorkingTimeCloseDraft,
+  ): Observable<void> {
+    const normalizedKey = toEmployeeBusinessKey(employeeKey);
+
+    return this.workingTimeClient
+      .closeWorkingTimeByBusinessKey(normalizedKey, workingTimeNumber, mapWorkingTimeCloseDraftToRequest(draft))
+      .pipe(map(() => undefined));
+  }
+
+  private sortByTimelineRecency(
+    items: ReadonlyArray<EmployeeWorkingTimeModel>,
+  ): ReadonlyArray<EmployeeWorkingTimeModel> {
+    return [...items].sort((left, right) => {
+      if (left.isActive !== right.isActive) {
+        return left.isActive ? -1 : 1;
+      }
+
+      const startDateOrder = right.startDate.localeCompare(left.startDate);
+      if (startDateOrder !== 0) {
+        return startDateOrder;
+      }
+
+      return right.workingTimeNumber - left.workingTimeNumber;
+    });
+  }
+
+  private toEmployeeWorkingTimeModel(source: EmployeeWorkingTimeReadModel): EmployeeWorkingTimeModel {
+    return {
+      workingTimeNumber: source.workingTimeNumber,
+      startDate: source.startDate,
+      endDate: source.endDate,
+      workingTimePercentage: source.workingTimePercentage,
+      weeklyHours: source.weeklyHours,
+      dailyHours: source.dailyHours,
+      monthlyHours: source.monthlyHours,
+      isActive: source.isActive,
+    };
+  }
+}

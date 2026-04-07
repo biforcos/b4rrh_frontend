@@ -357,7 +357,7 @@ export const employeeTexts = {
   personalAddressesBlockDescription:
     'Bloque preparado para direccion principal, historico y vigencias.',
   laborAreaTitle: 'Laborales',
-  laborAreaSubtitle: 'Bloques vinculados a presencia, condicion contractual y clasificacion laboral.',
+  laborAreaSubtitle: 'Bloques vinculados a presencia, condicion contractual, jornada y clasificacion laboral.',
   laborLoadingMessage: 'Cargando datos laborales...',
   organizationLoadingMessage: 'Cargando datos organizativos...',
   organizationFutureTitle: 'Proximas asignaciones organizativas',
@@ -443,6 +443,61 @@ export const employeeTexts = {
   contractSectionReplaceSuccessMessage: 'Contrato reemplazado correctamente.',
   contractSectionCorrectSuccessMessage: 'Contrato corregido correctamente.',
   contractSectionCloseSuccessMessage: 'Contrato cerrado correctamente.',
+  workingTimeSectionTitle: 'Jornada',
+  workingTimeSectionSubtitle: 'Gestiona la jornada actual y su historico dentro del area laboral.',
+  workingTimeSectionManageAction: 'Gestionar jornadas',
+  workingTimeSectionExitManageAction: 'Salir',
+  workingTimeSectionAddAction: 'Nueva jornada',
+  workingTimeSectionEditCurrentAction: 'Editar',
+  workingTimeSectionCorrectAction: 'Corregir',
+  workingTimeSectionCloseAction: 'Cerrar',
+  workingTimeSectionDeleteAction: 'Eliminar',
+  workingTimeSectionCancelAction: 'Cancelar',
+  workingTimeSectionSaveCreateAction: 'Guardar jornada',
+  workingTimeSectionSaveEditCurrentAction: 'Guardar',
+  workingTimeSectionSaveCorrectAction: 'Guardar',
+  workingTimeSectionConfirmCloseMessage: 'Confirma el cierre de esta jornada.',
+  workingTimeSectionConfirmCloseAction: 'Confirmar cierre',
+  workingTimeSectionConfirmDeleteMessage: 'La eliminacion no esta habilitada para jornada.',
+  workingTimeSectionConfirmDeleteAction: 'Confirmar eliminacion',
+  workingTimeSectionEmptyMessage: 'No hay jornadas cargadas.',
+  workingTimeSectionStatusActive: 'Actual',
+  workingTimeSectionStatusClosed: 'Historica',
+  workingTimeSectionCurrentPeriodLabel: 'actual',
+  workingTimeSectionPeriodPrefix: 'Periodo',
+  workingTimeSectionPercentageLabel: 'Porcentaje de jornada',
+  workingTimeSectionPercentagePlaceholder: 'Porcentaje',
+  workingTimeSectionWeeklyHoursLabel: 'Horas semanales',
+  workingTimeSectionDailyHoursLabel: 'Horas diarias',
+  workingTimeSectionMonthlyHoursLabel: 'Horas mensuales',
+  workingTimeSectionStartDateLabel: 'Fecha inicio',
+  workingTimeSectionCloseDateLabel: 'Fecha fin',
+  workingTimeSectionDerivedHint:
+    'Las horas semanales, diarias y mensuales se calculan automaticamente por el sistema y se muestran solo en lectura.',
+  workingTimeSectionCloseHint:
+    'Indica la fecha fin para cerrar la jornada vigente sin modificar el historico anterior.',
+  workingTimeSectionInvalidDataMessage:
+    'Completa la fecha inicio y un porcentaje de jornada valido para continuar.',
+  workingTimeSectionCloseDateInvalidMessage:
+    'La fecha fin debe ser igual o posterior a la fecha inicio de la jornada.',
+  workingTimeSectionInvalidPercentageMessage:
+    'El porcentaje de jornada debe ser mayor que 0 y menor o igual que 100.',
+  workingTimeSectionInvalidPeriodMessage:
+    'El periodo informado no es valido para esta operacion de jornada.',
+  workingTimeSectionOverlapMessage:
+    'La jornada se solapa con otra ocurrencia vigente o historica del empleado.',
+  workingTimeSectionOutsidePresenceMessage:
+    'La jornada debe quedar dentro de un periodo de presencia del empleado.',
+  workingTimeSectionAlreadyClosedMessage:
+    'La jornada ya estaba cerrada y no admite un nuevo cierre.',
+  workingTimeSectionNotFoundMessage:
+    'No se encontro la jornada seleccionada para este empleado.',
+  workingTimeSectionNumberConflictMessage:
+    'Se ha producido un conflicto de numeracion funcional al crear la jornada. Reintenta.',
+  workingTimeSectionRequestFailedMessage:
+    'No se pudo procesar la operacion de jornada. Reintenta.',
+  workingTimeSectionCreateSuccessMessage: 'Jornada creada correctamente.',
+  workingTimeSectionCloseSuccessMessage: 'Jornada cerrada correctamente.',
   laborClassificationBlockTitle: 'Clasificacion laboral',
   laborClassificationBlockCurrentLabel: 'Clasificacion actual',
   laborClassificationBlockCurrentActiveSectionLabel: 'Clasificacion activa',

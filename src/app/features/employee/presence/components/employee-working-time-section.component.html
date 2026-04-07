@@ -1,0 +1,58 @@
+<app-temporal-section
+  [title]="texts.workingTimeSectionTitle"
+  [subtitle]="sectionSubtitle"
+  [state]="sectionState()"
+  [displayMode]="displayMode()"
+  [rows]="rows()"
+  [texts]="sectionTexts"
+  [confirmingCloseKey]="confirmingCloseKey()"
+  [canCreate]="true"
+  [canEditCurrent]="false"
+  [canCorrect]="false"
+  [canClose]="true"
+  [canDelete]="false"
+  [createSubmitEnabled]="isCreateDraftValid()"
+  (manageStarted)="startManage()"
+  (manageExited)="exitManage()"
+  (createStarted)="startCreate()"
+  (closeRequested)="requestClose($event)"
+  (closeConfirmed)="confirmClose($event)"
+  (cancelled)="cancel()"
+  (createSubmitted)="submitCreate()"
+>
+  <div temporalCreateForm class="employee-working-time-section__form-grid">
+    <label class="employee-working-time-section__field employee-working-time-section__field--start-date">
+      <span>{{ texts.workingTimeSectionStartDateLabel }}</span>
+      <app-ui-date-input
+        [value]="createDraft().startDate"
+        (valueChanged)="updateCreateField('startDate', $event)"
+      />
+    </label>
+
+    <label class="employee-working-time-section__field employee-working-time-section__field--percentage">
+      <span>{{ texts.workingTimeSectionPercentageLabel }}</span>
+      <app-ui-input-number
+        [value]="createDraft().workingTimePercentage"
+        [min]="0"
+        [max]="100"
+        [suffix]="' %'"
+        [placeholder]="texts.workingTimeSectionPercentagePlaceholder"
+        (valueChanged)="updateCreateField('workingTimePercentage', $event)"
+      />
+    </label>
+
+    <p class="employee-working-time-section__hint">{{ texts.workingTimeSectionDerivedHint }}</p>
+  </div>
+
+  <div temporalConfirmCloseForm class="employee-working-time-section__close-form">
+    <p class="employee-working-time-section__hint">{{ texts.workingTimeSectionCloseHint }}</p>
+
+    <label class="employee-working-time-section__field employee-working-time-section__field--close-date">
+      <span>{{ texts.workingTimeSectionCloseDateLabel }}</span>
+      <app-ui-date-input
+        [value]="closeDraft().endDate"
+        (valueChanged)="updateCloseField('endDate', $event)"
+      />
+    </label>
+  </div>
+</app-temporal-section>

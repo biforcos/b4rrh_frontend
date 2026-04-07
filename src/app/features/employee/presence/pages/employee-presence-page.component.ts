@@ -12,6 +12,7 @@ import {
   EmployeePresenceCurrentKind,
 } from '../components/employee-presence-block.component';
 import { EmployeeLaborClassificationSectionComponent } from '../components/employee-labor-classification-section.component';
+import { EmployeeWorkingTimeSectionComponent } from '../components/employee-working-time-section.component';
 import { EmployeePresenceStore } from '../../data-access/employee-presence.store';
 import { employeeTexts } from '../../employee.texts';
 import { EmployeePresenceModel } from '../../models/employee-presence.model';
@@ -23,6 +24,7 @@ import { readEmployeeBusinessKeyFromParamMap } from '../../routing/employee-rout
   imports: [
     EmployeePresenceBlockComponent,
     EmployeeContractSectionComponent,
+    EmployeeWorkingTimeSectionComponent,
     EmployeeLaborClassificationSectionComponent,
   ],
   templateUrl: './employee-presence-page.component.html',

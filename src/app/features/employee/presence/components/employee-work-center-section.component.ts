@@ -13,6 +13,7 @@ import { employeeTexts } from '../../employee.texts';
 import { EmployeeBusinessKey } from '../../models/employee-business-key.model';
 import { UiDateInputComponent } from '../../../../shared/ui/date-input/ui-date-input.component';
 import { UiSelectComponent } from '../../../../shared/ui/select/ui-select.component';
+import { currentLocalDate } from '../../../../shared/utils/local-date.util';
 import { SlotKeyOption } from '../../shared/ui/section/editable-slot-section.model';
 import { TemporalSectionComponent } from '../../shared/ui/section/temporal-section.component';
 import { TemporalDisplayMode, TemporalRowViewModel, TemporalSectionTexts } from '../../shared/ui/section/temporal-section.model';
@@ -519,7 +520,7 @@ export class EmployeeWorkCenterSectionComponent {
   }
 
   private currentBusinessDate(): string {
-    return new Date().toISOString().slice(0, 10);
+    return currentLocalDate();
   }
 
   private isValidPeriod(startDate: string, endDate: string): boolean {

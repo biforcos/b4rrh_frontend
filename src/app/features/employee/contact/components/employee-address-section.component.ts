@@ -16,6 +16,7 @@ import { UiButtonComponent } from '../../../../shared/ui/button/ui-button.compon
 import { UiDateInputComponent } from '../../../../shared/ui/date-input/ui-date-input.component';
 import { UiSelectComponent } from '../../../../shared/ui/select/ui-select.component';
 import { UiTagComponent } from '../../../../shared/ui/tag/ui-tag.component';
+import { currentLocalDate } from '../../../../shared/utils/local-date.util';
 import { SlotKeyOption } from '../../shared/ui/section/editable-slot-section.model';
 import { SectionMode, SectionUiState } from '../../shared/ui/section/section-ui-state.model';
 
@@ -370,7 +371,7 @@ export class EmployeeAddressSectionComponent {
   }
 
   private currentBusinessDate(): string {
-    return new Date().toISOString().slice(0, 10);
+    return currentLocalDate();
   }
 
   private normalizeRequiredValue(value: string): string {

@@ -10,6 +10,7 @@ import { RuleEntityModel } from '../models/rule-entity.model';
 import { RuleEntityTypeModel } from '../models/rule-entity-type.model';
 import { RuleSystemModel } from '../models/rule-system.model';
 import { catalogTexts } from '../catalog.texts';
+import { currentLocalDate } from '../../../shared/utils/local-date.util';
 
 type CatalogMutation = 'creating' | 'correcting' | 'closing' | 'deleting';
 
@@ -543,5 +544,5 @@ function normalizeOptionalValue(value: string | null | undefined): string | null
 }
 
 function currentBusinessDate(): string {
-  return new Date().toISOString().slice(0, 10);
+  return currentLocalDate();
 }

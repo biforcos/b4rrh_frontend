@@ -2,6 +2,8 @@ import { ChangeDetectionStrategy, Component, computed, input, output } from '@an
 import { FormsModule } from '@angular/forms';
 import { DatePickerModule } from 'primeng/datepicker';
 
+import { formatLocalDate, parseLocalDate } from '../../utils/local-date.util';
+
 @Component({
   selector: 'app-ui-date-input',
   standalone: true,
@@ -39,12 +41,12 @@ export class UiDateInputComponent {
 
   readonly valueChanged = output<string>();
 
-  protected readonly minDate = () => this.min() ? new Date(this.min()!) : null;
-  protected readonly maxDate = () => this.max() ? new Date(this.max()!) : null;
+  protected readonly minDate = computed(() => parseLocalDate(this.min()));
+  protected readonly maxDate = computed(() => parseLocalDate(this.max()));
 
   protected onDateChange(newDate: Date | string | null): void {
     if (newDate instanceof Date) {
-      this.valueChanged.emit(newDate.toISOString().slice(0, 10));
+      this.valueChanged.emit(formatLocalDate(newDate));
     } else if (typeof newDate === 'string') {
       this.valueChanged.emit(newDate);
     } else {

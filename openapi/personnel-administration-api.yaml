@@ -1237,6 +1237,183 @@ paths:
             The work center assignment is already closed, or the resulting closed period
             is not fully contained within any of the employee's active presence periods.
 
+  /employees/{ruleSystemCode}/{employeeTypeCode}/{employeeNumber}/working-times:
+    post:
+      operationId: createWorkingTimeByBusinessKey
+      summary: Create employee working time by business key
+      tags:
+        - Employee Working Time
+      parameters:
+        - in: path
+          name: ruleSystemCode
+          required: true
+          schema:
+            type: string
+            maxLength: 5
+        - in: path
+          name: employeeTypeCode
+          required: true
+          schema:
+            type: string
+            maxLength: 30
+        - in: path
+          name: employeeNumber
+          required: true
+          schema:
+            type: string
+            maxLength: 15
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateWorkingTimeRequest"
+      responses:
+        "201":
+          description: Working time created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkingTimeResponse"
+        "400":
+          description: Invalid request
+        "404":
+          description: Employee not found
+        "409":
+          description: >-
+            Working time period overlaps another working time for the employee,
+            falls outside employee presence history,
+            or a functional numbering conflict was detected.
+    get:
+      operationId: listEmployeeWorkingTimesByBusinessKey
+      summary: List employee working times by business key
+      tags:
+        - Employee Working Time
+      parameters:
+        - in: path
+          name: ruleSystemCode
+          required: true
+          schema:
+            type: string
+            maxLength: 5
+        - in: path
+          name: employeeTypeCode
+          required: true
+          schema:
+            type: string
+            maxLength: 30
+        - in: path
+          name: employeeNumber
+          required: true
+          schema:
+            type: string
+            maxLength: 15
+      responses:
+        "200":
+          description: Working time list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WorkingTimeResponse"
+        "404":
+          description: Employee not found
+
+  /employees/{ruleSystemCode}/{employeeTypeCode}/{employeeNumber}/working-times/{workingTimeNumber}:
+    get:
+      operationId: getWorkingTimeByBusinessKey
+      summary: Get employee working time by business key
+      tags:
+        - Employee Working Time
+      parameters:
+        - in: path
+          name: ruleSystemCode
+          required: true
+          schema:
+            type: string
+            maxLength: 5
+        - in: path
+          name: employeeTypeCode
+          required: true
+          schema:
+            type: string
+            maxLength: 30
+        - in: path
+          name: employeeNumber
+          required: true
+          schema:
+            type: string
+            maxLength: 15
+        - in: path
+          name: workingTimeNumber
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        "200":
+          description: Working time found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkingTimeResponse"
+        "404":
+          description: Employee or working time not found
+
+  /employees/{ruleSystemCode}/{employeeTypeCode}/{employeeNumber}/working-times/{workingTimeNumber}/close:
+    post:
+      operationId: closeWorkingTimeByBusinessKey
+      summary: Close employee working time by business key
+      tags:
+        - Employee Working Time
+      parameters:
+        - in: path
+          name: ruleSystemCode
+          required: true
+          schema:
+            type: string
+            maxLength: 5
+        - in: path
+          name: employeeTypeCode
+          required: true
+          schema:
+            type: string
+            maxLength: 30
+        - in: path
+          name: employeeNumber
+          required: true
+          schema:
+            type: string
+            maxLength: 15
+        - in: path
+          name: workingTimeNumber
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CloseWorkingTimeRequest"
+      responses:
+        "200":
+          description: Working time closed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkingTimeResponse"
+        "400":
+          description: Invalid request
+        "404":
+          description: Employee or working time not found
+        "409":
+          description: >-
+            Working time is already closed,
+            or the resulting period is outside employee presence history.
+
   /employees/{ruleSystemCode}/{employeeTypeCode}/{employeeNumber}/cost-centers:
     get:
       operationId: listCostCenterDistributionHistory
@@ -3569,6 +3746,55 @@ paths:
         "400":
           description: Invalid request
 
+  /catalog-options/work-centers-by-company:
+    get:
+      operationId: getWorkCentersByCompany
+      summary: Get work center catalog options by company
+      tags:
+        - Catalogs
+      description: |
+        Returns WORK_CENTER catalog options applicable to the requested rule system and reference date,
+        filtered by the company that owns the work center through `rulesystem.work_center_profile.company_code`.
+        `referenceDate` in the response is the effective date applied by the service:
+        - request `referenceDate` when provided
+        - current date when omitted
+      parameters:
+        - in: query
+          name: ruleSystemCode
+          required: true
+          schema:
+            type: string
+            maxLength: 5
+        - in: query
+          name: companyCode
+          required: true
+          schema:
+            type: string
+            maxLength: 30
+        - in: query
+          name: referenceDate
+          required: false
+          schema:
+            type: string
+            format: date
+          description: Optional date used as effective date for validity filtering.
+        - in: query
+          name: q
+          required: false
+          schema:
+            type: string
+            maxLength: 100
+          description: Optional case-insensitive search by option code or name.
+      responses:
+        "200":
+          description: Work center options filtered by company
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkCentersByCompanyResponse"
+        "400":
+          description: Invalid request
+
   /rule-systems/{ruleSystemCode}:
     get:
       operationId: getRuleSystemByCode
@@ -4805,6 +5031,14 @@ components:
           type: string
           nullable: true
           description: Optional visible label resolved from WORK_CENTER rule entities for the employee ruleSystemCode and workCenterCode.
+        companyCode:
+          type: string
+          nullable: true
+          description: Company code owning the work center according to rulesystem.work_center_profile.
+        companyName:
+          type: string
+          nullable: true
+          description: Optional visible label resolved from COMPANY rule entities for the employee ruleSystemCode and companyCode.
         startDate:
           type: string
           format: date
@@ -4944,6 +5178,66 @@ components:
           description: Distribution windows ordered by startDate ascending.
           items:
             $ref: "#/components/schemas/CostCenterDistributionWindowResponse"
+    CreateWorkingTimeRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - startDate
+        - workingTimePercentage
+      properties:
+        startDate:
+          type: string
+          format: date
+          description: Start date of the working time period (yyyy-MM-dd).
+        workingTimePercentage:
+          type: number
+          format: double
+          description: Percentage from > 0 to <= 100. Source of truth for derived persisted hours.
+    CloseWorkingTimeRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - endDate
+      properties:
+        endDate:
+          type: string
+          format: date
+          description: Date on which the working time period ends (yyyy-MM-dd).
+    WorkingTimeResponse:
+      type: object
+      required:
+        - workingTimeNumber
+        - startDate
+        - workingTimePercentage
+        - weeklyHours
+        - dailyHours
+        - monthlyHours
+      properties:
+        workingTimeNumber:
+          type: integer
+          format: int32
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+          nullable: true
+        workingTimePercentage:
+          type: number
+          format: double
+        weeklyHours:
+          type: number
+          format: double
+          description: Derived and persisted from workingTimePercentage using the active working time derivation policy.
+        dailyHours:
+          type: number
+          format: double
+          description: Derived and persisted from workingTimePercentage using the active working time derivation policy.
+        monthlyHours:
+          type: number
+          format: double
+          description: Derived and persisted from workingTimePercentage using the active working time derivation policy.
     CreateContractRequest:
       type: object
       additionalProperties: false
@@ -5383,6 +5677,40 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/DirectCatalogOptionResponse"
+    WorkCenterByCompanyOptionResponse:
+      type: object
+      required:
+        - code
+        - name
+      properties:
+        code:
+          type: string
+          maxLength: 30
+        name:
+          type: string
+          maxLength: 100
+    WorkCentersByCompanyResponse:
+      type: object
+      required:
+        - ruleSystemCode
+        - companyCode
+        - referenceDate
+        - items
+      properties:
+        ruleSystemCode:
+          type: string
+          maxLength: 5
+        companyCode:
+          type: string
+          maxLength: 30
+        referenceDate:
+          type: string
+          format: date
+          description: Effective date applied by the service (request referenceDate when provided; otherwise current date).
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/WorkCenterByCompanyOptionResponse"
     CompanyAddress:
       type: object
       properties:

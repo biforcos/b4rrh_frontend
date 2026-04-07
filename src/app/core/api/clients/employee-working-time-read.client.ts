@@ -1,0 +1,102 @@
+import { HttpErrorResponse } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import { Observable, catchError, map, of, throwError } from 'rxjs';
+
+import { EmployeeWorkingTimeService } from '../generated/api/employee-working-time.service';
+import {
+  CloseWorkingTimeRequest,
+  CreateWorkingTimeRequest,
+  WorkingTimeResponse,
+} from '../generated/model/models';
+import { EmployeeBusinessKeyApiQuery } from './employee-read.client';
+
+export interface EmployeeWorkingTimeApiModel {
+  workingTimeNumber: number;
+  startDate: string;
+  endDate: string | null;
+  workingTimePercentage: number;
+  weeklyHours: number;
+  dailyHours: number;
+  monthlyHours: number;
+}
+
+@Injectable({
+  providedIn: 'root',
+})
+export class EmployeeWorkingTimeReadClient {
+  private readonly api = inject(EmployeeWorkingTimeService);
+
+  readEmployeeWorkingTimesByBusinessKey(
+    key: EmployeeBusinessKeyApiQuery,
+  ): Observable<ReadonlyArray<EmployeeWorkingTimeApiModel>> {
+    const normalizedKey = this.normalizeKey(key);
+
+    return this.api.listEmployeeWorkingTimesByBusinessKey(normalizedKey).pipe(
+      map((items: Array<WorkingTimeResponse>) =>
+        items.map((item: WorkingTimeResponse) => this.toEmployeeWorkingTimeApiModel(item)),
+      ),
+      catchError((error: HttpErrorResponse) => {
+        if (error.status === 404) {
+          return of([]);
+        }
+
+        return throwError(() => error);
+      }),
+    );
+  }
+
+  createWorkingTimeByBusinessKey(
+    key: EmployeeBusinessKeyApiQuery,
+    request: CreateWorkingTimeRequest,
+  ): Observable<EmployeeWorkingTimeApiModel> {
+    const normalizedKey = this.normalizeKey(key);
+
+    return this.api
+      .createWorkingTimeByBusinessKey({
+        ...normalizedKey,
+        createWorkingTimeRequest: {
+          startDate: request.startDate.trim(),
+          workingTimePercentage: request.workingTimePercentage,
+        },
+      })
+      .pipe(map((item: WorkingTimeResponse) => this.toEmployeeWorkingTimeApiModel(item)));
+  }
+
+  closeWorkingTimeByBusinessKey(
+    key: EmployeeBusinessKeyApiQuery,
+    workingTimeNumber: number,
+    request: CloseWorkingTimeRequest,
+  ): Observable<EmployeeWorkingTimeApiModel> {
+    const normalizedKey = this.normalizeKey(key);
+
+    return this.api
+      .closeWorkingTimeByBusinessKey({
+        ...normalizedKey,
+        workingTimeNumber,
+        closeWorkingTimeRequest: {
+          endDate: request.endDate.trim(),
+        },
+      })
+      .pipe(map((item: WorkingTimeResponse) => this.toEmployeeWorkingTimeApiModel(item)));
+  }
+
+  private normalizeKey(key: EmployeeBusinessKeyApiQuery): EmployeeBusinessKeyApiQuery {
+    return {
+      ruleSystemCode: key.ruleSystemCode.trim(),
+      employeeTypeCode: key.employeeTypeCode.trim(),
+      employeeNumber: key.employeeNumber.trim(),
+    };
+  }
+
+  private toEmployeeWorkingTimeApiModel(source: WorkingTimeResponse): EmployeeWorkingTimeApiModel {
+    return {
+      workingTimeNumber: source.workingTimeNumber,
+      startDate: source.startDate,
+      endDate: source.endDate ?? null,
+      workingTimePercentage: source.workingTimePercentage,
+      weeklyHours: source.weeklyHours,
+      dailyHours: source.dailyHours,
+      monthlyHours: source.monthlyHours,
+    };
+  }
+}
