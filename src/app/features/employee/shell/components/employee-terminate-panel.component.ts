@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, input, ou
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { CardModule } from 'primeng/card';
 import { EmployeeFieldCatalogService } from '../../data-access/employee-field-catalog.service';
 import { EmployeeBusinessKey } from '../../models/employee-business-key.model';
 import { EmployeeDetailStore } from '../../data-access/employee-detail.store';
@@ -9,46 +10,93 @@ import { EmployeeJourneyStore } from '../../data-access/employee-journey.store';
 import { EmployeePresenceStore } from '../../data-access/employee-presence.store';
 import { EmployeeWorkCenterStore } from '../../data-access/employee-work-center.store';
 import { EmployeeCostCenterStore } from '../../data-access/employee-cost-center.store';
+import { TerminateEmployeeResponse } from '../../../../core/api/generated/model/terminate-employee-response';
 import { BASE_PATH } from '../../../../core/api/generated/variables';
 import { PanelComponent } from '../../../../shared/ui/panel/panel.component';
+import { UiTagComponent } from '../../../../shared/ui/tag/ui-tag.component';
+import { parseLocalDate } from '../../../../shared/utils/local-date.util';
+import { employeeTexts } from '../../employee.texts';
 import { SlotKeyOption } from '../../shared/ui/section/editable-slot-section.model';
 
 @Component({
   selector: 'app-employee-terminate-panel',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, PanelComponent],
+  imports: [CommonModule, ReactiveFormsModule, PanelComponent, CardModule, UiTagComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <app-panel [title]="'Terminate employee'">
+    <app-panel [title]="texts.terminatePanelTitle">
       <form [formGroup]="form" (ngSubmit)="submit()" class="employee-terminate__form">
-        <label>Termination date</label>
+        <label>{{ texts.terminatePanelTerminationDateLabel }}</label>
         <input type="date" formControlName="terminationDate" />
 
-        <label>Exit reason</label>
+        <label>{{ texts.terminatePanelExitReasonLabel }}</label>
         <select formControlName="exitReasonCode" [attr.aria-busy]="optionsLoading()">
           <option value="" disabled>
-            {{ optionsLoading() ? 'Loading exit reasons...' : 'Select an exit reason' }}
+            {{ optionsLoading() ? texts.terminatePanelLoadingExitReasonsPlaceholder : texts.terminatePanelSelectExitReasonPlaceholder }}
           </option>
-          <option *ngFor="let opt of options()" [value]="opt.value">{{ opt.label }}</option>
+          @for (opt of options(); track opt.value) {
+            <option [value]="opt.value">{{ opt.label }}</option>
+          }
         </select>
-        <p *ngIf="!optionsLoading() && options().length === 0" class="employee-terminate__empty">No exit reasons available for this rule system.</p>
+        @if (!optionsLoading() && options().length === 0) {
+          <p class="employee-terminate__empty">{{ texts.terminatePanelEmptyOptionsMessage }}</p>
+        }
 
         <div class="employee-terminate__actions">
-          <button type="button" (click)="cancel()">Cancel</button>
-          <button type="submit" [disabled]="submitting() || form.invalid || optionsLoading() || options().length === 0">Terminate</button>
+          <button type="button" (click)="cancel()">{{ texts.terminatePanelCancelAction }}</button>
+          <button type="submit" [disabled]="submitting() || form.invalid || optionsLoading() || options().length === 0">{{ texts.terminatePanelSubmitAction }}</button>
         </div>
 
-        <p *ngIf="errorMsg()" class="employee-terminate__error">{{ errorMsg() }}</p>
+        @if (errorMsg(); as errorMessage) {
+          <p class="employee-terminate__error">{{ errorMessage }}</p>
+        }
       </form>
+
+      @if (terminationResult(); as result) {
+        <p-card [header]="texts.terminatePanelSummaryTitle" styleClass="employee-terminate__summary">
+          <div class="employee-terminate__summary-grid">
+            <div class="employee-terminate__summary-row">
+              <span class="employee-terminate__summary-label">{{ texts.terminatePanelSummaryDateLabel }}</span>
+              <span>{{ formatDisplayDate(result.terminationDate) }}</span>
+            </div>
+            <div class="employee-terminate__summary-row">
+              <span class="employee-terminate__summary-label">{{ texts.terminatePanelSummaryReasonLabel }}</span>
+              <span>{{ getExitReasonLabel(result.exitReasonCode) }}</span>
+            </div>
+            <div class="employee-terminate__summary-row">
+              <span class="employee-terminate__summary-label">{{ texts.terminatePanelSummaryStatusLabel }}</span>
+              <app-ui-tag [value]="mapStatus(result.status)" severity="success" />
+            </div>
+          </div>
+
+          @if (result.closedWorkingTime; as closedWorkingTime) {
+            <div class="employee-terminate__working-time" data-testid="termination-working-time-summary">
+              <h4 class="employee-terminate__working-time-title">{{ texts.terminatePanelSummaryWorkingTimeTitle }}</h4>
+              <p class="employee-terminate__working-time-primary">{{ formatHours(closedWorkingTime.workingTimePercentage) }}% jornada</p>
+              <p>{{ formatHours(closedWorkingTime.weeklyHours) }}h/semana · {{ formatHours(closedWorkingTime.dailyHours) }}h/día · {{ formatHours(closedWorkingTime.monthlyHours) }}h/mes</p>
+              <p>{{ formatDisplayDate(closedWorkingTime.startDate) }} → {{ formatDisplayDate(closedWorkingTime.endDate) }}</p>
+            </div>
+          }
+        </p-card>
+      }
     </app-panel>
   `,
   styles: [
     '.employee-terminate__form { display:flex; flex-direction:column; gap:8px }',
     '.employee-terminate__actions { display:flex; gap:8px; justify-content:flex-end }',
     '.employee-terminate__error { color: #b00020 }',
+    '.employee-terminate__summary { margin-top: 1rem; }',
+    '.employee-terminate__summary-grid { display:flex; flex-direction:column; gap:0.75rem; }',
+    '.employee-terminate__summary-row { display:flex; align-items:center; justify-content:space-between; gap:1rem; }',
+    '.employee-terminate__summary-label { font-weight:600; }',
+    '.employee-terminate__working-time { margin-top: 1rem; padding-top: 0.875rem; border-top: 1px solid var(--p-content-border-color, #e5e7eb); display:flex; flex-direction:column; gap:0.35rem; }',
+    '.employee-terminate__working-time-title { margin: 0; font-size: 1rem; font-weight: 600; }',
+    '.employee-terminate__working-time-primary { margin: 0; font-size: 1.05rem; font-weight: 700; }',
+    '.employee-terminate__working-time p { margin: 0; }',
   ],
 })
 export class EmployeeTerminatePanelComponent {
+  protected readonly texts = employeeTexts;
   /** Single required business key input. The panel expects a populated key when opened. */
   readonly employeeKey = input<import('../../models/employee-business-key.model').EmployeeBusinessKey | undefined>(undefined);
   readonly closed = output<void>();
@@ -71,6 +119,7 @@ export class EmployeeTerminatePanelComponent {
   readonly optionsLoading = signal(false);
   readonly submitting = signal(false);
   readonly errorMsg = signal<string | null>(null);
+  readonly terminationResult = signal<TerminateEmployeeResponse | null>(null);
 
   constructor() {
     effect(() => {
@@ -112,7 +161,7 @@ export class EmployeeTerminatePanelComponent {
         error: (e) => {
           this.options.set([]);
           this.optionsLoading.set(false);
-          this.errorMsg.set('Failed to load exit reasons. Please try again.');
+          this.errorMsg.set(this.texts.terminatePanelLoadExitReasonsErrorMessage);
           if (isDevMode()) {
             console.warn('[TerminatePanel] failed loading exit reasons', e);
           }
@@ -134,7 +183,7 @@ export class EmployeeTerminatePanelComponent {
 
     const key = this.employeeKey();
     if (!key) {
-      this.errorMsg.set('Missing employee key');
+      this.errorMsg.set(this.texts.terminatePanelMissingEmployeeKeyMessage);
       if (isDevMode()) {
         console.error('[TerminatePanel] submit called without employeeKey');
       }
@@ -152,12 +201,14 @@ export class EmployeeTerminatePanelComponent {
 
     this.submitting.set(true);
     this.errorMsg.set(null);
+    this.terminationResult.set(null);
 
     const url = `${this.basePath}/employees/${encodeURIComponent(rs)}/${encodeURIComponent(et)}/${encodeURIComponent(en)}/terminate`;
 
-    this.http.post(url, payload, { observe: 'response' as const }).subscribe({
-      next: () => {
+    this.http.post<TerminateEmployeeResponse>(url, payload, { observe: 'response' as const }).subscribe({
+      next: (response) => {
         this.submitting.set(false);
+        this.terminationResult.set(response.body ?? null);
         // refresh stores: detail, journey, presences and work centers
         const key: EmployeeBusinessKey = { ruleSystemCode: rs, employeeTypeCode: et, employeeNumber: en };
         this.detailStore.loadEmployeeDetailByBusinessKey(key);
@@ -165,22 +216,41 @@ export class EmployeeTerminatePanelComponent {
         this.presenceStore.loadPresencesByBusinessKey(key);
         this.workCenterStore.loadWorkCenters(key);
         this.costCenterStore.loadCostCenters(key);
-        this.closed.emit();
       },
       error: (err: HttpErrorResponse) => {
         this.submitting.set(false);
         if (err.status === 400) {
-          this.errorMsg.set('Invalid request payload');
+          this.errorMsg.set(this.texts.terminatePanelInvalidPayloadMessage);
         } else if (err.status === 404) {
-          this.errorMsg.set('Employee or rule system not found');
+          this.errorMsg.set(this.texts.terminatePanelEmployeeNotFoundMessage);
         } else if (err.status === 409) {
-          this.errorMsg.set('Functional conflict preventing termination');
+          this.errorMsg.set(this.texts.terminatePanelConflictMessage);
         } else if (err.status === 422) {
-          this.errorMsg.set('Business validation failed (invalid exit reason)');
+          this.errorMsg.set(this.texts.terminatePanelBusinessValidationMessage);
         } else {
-          this.errorMsg.set('Request failed');
+          this.errorMsg.set(this.texts.terminatePanelRequestFailedMessage);
         }
       },
     });
+  }
+
+  protected formatDisplayDate(value: string): string {
+    return parseLocalDate(value)?.toLocaleDateString('es-ES') ?? value;
+  }
+
+  protected formatHours(value: number): string {
+    return new Intl.NumberFormat('es-ES', { maximumFractionDigits: 2 }).format(value);
+  }
+
+  protected mapStatus(status: string): string {
+    if (status === 'TERMINATED') {
+      return this.texts.employeeStatusInactiveLabel;
+    }
+
+    return status;
+  }
+
+  protected getExitReasonLabel(code: string): string {
+    return this.options().find((option) => option.value === code)?.label ?? code;
   }
 }
