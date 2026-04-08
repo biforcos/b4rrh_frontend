@@ -4,6 +4,7 @@ import { take } from 'rxjs';
 
 import { mapEmployeeContactModelToSlotRow } from '../../data-access/employee-contact-edit.mapper';
 import { EmployeeFieldCatalogService } from '../../data-access/employee-field-catalog.service';
+import { GlobalMessageService } from '../../data-access/employee-global-message.store';
 import { EmployeeContactStore } from '../../data-access/employee-contact.store';
 import { employeeTexts } from '../../employee.texts';
 import { EmployeeBusinessKey } from '../../models/employee-business-key.model';
@@ -37,10 +38,13 @@ function createEmptyContactDraft(): SlotDraft<string> {
   styleUrl: './employee-contact-section.component.scss',
 })
 export class EmployeeContactSectionComponent {
+  private static readonly GLOBAL_FEEDBACK_SOURCE_KEY = 'employee-contact-section-local';
+
   readonly employeeKey = input<EmployeeBusinessKey | null>(null);
 
   private readonly contactStore = inject(EmployeeContactStore);
   private readonly fieldCatalogService = inject(EmployeeFieldCatalogService);
+  private readonly globalMessageService = inject(GlobalMessageService);
   private readonly creatingState = signal(false);
   private readonly editingKeyState = signal<string | null>(null);
   private readonly deletingKeyState = signal<string | null>(null);
@@ -101,6 +105,22 @@ export class EmployeeContactSectionComponent {
         this.resetInteractionState();
       });
     });
+
+    effect((onCleanup) => {
+      onCleanup(() => {
+        untracked(() => this.globalMessageService.clearSourceMessages(EmployeeContactSectionComponent.GLOBAL_FEEDBACK_SOURCE_KEY));
+      });
+    });
+
+    effect(() => {
+      if (!this.contactStore.success()) {
+        return;
+      }
+
+      untracked(() => {
+        this.resetInteractionState();
+      });
+    });
   }
 
   protected startCreate(): void {
@@ -155,7 +175,6 @@ export class EmployeeContactSectionComponent {
     }
 
     this.clearLocalError();
-    this.resetInteractionState();
     this.contactStore.deleteContact(activeEmployeeKey, contactTypeCode);
   }
 
@@ -212,12 +231,11 @@ export class EmployeeContactSectionComponent {
 
     const isDuplicateType = this.rows().some((row) => row.key === draft.key);
     if (isDuplicateType) {
-      this.localErrorMessageState.set(this.texts.contactsSectionDuplicateTypeMessage);
+      this.publishGlobalFeedback(this.texts.contactsSectionDuplicateTypeMessage);
       return;
     }
 
     this.clearLocalError();
-    this.resetInteractionState();
     this.contactStore.createContact(activeEmployeeKey, draft);
   }
 
@@ -233,7 +251,6 @@ export class EmployeeContactSectionComponent {
     }
 
     this.clearLocalError();
-    this.resetInteractionState();
     this.contactStore.updateContact(activeEmployeeKey, contactTypeCode, {
       key: contactTypeCode,
       value: contactValue,
@@ -264,6 +281,7 @@ export class EmployeeContactSectionComponent {
   private clearInteractionFeedback(): void {
     this.contactStore.clearFeedback();
     this.clearLocalError();
+    this.clearGlobalFeedback();
   }
 
   private clearLocalError(): void {
@@ -287,15 +305,7 @@ export class EmployeeContactSectionComponent {
   }
 
   private resolveErrorMessage(): string | null {
-    if (this.localErrorMessageState()) {
-      return this.localErrorMessageState();
-    }
-
-    if (this.contactStore.error() === 'request-failed') {
-      return this.texts.contactsSectionRequestFailedMessage;
-    }
-
-    return null;
+    return this.localErrorMessageState();
   }
 
   private resolveSuccessMessage(): string | null {
@@ -348,9 +358,26 @@ export class EmployeeContactSectionComponent {
           }
 
           this.catalogLoadingState.set(false);
-          this.localErrorMessageState.set(this.texts.catalogLoadFailedMessage);
+          this.publishGlobalFeedback(this.texts.catalogLoadFailedMessage);
         },
       });
+  }
+
+  private publishGlobalFeedback(message: string): void {
+    this.globalMessageService.setSourceMessages(EmployeeContactSectionComponent.GLOBAL_FEEDBACK_SOURCE_KEY, [
+      {
+        id: 'employee-contact-section-local-error',
+        level: 'error',
+        text: message,
+        sectionId: 'contact',
+        sectionLabel: this.texts.personalAreaLabel,
+        sticky: true,
+      },
+    ]);
+  }
+
+  private clearGlobalFeedback(): void {
+    this.globalMessageService.clearSourceMessages(EmployeeContactSectionComponent.GLOBAL_FEEDBACK_SOURCE_KEY);
   }
 
   private syncDraftKeyWithAvailableOptions(options: ReadonlyArray<SlotKeyOption<string>>): void {

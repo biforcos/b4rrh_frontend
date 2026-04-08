@@ -34,19 +34,6 @@
   color: #425c74;
 }
 
-.employee-section-shell__status--error {
-  border-color: #e6caca;
-  background: #fff3f3;
-  color: #8d2b2b;
-}
-
-.employee-section-shell__status--success {
-  border-color: #c8dfd1;
-  background: #f2fbf5;
-  color: #1f5a3b;
-  opacity: 0.92;
-}
-
 @media (max-width: 900px) {
   .employee-section-shell__header-actions {
     justify-content: flex-start;

@@ -440,45 +440,7 @@ export class EmployeeWorkCenterSectionComponent {
   }
 
   private resolveErrorMessage(): string | null {
-    if (this.localErrorMessageState()) {
-      return this.localErrorMessageState();
-    }
-
-    const errorCode = this.workCenterStore.error();
-
-    if (errorCode === 'WORK_CENTER_OVERLAP') {
-      return this.texts.workCenterSectionOverlapMessage;
-    }
-
-    if (errorCode === 'WORK_CENTER_OUTSIDE_PRESENCE') {
-      return this.texts.workCenterSectionOutsidePresenceMessage;
-    }
-
-    if (errorCode === 'WORK_CENTER_CATALOG_NOT_FOUND') {
-      return this.texts.workCenterSectionCatalogNotFoundMessage;
-    }
-
-    if (errorCode === 'WORK_CENTER_NOT_FOUND') {
-      return this.texts.workCenterSectionNotFoundMessage;
-    }
-
-    if (errorCode === 'WORK_CENTER_ALREADY_CLOSED') {
-      return this.texts.workCenterSectionAlreadyClosedMessage;
-    }
-
-    if (errorCode === 'WORK_CENTER_INVALID_PERIOD') {
-      return this.texts.workCenterSectionFunctionalInvalidPeriodMessage;
-    }
-
-    if (errorCode === 'WORK_CENTER_DELETE_FORBIDDEN_AT_PRESENCE_START') {
-      return this.texts.workCenterSectionDeleteForbiddenAtPresenceStartMessage;
-    }
-
-    if (errorCode === 'request-failed') {
-      return this.texts.workCenterSectionRequestFailedMessage;
-    }
-
-    return null;
+    return this.localErrorMessageState();
   }
 
   private resolveSuccessMessage(): string | null {

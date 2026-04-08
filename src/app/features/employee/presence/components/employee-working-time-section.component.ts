@@ -243,30 +243,7 @@ export class EmployeeWorkingTimeSectionComponent {
   }
 
   private resolveErrorMessage(): string | null {
-    if (this.localErrorMessageState()) {
-      return this.localErrorMessageState();
-    }
-
-    switch (this.workingTimeStore.error()) {
-      case 'WORKING_TIME_OVERLAP':
-        return this.texts.workingTimeSectionOverlapMessage;
-      case 'WORKING_TIME_OUTSIDE_PRESENCE':
-        return this.texts.workingTimeSectionOutsidePresenceMessage;
-      case 'WORKING_TIME_INVALID_PERCENTAGE':
-        return this.texts.workingTimeSectionInvalidPercentageMessage;
-      case 'WORKING_TIME_INVALID_PERIOD':
-        return this.texts.workingTimeSectionInvalidPeriodMessage;
-      case 'WORKING_TIME_ALREADY_CLOSED':
-        return this.texts.workingTimeSectionAlreadyClosedMessage;
-      case 'WORKING_TIME_NOT_FOUND':
-        return this.texts.workingTimeSectionNotFoundMessage;
-      case 'WORKING_TIME_NUMBER_CONFLICT':
-        return this.texts.workingTimeSectionNumberConflictMessage;
-      case 'request-failed':
-        return this.texts.workingTimeSectionRequestFailedMessage;
-      default:
-        return null;
-    }
+    return this.localErrorMessageState();
   }
 
   private resolveSuccessMessage(): string | null {

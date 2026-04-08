@@ -1,11 +1,7 @@
-<section class="employee-area" [attr.aria-label]="texts.laborAreaLabel">
+<section id="employee-section-presence" class="employee-area" [attr.aria-label]="texts.laborAreaLabel">
   <div class="employee-area__state-stack">
     @if (laborAreaLoading()) {
       <p class="employee-area__state">{{ texts.laborLoadingMessage }}</p>
-    }
-
-    @if (presencesError() === 'request-failed') {
-      <p class="employee-area__state employee-area__state--error">{{ texts.presenceLoadFailedMessage }}</p>
     }
 
   </div>

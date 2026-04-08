@@ -8,6 +8,7 @@ import {
   mapEmployeeIdentifierModelToSlotRow,
 } from '../../data-access/employee-identifier-edit.mapper';
 import { EmployeeFieldCatalogService } from '../../data-access/employee-field-catalog.service';
+import { GlobalMessageService } from '../../data-access/employee-global-message.store';
 import { EmployeeIdentifierStore } from '../../data-access/employee-identifier.store';
 import { employeeTexts } from '../../employee.texts';
 import { EmployeeBusinessKey } from '../../models/employee-business-key.model';
@@ -37,10 +38,13 @@ interface IdentifierRowViewModel {
   styleUrl: './employee-identifier-section.component.scss',
 })
 export class EmployeeIdentifierSectionComponent {
+  private static readonly GLOBAL_FEEDBACK_SOURCE_KEY = 'employee-identifier-section-local';
+
   readonly employeeKey = input<EmployeeBusinessKey | null>(null);
 
   private readonly identifierStore = inject(EmployeeIdentifierStore);
   private readonly fieldCatalogService = inject(EmployeeFieldCatalogService);
+  private readonly globalMessageService = inject(GlobalMessageService);
   private readonly creatingState = signal(false);
   private readonly editingKeyState = signal<string | null>(null);
   private readonly deletingKeyState = signal<string | null>(null);
@@ -114,6 +118,22 @@ export class EmployeeIdentifierSectionComponent {
         this.resetInteractionState();
       });
     });
+
+    effect((onCleanup) => {
+      onCleanup(() => {
+        untracked(() => this.globalMessageService.clearSourceMessages(EmployeeIdentifierSectionComponent.GLOBAL_FEEDBACK_SOURCE_KEY));
+      });
+    });
+
+    effect(() => {
+      if (!this.identifierStore.success()) {
+        return;
+      }
+
+      untracked(() => {
+        this.resetInteractionState();
+      });
+    });
   }
 
   protected startCreate(): void {
@@ -174,7 +194,6 @@ export class EmployeeIdentifierSectionComponent {
     }
 
     this.clearLocalError();
-    this.resetInteractionState();
     this.identifierStore.deleteIdentifier(activeEmployeeKey, identifierTypeCode);
   }
 
@@ -279,7 +298,7 @@ export class EmployeeIdentifierSectionComponent {
 
     const isDuplicateType = this.rows().some((row) => row.key === normalizedTypeCode);
     if (isDuplicateType) {
-      this.localErrorMessageState.set(this.texts.identifiersSectionDuplicateTypeMessage);
+      this.publishGlobalFeedback(this.texts.identifiersSectionDuplicateTypeMessage);
       return;
     }
 
@@ -288,7 +307,6 @@ export class EmployeeIdentifierSectionComponent {
     }
 
     this.clearLocalError();
-    this.resetInteractionState();
     this.identifierStore.createIdentifier(activeEmployeeKey, {
       ...draft,
       key: normalizedTypeCode,
@@ -321,7 +339,6 @@ export class EmployeeIdentifierSectionComponent {
     }
 
     this.clearLocalError();
-    this.resetInteractionState();
     this.identifierStore.updateIdentifier(activeEmployeeKey, normalizedTypeCode, draft);
   }
 
@@ -392,6 +409,7 @@ export class EmployeeIdentifierSectionComponent {
   private clearInteractionFeedback(): void {
     this.identifierStore.clearFeedback();
     this.clearLocalError();
+    this.clearGlobalFeedback();
   }
 
   private clearLocalError(): void {
@@ -415,15 +433,7 @@ export class EmployeeIdentifierSectionComponent {
   }
 
   private resolveErrorMessage(): string | null {
-    if (this.localErrorMessageState()) {
-      return this.localErrorMessageState();
-    }
-
-    if (this.identifierStore.error() === 'request-failed') {
-      return this.texts.identifiersSectionRequestFailedMessage;
-    }
-
-    return null;
+    return this.localErrorMessageState();
   }
 
   private resolveSuccessMessage(): string | null {
@@ -479,9 +489,26 @@ export class EmployeeIdentifierSectionComponent {
           }
 
           this.catalogLoadingState.set(false);
-          this.localErrorMessageState.set(this.texts.catalogLoadFailedMessage);
+          this.publishGlobalFeedback(this.texts.catalogLoadFailedMessage);
         },
       });
+  }
+
+  private publishGlobalFeedback(message: string): void {
+    this.globalMessageService.setSourceMessages(EmployeeIdentifierSectionComponent.GLOBAL_FEEDBACK_SOURCE_KEY, [
+      {
+        id: 'employee-identifier-section-local-error',
+        level: 'error',
+        text: message,
+        sectionId: 'contact',
+        sectionLabel: this.texts.personalAreaLabel,
+        sticky: true,
+      },
+    ]);
+  }
+
+  private clearGlobalFeedback(): void {
+    this.globalMessageService.clearSourceMessages(EmployeeIdentifierSectionComponent.GLOBAL_FEEDBACK_SOURCE_KEY);
   }
 
   private syncDraftKeyWithAvailableOptions(options: ReadonlyArray<SlotKeyOption<string>>): void {

@@ -9,6 +9,10 @@
   min-height: 0;
 }
 
+.employee-shell__detail {
+  position: relative;
+}
+
 .employee-shell__master app-master-list-panel {
   display: block;
   position: sticky;
@@ -50,6 +54,7 @@
   grid-template-columns: minmax(0, 1fr) minmax(22.5rem, 24rem);
   gap: 1.25rem;
   align-items: start;
+  position: relative;
 }
 
 .employee-shell__main-zone {
@@ -124,6 +129,24 @@
   margin-bottom: 1rem;
 }
 
+.employee-shell__message-overlay {
+  position: absolute;
+  top: 0.2rem;
+  right: 0;
+  z-index: 35;
+  display: flex;
+  justify-content: flex-end;
+  pointer-events: none;
+  width: min(22.5rem, calc(100% - 0.8rem));
+}
+
+.employee-shell__message-rail {
+  display: block;
+  width: 100%;
+  margin-left: auto;
+  pointer-events: auto;
+}
+
 .employee-shell__identity-editor {
   display: block;
   max-width: 42rem;
@@ -141,6 +164,22 @@
 .employee-shell__detail-content-zone--standalone {
   border-top: 1px solid #e3edf7;
   padding-top: 0.78rem;
+}
+
+:global(.employee-shell__section-highlight) {
+  animation: employee-shell-section-highlight 1.8s ease-out;
+}
+
+@keyframes employee-shell-section-highlight {
+  0% {
+    box-shadow: 0 0 0 0 rgba(14, 116, 144, 0);
+  }
+  25% {
+    box-shadow: 0 0 0 0.26rem rgba(14, 116, 144, 0.18);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(14, 116, 144, 0);
+  }
 }
 
 @media (max-width: 1280px) {
@@ -166,6 +205,21 @@
 
   .employee-shell__timeline-zone {
     padding: 0.82rem;
+  }
+
+  .employee-shell__message-overlay {
+    position: fixed;
+    left: 0.8rem;
+    right: 0.8rem;
+    top: auto;
+    bottom: 0.8rem;
+    justify-content: center;
+    z-index: 60;
+  }
+
+  .employee-shell__message-rail {
+    width: min(42rem, 100%);
+    margin-left: 0;
   }
 
   .employee-shell__nav-zone {

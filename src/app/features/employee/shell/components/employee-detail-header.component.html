@@ -56,18 +56,6 @@
           <input pInputText type="text" formControlName="preferredName" autocomplete="off" />
         </label>
 
-        @if (updateError()) {
-          <p class="employee-detail-header__edit-feedback employee-detail-header__edit-feedback--error">
-            {{ texts.detailHeaderUpdateErrorMessage }}
-          </p>
-        }
-
-        @if (updateSuccess()) {
-          <p class="employee-detail-header__edit-feedback employee-detail-header__edit-feedback--success">
-            {{ texts.detailHeaderUpdateSuccessMessage }}
-          </p>
-        }
-
         <div class="employee-detail-header__edit-actions">
           <app-ui-button
             type="button"

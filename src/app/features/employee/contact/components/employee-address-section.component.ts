@@ -8,6 +8,7 @@ import {
   mapEmployeeAddressModelToTemporalRow,
 } from '../../data-access/employee-address-edit.mapper';
 import { EmployeeFieldCatalogService } from '../../data-access/employee-field-catalog.service';
+import { GlobalMessageService } from '../../data-access/employee-global-message.store';
 import { EmployeeAddressStore } from '../../data-access/employee-address.store';
 import { employeeTexts } from '../../employee.texts';
 import { EmployeeBusinessKey } from '../../models/employee-business-key.model';
@@ -64,10 +65,13 @@ function createEmptyAddressEditCurrentDraft(): AddressEditCurrentDraft {
   styleUrl: './employee-address-section.component.scss',
 })
 export class EmployeeAddressSectionComponent {
+  private static readonly GLOBAL_FEEDBACK_SOURCE_KEY = 'employee-address-section-local';
+
   readonly employeeKey = input<EmployeeBusinessKey | null>(null);
 
   private readonly addressStore = inject(EmployeeAddressStore);
   private readonly fieldCatalogService = inject(EmployeeFieldCatalogService);
+  private readonly globalMessageService = inject(GlobalMessageService);
   private readonly modeState = signal<AddressInteractionMode>('view');
   private readonly localErrorMessageState = signal<string | null>(null);
   private readonly confirmingCloseKeyState = signal<number | null>(null);
@@ -159,6 +163,22 @@ export class EmployeeAddressSectionComponent {
         this.resetInteractionState();
       });
     });
+
+    effect((onCleanup) => {
+      onCleanup(() => {
+        untracked(() => this.globalMessageService.clearSourceMessages(EmployeeAddressSectionComponent.GLOBAL_FEEDBACK_SOURCE_KEY));
+      });
+    });
+
+    effect(() => {
+      if (!this.addressStore.success()) {
+        return;
+      }
+
+      untracked(() => {
+        this.resetInteractionState();
+      });
+    });
   }
 
   protected startCreate(): void {
@@ -223,7 +243,6 @@ export class EmployeeAddressSectionComponent {
     }
 
     this.clearLocalError();
-    this.resetInteractionState();
     this.addressStore.closeAddress(activeEmployeeKey, addressNumber, this.currentBusinessDate());
   }
 
@@ -250,7 +269,6 @@ export class EmployeeAddressSectionComponent {
 
     const draft = this.createDraftState();
     this.clearLocalError();
-    this.resetInteractionState();
     this.addressStore.createAddress(activeEmployeeKey, draft);
   }
 
@@ -262,7 +280,6 @@ export class EmployeeAddressSectionComponent {
 
     const draft = this.editCurrentDraftState();
     this.clearLocalError();
-    this.resetInteractionState();
     this.addressStore.updateAddress(activeEmployeeKey, addressNumber, draft);
   }
 
@@ -302,6 +319,7 @@ export class EmployeeAddressSectionComponent {
   private clearInteractionFeedback(): void {
     this.addressStore.clearFeedback();
     this.clearLocalError();
+    this.clearGlobalFeedback();
   }
 
   private clearLocalError(): void {
@@ -325,15 +343,7 @@ export class EmployeeAddressSectionComponent {
   }
 
   private resolveErrorMessage(): string | null {
-    if (this.localErrorMessageState()) {
-      return this.localErrorMessageState();
-    }
-
-    if (this.addressStore.error() === 'request-failed') {
-      return this.texts.addressesSectionRequestFailedMessage;
-    }
-
-    return null;
+    return this.localErrorMessageState();
   }
 
   private resolveSuccessMessage(): string | null {
@@ -413,9 +423,26 @@ export class EmployeeAddressSectionComponent {
           }
 
           this.catalogLoadingState.set(false);
-          this.localErrorMessageState.set(this.texts.catalogLoadFailedMessage);
+          this.publishGlobalFeedback(this.texts.catalogLoadFailedMessage);
         },
       });
+  }
+
+  private publishGlobalFeedback(message: string): void {
+    this.globalMessageService.setSourceMessages(EmployeeAddressSectionComponent.GLOBAL_FEEDBACK_SOURCE_KEY, [
+      {
+        id: 'employee-address-section-local-error',
+        level: 'error',
+        text: message,
+        sectionId: 'contact',
+        sectionLabel: this.texts.personalAreaLabel,
+        sticky: true,
+      },
+    ]);
+  }
+
+  private clearGlobalFeedback(): void {
+    this.globalMessageService.clearSourceMessages(EmployeeAddressSectionComponent.GLOBAL_FEEDBACK_SOURCE_KEY);
   }
 
   private syncCreateDraftTypeWithAvailableOptions(options: ReadonlyArray<SlotKeyOption<string>>): void {

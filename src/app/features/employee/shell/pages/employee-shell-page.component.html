@@ -49,22 +49,10 @@
             {{ texts.detailLoadingMessage }}
           </p>
         }
-
-        @if (detailError() === 'not-found') {
-          <p class="employee-shell__detail-feedback employee-shell__detail-feedback--warning">
-            {{ texts.detailNotFoundMessage }}
-          </p>
-        }
-
-        @if (detailError() === 'request-failed') {
-          <p class="employee-shell__detail-feedback employee-shell__detail-feedback--error">
-            {{ texts.detailLoadFailedMessage }}
-          </p>
-        }
       }
 
       @if (selectedEmployee(); as employee) {
-        <section class="employee-shell__identity-zone">
+        <section id="employee-section-overview" class="employee-shell__identity-zone">
           <app-employee-page-header
             [fullName]="employee.displayName"
             [employeeNumber]="employee.employeeNumber"
@@ -95,6 +83,18 @@
         </section>
 
         <div class="employee-shell__content-layout">
+          <div class="employee-shell__message-overlay" aria-live="polite">
+            <app-global-message-rail
+              class="employee-shell__message-rail"
+              [messages]="globalMessages()"
+              [summary]="globalMessageSummary()"
+              [expanded]="globalMessageExpanded()"
+              (toggleRequested)="toggleGlobalMessages()"
+              (closeRequested)="closeGlobalMessages()"
+              (sectionRequested)="navigateToMessageSection($event)"
+            />
+          </div>
+
           <section class="employee-shell__main-zone">
             @if (!isRehireWorkflow()) {
               @if (activeEmployeeKey(); as activeEmployeeKey) {
@@ -112,7 +112,7 @@
           </section>
 
           @if (!isRehireWorkflow()) {
-            <aside class="employee-shell__timeline-zone" aria-label="Panel contextual del historial del empleado">
+            <aside id="employee-section-journey" class="employee-shell__timeline-zone" aria-label="Panel contextual del historial del empleado">
               @if (!terminatePanelOpen()) {
                 <app-employee-journey-timeline
                   [journey]="journey()"

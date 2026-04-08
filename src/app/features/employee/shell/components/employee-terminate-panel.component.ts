@@ -10,6 +10,7 @@ import { EmployeeJourneyStore } from '../../data-access/employee-journey.store';
 import { EmployeePresenceStore } from '../../data-access/employee-presence.store';
 import { EmployeeWorkCenterStore } from '../../data-access/employee-work-center.store';
 import { EmployeeCostCenterStore } from '../../data-access/employee-cost-center.store';
+import { GlobalMessageService } from '../../data-access/employee-global-message.store';
 import { TerminateEmployeeResponse } from '../../../../core/api/generated/model/terminate-employee-response';
 import { BASE_PATH } from '../../../../core/api/generated/variables';
 import { PanelComponent } from '../../../../shared/ui/panel/panel.component';
@@ -47,9 +48,6 @@ import { SlotKeyOption } from '../../shared/ui/section/editable-slot-section.mod
           <button type="submit" [disabled]="submitting() || form.invalid || optionsLoading() || options().length === 0">{{ texts.terminatePanelSubmitAction }}</button>
         </div>
 
-        @if (errorMsg(); as errorMessage) {
-          <p class="employee-terminate__error">{{ errorMessage }}</p>
-        }
       </form>
 
       @if (terminationResult(); as result) {
@@ -84,7 +82,6 @@ import { SlotKeyOption } from '../../shared/ui/section/editable-slot-section.mod
   styles: [
     '.employee-terminate__form { display:flex; flex-direction:column; gap:8px }',
     '.employee-terminate__actions { display:flex; gap:8px; justify-content:flex-end }',
-    '.employee-terminate__error { color: #b00020 }',
     '.employee-terminate__summary { margin-top: 1rem; }',
     '.employee-terminate__summary-grid { display:flex; flex-direction:column; gap:0.75rem; }',
     '.employee-terminate__summary-row { display:flex; align-items:center; justify-content:space-between; gap:1rem; }',
@@ -96,6 +93,8 @@ import { SlotKeyOption } from '../../shared/ui/section/editable-slot-section.mod
   ],
 })
 export class EmployeeTerminatePanelComponent {
+  private static readonly GLOBAL_FEEDBACK_SOURCE_KEY = 'employee-terminate-panel';
+
   protected readonly texts = employeeTexts;
   /** Single required business key input. The panel expects a populated key when opened. */
   readonly employeeKey = input<import('../../models/employee-business-key.model').EmployeeBusinessKey | undefined>(undefined);
@@ -109,6 +108,7 @@ export class EmployeeTerminatePanelComponent {
   private readonly presenceStore = inject(EmployeePresenceStore);
   private readonly workCenterStore = inject(EmployeeWorkCenterStore);
   private readonly costCenterStore = inject(EmployeeCostCenterStore);
+  private readonly globalMessageService = inject(GlobalMessageService);
 
   readonly form = new FormGroup({
     terminationDate: new FormControl('', { nonNullable: true }),
@@ -170,9 +170,33 @@ export class EmployeeTerminatePanelComponent {
 
       return () => sub.unsubscribe();
     });
+
+    effect((onCleanup) => {
+      const errorMessage = this.errorMsg()?.trim() ?? '';
+
+      if (errorMessage.length > 0) {
+        this.globalMessageService.setSourceMessages(EmployeeTerminatePanelComponent.GLOBAL_FEEDBACK_SOURCE_KEY, [
+          {
+            id: 'employee-terminate-panel-error',
+            level: 'error',
+            text: errorMessage,
+            sectionId: 'journey',
+            sectionLabel: this.texts.timelineTitle,
+            sticky: true,
+          },
+        ]);
+      } else {
+        this.globalMessageService.clearSourceMessages(EmployeeTerminatePanelComponent.GLOBAL_FEEDBACK_SOURCE_KEY);
+      }
+
+      onCleanup(() => {
+        this.globalMessageService.clearSourceMessages(EmployeeTerminatePanelComponent.GLOBAL_FEEDBACK_SOURCE_KEY);
+      });
+    });
   }
 
   cancel(): void {
+    this.errorMsg.set(null);
     this.closed.emit();
   }
 

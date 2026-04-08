@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { take } from 'rxjs';
 
@@ -21,18 +22,22 @@ export class EmployeeContactStore {
   private readonly loadingState = signal(false);
   private readonly mutatingState = signal(false);
   private readonly errorState = signal<EmployeeContactErrorCode | null>(null);
+  private readonly errorMessageState = signal<string | null>(null);
   private readonly successState = signal<'created' | 'updated' | 'deleted' | null>(null);
   private requestId = 0;
+  private errorResolutionSequence = 0;
 
   readonly selectedEmployeeKey = this.selectedEmployeeKeyState.asReadonly();
   readonly contacts = this.contactsState.asReadonly();
   readonly loading = this.loadingState.asReadonly();
   readonly mutating = this.mutatingState.asReadonly();
   readonly error = this.errorState.asReadonly();
+  readonly errorMessage = this.errorMessageState.asReadonly();
   readonly success = this.successState.asReadonly();
 
   clearFeedback(): void {
     this.errorState.set(null);
+    this.errorMessageState.set(null);
     this.successState.set(null);
   }
 
@@ -50,9 +55,9 @@ export class EmployeeContactStore {
     }
 
     const normalizedEmployeeKey = toEmployeeBusinessKey(employeeKey);
+    const errorResolutionToken = this.startFeedbackResolution();
 
     this.mutatingState.set(true);
-    this.errorState.set(null);
     this.successState.set(null);
 
     this.employeeContactGateway
@@ -64,9 +69,10 @@ export class EmployeeContactStore {
           this.successState.set('created');
           this.loadContactsByBusinessKeyInternal(normalizedEmployeeKey, true);
         },
-        error: () => {
+        error: (error) => {
           this.mutatingState.set(false);
           this.errorState.set('request-failed');
+          void this.applyResolvedErrorMessage(error, errorResolutionToken);
         },
       });
   }
@@ -77,9 +83,9 @@ export class EmployeeContactStore {
     }
 
     const normalizedEmployeeKey = toEmployeeBusinessKey(employeeKey);
+    const errorResolutionToken = this.startFeedbackResolution();
 
     this.mutatingState.set(true);
-    this.errorState.set(null);
     this.successState.set(null);
 
     this.employeeContactGateway
@@ -91,9 +97,10 @@ export class EmployeeContactStore {
           this.successState.set('updated');
           this.loadContactsByBusinessKeyInternal(normalizedEmployeeKey, true);
         },
-        error: () => {
+        error: (error) => {
           this.mutatingState.set(false);
           this.errorState.set('request-failed');
+          void this.applyResolvedErrorMessage(error, errorResolutionToken);
         },
       });
   }
@@ -104,9 +111,9 @@ export class EmployeeContactStore {
     }
 
     const normalizedEmployeeKey = toEmployeeBusinessKey(employeeKey);
+    const errorResolutionToken = this.startFeedbackResolution();
 
     this.mutatingState.set(true);
-    this.errorState.set(null);
     this.successState.set(null);
 
     this.employeeContactGateway
@@ -118,9 +125,10 @@ export class EmployeeContactStore {
           this.successState.set('deleted');
           this.loadContactsByBusinessKeyInternal(normalizedEmployeeKey, true);
         },
-        error: () => {
+        error: (error) => {
           this.mutatingState.set(false);
           this.errorState.set('request-failed');
+          void this.applyResolvedErrorMessage(error, errorResolutionToken);
         },
       });
   }
@@ -144,8 +152,8 @@ export class EmployeeContactStore {
     if (hasKeyChanged) {
       this.contactsState.set([]);
     }
+    const errorResolutionToken = this.startFeedbackResolution();
     this.loadingState.set(true);
-    this.errorState.set(null);
     if (hasKeyChanged || !forceReload) {
       this.successState.set(null);
     }
@@ -164,24 +172,93 @@ export class EmployeeContactStore {
           this.contactsState.set(contacts);
           this.loadingState.set(false);
         },
-        error: () => {
+        error: (error) => {
           if (requestId !== this.requestId) {
             return;
           }
 
           this.loadingState.set(false);
           this.errorState.set('request-failed');
+          void this.applyResolvedErrorMessage(error, errorResolutionToken);
         },
       });
   }
 
   private resetState(): void {
     this.requestId += 1;
+    this.errorResolutionSequence += 1;
     this.selectedEmployeeKeyState.set(null);
     this.contactsState.set([]);
     this.loadingState.set(false);
     this.mutatingState.set(false);
     this.errorState.set(null);
+    this.errorMessageState.set(null);
     this.successState.set(null);
+  }
+
+  private startFeedbackResolution(): number {
+    const nextToken = this.errorResolutionSequence + 1;
+    this.errorResolutionSequence = nextToken;
+    this.errorState.set(null);
+    this.errorMessageState.set(null);
+    return nextToken;
+  }
+
+  private async applyResolvedErrorMessage(error: unknown, token: number): Promise<void> {
+    const message = await this.resolveErrorMessage(error);
+    if (token !== this.errorResolutionSequence) {
+      return;
+    }
+
+    this.errorMessageState.set(message);
+  }
+
+  private async resolveErrorMessage(error: unknown): Promise<string | null> {
+    if (!(error instanceof HttpErrorResponse)) {
+      return null;
+    }
+
+    return this.extractMessageFromPayload(error.error);
+  }
+
+  private async extractMessageFromPayload(payload: unknown): Promise<string | null> {
+    if (payload instanceof Blob) {
+      const text = (await payload.text()).trim();
+      return this.extractMessageFromText(text);
+    }
+
+    if (typeof payload === 'string' && payload.trim().length > 0) {
+      return this.extractMessageFromText(payload.trim());
+    }
+
+    if (payload && typeof payload === 'object' && 'message' in payload) {
+      const message = payload.message;
+      return typeof message === 'string' && message.trim().length > 0 ? message.trim() : null;
+    }
+
+    return null;
+  }
+
+  private extractMessageFromText(payload: string): string | null {
+    if (!payload) {
+      return null;
+    }
+
+    try {
+      const parsedPayload = JSON.parse(payload);
+      if (
+        parsedPayload &&
+        typeof parsedPayload === 'object' &&
+        'message' in parsedPayload &&
+        typeof parsedPayload.message === 'string' &&
+        parsedPayload.message.trim().length > 0
+      ) {
+        return parsedPayload.message.trim();
+      }
+    } catch {
+      return payload;
+    }
+
+    return payload;
   }
 }

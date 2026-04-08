@@ -23,18 +23,6 @@
       @if (showBusy()) {
         <p class="employee-section-shell__status employee-section-shell__status--busy">Procesando cambios...</p>
       }
-
-      @if (showError()) {
-        <p class="employee-section-shell__status employee-section-shell__status--error">
-          {{ errorMessage() }}
-        </p>
-      }
-
-      @if (showSuccess()) {
-        <p class="employee-section-shell__status employee-section-shell__status--success">
-          {{ successMessage() }}
-        </p>
-      }
     </footer>
   }
 </app-section-card>

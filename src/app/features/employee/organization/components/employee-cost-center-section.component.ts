@@ -168,7 +168,7 @@ export class EmployeeCostCenterSectionComponent {
       mode: isBusy ? 'submitting' : (this.isViewMode() ? 'view' : 'editing'),
       dirty: !this.isViewMode(),
       busy: isBusy,
-      errorMessage: this.localErrorMessageState() || this.mapErrorCode(this.store.error()),
+      errorMessage: this.localErrorMessageState(),
       successMessage: this.mapSuccessType(this.store.success()),
     };
   });

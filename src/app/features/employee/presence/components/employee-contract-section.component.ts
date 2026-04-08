@@ -487,20 +487,7 @@ export class EmployeeContractSectionComponent {
   }
 
   private resolveErrorMessage(): string | null {
-    if (this.localErrorMessageState()) {
-      return this.localErrorMessageState();
-    }
-
-    const errorCode = this.contractStore.error();
-    if (!errorCode) {
-      return null;
-    }
-
-    if (errorCode === 'request-failed') {
-      return this.texts.contractSectionRequestFailedMessage;
-    }
-
-    return errorCode;
+    return this.localErrorMessageState();
   }
 
   private resolveSuccessMessage(): string | null {

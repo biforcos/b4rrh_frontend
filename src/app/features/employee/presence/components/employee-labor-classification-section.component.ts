@@ -510,53 +510,7 @@ export class EmployeeLaborClassificationSectionComponent {
   }
 
   private resolveErrorMessage(): string | null {
-    if (this.localErrorMessageState()) {
-      return this.localErrorMessageState();
-    }
-
-    const errorCode = this.laborClassificationStore.error();
-
-    if (errorCode === 'LABOR_CLASSIFICATION_OVERLAP') {
-      return this.texts.laborClassificationSectionOverlapMessage;
-    }
-
-    if (errorCode === 'LABOR_CLASSIFICATION_OUTSIDE_PRESENCE') {
-      return this.texts.laborClassificationSectionOutsidePresenceMessage;
-    }
-
-    if (errorCode === 'LABOR_CLASSIFICATION_INCOMPLETE_COVERAGE') {
-      return this.texts.laborClassificationSectionIncompleteCoverageMessage;
-    }
-
-    if (errorCode === 'LABOR_CLASSIFICATION_INVALID_PERIOD') {
-      return this.texts.laborClassificationSectionInvalidPeriodMessage;
-    }
-
-    if (errorCode === 'LABOR_CLASSIFICATION_ALREADY_CLOSED') {
-      return this.texts.laborClassificationSectionAlreadyClosedMessage;
-    }
-
-    if (errorCode === 'LABOR_CLASSIFICATION_NOT_FOUND') {
-      return this.texts.laborClassificationSectionNotFoundMessage;
-    }
-
-    if (errorCode === 'AGREEMENT_NOT_FOUND') {
-      return this.texts.laborClassificationSectionAgreementNotFoundMessage;
-    }
-
-    if (errorCode === 'AGREEMENT_CATEGORY_NOT_FOUND') {
-      return this.texts.laborClassificationSectionAgreementCategoryNotFoundMessage;
-    }
-
-    if (errorCode === 'AGREEMENT_CATEGORY_RELATION_INVALID') {
-      return this.texts.laborClassificationSectionAgreementCategoryRelationInvalidMessage;
-    }
-
-    if (errorCode === 'request-failed') {
-      return this.texts.laborClassificationSectionRequestFailedMessage;
-    }
-
-    return null;
+    return this.localErrorMessageState();
   }
 
   private resolveSuccessMessage(): string | null {

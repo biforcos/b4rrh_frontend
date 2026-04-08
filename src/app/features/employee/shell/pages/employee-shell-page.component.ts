@@ -1,5 +1,5 @@
 
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter, startWith } from 'rxjs';
@@ -8,6 +8,7 @@ import { MasterDetailPageShellComponent } from '../../../../shared/ui/master-det
 import { MasterListPanelComponent, MasterListPanelEmptyState } from '../../../../shared/ui/master-list-panel/master-list-panel.component';
 import { ListItemComponent } from '../../../../shared/ui/list-item/list-item.component';
 import { UiTagComponent } from '../../../../shared/ui/tag/ui-tag.component';
+import { GlobalMessageService } from '../../data-access/employee-global-message.store';
 import { EmployeeDetailStore } from '../../data-access/employee-detail.store';
 import { EmployeeDirectoryStore } from '../../data-access/employee-directory.store';
 import { EmployeeJourneyStore } from '../../data-access/employee-journey.store';
@@ -32,6 +33,8 @@ import { EmployeePageHeaderComponent } from '../components/employee-page-header.
 import { EmployeeDetailHeaderComponent } from '../components/employee-detail-header.component';
 import { EmployeeJourneyTimelineComponent } from '../components/employee-journey-timeline.component';
 import { EmployeeDetailNavComponent } from '../components/employee-detail-nav.component';
+import { GlobalMessageRailComponent } from '../components/global-message-rail.component';
+import { GlobalUiMessage } from '../../models/global-ui-message.model';
 
 @Component({
   selector: 'app-employee-shell-page',
@@ -48,6 +51,7 @@ import { EmployeeDetailNavComponent } from '../components/employee-detail-nav.co
     EmployeeJourneyTimelineComponent,
     EmployeeDetailNavComponent,
     EmployeeTerminatePanelComponent,
+    GlobalMessageRailComponent,
   ],
   templateUrl: './employee-shell-page.component.html',
   styleUrl: './employee-shell-page.component.scss',
@@ -66,6 +70,9 @@ export class EmployeeShellPageComponent {
   private readonly presenceStore = inject(EmployeePresenceStore);
   private readonly workCenterStore = inject(EmployeeWorkCenterStore);
   private readonly journeyStore = inject(EmployeeJourneyStore);
+  private readonly globalMessageService = inject(GlobalMessageService);
+  private highlightedSectionResetHandle: number | null = null;
+  private previousIdentitySuccess: 'updated' | null = null;
 
   protected readonly texts = employeeTexts;
   protected readonly searchValue = signal('');
@@ -83,6 +90,9 @@ export class EmployeeShellPageComponent {
   protected readonly contacts = this.contactStore.contacts;
   protected readonly presences = this.presenceStore.presences;
   protected readonly workCenters = this.workCenterStore.workCenters;
+  protected readonly globalMessages = this.globalMessageService.messages;
+  protected readonly globalMessageSummary = this.globalMessageService.summary;
+  protected readonly globalMessageExpanded = this.globalMessageService.expanded;
   protected readonly updatingIdentity = this.detailStore.mutating;
   protected readonly updateIdentityError = computed(() => this.detailStore.mutationError() === 'request-failed');
   protected readonly updateIdentitySuccess = computed(() => this.detailStore.mutationSuccess() === 'updated');
@@ -172,7 +182,11 @@ export class EmployeeShellPageComponent {
         takeUntilDestroyed(),
       )
       .subscribe(() => {
+        const previousEmployeeKey = this.activeEmployeeKey();
         const activeEmployeeKey = this.resolveActiveEmployeeKey();
+        if (!areEmployeeBusinessKeysEqual(previousEmployeeKey, activeEmployeeKey)) {
+          this.globalMessageService.reset();
+        }
         this.activeEmployeeKey.set(activeEmployeeKey);
         this.activeDetailSection.set(this.resolveActiveDetailSection());
         this.detailStore.loadEmployeeDetailByBusinessKey(activeEmployeeKey);
@@ -181,6 +195,30 @@ export class EmployeeShellPageComponent {
         this.workCenterStore.loadWorkCenters(activeEmployeeKey);
         this.journeyStore.loadJourneyByBusinessKey(activeEmployeeKey);
       });
+
+    effect((onCleanup) => {
+      const messages = this.buildShellMessages();
+      untracked(() => {
+        this.globalMessageService.setSourceMessages('employee-shell-page', messages);
+      });
+      onCleanup(() => {
+        untracked(() => this.globalMessageService.clearSourceMessages('employee-shell-page'));
+      });
+    });
+
+    effect(() => {
+      const identitySuccess = this.detailStore.mutationSuccess();
+      if (identitySuccess && identitySuccess !== this.previousIdentitySuccess) {
+        untracked(() => {
+          this.globalMessageService.success(this.texts.detailHeaderUpdateSuccessMessage, {
+            id: 'employee-shell-identity-updated',
+            sectionId: 'overview',
+            sectionLabel: this.texts.detailPanelTitle,
+          });
+        });
+      }
+      this.previousIdentitySuccess = identitySuccess;
+    });
   }
 
   protected openIdentityEditorFromHeader(): void {
@@ -194,6 +232,50 @@ export class EmployeeShellPageComponent {
 
   protected closeTerminatePanel(): void {
     this.terminatePanelOpen.set(false);
+  }
+
+  protected expandGlobalMessages(): void {
+    this.globalMessageService.expand();
+  }
+
+  protected closeGlobalMessages(): void {
+    const summary = this.globalMessageSummary();
+    if (summary.errorCount === 0 && summary.warningCount === 0) {
+      this.globalMessageService.dismissTransientMessages();
+      return;
+    }
+
+    this.globalMessageService.collapse();
+  }
+
+  protected toggleGlobalMessages(): void {
+    this.globalMessageService.toggleExpanded();
+  }
+
+  protected navigateToMessageSection(message: GlobalUiMessage): void {
+    const sectionId = message.sectionId?.trim();
+    if (!sectionId) {
+      return;
+    }
+
+    const activeEmployeeKey = this.activeEmployeeKey();
+    if (!activeEmployeeKey) {
+      return;
+    }
+
+    if (employeeRouteSections.includes(sectionId as EmployeeRouteSection)) {
+      const routeSection = sectionId as EmployeeRouteSection;
+      if (this.activeDetailSection() !== routeSection) {
+        void this.openEmployeeDetail(activeEmployeeKey, routeSection).then((navigated) => {
+          if (navigated) {
+            this.scheduleSectionFocus(sectionId);
+          }
+        });
+        return;
+      }
+    }
+
+    this.focusSection(sectionId);
   }
 
   protected submitIdentityUpdate(draft: EmployeeCoreIdentityDraft): void {
@@ -321,6 +403,72 @@ export class EmployeeShellPageComponent {
     }
 
     return this.texts.employeePageHeaderEmptyValue;
+  }
+
+  private buildShellMessages(): ReadonlyArray<Omit<GlobalUiMessage, 'createdAt'>> {
+    const messages: Array<Omit<GlobalUiMessage, 'createdAt'>> = [];
+
+    if (this.detailError() === 'not-found') {
+      messages.push({
+        id: 'employee-detail-not-found',
+        level: 'warning',
+        text: this.texts.detailNotFoundMessage,
+        sectionId: 'overview',
+        sectionLabel: this.texts.detailPanelTitle,
+        sticky: true,
+      });
+    }
+
+    if (this.detailError() === 'request-failed') {
+      messages.push({
+        id: 'employee-detail-load-error',
+        level: 'error',
+        text: this.texts.detailLoadFailedMessage,
+        sectionId: 'overview',
+        sectionLabel: this.texts.detailPanelTitle,
+        sticky: true,
+      });
+    }
+
+    if (this.updateIdentityError()) {
+      messages.push({
+        id: 'employee-identity-update-error',
+        level: 'error',
+        text: this.texts.detailHeaderUpdateErrorMessage,
+        sectionId: 'overview',
+        sectionLabel: this.texts.detailPanelTitle,
+        sticky: true,
+      });
+    }
+
+    return messages;
+  }
+
+  private scheduleSectionFocus(sectionId: string): void {
+    window.setTimeout(() => this.focusSection(sectionId), 120);
+  }
+
+  private focusSection(sectionId: string): void {
+    const target = document.getElementById(this.buildSectionAnchorId(sectionId));
+    if (!(target instanceof HTMLElement)) {
+      return;
+    }
+
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    target.classList.add('employee-shell__section-highlight');
+
+    if (this.highlightedSectionResetHandle !== null) {
+      window.clearTimeout(this.highlightedSectionResetHandle);
+    }
+
+    this.highlightedSectionResetHandle = window.setTimeout(() => {
+      target.classList.remove('employee-shell__section-highlight');
+      this.highlightedSectionResetHandle = null;
+    }, 1800);
+  }
+
+  private buildSectionAnchorId(sectionId: string): string {
+    return `employee-section-${sectionId}`;
   }
 
   private findPreferredContactValue(
