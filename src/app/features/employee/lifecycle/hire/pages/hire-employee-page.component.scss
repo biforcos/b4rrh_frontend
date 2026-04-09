@@ -1,6 +1,22 @@
 .hire-employee-container {
   max-width: 1200px;
   margin: 0 auto;
+  position: relative;
+}
+
+.hire-employee-message-overlay {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 60;
+  width: min(22.5rem, calc(100vw - 2rem));
+  pointer-events: none;
+}
+
+.hire-employee-message-rail {
+  display: block;
+  width: 100%;
+  pointer-events: auto;
 }
 
 .grid {
@@ -28,6 +44,15 @@
   .lg\:col-6 {
     flex: 0 0 50%;
     padding: 0.5rem;
+  }
+}
+
+@media screen and (max-width: 960px) {
+  .hire-employee-message-overlay {
+    left: 0.8rem;
+    right: 0.8rem;
+    bottom: 0.8rem;
+    width: auto;
   }
 }
 

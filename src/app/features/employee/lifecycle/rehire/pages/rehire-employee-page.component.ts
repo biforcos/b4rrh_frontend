@@ -1,16 +1,16 @@
-import { ChangeDetectionStrategy, Component, inject, signal, effect, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, untracked, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { EmployeeRehireStore, RehireEmployeeErrorCode } from '../../../data-access/employee-rehire.store';
 import { EmployeeRehireCatalogService } from '../../../data-access/employee-rehire-catalog.service';
+import { GlobalMessageService } from '../../../data-access/employee-global-message.store';
 import { employeeTexts } from '../../../employee.texts';
 import { buildEmployeeDetailRouteCommands } from '../../../routing/employee-route-builder.util';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SelectModule } from 'primeng/select';
 import { DatePickerModule } from 'primeng/datepicker';
 import { ButtonModule } from 'primeng/button';
-import { MessageModule } from 'primeng/message';
 import { CardModule } from 'primeng/card';
 import { EmployeeCostCenterDistributionEditorComponent } from '../../../organization/components/employee-cost-center-distribution-editor.component';
 import { EmployeeDetailStore } from '../../../data-access/employee-detail.store';
@@ -28,7 +28,6 @@ import { formatLocalDate } from '../../../shared/utils/local-date-string.util';
     SelectModule,
     DatePickerModule,
     ButtonModule,
-    MessageModule,
     CardModule,
     EmployeeCostCenterDistributionEditorComponent,
   ],
@@ -37,12 +36,15 @@ import { formatLocalDate } from '../../../shared/utils/local-date-string.util';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RehireEmployeePageComponent {
+  private static readonly GLOBAL_SOURCE_KEY = 'rehire-employee-page';
+
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly rehireStore = inject(EmployeeRehireStore);
   private readonly rehireCatalog = inject(EmployeeRehireCatalogService);
   private readonly detailStore = inject(EmployeeDetailStore);
+  private readonly globalMessageService = inject(GlobalMessageService);
 
   readonly texts = employeeTexts;
 
@@ -81,9 +83,19 @@ export class RehireEmployeePageComponent {
   constructor() {
     this.rehireStore.reset();
 
+    effect((onCleanup) => {
+      const messages = this.buildGlobalMessages();
+      untracked(() => {
+        this.globalMessageService.setSourceMessages(RehireEmployeePageComponent.GLOBAL_SOURCE_KEY, messages);
+      });
+      onCleanup(() => {
+        untracked(() => this.globalMessageService.clearSourceMessages(RehireEmployeePageComponent.GLOBAL_SOURCE_KEY));
+      });
+    });
+
     const key = readEmployeeBusinessKeyFromParamMap(this.route.snapshot.paramMap);
     if (!key) {
-      this.rehireCatalog.error.set('Missing employee key in route');
+      this.rehireCatalog.error.set(this.texts.rehireEmployeeMissingKeyRouteMessage);
       return;
     }
 
@@ -119,6 +131,13 @@ export class RehireEmployeePageComponent {
     effect(() => {
       const res = this.rehireStore.result();
       if (res) {
+        untracked(() => {
+          this.globalMessageService.success(this.texts.rehireEmployeeSuccessMessage, {
+            id: 'rehire-employee-success',
+            sectionId: 'overview',
+            sectionLabel: this.texts.detailPanelTitle,
+          });
+        });
         const commands = buildEmployeeDetailRouteCommands(res.employeeKey, 'overview');
         void this.router.navigate(commands);
       }
@@ -133,7 +152,7 @@ export class RehireEmployeePageComponent {
 
     const key = readEmployeeBusinessKeyFromParamMap(this.route.snapshot.paramMap);
     if (!key) {
-      this.rehireCatalog.error.set('Missing employee key');
+      this.rehireCatalog.error.set(this.texts.rehireEmployeeMissingKeyMessage);
       return;
     }
 
@@ -172,19 +191,42 @@ export class RehireEmployeePageComponent {
   mapErrorMessage(code: RehireEmployeeErrorCode | null): string {
     switch (code) {
       case 'employee-not-found':
-        return 'Employee or rule system not found';
+        return this.texts.rehireEmployeeNotFoundMessage;
       case 'already-active':
-        return 'Employee is already active';
+        return this.texts.rehireEmployeeAlreadyActiveMessage;
       case 'invalid-rehire-date':
-        return 'Invalid rehire date';
+        return this.texts.rehireEmployeeInvalidDateMessage;
       case 'invalid-distribution':
-        return 'Invalid cost center distribution';
+        return this.texts.rehireEmployeeInvalidDistributionMessage;
       case 'invalid-dependent-relation':
-        return 'Invalid dependent relation';
+        return this.texts.rehireEmployeeInvalidDependentRelationMessage;
       case 'invalid-catalog-value':
-        return 'Invalid catalog value';
+        return this.texts.rehireEmployeeInvalidCatalogMessage;
       default:
-        return 'Request failed';
+        return this.texts.rehireEmployeeRequestFailedMessage;
     }
+  }
+
+  private buildGlobalMessages() {
+    const messages = [];
+    const catalogError = this.catalogError();
+    if (catalogError) {
+      messages.push({
+        id: 'rehire-catalog-error',
+        level: 'error' as const,
+        text: catalogError,
+      });
+    }
+
+    const error = this.error();
+    if (error) {
+      messages.push({
+        id: 'rehire-request-error',
+        level: 'error' as const,
+        text: this.mapErrorMessage(error),
+      });
+    }
+
+    return messages;
   }
 }

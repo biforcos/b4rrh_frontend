@@ -1,9 +1,10 @@
-import { ChangeDetectionStrategy, Component, inject, signal, effect } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, signal, untracked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { EmployeeHiringStore } from '../../../data-access/employee-hiring.store';
+import { EmployeeHiringStore, HireEmployeeErrorCode } from '../../../data-access/employee-hiring.store';
 import { EmployeeFieldCatalogService } from '../../../data-access/employee-field-catalog.service';
+import { GlobalMessageService } from '../../../data-access/employee-global-message.store';
 import { employeeTexts } from '../../../employee.texts';
 import { buildEmployeeDetailRouteCommands } from '../../../routing/employee-route-builder.util';
 import { DefaultService } from '../../../../../core/api/generated/api/default.service';
@@ -12,10 +13,10 @@ import { SelectModule } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
 import { DatePickerModule } from 'primeng/datepicker';
 import { ButtonModule } from 'primeng/button';
-import { MessageModule } from 'primeng/message';
 import { CardModule } from 'primeng/card';
 import { HIRE_EMPLOYEE_DEFAULTS } from '../../../models/hire-employee.defaults';
 import { formatLocalDate } from '../../../shared/utils/local-date-string.util';
+import { GlobalMessageRailComponent } from '../../../shell/components/global-message-rail.component';
 
 @Component({
   selector: 'app-hire-employee-page',
@@ -28,19 +29,22 @@ import { formatLocalDate } from '../../../shared/utils/local-date-string.util';
     InputTextModule,
     DatePickerModule,
     ButtonModule,
-    MessageModule,
     CardModule,
+    GlobalMessageRailComponent,
   ],
   templateUrl: './hire-employee-page.component.html',
   styleUrl: './hire-employee-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HireEmployeePageComponent {
+  private static readonly GLOBAL_SOURCE_KEY = 'hire-employee-page';
+
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly hiringStore = inject(EmployeeHiringStore);
   private readonly catalogService = inject(EmployeeFieldCatalogService);
   private readonly api = inject(DefaultService);
+  private readonly globalMessageService = inject(GlobalMessageService);
 
   protected readonly texts = employeeTexts;
 
@@ -75,10 +79,24 @@ export class HireEmployeePageComponent {
 
   readonly hiring = (this.hiringStore as any).hiring;
   readonly error = (this.hiringStore as any).error;
+  readonly globalMessages = this.globalMessageService.messages;
+  readonly globalMessageSummary = this.globalMessageService.summary;
+  readonly globalMessageExpanded = this.globalMessageService.expanded;
 
   constructor() {
+    this.globalMessageService.reset();
     (this.hiringStore as any).reset();
     this.loadInitialCatalogs();
+
+    effect((onCleanup) => {
+      const messages = this.buildGlobalMessages();
+      untracked(() => {
+        this.globalMessageService.setSourceMessages(HireEmployeePageComponent.GLOBAL_SOURCE_KEY, messages);
+      });
+      onCleanup(() => {
+        untracked(() => this.globalMessageService.clearSourceMessages(HireEmployeePageComponent.GLOBAL_SOURCE_KEY));
+      });
+    });
 
     effect(() => {
       const result = (this.hiringStore as any).result();
@@ -199,5 +217,54 @@ export class HireEmployeePageComponent {
 
   onCancel() {
     this.router.navigate(['/personas/empleados']);
+  }
+
+  protected toggleGlobalMessages(): void {
+    this.globalMessageService.toggleExpanded();
+  }
+
+  protected closeGlobalMessages(): void {
+    const summary = this.globalMessageSummary();
+    if (summary.errorCount === 0 && summary.warningCount === 0) {
+      this.globalMessageService.dismissTransientMessages();
+      return;
+    }
+
+    this.globalMessageService.collapse();
+  }
+
+  private buildGlobalMessages() {
+    const messages = [];
+    const catalogError = this.catalogError();
+    if (catalogError) {
+      messages.push({
+        id: 'hire-catalog-error',
+        level: 'error' as const,
+        text: catalogError,
+      });
+    }
+
+    const error = this.error() as HireEmployeeErrorCode | null;
+    if (error) {
+      messages.push({
+        id: 'hire-request-error',
+        level: 'error' as const,
+        text: this.mapErrorMessage(error),
+      });
+    }
+
+    return messages;
+  }
+
+  private mapErrorMessage(code: HireEmployeeErrorCode): string {
+    if (code === 'already-exists') {
+      return this.texts.hireEmployeeConflictMessage;
+    }
+
+    if (code === 'invalid-catalog-value' || code === 'invalid-dependent-relation') {
+      return this.texts.hireEmployeeInvalidCatalogMessage;
+    }
+
+    return this.texts.hireEmployeeErrorMessage;
   }
 }

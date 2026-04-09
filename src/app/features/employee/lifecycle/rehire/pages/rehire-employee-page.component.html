@@ -3,16 +3,13 @@
   <form [formGroup]="form" (ngSubmit)="onSubmit()">
   <!-- Page header -->
   <header class="rehire-page-header">
-    <h1 class="rehire-title">Recontratar empleado</h1>
-    <p class="rehire-subtitle">Reapertura del ciclo laboral para un empleado existente</p>
+    <h1 class="rehire-title">{{ texts.rehireEmployeeTitle }}</h1>
+    <p class="rehire-subtitle">{{ texts.rehireEmployeeSubtitle }}</p>
   </header>
-
-
-  <p-message *ngIf="error()" severity="error" [text]="mapErrorMessage(error())" class="w-full mb-4 block"></p-message>
 
   <!-- Rehire data -->
   <section class="rehire-section">
-    <h2 class="rehire-section-title">Datos de reincorporación</h2>
+    <h2 class="rehire-section-title">{{ texts.rehireEmployeeDataSectionTitle }}</h2>
     <div class="rehire-fields">
       <div class="rehire-field">
         <label for="rehireDate">Fecha de reincorporación *</label>
@@ -31,7 +28,7 @@
 
   <!-- Organizational context -->
   <section class="rehire-section">
-    <h2 class="rehire-section-title">Contexto organizativo inicial</h2>
+    <h2 class="rehire-section-title">{{ texts.rehireEmployeeOrganizationSectionTitle }}</h2>
     <div class="rehire-fields">
       <div class="rehire-field">
         <label for="workCenterCode">Centro de trabajo *</label>
@@ -46,7 +43,7 @@
 
   <!-- Labor context -->
   <section class="rehire-section">
-    <h2 class="rehire-section-title">Contexto laboral inicial</h2>
+    <h2 class="rehire-section-title">{{ texts.rehireEmployeeLaborSectionTitle }}</h2>
     <div class="rehire-fields rehire-fields--two-col">
       <div class="rehire-field">
         <label for="contractTypeCode">Tipo de contrato *</label>
@@ -71,14 +68,14 @@
   <footer class="rehire-footer">
     <div class="rehire-footer-actions">
       <p-button
-        label="Cancelar"
+        [label]="texts.rehireEmployeeCancelAction"
         icon="pi pi-times"
         severity="secondary"
         (click)="onCancel()"
         [disabled]="rehiring()"
       ></p-button>
       <p-button
-        label="Recontratar empleado"
+        [label]="texts.rehireEmployeeAction"
         icon="pi pi-check"
         (click)="onSubmit()"
         [loading]="rehiring()"
