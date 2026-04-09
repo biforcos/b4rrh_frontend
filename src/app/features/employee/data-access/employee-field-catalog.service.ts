@@ -1,6 +1,7 @@
 import { Injectable, inject, isDevMode } from '@angular/core';
 import { Observable, map, of, shareReplay, switchMap, throwError } from 'rxjs';
 
+import { CatalogsService } from '../../../core/api/generated/api/catalogs.service';
 import { DefaultService } from '../../../core/api/generated/api/default.service';
 import {
   CatalogFieldBindingResponse,
@@ -30,6 +31,7 @@ type CatalogFieldSpec = (typeof employeeCatalogFields)[keyof typeof employeeCata
 })
 export class EmployeeFieldCatalogService {
   private readonly api = inject(DefaultService);
+  private readonly catalogsApi = inject(CatalogsService);
 
   private readonly bindingsByResourceCache = new Map<string, Observable<ReadonlyArray<CatalogFieldBindingResponse>>>();
   private readonly optionsByDirectCatalogCache = new Map<string, Observable<ReadonlyArray<SlotKeyOption<string>>>>();
@@ -48,6 +50,50 @@ export class EmployeeFieldCatalogService {
 
   loadWorkCenterOptions(ruleSystemCode: string): Observable<ReadonlyArray<SlotKeyOption<string>>> {
     return this.loadDirectOptionsByField(ruleSystemCode, employeeCatalogFields.workCenter);
+  }
+
+  loadWorkCenterOptionsByCompany(
+    ruleSystemCode: string,
+    companyCode: string,
+  ): Observable<ReadonlyArray<SlotKeyOption<string>>> {
+    const normalizedRuleSystemCode = this.normalizeRequiredValue(ruleSystemCode);
+    const normalizedCompanyCode = this.normalizeRequiredValue(companyCode);
+
+    if (!normalizedRuleSystemCode || !normalizedCompanyCode) {
+      return of([]);
+    }
+
+    const cacheKey = `work-centers-by-company|${normalizedRuleSystemCode}|${normalizedCompanyCode}`;
+    const cached = this.optionsByDirectCatalogCache.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    const request = this.catalogsApi
+      .getWorkCentersByCompany({
+        ruleSystemCode: normalizedRuleSystemCode,
+        companyCode: normalizedCompanyCode,
+      })
+      .pipe(
+        map((response) => response.items ?? []),
+        map((items) =>
+          items
+            .map((item) => {
+              const display = getCatalogDisplay(item.name, item.code);
+              const label = display.code ? `${display.label} · ${display.code}` : display.label;
+
+              return {
+                value: item.code,
+                label,
+              };
+            })
+            .sort((left, right) => left.label.localeCompare(right.label)),
+        ),
+        shareReplay(1),
+      );
+
+    this.optionsByDirectCatalogCache.set(cacheKey, request);
+    return request;
   }
 
   loadContractTypeOptions(ruleSystemCode: string): Observable<ReadonlyArray<SlotKeyOption<string>>> {

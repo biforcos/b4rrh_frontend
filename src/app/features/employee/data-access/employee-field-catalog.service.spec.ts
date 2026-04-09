@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 
+import { CatalogsService } from '../../../core/api/generated/api/catalogs.service';
 import { DefaultService } from '../../../core/api/generated/api/default.service';
 import { CatalogFieldBindingResponseCatalogKindEnum } from '../../../core/api/generated/model/catalog-field-binding-response';
 import { EmployeeFieldCatalogService } from './employee-field-catalog.service';
@@ -10,6 +11,9 @@ describe('EmployeeFieldCatalogService', () => {
   let apiMock: {
     getCatalogBindingsByResourceCode: ReturnType<typeof vi.fn>;
     getDirectCatalogOptions: ReturnType<typeof vi.fn>;
+  };
+  let catalogsApiMock: {
+    getWorkCentersByCompany: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(() => {
@@ -160,8 +164,28 @@ describe('EmployeeFieldCatalogService', () => {
         ),
     };
 
+    catalogsApiMock = {
+      getWorkCentersByCompany: vi.fn().mockImplementation(
+        ({ ruleSystemCode, companyCode }: { ruleSystemCode: string; companyCode: string }) =>
+          of({
+            ruleSystemCode,
+            companyCode,
+            referenceDate: '2026-03-23',
+            items: [
+              {
+                code: 'ES01-MAD',
+                name: 'Madrid ES01',
+              },
+            ],
+          }),
+      ),
+    };
+
     TestBed.configureTestingModule({
-      providers: [{ provide: DefaultService, useValue: apiMock }],
+      providers: [
+        { provide: DefaultService, useValue: apiMock },
+        { provide: CatalogsService, useValue: catalogsApiMock },
+      ],
     });
 
     service = TestBed.inject(EmployeeFieldCatalogService);
@@ -373,6 +397,20 @@ describe('EmployeeFieldCatalogService', () => {
       ruleEntityTypeCode: 'WORK_CENTER',
     });
     expect(result).toEqual([{ value: 'MADRID-01', label: 'Madrid Centro · MADRID-01' }]);
+  });
+
+  it('loads work center options filtered by company for hire workflows', () => {
+    let result: ReadonlyArray<{ value: string; label: string }> = [];
+
+    service.loadWorkCenterOptionsByCompany('ESP', 'ES01').subscribe((options) => {
+      result = options;
+    });
+
+    expect(catalogsApiMock.getWorkCentersByCompany).toHaveBeenCalledWith({
+      ruleSystemCode: 'ESP',
+      companyCode: 'ES01',
+    });
+    expect(result).toEqual([{ value: 'ES01-MAD', label: 'Madrid ES01 · ES01-MAD' }]);
   });
 
   it('loads DIRECT options for employee.labor_classification agreementCode', () => {

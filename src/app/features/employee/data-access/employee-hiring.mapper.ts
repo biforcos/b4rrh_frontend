@@ -3,6 +3,11 @@ import { HireEmployeeDraft, HireEmployeeResult } from '../models/employee-hiring
 import { HIRE_EMPLOYEE_DEFAULTS } from '../models/hire-employee.defaults';
 
 export function mapDraftToHireRequest(draft: HireEmployeeDraft): HireEmployeeRequest {
+  const workingTimePercentage = draft.workingTime.workingTimePercentage;
+  if (!isValidWorkingTimePercentage(workingTimePercentage)) {
+    throw new Error('workingTime.workingTimePercentage is required');
+  }
+
   return {
     ruleSystemCode: draft.ruleSystemCode,
     employeeTypeCode: draft.employeeTypeCode || HIRE_EMPLOYEE_DEFAULTS.employeeTypeCode,
@@ -31,16 +36,50 @@ export function mapDraftToHireRequest(draft: HireEmployeeDraft): HireEmployeeReq
       contractTypeCode: draft.contractTypeCode,
       contractSubtypeCode: draft.contractSubtypeCode || '',
     },
+    workingTime: {
+      workingTimePercentage,
+    },
   };
 }
 
 export function mapResponseToResult(response: HireEmployeeResponse): HireEmployeeResult {
+  const workingTime = response.workingTime;
+
   return {
     employeeKey: {
-      ruleSystemCode: response.employee.ruleSystemCode,
-      employeeTypeCode: response.employee.employeeTypeCode,
-      employeeNumber: response.employee.employeeNumber,
+      ruleSystemCode: response.ruleSystemCode,
+      employeeTypeCode: response.employeeTypeCode,
+      employeeNumber: response.employeeNumber,
     },
-    displayName: response.employee.displayName,
+    displayName: buildDisplayName(response),
+    hireDate: response.hireDate,
+    status: response.status,
+    workingTime: workingTime
+      ? {
+          workingTimeNumber: workingTime.workingTimeNumber,
+          workingTimePercentage: workingTime.workingTimePercentage,
+          weeklyHours: workingTime.weeklyHours,
+          dailyHours: workingTime.dailyHours,
+          monthlyHours: workingTime.monthlyHours,
+          startDate: workingTime.startDate,
+          endDate: workingTime.endDate,
+        }
+      : undefined,
   };
+}
+
+function isValidWorkingTimePercentage(value: number | null): value is number {
+  return value !== null && Number.isFinite(value) && value > 0 && value <= 100;
+}
+
+function buildDisplayName(response: HireEmployeeResponse): string {
+  const preferredName = response.preferredName?.trim();
+  if (preferredName) {
+    return preferredName;
+  }
+
+  return [response.firstName, response.lastName1, response.lastName2 ?? '']
+    .map((part) => part?.trim() ?? '')
+    .filter((part) => part.length > 0)
+    .join(' ');
 }

@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, effect, inject, signal, untracked } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, untracked } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -6,17 +7,19 @@ import { EmployeeHiringStore, HireEmployeeErrorCode } from '../../../data-access
 import { EmployeeFieldCatalogService } from '../../../data-access/employee-field-catalog.service';
 import { GlobalMessageService } from '../../../data-access/employee-global-message.store';
 import { employeeTexts } from '../../../employee.texts';
-import { buildEmployeeDetailRouteCommands } from '../../../routing/employee-route-builder.util';
 import { DefaultService } from '../../../../../core/api/generated/api/default.service';
-import { take } from 'rxjs';
+import { startWith, take } from 'rxjs';
 import { SelectModule } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
 import { DatePickerModule } from 'primeng/datepicker';
+import { InputNumberModule } from 'primeng/inputnumber';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
+import { MessageModule } from 'primeng/message';
 import { HIRE_EMPLOYEE_DEFAULTS } from '../../../models/hire-employee.defaults';
 import { formatLocalDate } from '../../../shared/utils/local-date-string.util';
 import { GlobalMessageRailComponent } from '../../../shell/components/global-message-rail.component';
+import { parseLocalDate } from '../../../../../shared/utils/local-date.util';
 
 @Component({
   selector: 'app-hire-employee-page',
@@ -28,8 +31,10 @@ import { GlobalMessageRailComponent } from '../../../shell/components/global-mes
     SelectModule,
     InputTextModule,
     DatePickerModule,
+    InputNumberModule,
     ButtonModule,
     CardModule,
+    MessageModule,
     GlobalMessageRailComponent,
   ],
   templateUrl: './hire-employee-page.component.html',
@@ -63,6 +68,7 @@ export class HireEmployeePageComponent {
     contractSubtypeCode: [''],
     agreementCode: ['', Validators.required],
     agreementCategoryCode: ['', Validators.required],
+    workingTimePercentage: [null as number | null, [Validators.required, Validators.min(0.01), Validators.max(100)]],
   });
 
   // Options
@@ -77,15 +83,21 @@ export class HireEmployeePageComponent {
 
   readonly catalogError = signal<string | null>(null);
 
-  readonly hiring = (this.hiringStore as any).hiring;
-  readonly error = (this.hiringStore as any).error;
+  readonly hiring = this.hiringStore.hiring;
+  readonly error = this.hiringStore.error;
+  readonly result = this.hiringStore.result;
   readonly globalMessages = this.globalMessageService.messages;
   readonly globalMessageSummary = this.globalMessageService.summary;
   readonly globalMessageExpanded = this.globalMessageService.expanded;
+  readonly formStatus = toSignal(this.form.statusChanges.pipe(startWith(this.form.status)), {
+    initialValue: this.form.status,
+  });
+  readonly workingTimePreview = computed(() => this.buildWorkingTimePreview(this.form.controls.workingTimePercentage.value));
+  readonly submitDisabled = computed(() => this.hiring() || this.formStatus() !== 'VALID');
 
   constructor() {
     this.globalMessageService.reset();
-    (this.hiringStore as any).reset();
+    this.hiringStore.reset();
     this.loadInitialCatalogs();
 
     effect((onCleanup) => {
@@ -99,10 +111,15 @@ export class HireEmployeePageComponent {
     });
 
     effect(() => {
-      const result = (this.hiringStore as any).result();
+      const result = this.result();
       if (result) {
-        const commands = buildEmployeeDetailRouteCommands(result.employeeKey, 'overview');
-        this.router.navigate(commands);
+        untracked(() => {
+          this.globalMessageService.success(this.texts.hireEmployeeSuccessMessage, {
+            id: 'hire-employee-success',
+            sectionId: 'overview',
+            sectionLabel: this.texts.overviewPanelTitle,
+          });
+        });
       }
     });
 
@@ -131,6 +148,16 @@ export class HireEmployeePageComponent {
         this.agreementCategories.set([]);
       }
     });
+
+    this.form.get('companyCode')?.valueChanges.subscribe((companyCode: any) => {
+      const ruleSystemCode = this.form.get('ruleSystemCode')?.value;
+      if (ruleSystemCode && companyCode) {
+        this.loadWorkCentersByCompany(ruleSystemCode, companyCode);
+      } else {
+        this.workCenters.set([]);
+        this.form.get('workCenterCode')?.setValue('');
+      }
+    });
   }
 
   private loadInitialCatalogs() {
@@ -148,10 +175,8 @@ export class HireEmployeePageComponent {
 
   private loadDependentCatalogs(ruleSystemCode: string) {
     this.catalogError.set(null);
-    (this.catalogService as any).loadWorkCenterOptions(ruleSystemCode).subscribe({
-      next: (opts: any) => this.workCenters.set([...opts]),
-      error: () => this.catalogError.set(this.texts.catalogLoadFailedMessage)
-    });
+    this.workCenters.set([]);
+    this.form.get('workCenterCode')?.setValue('');
     (this.catalogService as any).loadPresenceCompanyOptions(ruleSystemCode).subscribe({
       next: (opts: any) => this.companies.set([...opts]),
       error: () => this.catalogError.set(this.texts.catalogLoadFailedMessage)
@@ -167,6 +192,20 @@ export class HireEmployeePageComponent {
     (this.catalogService as any).loadLaborClassificationAgreementOptions(ruleSystemCode).subscribe({
       next: (opts: any) => this.agreements.set([...opts]),
       error: () => this.catalogError.set(this.texts.catalogLoadFailedMessage)
+    });
+  }
+
+  private loadWorkCentersByCompany(ruleSystemCode: string, companyCode: string) {
+    (this.catalogService as any).loadWorkCenterOptionsByCompany(ruleSystemCode, companyCode).subscribe({
+      next: (opts: any) => {
+        this.workCenters.set([...opts]);
+
+        const selectedWorkCenterCode = this.form.get('workCenterCode')?.value;
+        if (selectedWorkCenterCode && !opts.some((option: { value: string }) => option.value === selectedWorkCenterCode)) {
+          this.form.get('workCenterCode')?.setValue('');
+        }
+      },
+      error: () => this.catalogError.set(this.texts.catalogLoadFailedMessage),
     });
   }
 
@@ -209,10 +248,13 @@ export class HireEmployeePageComponent {
       ...val,
       employeeTypeCode: HIRE_EMPLOYEE_DEFAULTS.employeeTypeCode,
       hireDate: formatLocalDate(val.hireDate as Date),
+      workingTime: {
+        workingTimePercentage: val.workingTimePercentage,
+      },
       costCenterDistribution: null,
     };
 
-    (this.hiringStore as any).hire(draft);
+    this.hiringStore.hire(draft);
   }
 
   onCancel() {
@@ -231,6 +273,39 @@ export class HireEmployeePageComponent {
     }
 
     this.globalMessageService.collapse();
+  }
+
+  protected workingTimePercentageError(): string | null {
+    const control = this.form.controls.workingTimePercentage;
+    if (!control.touched && !control.dirty) {
+      return null;
+    }
+
+    if (control.hasError('required')) {
+      return this.texts.hireEmployeeWorkingTimeRequiredMessage;
+    }
+
+    if (control.hasError('min') || control.hasError('max')) {
+      return this.texts.hireEmployeeWorkingTimeRangeMessage;
+    }
+
+    return null;
+  }
+
+  protected formatHours(value: number): string {
+    return new Intl.NumberFormat('es-ES', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    }).format(value);
+  }
+
+  protected formatDisplayDate(value: string): string {
+    const parsed = parseLocalDate(value);
+    if (!parsed) {
+      return value;
+    }
+
+    return new Intl.DateTimeFormat('es-ES').format(parsed);
   }
 
   private buildGlobalMessages() {
@@ -254,6 +329,29 @@ export class HireEmployeePageComponent {
     }
 
     return messages;
+  }
+
+  private buildWorkingTimePreview(workingTimePercentage: number | null) {
+    if (
+      workingTimePercentage === null
+      || !Number.isFinite(workingTimePercentage)
+      || workingTimePercentage <= 0
+      || workingTimePercentage > 100
+    ) {
+      return null;
+    }
+
+    const percentageFactor = workingTimePercentage / 100;
+
+    return {
+      weeklyHours: this.roundToTwoDecimals(40 * percentageFactor),
+      dailyHours: this.roundToTwoDecimals(8 * percentageFactor),
+      monthlyHours: this.roundToTwoDecimals((2000 / 12) * percentageFactor),
+    };
+  }
+
+  private roundToTwoDecimals(value: number): number {
+    return Math.round(value * 100) / 100;
   }
 
   private mapErrorMessage(code: HireEmployeeErrorCode): string {
