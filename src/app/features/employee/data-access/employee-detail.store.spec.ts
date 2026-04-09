@@ -103,6 +103,13 @@ describe('EmployeeDetailStore', () => {
     expect(readGatewayMock.readEmployeeDetailByBusinessKey).toHaveBeenCalledTimes(1);
   });
 
+  it('forces detail reload when refresh is requested for the same business key', () => {
+    store.loadEmployeeDetailByBusinessKey(employeeBusinessKey);
+    store.refreshEmployeeDetailByBusinessKey(employeeBusinessKey);
+
+    expect(readGatewayMock.readEmployeeDetailByBusinessKey).toHaveBeenCalledTimes(2);
+  });
+
   it('updates employee core identity and forces detail reload after success', () => {
     store.loadEmployeeDetailByBusinessKey(employeeBusinessKey);
 

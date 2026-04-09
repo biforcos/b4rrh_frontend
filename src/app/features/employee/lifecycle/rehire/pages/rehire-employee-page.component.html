@@ -61,8 +61,74 @@
         <label for="agreementCategoryCode">Categoría *</label>
         <p-select id="agreementCategoryCode" formControlName="agreementCategoryCode" [options]="agreementCategories()" optionLabel="label" optionValue="value" placeholder="Selecciona categoria" [fluid]="true" appendTo="body"></p-select>
       </div>
+      <div class="rehire-field rehire-field--full" data-testid="rehire-working-time-block">
+        <label for="workingTimePercentage">{{ texts.rehireEmployeeWorkingTimeTitle }} *</label>
+        <p-inputnumber
+          inputId="workingTimePercentage"
+          formControlName="workingTimePercentage"
+          [min]="0"
+          [max]="100"
+          [maxFractionDigits]="2"
+          [suffix]="' %'"
+          [useGrouping]="false"
+          [fluid]="true"
+          placeholder="0"
+        ></p-inputnumber>
+        <p class="rehire-working-time-hint">{{ texts.rehireEmployeeWorkingTimeHint }}</p>
+
+        @if (workingTimePercentageError(); as errorMessage) {
+          <p-message severity="error" [text]="errorMessage" styleClass="rehire-working-time-feedback" />
+        }
+
+        @if (workingTimePreview(); as preview) {
+          <div class="rehire-working-time-preview" aria-live="polite">
+            <div class="rehire-working-time-preview__item">
+              <span class="rehire-working-time-preview__label">{{ texts.workingTimeSectionWeeklyHoursLabel }}</span>
+              <strong>{{ formatHours(preview.weeklyHours) }}h</strong>
+            </div>
+            <div class="rehire-working-time-preview__item">
+              <span class="rehire-working-time-preview__label">{{ texts.workingTimeSectionDailyHoursLabel }}</span>
+              <strong>{{ formatHours(preview.dailyHours) }}h</strong>
+            </div>
+            <div class="rehire-working-time-preview__item">
+              <span class="rehire-working-time-preview__label">{{ texts.workingTimeSectionMonthlyHoursLabel }}</span>
+              <strong>{{ formatHours(preview.monthlyHours) }}h</strong>
+            </div>
+          </div>
+        }
+      </div>
     </div>
   </section>
+
+  @if (result(); as result) {
+    <section class="rehire-section rehire-summary" data-testid="rehire-result-summary">
+      <h2 class="rehire-section-title">{{ texts.rehireEmployeeSummaryTitle }}</h2>
+      <div class="rehire-summary-row">
+        <span class="rehire-summary-label">{{ texts.rehireEmployeeSummaryEmployeeLabel }}</span>
+        <span>{{ detail()?.displayName ?? result.employeeKey.employeeNumber }}</span>
+      </div>
+      <div class="rehire-summary-row">
+        <span class="rehire-summary-label">{{ texts.rehireEmployeeSummaryStatusLabel }}</span>
+        <span>{{ formatStatusLabel(result.status) }}</span>
+      </div>
+      <div class="rehire-summary-row">
+        <span class="rehire-summary-label">{{ texts.rehireEmployeeSummaryDateLabel }}</span>
+        <span>{{ formatDisplayDate(result.rehireDate) }}</span>
+      </div>
+
+      @if (result.newWorkingTime; as workingTime) {
+        <div class="rehire-summary-working-time" data-testid="rehire-working-time-summary">
+          <h3 class="rehire-summary-working-time__title">{{ texts.rehireEmployeeSummaryWorkingTimeTitle }}</h3>
+          <p class="rehire-summary-working-time__primary">{{ formatHours(workingTime.workingTimePercentage) }}% jornada</p>
+          <p>
+            {{ formatHours(workingTime.weeklyHours) }}h/semana · {{ formatHours(workingTime.dailyHours) }}h/día ·
+            {{ formatHours(workingTime.monthlyHours) }}h/mes
+          </p>
+          <p>{{ texts.rehireEmployeeSummarySincePrefix }} {{ formatDisplayDate(workingTime.startDate) }}</p>
+        </div>
+      }
+    </section>
+  }
 
   <!-- Footer actions -->
   <footer class="rehire-footer">
@@ -79,6 +145,7 @@
         icon="pi pi-check"
         (click)="onSubmit()"
         [loading]="rehiring()"
+        [disabled]="submitDisabled()"
       ></p-button>
     </div>
   </footer>

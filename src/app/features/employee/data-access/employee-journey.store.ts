@@ -25,6 +25,14 @@ export class EmployeeJourneyStore {
   readonly error = this.errorState.asReadonly();
 
   loadJourneyByBusinessKey(key: EmployeeBusinessKey | null): void {
+    this.loadJourneyByBusinessKeyInternal(key, false);
+  }
+
+  refreshJourneyByBusinessKey(key: EmployeeBusinessKey | null): void {
+    this.loadJourneyByBusinessKeyInternal(key, true);
+  }
+
+  private loadJourneyByBusinessKeyInternal(key: EmployeeBusinessKey | null, forceReload: boolean): void {
     if (!key) {
       this.resetState();
       return;
@@ -33,7 +41,7 @@ export class EmployeeJourneyStore {
     const normalizedKey = toEmployeeBusinessKey(key);
     const isSameKey = areEmployeeBusinessKeysEqual(this.selectedEmployeeKeyState(), normalizedKey);
 
-    if (isSameKey && (this.loadingState() || this.errorState() === null)) {
+    if (!forceReload && isSameKey && (this.loadingState() || this.errorState() === null)) {
       return;
     }
 

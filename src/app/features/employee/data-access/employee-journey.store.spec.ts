@@ -109,4 +109,11 @@ describe('EmployeeJourneyStore', () => {
 
     expect(readGatewayMock.readEmployeeJourneyByBusinessKey).toHaveBeenCalledTimes(1);
   });
+
+  it('forces journey reload when refresh is requested for the same business key', () => {
+    store.loadJourneyByBusinessKey(employeeBusinessKey);
+    store.refreshJourneyByBusinessKey(employeeBusinessKey);
+
+    expect(readGatewayMock.readEmployeeJourneyByBusinessKey).toHaveBeenCalledTimes(2);
+  });
 });

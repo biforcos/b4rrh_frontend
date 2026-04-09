@@ -68,6 +68,13 @@ describe('EmployeeWorkCenterStore', () => {
     expect(store.error()).toBeNull();
   });
 
+  it('forces work center reload when refresh is requested for the same business key', () => {
+    store.loadWorkCenters(employeeBusinessKey);
+    store.refreshWorkCenters(employeeBusinessKey);
+
+    expect(gatewayMock.readWorkCenters).toHaveBeenCalledTimes(2);
+  });
+
   it('creates work center and refreshes list on success', () => {
     store.loadWorkCenters(employeeBusinessKey);
 

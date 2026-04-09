@@ -43,6 +43,10 @@ export class EmployeeDetailStore {
     this.loadEmployeeDetailByBusinessKeyInternal(key, false);
   }
 
+  refreshEmployeeDetailByBusinessKey(key: EmployeeBusinessKey | null): void {
+    this.loadEmployeeDetailByBusinessKeyInternal(key, true);
+  }
+
   updateEmployeeCoreIdentity(employeeKey: EmployeeBusinessKey, draft: EmployeeCoreIdentityDraft): void {
     if (this.mutatingState()) {
       return;

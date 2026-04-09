@@ -38,7 +38,7 @@ export class EmployeeRehireCatalogService {
     this.lastRuleSystemCode = ruleSystemCode.trim();
     this.error.set(null);
 
-    this.loadWorkCenters(ruleSystemCode);
+    this.workCenters.set([]);
     this.loadCompanies(ruleSystemCode);
     this.loadEntryReasons(ruleSystemCode);
     this.loadContractTypes(ruleSystemCode);
@@ -56,13 +56,23 @@ export class EmployeeRehireCatalogService {
     if (this.pendingRequests === 0) this.loading.set(false);
   }
 
-  private loadWorkCenters(ruleSystemCode: string): void {
+  loadWorkCentersByCompany(companyCode: string): void {
+    const ruleSystemCode = this.lastRuleSystemCode;
+    if (!ruleSystemCode || !companyCode) {
+      this.workCenters.set([]);
+      return;
+    }
+
     this.startRequest();
-    this.fieldCatalog.loadWorkCenterOptions(ruleSystemCode).pipe(take(1)).subscribe({
+    this.fieldCatalog.loadWorkCenterOptionsByCompany(ruleSystemCode, companyCode).pipe(take(1)).subscribe({
       next: (opts) => this.workCenters.set([...opts]),
       error: () => this.error.set(employeeTexts.catalogLoadFailedMessage),
       complete: () => this.finishRequest(),
     });
+  }
+
+  clearWorkCenters(): void {
+    this.workCenters.set([]);
   }
 
   private loadCompanies(ruleSystemCode: string): void {

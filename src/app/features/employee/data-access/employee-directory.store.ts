@@ -52,6 +52,10 @@ export class EmployeeDirectoryStore {
     this.query.set(value);
   }
 
+  refreshDirectory(): void {
+    this.loadDirectory();
+  }
+
   findEmployeeByBusinessKey(key: EmployeeBusinessKey | null): EmployeeListItemModel | null {
     if (!key) {
       return null;

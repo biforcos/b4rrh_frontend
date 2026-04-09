@@ -37,6 +37,10 @@ export class EmployeeWorkCenterStore {
     this.loadWorkCentersByBusinessKeyInternal(key, false);
   }
 
+  refreshWorkCenters(key: EmployeeBusinessKey | null): void {
+    this.loadWorkCentersByBusinessKeyInternal(key, true);
+  }
+
   createWorkCenter(employeeKey: EmployeeBusinessKey, draft: WorkCenterCreateDraft): void {
     if (this.mutatingState()) {
       return;

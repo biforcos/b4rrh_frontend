@@ -19,6 +19,7 @@ import { MessageModule } from 'primeng/message';
 import { HIRE_EMPLOYEE_DEFAULTS } from '../../../models/hire-employee.defaults';
 import { formatLocalDate } from '../../../shared/utils/local-date-string.util';
 import { GlobalMessageRailComponent } from '../../../shell/components/global-message-rail.component';
+import { buildWorkingTimePreview, formatWorkingTimeHours } from '../../../shared/utils/working-time-preview.util';
 import { parseLocalDate } from '../../../../../shared/utils/local-date.util';
 
 @Component({
@@ -92,7 +93,7 @@ export class HireEmployeePageComponent {
   readonly formStatus = toSignal(this.form.statusChanges.pipe(startWith(this.form.status)), {
     initialValue: this.form.status,
   });
-  readonly workingTimePreview = computed(() => this.buildWorkingTimePreview(this.form.controls.workingTimePercentage.value));
+  readonly workingTimePreview = computed(() => buildWorkingTimePreview(this.form.controls.workingTimePercentage.value));
   readonly submitDisabled = computed(() => this.hiring() || this.formStatus() !== 'VALID');
 
   constructor() {
@@ -293,10 +294,7 @@ export class HireEmployeePageComponent {
   }
 
   protected formatHours(value: number): string {
-    return new Intl.NumberFormat('es-ES', {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    }).format(value);
+    return formatWorkingTimeHours(value);
   }
 
   protected formatDisplayDate(value: string): string {
@@ -329,29 +327,6 @@ export class HireEmployeePageComponent {
     }
 
     return messages;
-  }
-
-  private buildWorkingTimePreview(workingTimePercentage: number | null) {
-    if (
-      workingTimePercentage === null
-      || !Number.isFinite(workingTimePercentage)
-      || workingTimePercentage <= 0
-      || workingTimePercentage > 100
-    ) {
-      return null;
-    }
-
-    const percentageFactor = workingTimePercentage / 100;
-
-    return {
-      weeklyHours: this.roundToTwoDecimals(40 * percentageFactor),
-      dailyHours: this.roundToTwoDecimals(8 * percentageFactor),
-      monthlyHours: this.roundToTwoDecimals((2000 / 12) * percentageFactor),
-    };
-  }
-
-  private roundToTwoDecimals(value: number): number {
-    return Math.round(value * 100) / 100;
   }
 
   private mapErrorMessage(code: HireEmployeeErrorCode): string {

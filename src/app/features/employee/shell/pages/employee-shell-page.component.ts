@@ -184,16 +184,36 @@ export class EmployeeShellPageComponent {
       .subscribe(() => {
         const previousEmployeeKey = this.activeEmployeeKey();
         const activeEmployeeKey = this.resolveActiveEmployeeKey();
+        const shouldForceRefresh = this.shouldForceRefreshAfterRehire();
         if (!areEmployeeBusinessKeysEqual(previousEmployeeKey, activeEmployeeKey)) {
           this.globalMessageService.reset();
         }
         this.activeEmployeeKey.set(activeEmployeeKey);
         this.activeDetailSection.set(this.resolveActiveDetailSection());
-        this.detailStore.loadEmployeeDetailByBusinessKey(activeEmployeeKey);
+
+        if (shouldForceRefresh) {
+          this.directoryStore.refreshDirectory();
+          this.detailStore.refreshEmployeeDetailByBusinessKey(activeEmployeeKey);
+          this.presenceStore.refreshPresencesByBusinessKey(activeEmployeeKey);
+          this.workCenterStore.refreshWorkCenters(activeEmployeeKey);
+          this.journeyStore.refreshJourneyByBusinessKey(activeEmployeeKey);
+        } else {
+          this.detailStore.loadEmployeeDetailByBusinessKey(activeEmployeeKey);
+          this.presenceStore.loadPresencesByBusinessKey(activeEmployeeKey);
+          this.workCenterStore.loadWorkCenters(activeEmployeeKey);
+          this.journeyStore.loadJourneyByBusinessKey(activeEmployeeKey);
+        }
+
         this.contactStore.loadContactsByBusinessKey(activeEmployeeKey);
-        this.presenceStore.loadPresencesByBusinessKey(activeEmployeeKey);
-        this.workCenterStore.loadWorkCenters(activeEmployeeKey);
-        this.journeyStore.loadJourneyByBusinessKey(activeEmployeeKey);
+
+        if (shouldForceRefresh) {
+          void this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: { refresh: null },
+            queryParamsHandling: 'merge',
+            replaceUrl: true,
+          });
+        }
       });
 
     effect((onCleanup) => {
@@ -491,5 +511,15 @@ export class EmployeeShellPageComponent {
       key.employeeNumber,
       'rehire',
     ]);
+  }
+
+  private shouldForceRefreshAfterRehire(): boolean {
+    let snapshot = this.route.snapshot;
+
+    while (snapshot.firstChild) {
+      snapshot = snapshot.firstChild;
+    }
+
+    return snapshot.queryParamMap.get('refresh') === 'rehire';
   }
 }

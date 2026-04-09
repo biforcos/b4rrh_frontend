@@ -99,4 +99,11 @@ describe('EmployeePresenceStore', () => {
 
     expect(readGatewayMock.readEmployeePresencesByBusinessKey).toHaveBeenCalledTimes(1);
   });
+
+  it('forces presence reload when refresh is requested for the same business key', () => {
+    store.loadPresencesByBusinessKey(employeeBusinessKey);
+    store.refreshPresencesByBusinessKey(employeeBusinessKey);
+
+    expect(readGatewayMock.readEmployeePresencesByBusinessKey).toHaveBeenCalledTimes(2);
+  });
 });

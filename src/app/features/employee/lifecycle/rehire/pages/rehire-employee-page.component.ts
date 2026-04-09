@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, effect, inject, untracked, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, untracked, ViewChild } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -8,15 +9,20 @@ import { GlobalMessageService } from '../../../data-access/employee-global-messa
 import { employeeTexts } from '../../../employee.texts';
 import { buildEmployeeDetailRouteCommands } from '../../../routing/employee-route-builder.util';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { startWith } from 'rxjs';
 import { SelectModule } from 'primeng/select';
 import { DatePickerModule } from 'primeng/datepicker';
+import { InputNumberModule } from 'primeng/inputnumber';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
+import { MessageModule } from 'primeng/message';
 import { EmployeeCostCenterDistributionEditorComponent } from '../../../organization/components/employee-cost-center-distribution-editor.component';
 import { EmployeeDetailStore } from '../../../data-access/employee-detail.store';
 import { RehireEmployeeDraft } from '../../../models/employee-rehire.model';
 import { readEmployeeBusinessKeyFromParamMap } from '../../../routing/employee-route-key.util';
 import { formatLocalDate } from '../../../shared/utils/local-date-string.util';
+import { buildWorkingTimePreview, formatWorkingTimeHours } from '../../../shared/utils/working-time-preview.util';
+import { parseLocalDate } from '../../../../../shared/utils/local-date.util';
 
 @Component({
   selector: 'app-rehire-employee-page',
@@ -27,8 +33,10 @@ import { formatLocalDate } from '../../../shared/utils/local-date-string.util';
     ReactiveFormsModule,
     SelectModule,
     DatePickerModule,
+    InputNumberModule,
     ButtonModule,
     CardModule,
+    MessageModule,
     EmployeeCostCenterDistributionEditorComponent,
   ],
   templateUrl: './rehire-employee-page.component.html',
@@ -57,6 +65,7 @@ export class RehireEmployeePageComponent {
     contractSubtypeCode: [''],
     agreementCode: ['', Validators.required],
     agreementCategoryCode: ['', Validators.required],
+    workingTimePercentage: [null as number | null, [Validators.required, Validators.min(0.01), Validators.max(100)]],
   });
 
   // Bind catalog signals from catalog service
@@ -74,6 +83,11 @@ export class RehireEmployeePageComponent {
   readonly rehiring = this.rehireStore.rehiring;
   readonly error = this.rehireStore.error;
   readonly result = this.rehireStore.result;
+  readonly formStatus = toSignal(this.form.statusChanges.pipe(startWith(this.form.status)), {
+    initialValue: this.form.status,
+  });
+  readonly workingTimePreview = computed(() => buildWorkingTimePreview(this.form.controls.workingTimePercentage.value));
+  readonly submitDisabled = computed(() => this.rehiring() || this.formStatus() !== 'VALID');
 
   // Expose selected employee detail for template
   readonly detail = this.detailStore.selectedEmployeeDetail;
@@ -127,7 +141,21 @@ export class RehireEmployeePageComponent {
         }
       });
 
-    // Navigate on success
+    this.form
+      .get('companyCode')
+      ?.valueChanges.pipe(takeUntilDestroyed())
+      .subscribe((companyCode: string | null) => {
+        const workCenterControl = this.form.controls.workCenterCode;
+
+        if (companyCode) {
+          this.rehireCatalog.loadWorkCentersByCompany(companyCode);
+          return;
+        }
+
+        this.rehireCatalog.clearWorkCenters();
+        workCenterControl.setValue('');
+      });
+
     effect(() => {
       const res = this.rehireStore.result();
       if (res) {
@@ -137,9 +165,10 @@ export class RehireEmployeePageComponent {
             sectionId: 'overview',
             sectionLabel: this.texts.detailPanelTitle,
           });
+          void this.router.navigate(buildEmployeeDetailRouteCommands(res.employeeKey, 'overview'), {
+            queryParams: { refresh: 'rehire' },
+          });
         });
-        const commands = buildEmployeeDetailRouteCommands(res.employeeKey, 'overview');
-        void this.router.navigate(commands);
       }
     });
   }
@@ -169,6 +198,9 @@ export class RehireEmployeePageComponent {
       contractSubtypeCode: val.contractSubtypeCode ?? '',
       agreementCode: val.agreementCode ?? '',
       agreementCategoryCode: val.agreementCategoryCode ?? '',
+      workingTime: {
+        workingTimePercentage: val.workingTimePercentage,
+      },
       costCenterDistribution: null,
     };
 
@@ -196,6 +228,10 @@ export class RehireEmployeePageComponent {
         return this.texts.rehireEmployeeAlreadyActiveMessage;
       case 'invalid-rehire-date':
         return this.texts.rehireEmployeeInvalidDateMessage;
+      case 'rehire-conflict':
+        return this.texts.rehireEmployeeConflictMessage;
+      case 'invalid-working-time':
+        return this.texts.rehireEmployeeInvalidWorkingTimeMessage;
       case 'invalid-distribution':
         return this.texts.rehireEmployeeInvalidDistributionMessage;
       case 'invalid-dependent-relation':
@@ -205,6 +241,50 @@ export class RehireEmployeePageComponent {
       default:
         return this.texts.rehireEmployeeRequestFailedMessage;
     }
+  }
+
+  protected workingTimePercentageError(): string | null {
+    const control = this.form.controls.workingTimePercentage;
+    if (!control.touched && !control.dirty) {
+      return null;
+    }
+
+    if (control.hasError('required')) {
+      return this.texts.rehireEmployeeWorkingTimeRequiredMessage;
+    }
+
+    if (control.hasError('min') || control.hasError('max')) {
+      return this.texts.rehireEmployeeWorkingTimeRangeMessage;
+    }
+
+    return null;
+  }
+
+  protected formatHours(value: number): string {
+    return formatWorkingTimeHours(value);
+  }
+
+  protected formatDisplayDate(value: string): string {
+    const parsed = parseLocalDate(value);
+    if (!parsed) {
+      return value;
+    }
+
+    return new Intl.DateTimeFormat('es-ES').format(parsed);
+  }
+
+  protected formatStatusLabel(status: string): string {
+    const normalizedStatus = status.trim().toUpperCase();
+
+    if (normalizedStatus === 'ACTIVE') {
+      return this.texts.employeeStatusActiveLabel;
+    }
+
+    if (normalizedStatus === 'TERMINATED' || normalizedStatus === 'INACTIVE') {
+      return this.texts.employeeStatusInactiveLabel;
+    }
+
+    return this.texts.employeePageHeaderEmptyValue;
   }
 
   private buildGlobalMessages() {

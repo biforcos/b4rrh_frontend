@@ -57,4 +57,10 @@ describe('EmployeeDirectoryStore', () => {
 
     expect(employee).toBeNull();
   });
+
+  it('refreshes directory on demand', () => {
+    store.refreshDirectory();
+
+    expect(readGatewayMock.readDirectory).toHaveBeenCalledTimes(2);
+  });
 });

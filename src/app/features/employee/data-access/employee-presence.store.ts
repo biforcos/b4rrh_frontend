@@ -25,6 +25,14 @@ export class EmployeePresenceStore {
   readonly error = this.errorState.asReadonly();
 
   loadPresencesByBusinessKey(key: EmployeeBusinessKey | null): void {
+    this.loadPresencesByBusinessKeyInternal(key, false);
+  }
+
+  refreshPresencesByBusinessKey(key: EmployeeBusinessKey | null): void {
+    this.loadPresencesByBusinessKeyInternal(key, true);
+  }
+
+  private loadPresencesByBusinessKeyInternal(key: EmployeeBusinessKey | null, forceReload: boolean): void {
     if (!key) {
       this.resetState();
       return;
@@ -33,7 +41,7 @@ export class EmployeePresenceStore {
     const normalizedKey = toEmployeeBusinessKey(key);
     const isSameKey = areEmployeeBusinessKeysEqual(this.selectedEmployeeKeyState(), normalizedKey);
 
-    if (isSameKey && (this.loadingState() || this.errorState() === null)) {
+    if (!forceReload && isSameKey && (this.loadingState() || this.errorState() === null)) {
       return;
     }
 
