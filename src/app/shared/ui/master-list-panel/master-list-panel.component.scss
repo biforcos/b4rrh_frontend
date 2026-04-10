@@ -139,3 +139,45 @@
   border: 1px solid #ebc9c9;
   background: #fff5f5;
 }
+
+/* --- Skeleton shimmer --- */
+.master-list-panel__skeleton {
+  display: grid;
+  gap: 0.32rem;
+}
+
+.master-list-panel__skeleton-item {
+  border: 1px solid rgba(185, 210, 230, 0.4);
+  border-radius: 0.72rem;
+  background: #ffffff;
+  padding: 0.58rem 0.62rem;
+  display: grid;
+  gap: 0.28rem;
+}
+
+.master-list-panel__shimmer {
+  border-radius: 0.28rem;
+  background: linear-gradient(90deg, #edf2f7 25%, #dde6ef 50%, #edf2f7 75%);
+  background-size: 200% 100%;
+  animation: master-list-shimmer 1.4s ease-in-out infinite;
+}
+
+.master-list-panel__shimmer--name {
+  height: 0.78rem;
+  width: 70%;
+}
+
+.master-list-panel__shimmer--chips {
+  height: 0.62rem;
+  width: 55%;
+}
+
+.master-list-panel__shimmer--meta {
+  height: 0.58rem;
+  width: 45%;
+}
+
+@keyframes master-list-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

@@ -1,9 +1,26 @@
 <app-master-detail-shell [title]="texts.masterTitle" [subtitle]="''">
   <aside slot="list" class="employee-shell__master">
+    <div class="employee-shell__status-filters" role="group" aria-label="Filtrar por estado">
+      <button
+        class="employee-shell__filter-chip"
+        [class.employee-shell__filter-chip--active]="statusFilter() === 'all'"
+        (click)="setStatusFilter('all')"
+      >Todos</button>
+      <button
+        class="employee-shell__filter-chip"
+        [class.employee-shell__filter-chip--active]="statusFilter() === 'active'"
+        (click)="setStatusFilter('active')"
+      >{{ texts.employeeStatusActiveLabel }}</button>
+      <button
+        class="employee-shell__filter-chip"
+        [class.employee-shell__filter-chip--active]="statusFilter() === 'inactive'"
+        (click)="setStatusFilter('inactive')"
+      >{{ texts.employeeStatusInactiveLabel }}</button>
+    </div>
     <app-master-list-panel
       [title]="''"
       [subtitle]="texts.masterSubtitle"
-      [items]="filteredEmployees()"
+      [items]="displayedEmployees()"
       [emptyState]="employeeListEmptyState()"
       [loading]="loadingDirectory()"
       [errorMessage]="directoryError() ? texts.directoryLoadFailedMessage : null"

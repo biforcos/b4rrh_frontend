@@ -1,19 +1,96 @@
-<section class="employee-area" aria-labelledby="employee-overview-title">
-  <header class="employee-area__header">
-    <h3 id="employee-overview-title">{{ texts.summaryAreaTitle }}</h3>
-  </header>
+<section class="employee-overview" aria-labelledby="employee-overview-title">
 
-  <div class="employee-area__grid">
-    <article class="employee-area__card">
-      <h4>{{ texts.summaryProfileBlockTitle }}</h4>
-    </article>
+  @if (loading()) {
+    <div class="employee-overview__grid">
+      <div class="employee-overview__card employee-overview__card--loading" aria-hidden="true">
+        <div class="employee-overview__shimmer employee-overview__shimmer--label"></div>
+        <div class="employee-overview__shimmer employee-overview__shimmer--value"></div>
+        <div class="employee-overview__shimmer employee-overview__shimmer--value employee-overview__shimmer--short"></div>
+      </div>
+      <div class="employee-overview__card employee-overview__card--loading" aria-hidden="true">
+        <div class="employee-overview__shimmer employee-overview__shimmer--label"></div>
+        <div class="employee-overview__shimmer employee-overview__shimmer--value"></div>
+        <div class="employee-overview__shimmer employee-overview__shimmer--value"></div>
+        <div class="employee-overview__shimmer employee-overview__shimmer--value employee-overview__shimmer--short"></div>
+      </div>
+      <div class="employee-overview__card employee-overview__card--loading" aria-hidden="true">
+        <div class="employee-overview__shimmer employee-overview__shimmer--label"></div>
+        <div class="employee-overview__shimmer employee-overview__shimmer--value employee-overview__shimmer--short"></div>
+      </div>
+    </div>
+  } @else {
+    <div class="employee-overview__grid">
 
-    <article class="employee-area__card">
-      <h4>{{ texts.summaryLifecycleBlockTitle }}</h4>
-    </article>
+      <!-- Card 1: Identidad funcional -->
+      <article class="employee-overview__card">
+        <header class="employee-overview__card-header">
+          <h4 id="employee-overview-title" class="employee-overview__card-title">
+            {{ texts.summaryProfileBlockTitle }}
+          </h4>
+          @if (statusLabel(); as label) {
+            <app-ui-tag [value]="label" [severity]="statusSeverity()" [rounded]="true" />
+          }
+        </header>
+        <dl class="employee-overview__fields">
+          <div class="employee-overview__field">
+            <dt>Centro de trabajo</dt>
+            <dd>{{ employee()?.workCenter || '—' }}</dd>
+          </div>
+          <div class="employee-overview__field">
+            <dt>Empresa activa</dt>
+            <dd>{{ company() || '—' }}</dd>
+          </div>
+          <div class="employee-overview__field">
+            <dt>Tipo empleado</dt>
+            <dd>{{ employee()?.employeeTypeCode || '—' }}</dd>
+          </div>
+        </dl>
+      </article>
 
-    <article class="employee-area__card">
-      <h4>{{ texts.summaryPendingBlockTitle }}</h4>
-    </article>
-  </div>
+      <!-- Card 2: Hitos laborales -->
+      <article class="employee-overview__card">
+        <header class="employee-overview__card-header">
+          <h4 class="employee-overview__card-title">{{ texts.summaryLifecycleBlockTitle }}</h4>
+        </header>
+        <dl class="employee-overview__fields">
+          <div class="employee-overview__field">
+            <dt>Fecha de alta</dt>
+            <dd>{{ hireDate() ? (hireDate() | date:'dd/MM/yyyy') : '—' }}</dd>
+          </div>
+          @if (activeContract(); as contract) {
+            <div class="employee-overview__field">
+              <dt>Contrato activo</dt>
+              <dd>{{ contract.contractTypeName || contract.contractCode }}</dd>
+            </div>
+            <div class="employee-overview__field">
+              <dt>Período</dt>
+              <dd>
+                {{ contract.startDate | date:'dd/MM/yyyy' }}
+                @if (contract.endDate) {
+                  &ndash; {{ contract.endDate | date:'dd/MM/yyyy' }}
+                } @else {
+                  <span class="employee-overview__badge employee-overview__badge--active">En vigor</span>
+                }
+              </dd>
+            </div>
+          } @else if (!loadingContracts()) {
+            <div class="employee-overview__field">
+              <dt>Contrato activo</dt>
+              <dd class="employee-overview__empty-value">Sin contrato activo</dd>
+            </div>
+          }
+        </dl>
+      </article>
+
+      <!-- Card 3: Próximos pasos -->
+      <article class="employee-overview__card employee-overview__card--muted">
+        <header class="employee-overview__card-header">
+          <h4 class="employee-overview__card-title">{{ texts.summaryPendingBlockTitle }}</h4>
+        </header>
+        <p class="employee-overview__empty-note">{{ texts.summaryPendingBlockDescription }}</p>
+      </article>
+
+    </div>
+  }
+
 </section>

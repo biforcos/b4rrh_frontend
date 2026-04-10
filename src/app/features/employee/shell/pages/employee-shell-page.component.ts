@@ -1,11 +1,21 @@
-
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, untracked } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+  untracked,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter, startWith } from 'rxjs';
 
 import { MasterDetailPageShellComponent } from '../../../../shared/ui/master-detail-page-shell/master-detail-page-shell.component';
-import { MasterListPanelComponent, MasterListPanelEmptyState } from '../../../../shared/ui/master-list-panel/master-list-panel.component';
+import {
+  MasterListPanelComponent,
+  MasterListPanelEmptyState,
+} from '../../../../shared/ui/master-list-panel/master-list-panel.component';
 import { ListItemComponent } from '../../../../shared/ui/list-item/list-item.component';
 import { UiTagComponent } from '../../../../shared/ui/tag/ui-tag.component';
 import { GlobalMessageService } from '../../data-access/employee-global-message.store';
@@ -27,7 +37,11 @@ import {
   EmployeeRouteSection,
   employeeRouteSections,
 } from '../../routing/employee-route-builder.util';
-import { areEmployeeBusinessKeysEqual, readEmployeeBusinessKeyFromParamMap, toEmployeeBusinessKey } from '../../routing/employee-route-key.util';
+import {
+  areEmployeeBusinessKeysEqual,
+  readEmployeeBusinessKeyFromParamMap,
+  toEmployeeBusinessKey,
+} from '../../routing/employee-route-key.util';
 import { EmployeeTerminatePanelComponent } from '../components/employee-terminate-panel.component';
 import { EmployeePageHeaderComponent } from '../components/employee-page-header.component';
 import { EmployeeDetailHeaderComponent } from '../components/employee-detail-header.component';
@@ -76,7 +90,18 @@ export class EmployeeShellPageComponent {
 
   protected readonly texts = employeeTexts;
   protected readonly searchValue = signal('');
+  protected readonly statusFilter = signal<'all' | 'active' | 'inactive'>('all');
   protected readonly filteredEmployees = this.directoryStore.filteredEmployees;
+  protected readonly displayedEmployees = computed(() => {
+    const filter = this.statusFilter();
+    const employees = this.filteredEmployees();
+    if (filter === 'all') return employees;
+    return employees.filter((e) => {
+      const normalized = e.statusLabel.trim().toLowerCase();
+      const isActive = normalized.includes('active') || normalized.includes('alta');
+      return filter === 'active' ? isActive : !isActive;
+    });
+  });
   protected readonly loadingDirectory = this.directoryStore.loading;
   protected readonly directoryError = this.directoryStore.error;
   protected readonly activeEmployeeKey = signal<EmployeeBusinessKey | null>(null);
@@ -94,8 +119,12 @@ export class EmployeeShellPageComponent {
   protected readonly globalMessageSummary = this.globalMessageService.summary;
   protected readonly globalMessageExpanded = this.globalMessageService.expanded;
   protected readonly updatingIdentity = this.detailStore.mutating;
-  protected readonly updateIdentityError = computed(() => this.detailStore.mutationError() === 'request-failed');
-  protected readonly updateIdentitySuccess = computed(() => this.detailStore.mutationSuccess() === 'updated');
+  protected readonly updateIdentityError = computed(
+    () => this.detailStore.mutationError() === 'request-failed',
+  );
+  protected readonly updateIdentitySuccess = computed(
+    () => this.detailStore.mutationSuccess() === 'updated',
+  );
   protected readonly openIdentityEditorRequestId = signal(0);
   protected readonly terminatePanelOpen = signal(false);
   protected readonly activeEmployeeListKey = computed(() => {
@@ -126,7 +155,10 @@ export class EmployeeShellPageComponent {
     }
 
     const selectedEmployeeDetail = this.selectedEmployeeDetail();
-    if (selectedEmployeeDetail && areEmployeeBusinessKeysEqual(selectedEmployeeDetail, activeEmployeeKey)) {
+    if (
+      selectedEmployeeDetail &&
+      areEmployeeBusinessKeysEqual(selectedEmployeeDetail, activeEmployeeKey)
+    ) {
       return selectedEmployeeDetail;
     }
 
@@ -158,19 +190,27 @@ export class EmployeeShellPageComponent {
 
     return candidate ?? this.texts.employeePageHeaderEmptyValue;
   });
-  protected readonly headerWorkCenter = computed(() => this.resolveHeaderWorkCenter(this.workCenters(), this.selectedEmployee()));
+  protected readonly headerWorkCenter = computed(() =>
+    this.resolveHeaderWorkCenter(this.workCenters(), this.selectedEmployee()),
+  );
   protected readonly headerHireDate = computed(() => {
     const presences = this.presences();
     if (presences.length === 0) {
       return this.texts.employeePageHeaderEmptyValue;
     }
 
-    const earliestPresence = [...presences].sort((left, right) => left.startDate.localeCompare(right.startDate))[0];
+    const earliestPresence = [...presences].sort((left, right) =>
+      left.startDate.localeCompare(right.startDate),
+    )[0];
 
     return earliestPresence?.startDate ?? this.texts.employeePageHeaderEmptyValue;
   });
-  protected readonly headerEmail = computed(() => this.findPreferredContactValue(this.contacts(), 'email'));
-  protected readonly headerPhone = computed(() => this.findPreferredContactValue(this.contacts(), 'phone'));
+  protected readonly headerEmail = computed(() =>
+    this.findPreferredContactValue(this.contacts(), 'email'),
+  );
+  protected readonly headerPhone = computed(() =>
+    this.findPreferredContactValue(this.contacts(), 'phone'),
+  );
 
   constructor() {
     this.directoryStore.setQuery(this.searchValue());
@@ -320,11 +360,17 @@ export class EmployeeShellPageComponent {
     this.directoryStore.setQuery(value);
   }
 
+  protected setStatusFilter(filter: 'all' | 'active' | 'inactive'): void {
+    this.statusFilter.set(filter);
+  }
+
   protected openEmployeeListItem(employee: EmployeeListItemModel): void {
     void this.openEmployeeDetail(toEmployeeBusinessKey(employee), 'contact');
   }
 
-  protected employeeListKey(employee: Pick<EmployeeBusinessKey, 'ruleSystemCode' | 'employeeTypeCode' | 'employeeNumber'>): string {
+  protected employeeListKey(
+    employee: Pick<EmployeeBusinessKey, 'ruleSystemCode' | 'employeeTypeCode' | 'employeeNumber'>,
+  ): string {
     return `${employee.ruleSystemCode}::${employee.employeeTypeCode}::${employee.employeeNumber}`;
   }
 
@@ -386,7 +432,9 @@ export class EmployeeShellPageComponent {
     return 'contact';
   }
 
-  private resolveActivePresence(presences: ReadonlyArray<EmployeePresenceModel>): EmployeePresenceModel | null {
+  private resolveActivePresence(
+    presences: ReadonlyArray<EmployeePresenceModel>,
+  ): EmployeePresenceModel | null {
     if (presences.length === 0) {
       return null;
     }
@@ -396,24 +444,34 @@ export class EmployeeShellPageComponent {
       return activePresence;
     }
 
-    return [...presences].sort((left, right) => right.startDate.localeCompare(left.startDate))[0] ?? null;
+    return (
+      [...presences].sort((left, right) => right.startDate.localeCompare(left.startDate))[0] ?? null
+    );
   }
 
   private resolveHeaderWorkCenter(
-    workCenters: ReadonlyArray<import('../../models/employee-work-center.model').EmployeeWorkCenterModel>,
+    workCenters: ReadonlyArray<
+      import('../../models/employee-work-center.model').EmployeeWorkCenterModel
+    >,
     employee: import('../../models/employee-detail.model').EmployeeDetailModel | null,
   ): string {
     // Prefer an explicitly active work center assignment
     if (workCenters && workCenters.length > 0) {
       const active = workCenters.find((w) => w.isActive);
       if (active) {
-        return (active.workCenterName ?? active.workCenterCode ?? '').trim() || this.texts.employeePageHeaderEmptyValue;
+        return (
+          (active.workCenterName ?? active.workCenterCode ?? '').trim() ||
+          this.texts.employeePageHeaderEmptyValue
+        );
       }
 
       // Fallback to most recent by startDate
       const recent = [...workCenters].sort((l, r) => r.startDate.localeCompare(l.startDate))[0];
       if (recent) {
-        return (recent.workCenterName ?? recent.workCenterCode ?? '').trim() || this.texts.employeePageHeaderEmptyValue;
+        return (
+          (recent.workCenterName ?? recent.workCenterCode ?? '').trim() ||
+          this.texts.employeePageHeaderEmptyValue
+        );
       }
     }
 

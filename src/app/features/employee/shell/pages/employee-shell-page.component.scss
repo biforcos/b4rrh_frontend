@@ -13,6 +13,46 @@
   position: relative;
 }
 
+.employee-shell__status-filters {
+  display: flex;
+  gap: 0.28rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+
+.employee-shell__filter-chip {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(185, 210, 230, 0.8);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.7);
+  color: #4a6378;
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1;
+  padding: 0.28rem 0.72rem;
+  cursor: pointer;
+  transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+
+.employee-shell__filter-chip:hover {
+  background: rgba(14, 116, 144, 0.08);
+  border-color: rgba(14, 116, 144, 0.3);
+  color: #0a2d3e;
+}
+
+.employee-shell__filter-chip--active {
+  background: #0e7490;
+  border-color: #0e7490;
+  color: #ffffff;
+}
+
+.employee-shell__filter-chip--active:hover {
+  background: #0a6080;
+  border-color: #0a6080;
+  color: #ffffff;
+}
+
 .employee-shell__master app-master-list-panel {
   display: block;
   position: sticky;
