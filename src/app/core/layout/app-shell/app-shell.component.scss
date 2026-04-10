@@ -44,6 +44,35 @@
   line-height: 1.1;
 }
 
+.app-shell__auth {
+  display: grid;
+  gap: 0.6rem;
+  padding: 0.12rem 0.18rem 0.9rem;
+  margin-bottom: 0.62rem;
+  border-bottom: 1px solid rgba(14, 116, 144, 0.15);
+}
+
+.app-shell__auth-copy {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.app-shell__auth-copy span {
+  color: #497086;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.app-shell__auth-copy strong {
+  color: #0a2d3e;
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
 .app-shell__workspace {
   display: grid;
   grid-template-columns: 16.4rem minmax(0, 1fr);
@@ -182,6 +211,10 @@
     position: static;
     max-height: none;
     padding-right: 0;
+  }
+
+  .app-shell__auth {
+    padding-bottom: 0.72rem;
   }
 
   .app-shell__main {

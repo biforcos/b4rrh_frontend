@@ -8,6 +8,21 @@
         </span>
       </a>
 
+      <section class="app-shell__auth" [attr.aria-label]="texts.authCurrentSubjectLabel">
+        <div class="app-shell__auth-copy">
+          <span>{{ texts.authCurrentSubjectLabel }}</span>
+          <strong>{{ auth.subject() ?? '—' }}</strong>
+        </div>
+
+        <app-ui-button
+          [label]="texts.authLogoutAction"
+          severity="secondary"
+          [outlined]="true"
+          [fluid]="true"
+          (pressed)="logout()"
+        />
+      </section>
+
       <p-panelmenu class="app-shell__panelmenu" [model]="sideNavItems" />
     </aside>
 

@@ -1,8 +1,16 @@
 import { Routes } from '@angular/router';
 
+import { authGuard } from './core/auth/auth.guard';
+
 export const routes: Routes = [
 	{
+		path: 'login',
+		loadComponent: () =>
+			import('./core/auth/pages/local-dev-login-page.component').then((m) => m.LocalDevLoginPageComponent),
+	},
+	{
 		path: '',
+		canActivate: [authGuard],
 		loadComponent: () =>
 			import('./core/layout/app-shell/app-shell.component').then((m) => m.AppShellComponent),
 		children: [
@@ -62,6 +70,6 @@ export const routes: Routes = [
 	},
 	{
 		path: '**',
-		redirectTo: 'inicio',
+		redirectTo: 'login',
 	},
 ];

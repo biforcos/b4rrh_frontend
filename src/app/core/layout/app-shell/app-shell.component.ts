@@ -1,19 +1,24 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { PanelMenuModule } from 'primeng/panelmenu';
 
+import { AuthStore } from '../../auth/auth.store';
 import { appTexts } from '../../i18n/app-texts';
+import { UiButtonComponent } from '../../../shared/ui/button/ui-button.component';
 
 @Component({
   selector: 'app-shell',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, RouterOutlet, PanelMenuModule],
+  imports: [RouterLink, RouterOutlet, PanelMenuModule, UiButtonComponent],
   templateUrl: './app-shell.component.html',
   styleUrl: './app-shell.component.scss',
 })
 export class AppShellComponent {
   protected readonly texts = appTexts;
+  protected readonly auth = inject(AuthStore);
+
+  private readonly router = inject(Router);
 
   protected readonly sideNavItems: MenuItem[] = [
     {
@@ -46,4 +51,9 @@ export class AppShellComponent {
       items: [{ label: this.texts.sectionRuleSystems, icon: 'pi pi-cog', routerLink: '/configuracion/rule-systems' }],
     },
   ];
+
+  protected async logout(): Promise<void> {
+    this.auth.logout();
+    await this.router.navigate(['/login']);
+  }
 }
