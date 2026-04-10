@@ -1,5 +1,11 @@
 <header class="entity-header">
   <div class="entity-header__main">
+    @if (avatarText()) {
+      <div class="entity-header__avatar" aria-hidden="true">
+        {{ avatarText() }}
+      </div>
+    }
+
     <div class="entity-header__copy">
       @if (eyebrow()) {
         <p class="entity-header__eyebrow">{{ eyebrow() }}</p>

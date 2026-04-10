@@ -29,7 +29,7 @@
 }
 
 .employee-shell__list-name {
-  font-size: 0.82rem;
+  font-size: 0.84rem;
   font-weight: 700;
   line-height: 1.2;
   color: var(--text-primary);
@@ -41,34 +41,39 @@
   gap: 0.22rem;
 }
 
+/* Cambio 2: Sin max-width — el contenido llena la columna, pegado al panel */
 .employee-shell__identity-zone,
 .employee-shell__content-layout {
   width: 100%;
-  max-width: 1500px;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 .employee-shell__content-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(22.5rem, 24rem);
-  gap: 1.25rem;
+  gap: 1rem;
   align-items: start;
   position: relative;
 }
 
+/* Cambio 5: main-zone como panel unificado que contiene tabs + contenido */
 .employee-shell__main-zone {
   min-width: 0;
   width: 100%;
+  background: #ffffff;
+  border-radius: 0.92rem;
+  border: 1px solid rgba(185, 210, 230, 0.65);
+  box-shadow: var(--elevation-2);
+  overflow: hidden;
 }
 
 .employee-shell__timeline-zone {
   min-width: 0;
-  border-radius: 0.82rem;
-  background: linear-gradient(180deg, #ffffff 0%, #f9fcff 100%);
+  border-radius: 0.92rem;
+  background: #ffffff;
   padding: 0.95rem;
-  border: 1px solid #ccdceb;
-  box-shadow: 0 16px 32px -34px rgba(14, 116, 144, 0.82);
+  border: 1px solid rgba(185, 210, 230, 0.65);
+  border-top: 2px solid rgba(14, 116, 144, 0.35);
+  box-shadow: var(--elevation-2);
   align-self: start;
   position: sticky;
   top: 0.72rem;
@@ -81,7 +86,7 @@
   display: flex;
   gap: 0.24rem;
   min-width: 0;
-  font-size: 0.69rem;
+  font-size: 0.72rem;
   color: #3e546b;
 }
 
@@ -153,17 +158,19 @@
   margin-top: 0.72rem;
 }
 
+/* nav-zone vive dentro del panel blanco — sin separación extra */
 .employee-shell__nav-zone {
-  margin-bottom: 0.78rem;
+  margin-bottom: 0;
 }
 
+/* Contenido con padding interno dentro del panel */
 .employee-shell__detail-content-zone {
-  margin-top: 0;
+  padding: 1rem;
 }
 
 .employee-shell__detail-content-zone--standalone {
-  border-top: 1px solid #e3edf7;
-  padding-top: 0.78rem;
+  border-top: 1px solid rgba(14, 116, 144, 0.1);
+  padding-top: 1rem;
 }
 
 :global(.employee-shell__section-highlight) {
@@ -171,15 +178,9 @@
 }
 
 @keyframes employee-shell-section-highlight {
-  0% {
-    box-shadow: 0 0 0 0 rgba(14, 116, 144, 0);
-  }
-  25% {
-    box-shadow: 0 0 0 0.26rem rgba(14, 116, 144, 0.18);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(14, 116, 144, 0);
-  }
+  0% { box-shadow: 0 0 0 0 rgba(14, 116, 144, 0); }
+  25% { box-shadow: 0 0 0 0.26rem rgba(14, 116, 144, 0.18); }
+  100% { box-shadow: 0 0 0 0 rgba(14, 116, 144, 0); }
 }
 
 @media (max-width: 1280px) {
@@ -223,7 +224,7 @@
   }
 
   .employee-shell__nav-zone {
-    margin-bottom: 0.6rem;
+    margin-bottom: 0;
   }
 
   .employee-shell__detail-content-zone--standalone {

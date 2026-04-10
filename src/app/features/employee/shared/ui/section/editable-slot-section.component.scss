@@ -9,20 +9,24 @@
   min-width: 5.6rem;
 }
 
+.editable-slot-section__header-actions:empty {
+  display: none;
+}
+
 .editable-slot-section__body {
   display: grid;
-  gap: 0.42rem;
+  gap: 0.56rem;
 }
 
 .editable-slot-section__empty {
   margin: 0;
-  border: 1px dashed #c8d9ea;
+  border: 1px dashed rgba(14, 116, 144, 0.28);
   border-radius: 0.56rem;
-  background: #f6fbff;
-  color: #5f7489;
-  font-size: 0.72rem;
-  line-height: 1.3;
-  padding: 0.5rem 0.56rem;
+  background: rgba(14, 116, 144, 0.03);
+  color: #4f6a80;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  padding: 0.72rem 0.82rem;
 }
 
 .editable-slot-section__rows {
@@ -30,37 +34,38 @@
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 0.3rem;
+  gap: 0.42rem;
 }
 
+/* Más padding y aire en cada fila de dato */
 .editable-slot-section__row {
-  border: 1px solid #d0deec;
-  border-radius: 0.58rem;
+  border: 1px solid rgba(185, 210, 230, 0.7);
+  border-radius: 0.62rem;
   background: #ffffff;
-  padding: 0.5rem 0.56rem;
+  padding: 0.72rem 0.88rem;
   display: grid;
-  gap: 0.3rem;
+  gap: 0.38rem;
   justify-items: start;
   transition: border-color 120ms ease, background-color 120ms ease, box-shadow 120ms ease;
 }
 
 .editable-slot-section__row:hover {
-  border-color: #b9d0e5;
-  background: #f8fcff;
+  border-color: rgba(14, 116, 144, 0.3);
+  background: #f5faff;
 }
 
 .editable-slot-section__row--draft {
-  border-color: #c9d9ea;
-  background: #f8fbff;
+  border-color: rgba(14, 116, 144, 0.25);
+  background: #f5faff;
 }
 
 .editable-slot-section__row--readonly {
-  border-color: #dce5ef;
-  background: #f8fafd;
+  border-color: rgba(185, 210, 230, 0.5);
+  background: #fafcff;
 }
 
 .editable-slot-section__row--editing {
-  border-color: #95bcde;
+  border-color: #7ab8d8;
   background: #ebf6ff;
   box-shadow: inset 3px 0 0 #0e7490;
 }
@@ -72,37 +77,36 @@
 
 .editable-slot-section__summary {
   display: grid;
-  gap: 0.12rem;
+  gap: 0.18rem;
   width: 100%;
   max-width: 58rem;
 }
 
-.editable-slot-section__key,
-.editable-slot-section__value {
-  margin: 0;
-  font-size: 0.76rem;
-  line-height: 1.3;
-}
-
+/* Etiqueta de campo — más visible */
 .editable-slot-section__key {
-  font-size: 0.58rem;
+  margin: 0;
+  font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #60758a;
+  color: #5b7489;
+  line-height: 1.2;
 }
 
+/* Valor del campo — más peso visual */
 .editable-slot-section__value {
-  font-size: 0.79rem;
+  margin: 0;
+  font-size: 0.9rem;
   font-weight: 600;
-  color: #24425b;
+  color: #162f42;
+  line-height: 1.35;
 }
 
 .editable-slot-section__secondary {
   margin: 0;
-  font-size: 0.66rem;
-  line-height: 1.3;
-  color: #6a7f93;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: #607284;
 }
 
 .editable-slot-section__badges {
@@ -119,14 +123,14 @@
   border-radius: 999px;
   background: #f2f8ff;
   color: #476079;
-  font-size: 0.6rem;
+  font-size: 0.64rem;
   line-height: 1;
-  padding: 0.16rem 0.38rem;
+  padding: 0.18rem 0.42rem;
 }
 
 .editable-slot-section__fields {
   display: grid;
-  gap: 0.34rem;
+  gap: 0.5rem;
   width: 100%;
   max-width: 58rem;
 }
@@ -134,34 +138,36 @@
 .editable-slot-section__fields label,
 .editable-slot-section__readonly-field {
   display: grid;
-  gap: 0.05rem;
+  gap: 0.12rem;
 }
 
+/* Etiquetas de formulario — más legibles */
 .editable-slot-section__fields span,
 .editable-slot-section__readonly-field span {
-  font-size: 0.58rem;
+  font-size: 0.68rem;
   line-height: 1.2;
-  color: #5f758b;
+  color: #4f6a80;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   font-weight: 700;
 }
 
 .editable-slot-section__readonly-field strong {
-  font-size: 0.72rem;
+  font-size: 0.875rem;
+  font-weight: 600;
   line-height: 1.3;
-  color: #203f58;
+  color: #162f42;
 }
 
 .editable-slot-section__fields input,
 .editable-slot-section__fields select {
-  border: 1px solid #c2d4e6;
+  border: 1px solid rgba(185, 210, 230, 0.8);
   border-radius: 0.5rem;
   background: #ffffff;
   color: #1e3b54;
-  font-size: 0.72rem;
-  line-height: 1.2;
-  padding: 0.3rem 0.42rem;
+  font-size: 0.875rem;
+  line-height: 1.3;
+  padding: 0.38rem 0.52rem;
 }
 
 .editable-slot-section__fields input.p-inputtext {
@@ -172,7 +178,7 @@
 .editable-slot-section__fields select:focus-visible {
   outline: none;
   border-color: #7ea6cc;
-  box-shadow: 0 0 0 2px rgba(126, 166, 204, 0.2);
+  box-shadow: 0 0 0 2px rgba(14, 116, 144, 0.18);
 }
 
 .editable-slot-section__row-actions {
@@ -189,21 +195,21 @@
 
 .editable-slot-section__delete-confirm {
   display: grid;
-  gap: 0.3rem;
+  gap: 0.38rem;
   width: 100%;
   max-width: 58rem;
 }
 
 .editable-slot-section__delete-confirm p {
   margin: 0;
-  font-size: 0.74rem;
-  line-height: 1.3;
+  font-size: 0.82rem;
+  line-height: 1.35;
   color: #5b2431;
 }
 
 @media (max-width: 900px) {
   .editable-slot-section__row {
-    padding: 0.46rem 0.5rem;
+    padding: 0.58rem 0.68rem;
   }
 
   .editable-slot-section__summary,

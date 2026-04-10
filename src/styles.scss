@@ -1,8 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
 
 :root {
-	--font-body: 'IBM Plex Sans', 'Segoe UI', sans-serif;
-	--font-heading: 'IBM Plex Sans', 'Segoe UI', sans-serif;
+	--font-body: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+	--font-heading: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
 	--text-primary: #0f172a;
 	--text-muted: #475569;
 	--text-soft: #64748b;
@@ -10,14 +10,19 @@
 	--accent-soft: #22d3ee;
 	--border-subtle: #e2e8f0;
 	--border-strong: #cbd5e1;
-	--surface-app: #f3f7fb;
+	--surface-app: #d4e4f0;
 	--surface-panel: #ffffff;
-	--surface-muted: #f8fbff;
-	--surface-block: #eef5fb;
-	--surface-block-alt: #f8fbff;
-	--shadow-panel: 0 8px 20px rgba(15, 23, 42, 0.06);
+	--surface-muted: #e8f2fa;
+	--surface-block: #ddeef8;
+	--surface-block-alt: #e8f2fa;
+	--shadow-panel: 0 1px 3px rgba(15, 23, 42, 0.08), 0 6px 20px rgba(15, 23, 42, 0.06);
 	--shadow-soft: 0 18px 45px -30px rgba(14, 116, 144, 0.45);
 	--focus-ring: 0 0 0 3px rgba(34, 211, 238, 0.34);
+
+	/* Elevation scale */
+	--elevation-1: 0 1px 3px rgba(15, 23, 42, 0.07), 0 2px 6px rgba(15, 23, 42, 0.04);
+	--elevation-2: 0 2px 6px rgba(15, 23, 42, 0.08), 0 8px 24px rgba(15, 23, 42, 0.06);
+	--elevation-3: 0 4px 12px rgba(15, 23, 42, 0.1), 0 16px 40px rgba(15, 23, 42, 0.08);
 }
 
 * {
@@ -34,9 +39,9 @@ body {
 	font-family: var(--font-body);
 	color: var(--text-primary);
 	background:
-		radial-gradient(circle at 14% -10%, rgba(34, 211, 238, 0.14), transparent 36%),
-		radial-gradient(circle at 92% 2%, rgba(14, 116, 144, 0.12), transparent 32%),
-		linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(248, 252, 255, 0.72)),
+		radial-gradient(circle at 12% -8%, rgba(34, 211, 238, 0.22), transparent 38%),
+		radial-gradient(circle at 90% 3%, rgba(14, 116, 144, 0.18), transparent 34%),
+		radial-gradient(circle at 50% 100%, rgba(8, 145, 178, 0.1), transparent 42%),
 		var(--surface-app);
 }
 
@@ -92,4 +97,17 @@ select {
 	font-size: 0.62rem;
 	font-weight: 700;
 	letter-spacing: 0.02em;
+}
+
+/* Cambio 5: Tags lightweight — menos ruido visual */
+.p-tag.p-tag-contrast {
+	background: rgba(15, 47, 73, 0.09) !important;
+	border: 1px solid rgba(15, 47, 73, 0.22) !important;
+	color: #1e3a52 !important;
+}
+
+.p-tag.p-tag-secondary {
+	background: rgba(14, 116, 144, 0.08) !important;
+	border: 1px solid rgba(14, 116, 144, 0.22) !important;
+	color: #0a5c72 !important;
 }

@@ -1,6 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { employeeTexts } from '../../employee.texts';
-import { EntityHeaderComponent, EntityHeaderMetadataItem, EntityHeaderStatus } from '../../../../shared/ui/entity-header/entity-header.component';
+import {
+  EntityHeaderComponent,
+  EntityHeaderMetadataItem,
+  EntityHeaderStatus,
+} from '../../../../shared/ui/entity-header/entity-header.component';
 import { UiButtonComponent } from '../../../../shared/ui/button/ui-button.component';
 
 type EmployeeStatus = 'ACTIVE' | 'TERMINATED';
@@ -37,8 +41,17 @@ export class EmployeePageHeaderComponent {
     { label: this.texts.detailHeaderEmployeeTypeLabel, value: this.employeeTypeCode() },
     { label: this.texts.detailHeaderRuleSystemLabel, value: this.ruleSystemCode() },
   ]);
+  protected readonly initials = computed(() => {
+    const parts = this.fullName().trim().split(/\s+/);
+    if (parts.length === 0 || !parts[0]) return '?';
+    if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+    return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+  });
+
   protected readonly statusBadge = computed<EntityHeaderStatus>(() => ({
-    label: this.isActive() ? this.texts.employeeStatusActiveLabel : this.texts.employeeStatusInactiveLabel,
+    label: this.isActive()
+      ? this.texts.employeeStatusActiveLabel
+      : this.texts.employeeStatusInactiveLabel,
     severity: this.isActive() ? 'success' : 'secondary',
   }));
   protected readonly subtitle = computed(() => {

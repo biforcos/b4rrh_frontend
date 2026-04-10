@@ -18,8 +18,8 @@
   font-size: 0.9rem;
   font-weight: 800;
   color: #ffffff;
-  background: linear-gradient(140deg, var(--accent-strong), var(--accent-soft));
-  box-shadow: var(--shadow-soft);
+  background: linear-gradient(140deg, #0e7490, #22d3ee);
+  box-shadow: 0 4px 14px -4px rgba(14, 116, 144, 0.45);
 }
 
 .app-shell__brand {
@@ -27,7 +27,9 @@
   align-items: center;
   gap: 0.7rem;
   text-decoration: none;
-  margin-bottom: 0.1rem;
+  padding: 0.2rem 0.18rem 0.88rem;
+  margin-bottom: 0.62rem;
+  border-bottom: 1px solid rgba(14, 116, 144, 0.15);
 }
 
 .app-shell__brand-copy {
@@ -36,27 +38,26 @@
 }
 
 .app-shell__brand-copy strong {
-  color: #0f2f45;
+  color: #0a2d3e;
   font-size: 0.96rem;
+  font-weight: 700;
   line-height: 1.1;
 }
 
 .app-shell__workspace {
   display: grid;
   grid-template-columns: 16.4rem minmax(0, 1fr);
-  min-height: 0;
   min-height: 100dvh;
 }
 
+/* Sidebar: light teal — misma familia que el fondo, no oscuro */
 .app-shell__sidebar {
   display: grid;
   align-content: start;
-  gap: 0.3rem;
   min-height: 0;
-  border-right: 1px solid rgba(203, 213, 225, 0.78);
-  background:
-    linear-gradient(185deg, rgba(255, 255, 255, 0.88), rgba(243, 248, 254, 0.98)),
-    radial-gradient(circle at 20% -10%, rgba(34, 211, 238, 0.14), transparent 42%);
+  border-right: 1px solid rgba(14, 116, 144, 0.18);
+  border-left: 3px solid #0e7490;
+  background: linear-gradient(185deg, #cce7f2 0%, #c4e0ec 100%);
   padding: 0.74rem 0.58rem;
 }
 
@@ -69,17 +70,18 @@
   padding-right: 0.14rem;
 }
 
+/* PrimeNG panelmenu — light theme */
 .app-shell__panelmenu :where(.p-panelmenu) {
   border: 0;
   background: transparent;
 }
 
 .app-shell__panelmenu :where(.p-panelmenu-panel) {
-  border: 1px solid rgba(203, 213, 225, 0.72);
+  border: 1px solid rgba(14, 116, 144, 0.18);
   border-radius: 0.68rem;
   overflow: hidden;
-  background: #ffffff;
-  box-shadow: 0 14px 26px -24px rgba(15, 23, 42, 0.55);
+  background: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 2px 8px -4px rgba(14, 116, 144, 0.2);
 }
 
 .app-shell__panelmenu :where(.p-panelmenu-panel:not(:last-child)) {
@@ -88,45 +90,60 @@
 
 .app-shell__panelmenu :where(.p-panelmenu-header-content) {
   border: 0;
-  background: linear-gradient(180deg, #fdfefe 0%, #f5f9fe 100%);
+  background: transparent;
 }
 
 .app-shell__panelmenu :where(.p-panelmenu-header-link) {
-  color: #1f3950;
+  color: #0a2d3e;
   font-size: 0.78rem;
   font-weight: 700;
   gap: 0.42rem;
   padding: 0.56rem 0.64rem;
+  transition: background-color 120ms ease, color 120ms ease;
 }
 
 .app-shell__panelmenu :where(.p-panelmenu-header-link:hover) {
-  background: #edf5ff;
-  color: #0d2e45;
+  background: rgba(14, 116, 144, 0.1);
+  color: #071e29;
 }
 
 .app-shell__panelmenu :where(.p-panelmenu-content) {
   border: 0;
-  background: #f8fbff;
+  background: rgba(255, 255, 255, 0.35);
   padding: 0.1rem;
 }
 
 .app-shell__panelmenu :where(.p-menuitem-link) {
   border-radius: 0.48rem;
-  color: #355169;
+  color: #1e4a60;
   font-size: 0.74rem;
   font-weight: 600;
   gap: 0.4rem;
   padding: 0.48rem 0.56rem;
+  transition: background-color 120ms ease, color 120ms ease;
 }
 
 .app-shell__panelmenu :where(.p-menuitem-link:hover) {
-  background: #e7f2ff;
-  color: #0a2f46;
+  background: rgba(14, 116, 144, 0.1);
+  color: #0a2d3e;
 }
 
 .app-shell__panelmenu :where(.p-menuitem-link-active) {
-  background: linear-gradient(180deg, #e4f1ff 0%, #dcefff 100%);
-  color: #083047;
+  background: rgba(14, 116, 144, 0.16);
+  color: #062030;
+  font-weight: 700;
+  position: relative;
+}
+
+.app-shell__panelmenu :where(.p-menuitem-link-active)::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.22rem;
+  bottom: 0.22rem;
+  width: 3px;
+  border-radius: 0 2px 2px 0;
+  background: #0e7490;
 }
 
 .app-shell__panelmenu :where(.p-panelmenu-header-link .p-menuitem-icon),
@@ -135,7 +152,7 @@
 }
 
 .app-shell__panelmenu :where(.p-panelmenu-submenu-icon) {
-  color: #4f6f88;
+  color: rgba(10, 45, 62, 0.45);
 }
 
 .app-shell__main {
@@ -155,8 +172,9 @@
   }
 
   .app-shell__sidebar {
+    border-left: none;
     border-right: 0;
-    border-bottom: 1px solid rgba(203, 213, 225, 0.72);
+    border-bottom: 3px solid #0e7490;
     padding: 0.54rem 0.5rem;
   }
 
