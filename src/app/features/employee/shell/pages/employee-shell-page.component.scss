@@ -174,22 +174,14 @@
   margin-bottom: 1rem;
 }
 
+/* Toast stack is position: fixed inside the component — no overlay wrapper needed */
 .employee-shell__message-overlay {
-  position: absolute;
-  top: 0.2rem;
-  right: 0;
-  z-index: 35;
-  display: flex;
-  justify-content: flex-end;
+  display: contents;
   pointer-events: none;
-  width: min(22.5rem, calc(100% - 0.8rem));
 }
 
 .employee-shell__message-rail {
-  display: block;
-  width: 100%;
-  margin-left: auto;
-  pointer-events: auto;
+  display: contents;
 }
 
 .employee-shell__identity-editor {
@@ -246,21 +238,6 @@
 
   .employee-shell__timeline-zone {
     padding: 0.82rem;
-  }
-
-  .employee-shell__message-overlay {
-    position: fixed;
-    left: 0.8rem;
-    right: 0.8rem;
-    top: auto;
-    bottom: 0.8rem;
-    justify-content: center;
-    z-index: 60;
-  }
-
-  .employee-shell__message-rail {
-    width: min(42rem, 100%);
-    margin-left: 0;
   }
 
   .employee-shell__nav-zone {

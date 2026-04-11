@@ -1,195 +1,417 @@
-import { animate, style, transition, trigger } from '@angular/animations';
+import { animate, style, transition, trigger, query, stagger } from '@angular/animations';
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
 
 import { employeeTexts } from '../../employee.texts';
-import { GlobalMessageSummary, GlobalUiMessage, GlobalUiMessageLevel } from '../../models/global-ui-message.model';
-import { UiButtonComponent } from '../../../../shared/ui/button/ui-button.component';
-import { UiTagComponent } from '../../../../shared/ui/tag/ui-tag.component';
+import {
+  GlobalMessageSummary,
+  GlobalUiMessage,
+  GlobalUiMessageLevel,
+} from '../../models/global-ui-message.model';
+
+const MAX_VISIBLE = 4;
 
 @Component({
   selector: 'app-global-message-rail',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, ButtonModule, CardModule, UiButtonComponent, UiTagComponent],
+  imports: [CommonModule],
   animations: [
-    trigger('overlayMotion', [
+    trigger('toastEnter', [
       transition(':enter', [
-        style({ opacity: 0, transform: 'translate3d(12px, -8px, 0)' }),
-        animate('200ms cubic-bezier(0.22, 1, 0.36, 1)', style({ opacity: 1, transform: 'translate3d(0, 0, 0)' })),
+        style({ opacity: 0, transform: 'translateX(110%) scale(0.96)' }),
+        animate(
+          '280ms cubic-bezier(0.22, 1, 0.36, 1)',
+          style({ opacity: 1, transform: 'translateX(0) scale(1)' }),
+        ),
       ]),
       transition(':leave', [
-        animate('160ms cubic-bezier(0.4, 0, 1, 1)', style({ opacity: 0, transform: 'translate3d(12px, -8px, 0)' })),
-      ]),
-    ]),
-    trigger('detailMessageMotion', [
-      transition(':enter', [
-        style({ opacity: 0, transform: 'translate3d(8px, -4px, 0)' }),
-        animate('190ms cubic-bezier(0.22, 1, 0.36, 1)', style({ opacity: 1, transform: 'translate3d(0, 0, 0)' })),
-      ]),
-      transition(':leave', [
-        animate('150ms cubic-bezier(0.4, 0, 1, 1)', style({ opacity: 0, transform: 'translate3d(8px, -6px, 0)' })),
+        animate(
+          '200ms cubic-bezier(0.4, 0, 1, 1)',
+          style({ opacity: 0, transform: 'translateX(110%) scale(0.96)' }),
+        ),
       ]),
     ]),
   ],
   template: `
-    @if (shouldRenderRail()) {
-      <p-card
-        @overlayMotion
-        [styleClass]="railClass()"
-        [class.global-message-rail--compact]="isCompactToast()"
-        [class.global-message-rail--expanded]="expanded()"
-        [attr.aria-label]="texts.globalMessageRailAriaLabel"
-      >
-        @if (autoDismissDurationMs(); as autoDismissDurationMs) {
-          <div
-            class="global-message-rail__countdown"
-            [style.animation-duration.ms]="autoDismissDurationMs"
-            aria-hidden="true"
-          ></div>
-        }
+    <div class="toast-stack" aria-live="polite" aria-atomic="false">
+      @for (msg of visibleMessages(); track msg.id) {
+        <div
+          @toastEnter
+          class="toast"
+          [class]="toastClass(msg)"
+          role="alert"
+          [attr.aria-label]="msg.text"
+        >
+          @if (isTransient(msg)) {
+            <div class="toast__progress" [style.animation-duration.ms]="msg.dismissAfterMs"></div>
+          }
 
-        <div class="global-message-rail__summary">
-          <div class="global-message-rail__summary-main">
-            <div class="global-message-rail__summary-icon-shell">
-              <i class="global-message-rail__summary-icon pi" [class]="resolveIconClass(summary().dominantLevel)"></i>
-            </div>
-            <div class="global-message-rail__summary-copy">
-              @if (!isCompactToast()) {
-                <p class="global-message-rail__summary-title">{{ summaryEyebrow() }}</p>
-              }
-              <p class="global-message-rail__summary-text">{{ buildSummaryText(summary()) }}</p>
-            </div>
+          <div class="toast__icon-shell">
+            <i class="pi" [class]="iconClass(msg.level)"></i>
           </div>
 
-          <div class="global-message-rail__summary-actions">
-            @if (shouldShowInlineAction() && primaryMessage(); as primaryMessage) {
-              <app-ui-button
-                [label]="texts.globalMessageRailGoToSectionAction"
-                severity="secondary"
-                [outlined]="true"
-                size="small"
-                [icon]="'pi pi-arrow-right'"
-                (pressed)="sectionRequested.emit(primaryMessage)"
-              />
+          <div class="toast__body">
+            <p class="toast__eyebrow">{{ eyebrow(msg.level) }}</p>
+            <p class="toast__text">{{ msg.text }}</p>
+            @if (msg.sectionLabel) {
+              <p class="toast__section">{{ msg.sectionLabel }}</p>
             }
-
-            @if (shouldShowTags() && summary().errorCount > 0) {
-              <app-ui-tag [value]="buildCountText(summary().errorCount, 'error')" severity="danger" />
-            }
-            @if (shouldShowTags() && summary().warningCount > 0) {
-              <app-ui-tag [value]="buildCountText(summary().warningCount, 'warning')" severity="warn" />
-            }
-            @if (shouldShowTags() && summary().successCount > 0) {
-              <app-ui-tag [value]="buildCountText(summary().successCount, 'success')" severity="success" />
-            }
-            @if (shouldShowTags() && summary().infoCount > 0) {
-              <app-ui-tag [value]="buildCountText(summary().infoCount, 'info')" severity="info" />
-            }
-
-            @if (canExpand()) {
-              <button
-                pButton
-                type="button"
-                class="global-message-rail__icon-action"
-                [text]="true"
-                [rounded]="true"
-                [icon]="expanded() ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"
-                [attr.aria-label]="expanded() ? texts.globalMessageRailCollapseAction : texts.globalMessageRailExpandAction"
-                [attr.title]="expanded() ? texts.globalMessageRailCollapseAction : texts.globalMessageRailExpandAction"
-                (click)="toggleRequested.emit()"
-              ></button>
-            }
-            @if (shouldShowCloseAction()) {
-              <button
-                pButton
-                type="button"
-                class="global-message-rail__icon-action global-message-rail__icon-action--close"
-                [text]="true"
-                [rounded]="true"
-                icon="pi pi-times"
-                [attr.aria-label]="texts.globalMessageRailCloseDetailAction"
-                [attr.title]="texts.globalMessageRailCloseDetailAction"
-                (click)="closeRequested.emit()"
-              ></button>
+            @if (msg.sectionId) {
+              <button class="toast__link" type="button" (click)="sectionRequested.emit(msg)">
+                Ir a la sección
+                <i class="pi pi-arrow-right toast__link-icon"></i>
+              </button>
             }
           </div>
+
+          <button
+            class="toast__close"
+            type="button"
+            [attr.aria-label]="texts.globalMessageRailCloseDetailAction"
+            (click)="closeRequested.emit()"
+          >
+            <i class="pi pi-times"></i>
+          </button>
         </div>
+      }
 
-        @if (expanded() && shouldRenderDetail()) {
-          <div class="global-message-rail__detail">
-            @for (message of visibleDetailMessages(); track message.id) {
-              <article @detailMessageMotion class="global-message-rail__message" [attr.data-level]="message.level">
-                <div class="global-message-rail__message-copy">
-                  <p class="global-message-rail__message-text">{{ message.text }}</p>
-                  @if (message.sectionLabel) {
-                    <p class="global-message-rail__message-section">{{ message.sectionLabel }}</p>
-                  }
-                </div>
-
-                @if (message.sectionId) {
-                  <app-ui-button
-                    [label]="texts.globalMessageRailGoToSectionAction"
-                    severity="secondary"
-                    [outlined]="true"
-                    size="small"
-                    [icon]="'pi pi-arrow-right'"
-                    (pressed)="sectionRequested.emit(message)"
-                  />
-                }
-              </article>
-            }
-
-            @if (hiddenMessageCount() > 0) {
-              <p class="global-message-rail__overflow-note">{{ buildAdditionalMessagesText(hiddenMessageCount()) }}</p>
-            }
-          </div>
-        }
-      </p-card>
-    }
+      @if (hiddenCount() > 0) {
+        <div class="toast toast--overflow">
+          <i class="pi pi-ellipsis-h toast__overflow-icon"></i>
+          <span class="toast__overflow-text"
+            >+{{ hiddenCount() }} mensaje{{ hiddenCount() === 1 ? '' : 's' }} más</span
+          >
+          <button class="toast__close" type="button" (click)="closeRequested.emit()">
+            <i class="pi pi-times"></i>
+          </button>
+        </div>
+      }
+    </div>
   `,
   styles: [
-    ':host { display: block; }',
-    ':host ::ng-deep .global-message-rail.p-card { position: relative; border-radius: 0.92rem; border: 1px solid rgba(205, 218, 231, 0.92); border-left-width: 0.28rem; box-shadow: 0 16px 32px -26px rgba(15, 23, 42, 0.26), 0 8px 18px -18px rgba(15, 23, 42, 0.16); backdrop-filter: blur(14px); overflow: hidden; }',
-    ':host ::ng-deep .global-message-rail .p-card-body { padding: 0.68rem 0.78rem 0.72rem; }',
-    ':host ::ng-deep .global-message-rail--compact.p-card { border-radius: 0.9rem; }',
-    ':host ::ng-deep .global-message-rail--error.p-card { background: linear-gradient(180deg, rgba(255, 251, 251, 0.96) 0%, rgba(255, 255, 255, 0.98) 100%); border-left-color: #dc2626; }',
-    ':host ::ng-deep .global-message-rail--warning.p-card { background: linear-gradient(180deg, rgba(255, 251, 243, 0.96) 0%, rgba(255, 255, 255, 0.98) 100%); border-left-color: #d97706; }',
-    ':host ::ng-deep .global-message-rail--success.p-card { background: linear-gradient(180deg, rgba(245, 252, 247, 0.96) 0%, rgba(255, 255, 255, 0.98) 100%); border-left-color: #16a34a; }',
-    ':host ::ng-deep .global-message-rail--info.p-card { background: linear-gradient(180deg, rgba(245, 250, 255, 0.96) 0%, rgba(255, 255, 255, 0.98) 100%); border-left-color: #0284c7; }',
-    '.global-message-rail__countdown { position:absolute; inset:0 auto auto 0; width:100%; height:0.14rem; background:linear-gradient(90deg, rgba(22, 163, 74, 0.85) 0%, rgba(52, 211, 153, 0.45) 100%); transform-origin:left center; animation: global-message-rail-countdown linear forwards; }',
-    '.global-message-rail--info .global-message-rail__countdown { background:linear-gradient(90deg, rgba(2, 132, 199, 0.82) 0%, rgba(56, 189, 248, 0.38) 100%); }',
-    '.global-message-rail__summary { display:flex; align-items:center; justify-content:space-between; gap:0.58rem; }',
-    '.global-message-rail__summary-main { display:flex; align-items:center; gap:0.58rem; min-width:0; flex:1 1 auto; }',
-    '.global-message-rail__summary-icon-shell { display:grid; place-items:center; width:1.78rem; height:1.78rem; border-radius:999px; background:rgba(255,255,255,0.78); box-shadow: inset 0 0 0 1px rgba(148,163,184,0.12); flex:0 0 auto; }',
-    '.global-message-rail--compact .global-message-rail__summary-icon-shell { width:1.65rem; height:1.65rem; }',
-    '.global-message-rail__summary-icon { font-size: 0.88rem; color: #334155; }',
-    '.global-message-rail--error .global-message-rail__summary-icon { color:#b91c1c; }',
-    '.global-message-rail--warning .global-message-rail__summary-icon { color:#b45309; }',
-    '.global-message-rail--success .global-message-rail__summary-icon { color:#15803d; }',
-    '.global-message-rail--info .global-message-rail__summary-icon { color:#0369a1; }',
-    '.global-message-rail__summary-copy { min-width:0; }',
-    '.global-message-rail__summary-title { margin:0; font-size:0.63rem; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; color:#607286; }',
-    '.global-message-rail__summary-text { margin:0.08rem 0 0; font-size:0.83rem; line-height:1.25; font-weight:650; color:#172533; }',
-    '.global-message-rail--compact .global-message-rail__summary-text { margin-top:0; font-size:0.8rem; font-weight:600; }',
-    '.global-message-rail__summary-actions { display:flex; align-items:center; gap:0.22rem; flex-wrap:nowrap; justify-content:flex-end; flex:0 0 auto; }',
-    '.global-message-rail__icon-action { color:#4a6074; width:1.85rem; height:1.85rem; }',
-    '.global-message-rail__icon-action--close { color:#667b8f; }',
-    '.global-message-rail__detail { margin-top:0.44rem; display:flex; flex-direction:column; gap:0.38rem; max-height:12rem; overflow:auto; }',
-    '.global-message-rail__message { display:flex; align-items:center; justify-content:space-between; gap:0.62rem; padding:0.28rem 0; background:transparent; }',
-    '.global-message-rail__message + .global-message-rail__message { border-top:1px solid rgba(226,235,243,0.62); }',
-    '.global-message-rail__message-copy { min-width:0; flex:1 1 auto; }',
-    '.global-message-rail__message-text { margin:0; font-size:0.79rem; font-weight:600; line-height:1.28; color:#22384a; }',
-    '.global-message-rail__message-section { margin:0.14rem 0 0; font-size:0.71rem; color:#5d738a; }',
-    '.global-message-rail__overflow-note { margin:0.08rem 0 0; font-size:0.72rem; font-weight:700; color:#5d738a; }',
-    '@keyframes global-message-rail-countdown { from { transform: scaleX(1); opacity: 1; } to { transform: scaleX(0); opacity: 0.45; } }',
-    '@media (max-width: 720px) { .global-message-rail__summary, .global-message-rail__message { align-items:flex-start; } .global-message-rail__message { flex-direction:column; } .global-message-rail__summary-actions { justify-content:flex-start; flex-wrap:wrap; } .global-message-rail__detail { max-height:10rem; } }',
+    `
+      :host {
+        display: block;
+        pointer-events: none;
+      }
+
+      .toast-stack {
+        position: fixed;
+        bottom: 1.5rem;
+        right: 1.5rem;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        gap: 0.52rem;
+        width: min(22rem, calc(100vw - 2rem));
+        pointer-events: none;
+      }
+
+      /* ─── BASE TOAST ─── */
+      .toast {
+        pointer-events: auto;
+        position: relative;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.72rem;
+        padding: 0.82rem 0.78rem 0.82rem 0.82rem;
+        border-radius: 0.92rem;
+        border: 1px solid transparent;
+        overflow: hidden;
+        box-shadow:
+          0 4px 6px -1px rgba(0, 0, 0, 0.08),
+          0 10px 28px -8px rgba(0, 0, 0, 0.16),
+          0 0 0 1px rgba(255, 255, 255, 0.12) inset;
+      }
+
+      /* ─── PROGRESS BAR ─── */
+      .toast__progress {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 0.2rem;
+        width: 100%;
+        transform-origin: left center;
+        animation: toast-progress linear forwards;
+        border-radius: 0 0 0.92rem 0.92rem;
+      }
+
+      @keyframes toast-progress {
+        from {
+          transform: scaleX(1);
+        }
+        to {
+          transform: scaleX(0);
+        }
+      }
+
+      /* ─── ICON ─── */
+      .toast__icon-shell {
+        flex-shrink: 0;
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 0.04rem;
+      }
+
+      .toast__icon-shell .pi {
+        font-size: 0.9rem;
+      }
+
+      /* ─── BODY ─── */
+      .toast__body {
+        flex: 1;
+        min-width: 0;
+        display: grid;
+        gap: 0.12rem;
+      }
+
+      .toast__eyebrow {
+        font-size: 0.58rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        line-height: 1.2;
+      }
+
+      .toast__text {
+        font-size: 0.82rem;
+        font-weight: 600;
+        line-height: 1.35;
+      }
+
+      .toast__section {
+        font-size: 0.7rem;
+        font-weight: 500;
+        opacity: 0.7;
+        line-height: 1.2;
+      }
+
+      .toast__link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.28rem;
+        margin-top: 0.18rem;
+        font-size: 0.72rem;
+        font-weight: 700;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+      }
+
+      .toast__link-icon {
+        font-size: 0.62rem;
+      }
+
+      /* ─── CLOSE ─── */
+      .toast__close {
+        flex-shrink: 0;
+        width: 1.6rem;
+        height: 1.6rem;
+        border-radius: 50%;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 0.02rem;
+        transition: background 120ms ease;
+      }
+
+      .toast__close .pi {
+        font-size: 0.7rem;
+      }
+
+      /* ─── SUCCESS ─── */
+      .toast--success {
+        background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
+        border-color: #bbf7d0;
+      }
+
+      .toast--success .toast__icon-shell {
+        background: #dcfce7;
+      }
+
+      .toast--success .toast__icon-shell .pi {
+        color: #16a34a;
+      }
+
+      .toast--success .toast__eyebrow {
+        color: #15803d;
+      }
+      .toast--success .toast__text {
+        color: #14532d;
+      }
+      .toast--success .toast__section {
+        color: #4ade80;
+      }
+      .toast--success .toast__link {
+        color: #16a34a;
+      }
+
+      .toast--success .toast__progress {
+        background: linear-gradient(90deg, #16a34a, #4ade80);
+      }
+
+      .toast--success .toast__close {
+        background: rgba(22, 163, 74, 0.1);
+        color: #16a34a;
+      }
+
+      .toast--success .toast__close:hover {
+        background: rgba(22, 163, 74, 0.2);
+      }
+
+      /* ─── ERROR ─── */
+      .toast--error {
+        background: linear-gradient(135deg, #fff1f2 0%, #ffffff 100%);
+        border-color: #fecdd3;
+      }
+
+      .toast--error .toast__icon-shell {
+        background: #ffe4e6;
+      }
+
+      .toast--error .toast__icon-shell .pi {
+        color: #dc2626;
+      }
+
+      .toast--error .toast__eyebrow {
+        color: #b91c1c;
+      }
+      .toast--error .toast__text {
+        color: #7f1d1d;
+      }
+      .toast--error .toast__link {
+        color: #dc2626;
+      }
+
+      .toast--error .toast__close {
+        background: rgba(220, 38, 38, 0.08);
+        color: #dc2626;
+      }
+
+      .toast--error .toast__close:hover {
+        background: rgba(220, 38, 38, 0.18);
+      }
+
+      /* ─── WARNING ─── */
+      .toast--warning {
+        background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%);
+        border-color: #fde68a;
+      }
+
+      .toast--warning .toast__icon-shell {
+        background: #fef3c7;
+      }
+
+      .toast--warning .toast__icon-shell .pi {
+        color: #d97706;
+      }
+
+      .toast--warning .toast__eyebrow {
+        color: #b45309;
+      }
+      .toast--warning .toast__text {
+        color: #78350f;
+      }
+      .toast--warning .toast__link {
+        color: #d97706;
+      }
+
+      .toast--warning .toast__close {
+        background: rgba(217, 119, 6, 0.08);
+        color: #d97706;
+      }
+
+      .toast--warning .toast__close:hover {
+        background: rgba(217, 119, 6, 0.18);
+      }
+
+      /* ─── INFO ─── */
+      .toast--info {
+        background: linear-gradient(135deg, #f0f9ff 0%, #ffffff 100%);
+        border-color: #bae6fd;
+      }
+
+      .toast--info .toast__icon-shell {
+        background: #e0f2fe;
+      }
+
+      .toast--info .toast__icon-shell .pi {
+        color: #0284c7;
+      }
+
+      .toast--info .toast__eyebrow {
+        color: #0369a1;
+      }
+      .toast--info .toast__text {
+        color: #0c4a6e;
+      }
+      .toast--info .toast__link {
+        color: #0284c7;
+      }
+
+      .toast--info .toast__progress {
+        background: linear-gradient(90deg, #0284c7, #38bdf8);
+      }
+
+      .toast--info .toast__close {
+        background: rgba(2, 132, 199, 0.08);
+        color: #0284c7;
+      }
+
+      .toast--info .toast__close:hover {
+        background: rgba(2, 132, 199, 0.18);
+      }
+
+      /* ─── OVERFLOW ─── */
+      .toast--overflow {
+        background: #f8fafc;
+        border-color: #e2e8f0;
+        align-items: center;
+        padding: 0.56rem 0.78rem;
+      }
+
+      .toast__overflow-icon {
+        color: #64748b;
+        font-size: 0.88rem;
+      }
+
+      .toast__overflow-text {
+        flex: 1;
+        font-size: 0.76rem;
+        font-weight: 600;
+        color: #64748b;
+      }
+
+      .toast--overflow .toast__close {
+        background: rgba(100, 116, 139, 0.1);
+        color: #64748b;
+      }
+
+      /* ─── RESPONSIVE ─── */
+      @media (max-width: 640px) {
+        .toast-stack {
+          bottom: 0.75rem;
+          right: 0.75rem;
+          left: 0.75rem;
+          width: auto;
+        }
+      }
+    `,
   ],
 })
 export class GlobalMessageRailComponent {
-  private static readonly MAX_VISIBLE_DETAIL_MESSAGES = 3;
+  // Unused but kept for API compatibility with shell page
+  readonly expanded = input(false);
 
   readonly messages = input<ReadonlyArray<GlobalUiMessage>>([]);
   readonly summary = input<GlobalMessageSummary>({
@@ -200,105 +422,44 @@ export class GlobalMessageRailComponent {
     infoCount: 0,
     dominantLevel: null,
   });
-  readonly expanded = input(false);
 
   readonly toggleRequested = output<void>();
   readonly closeRequested = output<void>();
   readonly sectionRequested = output<GlobalUiMessage>();
 
   protected readonly texts = employeeTexts;
-  protected readonly railClass = computed(() => `global-message-rail global-message-rail--${this.summary().dominantLevel ?? 'info'}`);
-  protected readonly primaryMessage = computed(() => this.messages()[0] ?? null);
-  protected readonly hasBlockingMessages = computed(() => {
-    const summary = this.summary();
-    return summary.errorCount > 0 || summary.warningCount > 0;
-  });
-  protected readonly shouldRenderRail = computed(() => this.summary().total > 0 && (!this.hasBlockingMessages() || this.expanded()));
-  protected readonly isCompactToast = computed(() => {
-    const summary = this.summary();
-    return summary.total === 1 && summary.errorCount === 0 && summary.warningCount === 0;
-  });
-  protected readonly visibleDetailMessages = computed(() =>
-    this.messages().slice(0, GlobalMessageRailComponent.MAX_VISIBLE_DETAIL_MESSAGES),
+
+  protected readonly visibleMessages = computed(() => this.messages().slice(0, MAX_VISIBLE));
+
+  protected readonly hiddenCount = computed(() =>
+    Math.max(this.messages().length - MAX_VISIBLE, 0),
   );
-  protected readonly hiddenMessageCount = computed(() =>
-    Math.max(this.messages().length - this.visibleDetailMessages().length, 0),
-  );
-  protected readonly shouldRenderDetail = computed(() => this.messages().length > 1);
-  protected readonly canExpand = computed(() => this.shouldRenderDetail());
-  protected readonly shouldShowInlineAction = computed(() => !this.shouldRenderDetail() && !!this.primaryMessage()?.sectionId);
-  protected readonly shouldShowCloseAction = computed(() => this.expanded() || this.isCompactToast());
-  protected readonly shouldShowTags = computed(() => !this.isCompactToast() && this.summary().total > 1);
-  protected readonly autoDismissDurationMs = computed(() => this.primaryMessage()?.dismissAfterMs ?? null);
-  protected readonly summaryEyebrow = computed(() => {
-    const summary = this.summary();
-    if (summary.errorCount > 0) {
-      return this.texts.globalMessageRailErrorsEyebrow;
-    }
-    if (summary.warningCount > 0) {
-      return this.texts.globalMessageRailWarningsEyebrow;
-    }
-    if (summary.successCount > 0) {
-      return this.texts.globalMessageRailSuccessEyebrow;
-    }
-    return this.texts.globalMessageRailInfoEyebrow;
-  });
 
-  protected buildSummaryText(summary: GlobalMessageSummary): string {
-    const railMessages = this.messages();
-    if (railMessages.length === 1) {
-      return railMessages[0].text;
-    }
-
-    if (summary.errorCount > 0 && summary.warningCount === 0 && summary.successCount === 0 && summary.infoCount === 0) {
-      return `${summary.errorCount} ${summary.errorCount === 1 ? this.texts.globalMessageRailErrorSingular : this.texts.globalMessageRailErrorPlural} en la ficha`;
-    }
-
-    if (summary.warningCount > 0 && summary.errorCount === 0 && summary.successCount === 0 && summary.infoCount === 0) {
-      return `${summary.warningCount} ${summary.warningCount === 1 ? this.texts.globalMessageRailWarningSingular : this.texts.globalMessageRailWarningPlural} en la ficha`;
-    }
-
-    return [
-      summary.errorCount > 0 ? this.buildCountText(summary.errorCount, 'error') : null,
-      summary.warningCount > 0 ? this.buildCountText(summary.warningCount, 'warning') : null,
-      summary.successCount > 0 ? this.buildCountText(summary.successCount, 'success') : null,
-      summary.infoCount > 0 ? this.buildCountText(summary.infoCount, 'info') : null,
-    ].filter((value): value is string => value !== null).join(' · ');
+  protected toastClass(msg: GlobalUiMessage): string {
+    return `toast toast--${msg.level}`;
   }
 
-  protected buildCountText(count: number, level: GlobalUiMessageLevel): string {
-    if (level === 'error') {
-      return `${count} ${count === 1 ? this.texts.globalMessageRailErrorSingular : this.texts.globalMessageRailErrorPlural}`;
-    }
-
-    if (level === 'warning') {
-      return `${count} ${count === 1 ? this.texts.globalMessageRailWarningSingular : this.texts.globalMessageRailWarningPlural}`;
-    }
-
-    if (level === 'success') {
-      return `${count} ${count === 1 ? this.texts.globalMessageRailSuccessSingular : this.texts.globalMessageRailSuccessPlural}`;
-    }
-
-    return `${count} ${count === 1 ? this.texts.globalMessageRailInfoSingular : this.texts.globalMessageRailInfoPlural}`;
+  protected isTransient(msg: GlobalUiMessage): boolean {
+    return !!msg.dismissAfterMs && !msg.sticky;
   }
 
-  protected buildAdditionalMessagesText(count: number): string {
-    return `${count} ${count === 1 ? this.texts.globalMessageRailAdditionalMessageSingular : this.texts.globalMessageRailAdditionalMessagePlural}`;
+  protected iconClass(level: GlobalUiMessageLevel): string {
+    const map: Record<GlobalUiMessageLevel, string> = {
+      success: 'pi-check-circle',
+      error: 'pi-times-circle',
+      warning: 'pi-exclamation-triangle',
+      info: 'pi-info-circle',
+    };
+    return map[level];
   }
 
-  protected resolveIconClass(level: GlobalUiMessageLevel | null): string {
-    if (level === 'error') {
-      return 'pi-exclamation-circle';
-    }
-
-    if (level === 'warning') {
-      return 'pi-exclamation-triangle';
-    }
-
-    if (level === 'success') {
-      return 'pi-check-circle';
-    }
-
-    return 'pi-info-circle';
+  protected eyebrow(level: GlobalUiMessageLevel): string {
+    const map: Record<GlobalUiMessageLevel, string> = {
+      success: 'Éxito',
+      error: 'Error',
+      warning: 'Aviso',
+      info: 'Info',
+    };
+    return map[level];
   }
 }
