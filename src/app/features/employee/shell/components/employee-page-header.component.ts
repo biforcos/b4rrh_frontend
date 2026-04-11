@@ -30,6 +30,7 @@ export class EmployeePageHeaderComponent {
   readonly editIdentityRequested = output<void>();
   readonly terminateRequested = output<void>();
   readonly rehireRequested = output<void>();
+  readonly printRequested = output<void>();
 
   protected readonly texts = employeeTexts;
   protected readonly isActive = computed(() => this.status() === 'ACTIVE');
@@ -73,6 +74,10 @@ export class EmployeePageHeaderComponent {
 
   protected requestRehire(): void {
     this.rehireRequested.emit();
+  }
+
+  protected requestPrint(): void {
+    this.printRequested.emit();
   }
 
   private normalizeSecondaryValue(value: string, label: string): string | null {

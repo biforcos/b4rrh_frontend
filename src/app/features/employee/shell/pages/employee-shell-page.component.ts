@@ -24,6 +24,8 @@ import { EmployeeDirectoryStore } from '../../data-access/employee-directory.sto
 import { EmployeeJourneyStore } from '../../data-access/employee-journey.store';
 import { EmployeeContactStore } from '../../data-access/employee-contact.store';
 import { EmployeePresenceStore } from '../../data-access/employee-presence.store';
+import { EmployeeContractStore } from '../../data-access/employee-contract.store';
+import { EmployeePdfService } from '../services/employee-pdf.service';
 import { EmployeeWorkCenterStore } from '../../data-access/employee-work-center.store';
 import { employeeTexts } from '../../employee.texts';
 import { EmployeeBusinessKey } from '../../models/employee-business-key.model';
@@ -84,6 +86,8 @@ export class EmployeeShellPageComponent {
   private readonly presenceStore = inject(EmployeePresenceStore);
   private readonly workCenterStore = inject(EmployeeWorkCenterStore);
   private readonly journeyStore = inject(EmployeeJourneyStore);
+  private readonly contractStore = inject(EmployeeContractStore);
+  private readonly pdfService = inject(EmployeePdfService);
   private readonly globalMessageService = inject(GlobalMessageService);
   private highlightedSectionResetHandle: number | null = null;
   private previousIdentitySuccess: 'updated' | null = null;
@@ -237,11 +241,13 @@ export class EmployeeShellPageComponent {
           this.presenceStore.refreshPresencesByBusinessKey(activeEmployeeKey);
           this.workCenterStore.refreshWorkCenters(activeEmployeeKey);
           this.journeyStore.refreshJourneyByBusinessKey(activeEmployeeKey);
+          this.contractStore.loadContractsByBusinessKey(activeEmployeeKey);
         } else {
           this.detailStore.loadEmployeeDetailByBusinessKey(activeEmployeeKey);
           this.presenceStore.loadPresencesByBusinessKey(activeEmployeeKey);
           this.workCenterStore.loadWorkCenters(activeEmployeeKey);
           this.journeyStore.loadJourneyByBusinessKey(activeEmployeeKey);
+          this.contractStore.loadContractsByBusinessKey(activeEmployeeKey);
         }
 
         this.contactStore.loadContactsByBusinessKey(activeEmployeeKey);
@@ -557,6 +563,40 @@ export class EmployeeShellPageComponent {
     const value = directMatch?.value?.trim() ?? '';
 
     return value.length > 0 ? value : this.texts.employeePageHeaderEmptyValue;
+  }
+
+  protected onPrintRequested(): void {
+    const employee = this.selectedEmployee();
+    if (!employee) return;
+
+    const contracts = this.contractStore.contracts();
+    const activeContract =
+      contracts.find((c) => c.isActive) ??
+      [...contracts].sort((a, b) => b.startDate.localeCompare(a.startDate))[0] ??
+      null;
+
+    const empty = this.texts.employeePageHeaderEmptyValue;
+    const nullIfEmpty = (v: string) => (v === empty || !v.trim() ? null : v);
+
+    this.pdfService.print({
+      fullName: employee.displayName,
+      employeeNumber: employee.employeeNumber,
+      employeeTypeCode: employee.employeeTypeCode,
+      ruleSystemCode: employee.ruleSystemCode,
+      statusLabel: this.resolveEmployeeStatusLabel(employee.statusLabel),
+      isActive: this.headerStatus() === 'ACTIVE',
+      company: nullIfEmpty(this.headerCompany()),
+      workCenter: nullIfEmpty(this.headerWorkCenter()),
+      hireDate: nullIfEmpty(this.headerHireDate()),
+      contractTypeName: activeContract?.contractTypeName ?? null,
+      contractSubtypeName: activeContract?.contractSubtypeName ?? null,
+      contractCode: activeContract?.contractCode ?? null,
+      contractStartDate: activeContract?.startDate ?? null,
+      contractEndDate: activeContract?.endDate ?? null,
+      contractIsActive: activeContract?.isActive ?? false,
+      email: nullIfEmpty(this.headerEmail()),
+      phone: nullIfEmpty(this.headerPhone()),
+    });
   }
 
   protected onRehireRequested(): void {

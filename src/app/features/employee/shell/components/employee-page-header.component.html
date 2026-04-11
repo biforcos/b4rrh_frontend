@@ -12,6 +12,15 @@
       severity="secondary"
       [outlined]="true"
       size="small"
+      icon="pi pi-print"
+      label="Exportar PDF"
+      (pressed)="requestPrint()"
+    />
+    <app-ui-button
+      type="button"
+      severity="secondary"
+      [outlined]="true"
+      size="small"
       [label]="texts.employeePageHeaderEditIdentityAction"
       (pressed)="requestEditIdentity()"
     />
