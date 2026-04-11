@@ -117,6 +117,83 @@
   color: #7b95aa;
 }
 
+/* --- Quick links card --- */
+.employee-overview__card--actions {
+  background: #fafcff;
+}
+
+.employee-overview__quick-links {
+  display: grid;
+  gap: 0;
+}
+
+.employee-overview__quick-link {
+  display: flex;
+  align-items: center;
+  gap: 0.62rem;
+  padding: 0.6rem 0.82rem;
+  background: none;
+  border: none;
+  border-bottom: 1px solid rgba(185, 210, 230, 0.5);
+  cursor: pointer;
+  text-align: left;
+  transition: background 120ms ease;
+  font: inherit;
+}
+
+.employee-overview__quick-link:last-child {
+  border-bottom: none;
+}
+
+.employee-overview__quick-link:hover {
+  background: rgba(14, 116, 144, 0.05);
+}
+
+.employee-overview__quick-link:hover .employee-overview__quick-link-arrow {
+  transform: translateX(2px);
+  color: #0e7490;
+}
+
+.employee-overview__quick-link-icon {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  min-width: 2rem;
+  border-radius: 0.52rem;
+  background: rgba(14, 116, 144, 0.1);
+  color: #0e7490;
+  font-size: 0.82rem;
+}
+
+.employee-overview__quick-link-body {
+  flex: 1;
+  display: grid;
+  gap: 0.06rem;
+  min-width: 0;
+}
+
+.employee-overview__quick-link-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #1a3f58;
+  line-height: 1.2;
+}
+
+.employee-overview__quick-link-hint {
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: #7b95aa;
+  line-height: 1.2;
+}
+
+.employee-overview__quick-link-arrow {
+  font-size: 0.62rem;
+  color: #afc4d4;
+  transition: transform 140ms ease, color 140ms ease;
+  flex-shrink: 0;
+}
+
 /* --- Skeleton / shimmer --- */
 .employee-overview__card--loading {
   pointer-events: none;

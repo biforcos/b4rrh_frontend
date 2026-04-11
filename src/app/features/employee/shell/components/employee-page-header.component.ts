@@ -35,7 +35,11 @@ export class EmployeePageHeaderComponent {
   protected readonly texts = employeeTexts;
   protected readonly isActive = computed(() => this.status() === 'ACTIVE');
   protected readonly metadata = computed<ReadonlyArray<EntityHeaderMetadataItem>>(() => [
-    { label: this.texts.detailHeaderEmployeeNumberLabel, value: this.employeeNumber() },
+    {
+      label: this.texts.detailHeaderEmployeeNumberLabel,
+      value: this.employeeNumber(),
+      copyable: true,
+    },
     { label: this.texts.employeePageHeaderCompanyLabel, value: this.companyCode() },
     { label: this.texts.employeePageHeaderWorkCenterLabel, value: this.workCenterCode() },
     { label: this.texts.employeePageHeaderHireDateLabel, value: this.hireDate() },

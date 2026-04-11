@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { DatePipe } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { map } from 'rxjs';
 
 import { UiTagComponent } from '../../../../shared/ui/tag/ui-tag.component';
@@ -12,6 +12,7 @@ import { employeeTexts } from '../../employee.texts';
 import { EmployeePresenceModel } from '../../models/employee-presence.model';
 import { EmployeeContractModel } from '../../models/employee-contract.model';
 import { readEmployeeBusinessKeyFromParamMap } from '../../routing/employee-route-key.util';
+import { buildEmployeeDetailRouteCommands } from '../../routing/employee-route-builder.util';
 
 @Component({
   selector: 'app-employee-overview-page',
@@ -22,6 +23,7 @@ import { readEmployeeBusinessKeyFromParamMap } from '../../routing/employee-rout
 })
 export class EmployeeOverviewPageComponent {
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly detailStore = inject(EmployeeDetailStore);
   private readonly presenceStore = inject(EmployeePresenceStore);
   private readonly contractStore = inject(EmployeeContractStore);
@@ -86,6 +88,12 @@ export class EmployeeOverviewPageComponent {
     effect(() => {
       this.contractStore.loadContractsByBusinessKey(this.activeEmployeeKey());
     });
+  }
+
+  protected navigateTo(section: 'contact' | 'presence' | 'organization'): void {
+    const key = this.activeEmployeeKey();
+    if (!key) return;
+    void this.router.navigate(buildEmployeeDetailRouteCommands(key, section));
   }
 
   private resolveActivePresence(

@@ -27,6 +27,7 @@ import { EmployeePresenceStore } from '../../data-access/employee-presence.store
 import { EmployeeContractStore } from '../../data-access/employee-contract.store';
 import { EmployeePdfService } from '../services/employee-pdf.service';
 import { EmployeeWorkCenterStore } from '../../data-access/employee-work-center.store';
+import { EmployeeRecentsService } from '../../data-access/employee-recents.service';
 import { employeeTexts } from '../../employee.texts';
 import { EmployeeBusinessKey } from '../../models/employee-business-key.model';
 import { EmployeeContactModel } from '../../models/employee-contact.model';
@@ -89,6 +90,7 @@ export class EmployeeShellPageComponent {
   private readonly contractStore = inject(EmployeeContractStore);
   private readonly pdfService = inject(EmployeePdfService);
   private readonly globalMessageService = inject(GlobalMessageService);
+  private readonly recentsService = inject(EmployeeRecentsService);
   private highlightedSectionResetHandle: number | null = null;
   private previousIdentitySuccess: 'updated' | null = null;
 
@@ -106,6 +108,21 @@ export class EmployeeShellPageComponent {
       return filter === 'active' ? isActive : !isActive;
     });
   });
+  protected readonly activeCount = computed(
+    () =>
+      this.filteredEmployees().filter((e) => {
+        const n = e.statusLabel.trim().toLowerCase();
+        return n.includes('active') || n.includes('alta');
+      }).length,
+  );
+  protected readonly inactiveCount = computed(
+    () =>
+      this.filteredEmployees().filter((e) => {
+        const n = e.statusLabel.trim().toLowerCase();
+        return !n.includes('active') && !n.includes('alta');
+      }).length,
+  );
+  protected readonly recentEmployees = this.recentsService.recents;
   protected readonly loadingDirectory = this.directoryStore.loading;
   protected readonly directoryError = this.directoryStore.error;
   protected readonly activeEmployeeKey = signal<EmployeeBusinessKey | null>(null);
@@ -371,6 +388,7 @@ export class EmployeeShellPageComponent {
   }
 
   protected openEmployeeListItem(employee: EmployeeListItemModel): void {
+    this.recentsService.add(employee);
     void this.openEmployeeDetail(toEmployeeBusinessKey(employee), 'contact');
   }
 

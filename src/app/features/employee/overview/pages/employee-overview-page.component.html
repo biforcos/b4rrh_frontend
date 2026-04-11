@@ -82,12 +82,43 @@
         </dl>
       </article>
 
-      <!-- Card 3: Próximos pasos -->
-      <article class="employee-overview__card employee-overview__card--muted">
+      <!-- Card 3: Accesos rápidos -->
+      <article class="employee-overview__card employee-overview__card--actions">
         <header class="employee-overview__card-header">
-          <h4 class="employee-overview__card-title">{{ texts.summaryPendingBlockTitle }}</h4>
+          <h4 class="employee-overview__card-title">Accesos rápidos</h4>
         </header>
-        <p class="employee-overview__empty-note">{{ texts.summaryPendingBlockDescription }}</p>
+        <div class="employee-overview__quick-links">
+          <button class="employee-overview__quick-link" type="button" (click)="navigateTo('contact')">
+            <span class="employee-overview__quick-link-icon">
+              <i class="pi pi-envelope"></i>
+            </span>
+            <span class="employee-overview__quick-link-body">
+              <span class="employee-overview__quick-link-label">Contacto</span>
+              <span class="employee-overview__quick-link-hint">Emails, teléfonos y dirección</span>
+            </span>
+            <i class="pi pi-chevron-right employee-overview__quick-link-arrow"></i>
+          </button>
+          <button class="employee-overview__quick-link" type="button" (click)="navigateTo('presence')">
+            <span class="employee-overview__quick-link-icon">
+              <i class="pi pi-building"></i>
+            </span>
+            <span class="employee-overview__quick-link-body">
+              <span class="employee-overview__quick-link-label">Presencia laboral</span>
+              <span class="employee-overview__quick-link-hint">Empresa y centro de trabajo</span>
+            </span>
+            <i class="pi pi-chevron-right employee-overview__quick-link-arrow"></i>
+          </button>
+          <button class="employee-overview__quick-link" type="button" (click)="navigateTo('organization')">
+            <span class="employee-overview__quick-link-icon">
+              <i class="pi pi-sitemap"></i>
+            </span>
+            <span class="employee-overview__quick-link-body">
+              <span class="employee-overview__quick-link-label">Organización</span>
+              <span class="employee-overview__quick-link-hint">Clasificación y contrato</span>
+            </span>
+            <i class="pi pi-chevron-right employee-overview__quick-link-arrow"></i>
+          </button>
+        </div>
       </article>
 
     </div>

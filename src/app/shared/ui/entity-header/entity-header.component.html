@@ -34,9 +34,25 @@
       @if (hasMetadata()) {
         <dl class="entity-header__metadata">
           @for (item of metadata(); track item.label) {
-            <div class="entity-header__metadata-item">
+            <div
+              class="entity-header__metadata-item"
+              [class.entity-header__metadata-item--copyable]="item.copyable"
+              [attr.title]="item.copyable ? 'Copiar ' + item.label : null"
+              (click)="copyValue(item)"
+            >
               <dt>{{ item.label }}</dt>
-              <dd>{{ item.value }}</dd>
+              <dd>
+                @if (item.copyable && copiedLabel() === item.label) {
+                  <span class="entity-header__copied-feedback">
+                    <i class="pi pi-check"></i> Copiado
+                  </span>
+                } @else {
+                  {{ item.value }}
+                  @if (item.copyable) {
+                    <i class="pi pi-copy entity-header__copy-icon" aria-hidden="true"></i>
+                  }
+                }
+              </dd>
             </div>
           }
         </dl>

@@ -5,18 +5,38 @@
         class="employee-shell__filter-chip"
         [class.employee-shell__filter-chip--active]="statusFilter() === 'all'"
         (click)="setStatusFilter('all')"
-      >Todos</button>
+      >Todos <span class="employee-shell__filter-chip-count">{{ filteredEmployees().length }}</span></button>
       <button
         class="employee-shell__filter-chip"
         [class.employee-shell__filter-chip--active]="statusFilter() === 'active'"
         (click)="setStatusFilter('active')"
-      >{{ texts.employeeStatusActiveLabel }}</button>
+      >{{ texts.employeeStatusActiveLabel }} <span class="employee-shell__filter-chip-count">{{ activeCount() }}</span></button>
       <button
         class="employee-shell__filter-chip"
         [class.employee-shell__filter-chip--active]="statusFilter() === 'inactive'"
         (click)="setStatusFilter('inactive')"
-      >{{ texts.employeeStatusInactiveLabel }}</button>
+      >{{ texts.employeeStatusInactiveLabel }} <span class="employee-shell__filter-chip-count">{{ inactiveCount() }}</span></button>
     </div>
+
+    @if (recentEmployees().length > 0 && !loadingDirectory()) {
+      <div class="employee-shell__recents">
+        <p class="employee-shell__recents-label">Vistos recientemente</p>
+        <div class="employee-shell__recents-list">
+          @for (recent of recentEmployees(); track employeeListKey(recent)) {
+            <button
+              class="employee-shell__recent-item"
+              [class.employee-shell__recent-item--active]="activeEmployeeListKey() === employeeListKey(recent)"
+              (click)="openEmployeeListItem(recent)"
+              [attr.aria-label]="recent.displayName"
+            >
+              <span class="employee-shell__recent-avatar">{{ recent.displayName.charAt(0) }}</span>
+              <span class="employee-shell__recent-name">{{ recent.displayName }}</span>
+            </button>
+          }
+        </div>
+      </div>
+    }
+
     <app-master-list-panel
       [title]="''"
       [subtitle]="texts.masterSubtitle"

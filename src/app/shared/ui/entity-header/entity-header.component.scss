@@ -152,6 +152,42 @@
   }
 }
 
+/* ─── COPY-TO-CLIPBOARD ─── */
+.entity-header__metadata-item--copyable {
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+
+.entity-header__metadata-item--copyable:hover {
+  background: rgba(14, 116, 144, 0.06);
+}
+
+.entity-header__copy-icon {
+  margin-left: 0.3rem;
+  font-size: 0.68rem;
+  color: #7a9bb5;
+  opacity: 0;
+  transition: opacity 120ms ease;
+  vertical-align: middle;
+}
+
+.entity-header__metadata-item--copyable:hover .entity-header__copy-icon {
+  opacity: 1;
+}
+
+.entity-header__copied-feedback {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.22rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #16a34a;
+}
+
+.entity-header__copied-feedback .pi {
+  font-size: 0.6rem;
+}
+
 @media (max-width: 640px) {
   .entity-header__title {
     font-size: 1.16rem;

@@ -53,6 +53,96 @@
   color: #ffffff;
 }
 
+.employee-shell__filter-chip-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.2rem;
+  height: 1.2rem;
+  padding: 0 0.3rem;
+  border-radius: 999px;
+  background: rgba(14, 116, 144, 0.12);
+  color: inherit;
+  font-size: 0.62rem;
+  font-weight: 800;
+  line-height: 1;
+  margin-left: 0.22rem;
+  transition: background 120ms ease;
+}
+
+.employee-shell__filter-chip--active .employee-shell__filter-chip-count {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
+/* ─── RECENTS ─── */
+.employee-shell__recents {
+  margin-bottom: 0.52rem;
+}
+
+.employee-shell__recents-label {
+  margin: 0 0 0.32rem;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7a9bb5;
+  padding: 0 0.1rem;
+}
+
+.employee-shell__recents-list {
+  display: flex;
+  gap: 0.32rem;
+  flex-wrap: wrap;
+}
+
+.employee-shell__recent-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  border: 1px solid rgba(185, 210, 230, 0.8);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 0.2rem 0.5rem 0.2rem 0.26rem;
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease;
+  max-width: 9rem;
+  font: inherit;
+}
+
+.employee-shell__recent-item:hover {
+  background: rgba(14, 116, 144, 0.06);
+  border-color: rgba(14, 116, 144, 0.3);
+}
+
+.employee-shell__recent-item--active {
+  border-color: rgba(14, 116, 144, 0.4);
+  background: rgba(14, 116, 144, 0.06);
+}
+
+.employee-shell__recent-avatar {
+  display: grid;
+  place-items: center;
+  width: 1.2rem;
+  height: 1.2rem;
+  min-width: 1.2rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0c6882 0%, #22d3ee 100%);
+  color: #ffffff;
+  font-size: 0.56rem;
+  font-weight: 800;
+}
+
+.employee-shell__recent-name {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #2e4d65;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
 .employee-shell__master app-master-list-panel {
   display: block;
   position: sticky;
