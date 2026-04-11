@@ -23,10 +23,10 @@
 .employee-shell__filter-chip {
   display: inline-flex;
   align-items: center;
-  border: 1px solid rgba(185, 210, 230, 0.8);
+  border: 1px solid rgba(209, 213, 219, 0.8);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.7);
-  color: #4a6378;
+  color: #6b7280;
   font-size: 0.72rem;
   font-weight: 600;
   line-height: 1;
@@ -38,7 +38,7 @@
 .employee-shell__filter-chip:hover {
   background: rgba(14, 116, 144, 0.08);
   border-color: rgba(14, 116, 144, 0.3);
-  color: #0a2d3e;
+  color: #111827;
 }
 
 .employee-shell__filter-chip--active {
@@ -100,7 +100,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  border: 1px solid rgba(185, 210, 230, 0.8);
+  border: 1px solid rgba(209, 213, 219, 0.8);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.8);
   padding: 0.2rem 0.5rem 0.2rem 0.26rem;
@@ -191,7 +191,7 @@
   width: 100%;
   background: #ffffff;
   border-radius: 0.92rem;
-  border: 1px solid rgba(185, 210, 230, 0.65);
+  border: 1px solid rgba(209, 213, 219, 0.65);
   box-shadow: var(--elevation-2);
   overflow: hidden;
 }
@@ -201,8 +201,8 @@
   border-radius: 0.92rem;
   background: #ffffff;
   padding: 0.95rem;
-  border: 1px solid rgba(185, 210, 230, 0.65);
-  border-top: 2px solid rgba(14, 116, 144, 0.35);
+  border: 1px solid rgba(209, 213, 219, 0.65);
+  border-top: 2px solid rgba(14, 116, 144, 0.4);
   box-shadow: var(--elevation-2);
   align-self: start;
   position: sticky;
@@ -217,12 +217,12 @@
   gap: 0.24rem;
   min-width: 0;
   font-size: 0.72rem;
-  color: #3e546b;
+  color: #6b7280;
 }
 
 .employee-shell__list-context-label {
   font-weight: 600;
-  color: #5d738a;
+  color: #6b7280;
 }
 
 .employee-shell__list-context-value {
@@ -234,18 +234,18 @@
 
 .employee-shell__detail-feedback {
   margin: 0 0 0.88rem;
-  border: 1px solid #dbe6f2;
+  border: 1px solid #e5e7eb;
   border-radius: 0.78rem;
-  background: #f6fbff;
+  background: #f9fafb;
   padding: 0.58rem 0.72rem;
   font-size: 0.78rem;
   line-height: 1.4;
-  color: #27455f;
+  color: #374151;
 }
 
 .employee-shell__detail-feedback--loading {
-  border-color: #cfe0f3;
-  background: #f5faff;
+  border-color: #dde1e7;
+  background: #f9fafb;
 }
 
 .employee-shell__detail-feedback--warning {
@@ -275,9 +275,8 @@
 }
 
 .employee-shell__identity-editor {
-  display: block;
-  max-width: 42rem;
-  margin-top: 0.72rem;
+  /* Drawer is position:fixed — no layout space needed */
+  display: contents;
 }
 
 /* nav-zone vive dentro del panel blanco — sin separación extra */

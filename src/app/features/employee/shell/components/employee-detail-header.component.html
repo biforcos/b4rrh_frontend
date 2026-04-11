@@ -32,47 +32,76 @@
   }
 
   @if (editingIdentity()) {
-    <section class="employee-detail-header__edit-popover" (click)="$event.stopPropagation()">
-      <h3>{{ texts.detailHeaderEditPopoverTitle }}</h3>
-
-      <form class="employee-detail-header__edit-form" [formGroup]="identityForm" (ngSubmit)="submitIdentityUpdate()">
-        <label>
-          <span>{{ texts.detailHeaderFirstNameLabel }}</span>
-          <input pInputText type="text" formControlName="firstName" autocomplete="off" />
-        </label>
-
-        <label>
-          <span>{{ texts.detailHeaderLastName1Label }}</span>
-          <input pInputText type="text" formControlName="lastName1" autocomplete="off" />
-        </label>
-
-        <label>
-          <span>{{ texts.detailHeaderLastName2Label }}</span>
-          <input pInputText type="text" formControlName="lastName2" autocomplete="off" />
-        </label>
-
-        <label>
-          <span>{{ texts.detailHeaderPreferredNameLabel }}</span>
-          <input pInputText type="text" formControlName="preferredName" autocomplete="off" />
-        </label>
-
-        <div class="employee-detail-header__edit-actions">
-          <app-ui-button
+    <div
+      class="employee-detail-header__overlay"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-label]="texts.detailHeaderEditPopoverTitle"
+      (click)="cancelIdentityEditor()"
+    >
+      <aside class="employee-detail-header__drawer" (click)="$event.stopPropagation()">
+        <header class="employee-detail-header__drawer-header">
+          <div class="employee-detail-header__drawer-title-row">
+            <span class="employee-detail-header__drawer-eyebrow">Empleado</span>
+            <h3 class="employee-detail-header__drawer-title">{{ texts.detailHeaderEditPopoverTitle }}</h3>
+          </div>
+          <button
+            class="employee-detail-header__drawer-close"
             type="button"
-            severity="secondary"
-            [outlined]="true"
-            [label]="texts.detailHeaderCancelAction"
-            (pressed)="cancelIdentityEditor()"
+            aria-label="Cerrar panel"
             [disabled]="updating()"
-          />
-          <app-ui-button
-            type="submit"
-            [label]="updating() ? texts.sectionShellBusyMessage : texts.detailHeaderSaveAction"
-            [disabled]="identityForm.invalid || updating()"
-          />
+            (click)="cancelIdentityEditor()"
+          >
+            <i class="pi pi-times"></i>
+          </button>
+        </header>
+
+        <div class="employee-detail-header__drawer-body">
+          <form
+            class="employee-detail-header__edit-form"
+            [formGroup]="identityForm"
+            (ngSubmit)="submitIdentityUpdate()"
+          >
+            <label class="employee-detail-header__field">
+              <span class="employee-detail-header__field-label">{{ texts.detailHeaderFirstNameLabel }}</span>
+              <input pInputText type="text" formControlName="firstName" autocomplete="given-name" />
+            </label>
+
+            <label class="employee-detail-header__field">
+              <span class="employee-detail-header__field-label">{{ texts.detailHeaderLastName1Label }}</span>
+              <input pInputText type="text" formControlName="lastName1" autocomplete="family-name" />
+            </label>
+
+            <label class="employee-detail-header__field">
+              <span class="employee-detail-header__field-label">{{ texts.detailHeaderLastName2Label }}</span>
+              <input pInputText type="text" formControlName="lastName2" autocomplete="off" />
+            </label>
+
+            <label class="employee-detail-header__field">
+              <span class="employee-detail-header__field-label">{{ texts.detailHeaderPreferredNameLabel }}</span>
+              <input pInputText type="text" formControlName="preferredName" autocomplete="nickname" />
+              <span class="employee-detail-header__field-hint">Nombre por el que prefiere que le llamen</span>
+            </label>
+
+            <div class="employee-detail-header__edit-actions">
+              <app-ui-button
+                type="button"
+                severity="secondary"
+                [outlined]="true"
+                [label]="texts.detailHeaderCancelAction"
+                (pressed)="cancelIdentityEditor()"
+                [disabled]="updating()"
+              />
+              <app-ui-button
+                type="submit"
+                [label]="updating() ? texts.sectionShellBusyMessage : texts.detailHeaderSaveAction"
+                [disabled]="identityForm.invalid || updating()"
+              />
+            </div>
+          </form>
         </div>
-      </form>
-    </section>
+      </aside>
+    </div>
   }
 
   @if (!editorOnly()) {
