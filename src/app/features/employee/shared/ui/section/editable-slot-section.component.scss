@@ -37,16 +37,20 @@
   gap: 0.42rem;
 }
 
-/* Más padding y aire en cada fila de dato */
+/* Fila de dato — summary a la izquierda, acciones a la derecha */
 .editable-slot-section__row {
-  border: 1px solid rgba(209, 213, 219, 0.7);
+  border: 1px solid #f1f5f9;
   border-radius: 0.62rem;
   background: #ffffff;
   padding: 0.72rem 0.88rem;
-  display: grid;
-  gap: 0.38rem;
-  justify-items: start;
-  transition: border-color 120ms ease, background-color 120ms ease, box-shadow 120ms ease;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: border-color 120ms ease, background-color 120ms ease;
+}
+
+.editable-slot-section__row:not(.editable-slot-section__row--editing):not(.editable-slot-section__row--draft):not(.editable-slot-section__row--confirming-delete) {
+  justify-content: space-between;
 }
 
 .editable-slot-section__row:hover {
@@ -78,35 +82,35 @@
 .editable-slot-section__summary {
   display: grid;
   gap: 0.18rem;
-  width: 100%;
-  max-width: 58rem;
+  flex: 1;
+  min-width: 0;
 }
 
 /* Etiqueta de campo — más visible */
 .editable-slot-section__key {
   margin: 0;
-  font-size: 0.68rem;
+  font-size: 0.6rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: #5b7489;
+  letter-spacing: 0.07em;
+  color: #9ca3af;
   line-height: 1.2;
 }
 
 /* Valor del campo — más peso visual */
 .editable-slot-section__value {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   font-weight: 600;
-  color: #162f42;
+  color: #111827;
   line-height: 1.35;
 }
 
 .editable-slot-section__secondary {
   margin: 0;
-  font-size: 0.75rem;
+  font-size: 0.74rem;
   line-height: 1.35;
-  color: #607284;
+  color: #6b7280;
 }
 
 .editable-slot-section__badges {
@@ -185,12 +189,18 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.28rem;
-  width: 100%;
-  max-width: 58rem;
+  flex-shrink: 0;
 }
 
-.editable-slot-section__summary + .editable-slot-section__row-actions :where(app-ui-button) {
-  opacity: 0.9;
+/* Show actions only on hover when in read mode */
+.editable-slot-section__row:not(:hover):not(:focus-within)
+  .editable-slot-section__summary
+  + .editable-slot-section__row-actions {
+  opacity: 0;
+}
+
+.editable-slot-section__summary + .editable-slot-section__row-actions {
+  transition: opacity 120ms ease;
 }
 
 .editable-slot-section__delete-confirm {

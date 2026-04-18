@@ -4,92 +4,89 @@
   </header>
 
   @if (hasAnyData()) {
-    @if (currentPresence(); as currentPresence) {
-      <article class="employee-presence-block__current-item">
-        <p class="employee-presence-block__label">{{ resolveCurrentSectionLabel() }}</p>
-        <p class="employee-presence-block__identity">
-          <span>{{ resolveCompanyLabel(currentPresence) }}</span>
-          @if (resolveCompanyCodeSecondary(currentPresence); as companyCodeSecondary) {
-            <span class="employee-presence-block__identity-secondary"> · {{ companyCodeSecondary }}</span>
-          }
-          <span> · {{ texts.presenceBlockPeriodNumberPrefix }} #{{ currentPresence.presenceNumber }}</span>
-        </p>
-        <p class="employee-presence-block__period">
-          {{ texts.presenceBlockPeriodLabel }}: {{ buildPeriodLabel(currentPresence) }}
-        </p>
-        <p class="employee-presence-block__meta">
+    @if (currentPresence(); as p) {
+      <article class="employee-presence-block__current">
+        <div class="employee-presence-block__card-top">
+          <span class="employee-presence-block__eyebrow">{{ resolveCurrentSectionLabel() }}</span>
           <span
-            class="employee-presence-block__status-chip"
-            [class.employee-presence-block__status-chip--active]="currentPresence.isActive"
-          >
-            {{ resolveStatusLabel(currentPresence) }}
-          </span>
-        </p>
-        <p class="employee-presence-block__reason-row">
-          <span>
-            {{ texts.presenceBlockEntryReasonLabel }}:
-            {{ resolveEntryReasonLabel(currentPresence) }}
-            @if (resolveEntryReasonCodeSecondary(currentPresence); as entryReasonCodeSecondary) {
-              <span class="employee-presence-block__reason-secondary"> · {{ entryReasonCodeSecondary }}</span>
+            class="employee-presence-block__badge"
+            [class.employee-presence-block__badge--active]="p.isActive"
+          >{{ resolveStatusLabel(p) }}</span>
+        </div>
+
+        <div class="employee-presence-block__identity">
+          <span class="employee-presence-block__identity-name">{{ resolveCompanyLabel(p) }}</span>
+          <div class="employee-presence-block__codes">
+            @if (resolveCompanyCodeSecondary(p); as code) {
+              <span class="employee-presence-block__code">{{ code }}</span>
             }
-          </span>
-          @if (currentPresence.exitReasonCode) {
-            <span>
-              {{ texts.presenceBlockExitReasonLabel }}:
-              {{ resolveExitReasonLabel(currentPresence) }}
-              @if (resolveExitReasonCodeSecondary(currentPresence); as exitReasonCodeSecondary) {
-                <span class="employee-presence-block__reason-secondary"> · {{ exitReasonCodeSecondary }}</span>
+            <span class="employee-presence-block__code">
+              {{ texts.presenceBlockPeriodNumberPrefix }} #{{ p.presenceNumber }}
+            </span>
+          </div>
+        </div>
+
+        <div class="employee-presence-block__fields">
+          <div class="employee-presence-block__field">
+            <span class="employee-presence-block__field-label">{{ texts.presenceBlockPeriodLabel }}</span>
+            <span class="employee-presence-block__field-value employee-presence-block__period">
+              {{ buildPeriodLabel(p) }}
+            </span>
+          </div>
+
+          <div class="employee-presence-block__field">
+            <span class="employee-presence-block__field-label">{{ texts.presenceBlockEntryReasonLabel }}</span>
+            <span class="employee-presence-block__field-value">
+              {{ resolveEntryReasonLabel(p) }}
+              @if (resolveEntryReasonCodeSecondary(p); as code) {
+                <span class="employee-presence-block__code">{{ code }}</span>
               }
             </span>
+          </div>
+
+          @if (p.exitReasonCode) {
+            <div class="employee-presence-block__field">
+              <span class="employee-presence-block__field-label">{{ texts.presenceBlockExitReasonLabel }}</span>
+              <span class="employee-presence-block__field-value">
+                {{ resolveExitReasonLabel(p) }}
+                @if (resolveExitReasonCodeSecondary(p); as code) {
+                  <span class="employee-presence-block__code">{{ code }}</span>
+                }
+              </span>
+            </div>
           }
-        </p>
-        <p class="employee-presence-block__context">{{ resolveCurrentKindLabel() }}</p>
+        </div>
       </article>
     }
 
     <section class="employee-presence-block__history" [attr.aria-label]="texts.presenceBlockHistoryTitle">
-      <h5>{{ texts.presenceBlockHistoryTitle }}</h5>
+      <h5 class="employee-presence-block__history-title">{{ texts.presenceBlockHistoryTitle }}</h5>
 
       @if (hasHistory()) {
         <div class="employee-presence-block__history-list" role="list">
           @for (presence of presenceHistory(); track presence.presenceNumber + '-' + presence.startDate) {
             <article class="employee-presence-block__history-item" role="listitem">
-              <p class="employee-presence-block__identity">
-                <span>{{ resolveCompanyLabel(presence) }}</span>
-                @if (resolveCompanyCodeSecondary(presence); as companyCodeSecondary) {
-                  <span class="employee-presence-block__identity-secondary"> · {{ companyCodeSecondary }}</span>
-                }
-                <span> · {{ texts.presenceBlockPeriodNumberPrefix }} #{{ presence.presenceNumber }}</span>
-              </p>
-              <p class="employee-presence-block__period">
-                {{ texts.presenceBlockPeriodLabel }}: {{ buildPeriodLabel(presence) }}
-              </p>
-              <p class="employee-presence-block__meta">
-                <span
-                  class="employee-presence-block__status-chip"
-                  [class.employee-presence-block__status-chip--active]="presence.isActive"
-                >
-                  {{ resolveStatusLabel(presence) }}
-                </span>
-              </p>
-              <p class="employee-presence-block__reason-row">
-                <span>
-                  {{ texts.presenceBlockEntryReasonLabel }}:
-                  {{ resolveEntryReasonLabel(presence) }}
-                  @if (resolveEntryReasonCodeSecondary(presence); as entryReasonCodeSecondary) {
-                    <span class="employee-presence-block__reason-secondary"> · {{ entryReasonCodeSecondary }}</span>
+              <div class="employee-presence-block__history-item-head">
+                <span class="employee-presence-block__history-company">
+                  {{ resolveCompanyLabel(presence) }}
+                  @if (resolveCompanyCodeSecondary(presence); as code) {
+                    <span class="employee-presence-block__code">{{ code }}</span>
                   }
                 </span>
-                @if (presence.exitReasonCode) {
-                  <span>
-                    {{ texts.presenceBlockExitReasonLabel }}:
-                    {{ resolveExitReasonLabel(presence) }}
-                    @if (resolveExitReasonCodeSecondary(presence); as exitReasonCodeSecondary) {
-                      <span class="employee-presence-block__reason-secondary"> · {{ exitReasonCodeSecondary }}</span>
-                    }
-                  </span>
-                }
-              </p>
+                <span
+                  class="employee-presence-block__badge"
+                  [class.employee-presence-block__badge--active]="presence.isActive"
+                >{{ resolveStatusLabel(presence) }}</span>
+              </div>
+              <span class="employee-presence-block__period">{{ buildPeriodLabel(presence) }}</span>
+              @if (presence.exitReasonCode) {
+                <span class="employee-presence-block__history-exit">
+                  {{ resolveExitReasonLabel(presence) }}
+                  @if (resolveExitReasonCodeSecondary(presence); as code) {
+                    <span class="employee-presence-block__code">{{ code }}</span>
+                  }
+                </span>
+              }
             </article>
           }
         </div>

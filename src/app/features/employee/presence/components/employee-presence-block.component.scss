@@ -1,151 +1,218 @@
-/* Cambio 3: Presencia como entidad visual unificada (card completa) */
 .employee-presence-block {
   display: grid;
   gap: 0;
-  border: 1px solid rgba(209, 213, 219, 0.65);
-  border-top: 2px solid rgba(14, 116, 144, 0.4);
+  border: 1px solid #e5e7eb;
+  border-top: 2px solid #0e7490;
   border-radius: 0.82rem;
   background: #ffffff;
-  box-shadow: var(--elevation-2);
+  box-shadow: var(--elevation-1);
   overflow: hidden;
 }
 
-/* Header tipo section-card chrome */
+/* ─── HEADER ─── */
 .employee-presence-block__header {
-  padding: 0.72rem 1rem;
-  background: linear-gradient(180deg, rgba(14, 116, 144, 0.07) 0%, rgba(14, 116, 144, 0.03) 100%);
-  border-bottom: 1px solid rgba(14, 116, 144, 0.1);
+  padding: 0.62rem 1rem;
+  background: linear-gradient(180deg, rgba(14, 116, 144, 0.06) 0%, rgba(14, 116, 144, 0.02) 100%);
+  border-bottom: 1px solid #f1f5f9;
 }
 
 .employee-presence-block__header h4 {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 0.78rem;
   font-weight: 700;
-  color: #0f3247;
+  color: #111827;
 }
 
-/* Presencia actual: fondo accent suave, destacada */
-.employee-presence-block__current-item {
+/* ─── CURRENT / ACTIVE CARD ─── */
+.employee-presence-block__current {
   display: grid;
-  gap: 0.3rem;
-  padding: 0.9rem 1rem;
-  background: rgba(14, 116, 144, 0.04);
-  border-bottom: 1px solid rgba(14, 116, 144, 0.1);
+  gap: 0.82rem;
+  padding: 0.88rem 1rem 0.96rem;
+  border-bottom: 1px solid #f1f5f9;
+  border-left: 3px solid #0e7490;
+  background: #fafcff;
 }
 
-/* Historial: continuación visual dentro de la misma card */
-.employee-presence-block__history {
-  display: grid;
-  gap: 0.56rem;
-  padding: 0.82rem 1rem;
-  background: #ffffff;
+.employee-presence-block__card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
 }
 
-.employee-presence-block__history h5 {
-  margin: 0;
-  font-size: 0.68rem;
+.employee-presence-block__eyebrow {
+  font-size: 0.6rem;
   font-weight: 800;
   text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #0e7490;
+}
+
+/* ─── BADGE ─── */
+.employee-presence-block__badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  color: #6b7280;
+  font-size: 0.62rem;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0.22rem 0.5rem;
+  white-space: nowrap;
+}
+
+.employee-presence-block__badge--active {
+  border-color: #a7f3d0;
+  background: #ecfdf5;
+  color: #065f46;
+}
+
+/* ─── IDENTITY ROW ─── */
+.employee-presence-block__identity {
+  display: grid;
+  gap: 0.22rem;
+}
+
+.employee-presence-block__identity-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1.2;
+}
+
+.employee-presence-block__codes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.28rem;
+}
+
+/* ─── CODE PILL ─── */
+.employee-presence-block__code {
+  display: inline-flex;
+  align-items: center;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  padding: 0.12rem 0.36rem;
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: #6b7280;
+  font-family: 'SF Mono', ui-monospace, monospace;
+}
+
+/* ─── FIELD GRID ─── */
+.employee-presence-block__fields {
+  display: grid;
+  gap: 0.64rem;
+}
+
+.employee-presence-block__field {
+  display: grid;
+  gap: 0.18rem;
+}
+
+.employee-presence-block__field-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
   letter-spacing: 0.07em;
-  color: #5c7891;
+  color: #9ca3af;
+}
+
+.employee-presence-block__field-value {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #1f2937;
+  line-height: 1.3;
+  display: flex;
+  align-items: center;
+  gap: 0.32rem;
+  flex-wrap: wrap;
+}
+
+.employee-presence-block__period {
+  font-variant-numeric: tabular-nums;
+  color: #0f172a;
+}
+
+/* ─── HISTORY ─── */
+.employee-presence-block__history {
+  display: grid;
+  gap: 0.52rem;
+  padding: 0.82rem 1rem;
+}
+
+.employee-presence-block__history-title {
+  margin: 0;
+  font-size: 0.6rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #9ca3af;
 }
 
 .employee-presence-block__history-list {
   display: grid;
-  gap: 0.36rem;
+  gap: 0.32rem;
 }
 
 .employee-presence-block__history-item {
   display: grid;
-  gap: 0.22rem;
-  border: 1px solid rgba(209, 213, 219, 0.5);
-  border-radius: 0.62rem;
-  background: #fafafa;
-  padding: 0.62rem 0.78rem;
+  gap: 0.16rem;
+  border: 1px solid #f1f5f9;
+  border-radius: 0.52rem;
+  background: #ffffff;
+  padding: 0.56rem 0.72rem;
+  transition: border-color 120ms ease;
 }
 
-/* Textos más grandes — cambio 4 */
-.employee-presence-block__label {
-  margin: 0;
-  font-size: 0.68rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #5c7891;
+.employee-presence-block__history-item:hover {
+  border-color: #e5e7eb;
+}
+
+.employee-presence-block__history-item-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.employee-presence-block__history-company {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #374151;
+  display: flex;
+  align-items: center;
+  gap: 0.28rem;
+  flex-wrap: wrap;
 }
 
 .employee-presence-block__period {
-  margin: 0;
-  font-size: 0.9rem;
-  font-weight: 700;
-  line-height: 1.3;
-  color: #0f172a;
-}
-
-.employee-presence-block__identity {
-  margin: 0;
-  font-size: 0.8rem;
-  font-weight: 600;
-  line-height: 1.3;
-  color: #2d4a5f;
-}
-
-.employee-presence-block__identity-secondary {
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: #6f8296;
-}
-
-.employee-presence-block__reason-secondary {
-  font-size: 0.72rem;
-  font-weight: 500;
-  color: #6f8296;
-}
-
-.employee-presence-block__meta,
-.employee-presence-block__reason-row {
-  margin: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.32rem;
   font-size: 0.78rem;
-  line-height: 1.3;
-  color: #4f6880;
+  font-weight: 500;
+  color: #6b7280;
 }
 
-.employee-presence-block__status-chip {
-  display: inline-flex;
+.employee-presence-block__history-exit {
+  font-size: 0.72rem;
+  color: #9ca3af;
+  display: flex;
   align-items: center;
-  border-radius: 999px;
-  border: 1px solid #cdd6e0;
-  background: #f6f7f9;
-  color: #475569;
-  font-size: 0.68rem;
-  font-weight: 700;
-  line-height: 1;
-  padding: 0.2rem 0.5rem;
+  gap: 0.28rem;
+  flex-wrap: wrap;
 }
 
-.employee-presence-block__status-chip--active {
-  border-color: rgba(14, 116, 144, 0.35);
-  background: rgba(14, 116, 144, 0.08);
-  color: #0a4d5f;
-}
-
-.employee-presence-block__context {
-  margin: 0;
-  font-size: 0.75rem;
-  color: #4f6376;
-}
-
+/* ─── EMPTY STATES ─── */
 .employee-presence-block__history-empty,
 .employee-presence-block__empty {
   margin: 0;
-  border: 1px dashed rgba(14, 116, 144, 0.25);
-  border-radius: 0.52rem;
   padding: 0.6rem 0.75rem;
-  font-size: 0.8rem;
-  color: #64748b;
+  border: 1px dashed #e5e7eb;
+  border-radius: 0.52rem;
+  font-size: 0.78rem;
+  color: #9ca3af;
 }
 
 .employee-presence-block__empty {
