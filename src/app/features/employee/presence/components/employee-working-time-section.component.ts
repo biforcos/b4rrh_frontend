@@ -67,7 +67,10 @@ export class EmployeeWorkingTimeSectionComponent {
   };
 
   protected readonly rows = computed<ReadonlyArray<TemporalRowViewModel<number>>>(() =>
-    this.workingTimeStore.workingTimes().map((item) => mapEmployeeWorkingTimeModelToTemporalRow(item, this.rowTexts)),
+    this.workingTimeStore.workingTimes().map((item) => ({
+      ...mapEmployeeWorkingTimeModelToTemporalRow(item, this.rowTexts),
+      titleSecondary: null,
+    })),
   );
   protected readonly displayMode = this.displayModeState.asReadonly();
   protected readonly confirmingCloseKey = this.confirmingCloseKeyState.asReadonly();

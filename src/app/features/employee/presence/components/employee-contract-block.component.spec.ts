@@ -34,14 +34,13 @@ describe('EmployeeContractBlockComponent', () => {
     fixture.componentRef.setInput('contract', model);
     fixture.detectChanges();
 
-    const identityLines = Array.from(
-      fixture.nativeElement.querySelectorAll('.employee-contract-block__current-item .employee-contract-block__identity'),
-    ) as HTMLElement[];
+    const identityEl = fixture.nativeElement.querySelector('.employee-contract-block__identity') as HTMLElement | null;
+    const subtypeEl = fixture.nativeElement.querySelector('.employee-contract-block__subtype') as HTMLElement | null;
 
-    expect(identityLines[0]?.textContent ?? '').toContain('Indefinido');
-    expect(identityLines[0]?.textContent ?? '').toContain('IND');
-    expect(identityLines[1]?.textContent ?? '').toContain('Tiempo completo');
-    expect(identityLines[1]?.textContent ?? '').toContain('FT1');
+    expect(identityEl?.textContent ?? '').toContain('Indefinido');
+    expect(identityEl?.textContent ?? '').toContain('IND');
+    expect(subtypeEl?.textContent ?? '').toContain('Tiempo completo');
+    expect(subtypeEl?.textContent ?? '').toContain('FT1');
   });
 
   it('falls back to CODE when names are missing', () => {

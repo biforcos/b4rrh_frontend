@@ -38,7 +38,7 @@ describe('EmployeePresenceBlockComponent', () => {
     fixture.detectChanges();
 
     const identity =
-      fixture.nativeElement.querySelector('.employee-presence-block__current-item .employee-presence-block__identity')
+      fixture.nativeElement.querySelector('.employee-presence-block__current .employee-presence-block__identity')
         ?.textContent ?? '';
 
     expect(identity).toContain('Empresa Activa');

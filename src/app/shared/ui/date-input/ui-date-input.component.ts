@@ -1,33 +1,25 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { DatePickerModule } from 'primeng/datepicker';
-
-import { formatLocalDate, parseLocalDate } from '../../utils/local-date.util';
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 
 @Component({
   selector: 'app-ui-date-input',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DatePickerModule, FormsModule],
   template: `
-    <p-datepicker
+    <input
+      type="date"
       [id]="inputId() ?? undefined"
-      [ngModel]="value()"
-      [minDate]="minDate()"
-      [maxDate]="maxDate()"
+      [value]="value() ?? ''"
+      [min]="min() ?? undefined"
+      [max]="max() ?? undefined"
       [disabled]="disabled()"
-      [readonlyInput]="readonly()"
-      [ariaLabel]="ariaLabel() ?? undefined"
-      (ngModelChange)="onDateChange($event)"
-      dateFormat="yy-mm-dd"
-      [showIcon]="true"
-      [fluid]="true"
-      appendTo="body"
+      [readOnly]="readonly()"
+      [attr.aria-label]="ariaLabel() ?? undefined"
+      (input)="onDateInput($event)"
     />
   `,
   styles: [`
     :host { display: block; width: 100%; }
-    :host ::ng-deep .p-datepicker { width: 100%; }
+    input { width: 100%; }
   `],
 })
 export class UiDateInputComponent {
@@ -41,16 +33,8 @@ export class UiDateInputComponent {
 
   readonly valueChanged = output<string>();
 
-  protected readonly minDate = computed(() => parseLocalDate(this.min()));
-  protected readonly maxDate = computed(() => parseLocalDate(this.max()));
-
-  protected onDateChange(newDate: Date | string | null): void {
-    if (newDate instanceof Date) {
-      this.valueChanged.emit(formatLocalDate(newDate));
-    } else if (typeof newDate === 'string') {
-      this.valueChanged.emit(newDate);
-    } else {
-      this.valueChanged.emit('');
-    }
+  protected onDateInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.valueChanged.emit(input.value);
   }
 }

@@ -1,31 +1,27 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { SelectModule } from 'primeng/select';
 import { SlotKeyOption } from '../../../features/employee/shared/ui/section/editable-slot-section.model';
 
 @Component({
   selector: 'app-ui-select',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [SelectModule, FormsModule],
   template: `
-    <p-select
+    <select
       [id]="inputId() ?? undefined"
-      [options]="selectOptions()"
-      optionLabel="label"
-      optionValue="value"
-      [ngModel]="value()"
       [disabled]="disabled()"
-      [ariaLabel]="ariaLabel() ?? undefined"
-      (ngModelChange)="onSelectionChange($event)"
-      [placeholder]="placeholder() ?? undefined"
-      [fluid]="true"
-      appendTo="body"
-    />
+      [attr.aria-label]="ariaLabel() ?? undefined"
+      [value]="value() ?? ''"
+      (change)="onSelectionChange($event)"
+    >
+      <option value="" [disabled]="true" [hidden]="true">{{ placeholder() ?? '' }}</option>
+      @for (opt of selectOptions(); track opt.value) {
+        <option [value]="opt.value">{{ opt.label }}</option>
+      }
+    </select>
   `,
   styles: [`
     :host { display: block; width: 100%; }
-    :host ::ng-deep .p-select { width: 100%; }
+    select { width: 100%; }
   `],
 })
 export class UiSelectComponent {
@@ -36,11 +32,12 @@ export class UiSelectComponent {
   readonly ariaLabel = input<string | null>(null);
   readonly disabled = input(false);
 
-  protected readonly selectOptions = computed(() => this.options() as any[]);
+  protected readonly selectOptions = computed(() => this.options() as SlotKeyOption<string>[]);
 
   readonly valueChanged = output<string>();
 
-  protected onSelectionChange(newValue: string): void {
-    this.valueChanged.emit(newValue);
+  protected onSelectionChange(event: Event): void {
+    const select = event.target as HTMLSelectElement;
+    this.valueChanged.emit(select.value);
   }
 }

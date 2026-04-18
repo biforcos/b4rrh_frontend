@@ -45,7 +45,7 @@ export function mapEmployeeWorkingTimeModelToTemporalRow(
   return {
     key: source.workingTimeNumber,
     title: `${texts.percentageLabel}: ${formatNumber(source.workingTimePercentage)} %`,
-    titleSecondary: null,
+    titleSecondary: `#${source.workingTimeNumber}`,
     subtitle: `${texts.weeklyHoursLabel}: ${formatNumber(source.weeklyHours)} · ${texts.dailyHoursLabel}: ${formatNumber(source.dailyHours)}`,
     detailText: `${texts.monthlyHoursLabel}: ${formatNumber(source.monthlyHours)}`,
     periodText: buildPeriodText(source.startDate, source.endDate, texts.currentPeriodLabel, texts.periodPrefix),

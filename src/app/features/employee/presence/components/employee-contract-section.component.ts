@@ -487,7 +487,7 @@ export class EmployeeContractSectionComponent {
   }
 
   private resolveErrorMessage(): string | null {
-    return this.localErrorMessageState();
+    return this.localErrorMessageState() ?? this.contractStore.error() ?? null;
   }
 
   private resolveSuccessMessage(): string | null {
