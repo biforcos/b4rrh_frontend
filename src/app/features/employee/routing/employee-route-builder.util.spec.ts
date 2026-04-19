@@ -12,13 +12,7 @@ describe('buildEmployeeDetailRouteCommands', () => {
   it('builds route commands for overview section', () => {
     const commands = buildEmployeeDetailRouteCommands(key, 'overview');
 
-    expect(commands).toEqual([
-      `/${employeeRouteBaseSegment}`,
-      'ESP',
-      'ORD',
-      '00001',
-      'overview',
-    ]);
+    expect(commands).toEqual([`/${employeeRouteBaseSegment}`, 'ESP', 'ORD', '00001', 'overview']);
   });
 
   it('trims whitespace from key segments', () => {

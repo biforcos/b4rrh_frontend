@@ -22,7 +22,9 @@ const window = (start: string, end: string | undefined, pct: number, code: strin
 
 describe('mapCostCenterResponsesToHistoryModel', () => {
   it('maps a single open window as currentDistribution', () => {
-    const result = mapCostCenterResponsesToHistoryModel([window('2024-01-01', undefined, 100, 'CC1')]);
+    const result = mapCostCenterResponsesToHistoryModel([
+      window('2024-01-01', undefined, 100, 'CC1'),
+    ]);
 
     expect(result.currentDistribution).not.toBeNull();
     expect(result.currentDistribution!.startDate).toBe('2024-01-01');
@@ -30,7 +32,9 @@ describe('mapCostCenterResponsesToHistoryModel', () => {
   });
 
   it('returns null currentDistribution when all windows are closed', () => {
-    const result = mapCostCenterResponsesToHistoryModel([window('2023-01-01', '2023-12-31', 100, 'CC1')]);
+    const result = mapCostCenterResponsesToHistoryModel([
+      window('2023-01-01', '2023-12-31', 100, 'CC1'),
+    ]);
 
     expect(result.currentDistribution).toBeNull();
   });
@@ -61,7 +65,9 @@ describe('mapCostCenterResponsesToHistoryModel', () => {
   });
 
   it('maps item names correctly', () => {
-    const result = mapCostCenterResponsesToHistoryModel([window('2024-01-01', undefined, 100, 'CC1')]);
+    const result = mapCostCenterResponsesToHistoryModel([
+      window('2024-01-01', undefined, 100, 'CC1'),
+    ]);
 
     expect(result.distributionHistory[0].items[0].costCenterCode).toBe('CC1');
     expect(result.distributionHistory[0].items[0].costCenterName).toBe('Centro CC1');

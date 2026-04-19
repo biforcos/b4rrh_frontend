@@ -1,4 +1,7 @@
-import { mapCompanyListItemResponseToModel, mapCompanyResponseToDetailModel } from './company.mapper';
+import {
+  mapCompanyListItemResponseToModel,
+  mapCompanyResponseToDetailModel,
+} from './company.mapper';
 
 describe('mapCompanyListItemResponseToModel', () => {
   it('maps all required fields', () => {
@@ -79,7 +82,8 @@ describe('mapCompanyResponseToDetailModel', () => {
       active: true,
       startDate: '2020-01-01',
       endDate: undefined,
-      address: undefined as unknown as import('../../../core/api/generated/model/company-address').CompanyAddress,
+      address:
+        undefined as unknown as import('../../../core/api/generated/model/company-address').CompanyAddress,
     });
 
     expect(result.description).toBeNull();

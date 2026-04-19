@@ -1,4 +1,7 @@
-import { mapWorkCenterListItemResponseToModel, mapWorkCenterResponseToDetailModel } from './work-center.mapper';
+import {
+  mapWorkCenterListItemResponseToModel,
+  mapWorkCenterResponseToDetailModel,
+} from './work-center.mapper';
 
 describe('mapWorkCenterListItemResponseToModel', () => {
   it('maps all required fields', () => {
@@ -75,7 +78,8 @@ describe('mapWorkCenterResponseToDetailModel', () => {
       endDate: undefined,
       active: true,
       companyCode: undefined,
-      address: undefined as unknown as import('../../../core/api/generated/model/work-center-address').WorkCenterAddress,
+      address:
+        undefined as unknown as import('../../../core/api/generated/model/work-center-address').WorkCenterAddress,
     });
 
     expect(result.description).toBeNull();

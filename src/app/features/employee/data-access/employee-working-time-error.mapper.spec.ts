@@ -2,12 +2,15 @@ import { mapEmployeeWorkingTimeErrorCode } from './employee-working-time-error.m
 
 describe('mapEmployeeWorkingTimeErrorCode', () => {
   it('recognizes WORKING_TIME_OVERLAP from direct code property', () => {
-    expect(mapEmployeeWorkingTimeErrorCode({ code: 'WORKING_TIME_OVERLAP' })).toBe('WORKING_TIME_OVERLAP');
+    expect(mapEmployeeWorkingTimeErrorCode({ code: 'WORKING_TIME_OVERLAP' })).toBe(
+      'WORKING_TIME_OVERLAP',
+    );
   });
 
   it('recognizes WORKING_TIME_NOT_FOUND from nested error.code', () => {
-    expect(mapEmployeeWorkingTimeErrorCode({ error: { code: 'WORKING_TIME_NOT_FOUND' } }))
-      .toBe('WORKING_TIME_NOT_FOUND');
+    expect(mapEmployeeWorkingTimeErrorCode({ error: { code: 'WORKING_TIME_NOT_FOUND' } })).toBe(
+      'WORKING_TIME_NOT_FOUND',
+    );
   });
 
   it('recognizes all known functional error codes', () => {

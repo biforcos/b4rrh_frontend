@@ -2,13 +2,15 @@ import { mapEmployeeLaborClassificationErrorCode } from './employee-labor-classi
 
 describe('mapEmployeeLaborClassificationErrorCode', () => {
   it('recognizes LABOR_CLASSIFICATION_OVERLAP from nested error.code', () => {
-    expect(mapEmployeeLaborClassificationErrorCode({ error: { code: 'LABOR_CLASSIFICATION_OVERLAP' } }))
-      .toBe('LABOR_CLASSIFICATION_OVERLAP');
+    expect(
+      mapEmployeeLaborClassificationErrorCode({ error: { code: 'LABOR_CLASSIFICATION_OVERLAP' } }),
+    ).toBe('LABOR_CLASSIFICATION_OVERLAP');
   });
 
   it('normalizes code to uppercase before matching', () => {
-    expect(mapEmployeeLaborClassificationErrorCode({ error: { code: 'labor_classification_overlap' } }))
-      .toBe('LABOR_CLASSIFICATION_OVERLAP');
+    expect(
+      mapEmployeeLaborClassificationErrorCode({ error: { code: 'labor_classification_overlap' } }),
+    ).toBe('LABOR_CLASSIFICATION_OVERLAP');
   });
 
   it('recognizes all known functional error codes', () => {
@@ -29,7 +31,9 @@ describe('mapEmployeeLaborClassificationErrorCode', () => {
   });
 
   it('returns request-failed for an unknown code', () => {
-    expect(mapEmployeeLaborClassificationErrorCode({ error: { code: 'UNKNOWN_ERROR' } })).toBe('request-failed');
+    expect(mapEmployeeLaborClassificationErrorCode({ error: { code: 'UNKNOWN_ERROR' } })).toBe(
+      'request-failed',
+    );
   });
 
   it('returns request-failed when error is null', () => {

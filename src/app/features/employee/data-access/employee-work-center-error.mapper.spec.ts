@@ -2,12 +2,15 @@ import { mapEmployeeWorkCenterErrorCode } from './employee-work-center-error.map
 
 describe('mapEmployeeWorkCenterErrorCode', () => {
   it('recognizes WORK_CENTER_OVERLAP from direct code property', () => {
-    expect(mapEmployeeWorkCenterErrorCode({ code: 'WORK_CENTER_OVERLAP' })).toBe('WORK_CENTER_OVERLAP');
+    expect(mapEmployeeWorkCenterErrorCode({ code: 'WORK_CENTER_OVERLAP' })).toBe(
+      'WORK_CENTER_OVERLAP',
+    );
   });
 
   it('recognizes WORK_CENTER_NOT_FOUND from nested error.code', () => {
-    expect(mapEmployeeWorkCenterErrorCode({ error: { code: 'WORK_CENTER_NOT_FOUND' } }))
-      .toBe('WORK_CENTER_NOT_FOUND');
+    expect(mapEmployeeWorkCenterErrorCode({ error: { code: 'WORK_CENTER_NOT_FOUND' } })).toBe(
+      'WORK_CENTER_NOT_FOUND',
+    );
   });
 
   it('recognizes all known functional error codes', () => {
@@ -34,7 +37,11 @@ describe('mapEmployeeWorkCenterErrorCode', () => {
   });
 
   it('prefers direct code over nested error.code', () => {
-    expect(mapEmployeeWorkCenterErrorCode({ code: 'WORK_CENTER_OVERLAP', error: { code: 'WORK_CENTER_NOT_FOUND' } }))
-      .toBe('WORK_CENTER_OVERLAP');
+    expect(
+      mapEmployeeWorkCenterErrorCode({
+        code: 'WORK_CENTER_OVERLAP',
+        error: { code: 'WORK_CENTER_NOT_FOUND' },
+      }),
+    ).toBe('WORK_CENTER_OVERLAP');
   });
 });

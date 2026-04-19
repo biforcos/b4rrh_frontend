@@ -2,12 +2,15 @@ import { mapEmployeeCostCenterErrorCode } from './employee-cost-center-error.map
 
 describe('mapEmployeeCostCenterErrorCode', () => {
   it('recognizes COST_CENTER_OVERLAP from direct code property', () => {
-    expect(mapEmployeeCostCenterErrorCode({ code: 'COST_CENTER_OVERLAP' })).toBe('COST_CENTER_OVERLAP');
+    expect(mapEmployeeCostCenterErrorCode({ code: 'COST_CENTER_OVERLAP' })).toBe(
+      'COST_CENTER_OVERLAP',
+    );
   });
 
   it('recognizes COST_CENTER_OUTSIDE_PRESENCE from nested error.code', () => {
-    expect(mapEmployeeCostCenterErrorCode({ error: { code: 'COST_CENTER_OUTSIDE_PRESENCE' } }))
-      .toBe('COST_CENTER_OUTSIDE_PRESENCE');
+    expect(
+      mapEmployeeCostCenterErrorCode({ error: { code: 'COST_CENTER_OUTSIDE_PRESENCE' } }),
+    ).toBe('COST_CENTER_OUTSIDE_PRESENCE');
   });
 
   it('recognizes all known functional error codes', () => {

@@ -16,7 +16,13 @@ const detail: CompanyDetailModel = {
   active: true,
   legalName: 'Company Spain SL',
   taxIdentifier: 'B12345678',
-  address: { street: 'Calle Mayor 1', city: 'Madrid', postalCode: '28001', regionCode: 'MD', countryCode: 'ES' },
+  address: {
+    street: 'Calle Mayor 1',
+    city: 'Madrid',
+    postalCode: '28001',
+    regionCode: 'MD',
+    countryCode: 'ES',
+  },
 };
 
 describe('buildEmptyCompanyFormValue', () => {
@@ -41,7 +47,11 @@ describe('buildCompanyFormValueFromDetail', () => {
   });
 
   it('converts null optional fields to empty strings', () => {
-    const form = buildCompanyFormValueFromDetail({ ...detail, description: null, taxIdentifier: null });
+    const form = buildCompanyFormValueFromDetail({
+      ...detail,
+      description: null,
+      taxIdentifier: null,
+    });
 
     expect(form.description).toBe('');
     expect(form.taxIdentifier).toBe('');
@@ -51,21 +61,35 @@ describe('buildCompanyFormValueFromDetail', () => {
 describe('mapCompanyFormValueToCreateRequest', () => {
   it('trims and uppercases codes', () => {
     const form = buildCompanyFormValueFromDetail(detail);
-    const result = mapCompanyFormValueToCreateRequest({ ...form, ruleSystemCode: ' esp ', companyCode: ' es01 ' });
+    const result = mapCompanyFormValueToCreateRequest({
+      ...form,
+      ruleSystemCode: ' esp ',
+      companyCode: ' es01 ',
+    });
 
     expect(result.ruleSystemCode).toBe('ESP');
     expect(result.companyCode).toBe('ES01');
   });
 
   it('normalizes empty description to null', () => {
-    const result = mapCompanyFormValueToCreateRequest({ ...buildCompanyFormValueFromDetail(detail), description: '   ' });
+    const result = mapCompanyFormValueToCreateRequest({
+      ...buildCompanyFormValueFromDetail(detail),
+      description: '   ',
+    });
 
     expect(result.description).toBeNull();
   });
 
   it('returns undefined address when all address fields are blank', () => {
     const form = buildEmptyCompanyFormValue();
-    const result = mapCompanyFormValueToCreateRequest({ ...form, ruleSystemCode: 'ESP', companyCode: 'ES01', name: 'X', legalName: 'X SL', startDate: '2020-01-01' });
+    const result = mapCompanyFormValueToCreateRequest({
+      ...form,
+      ruleSystemCode: 'ESP',
+      companyCode: 'ES01',
+      name: 'X',
+      legalName: 'X SL',
+      startDate: '2020-01-01',
+    });
 
     expect(result.address).toBeUndefined();
   });
@@ -88,7 +112,10 @@ describe('mapCompanyFormValueToUpdateRequest', () => {
   });
 
   it('uppercases countryCode in address', () => {
-    const form = buildCompanyFormValueFromDetail({ ...detail, address: { ...detail.address, countryCode: 'es' } });
+    const form = buildCompanyFormValueFromDetail({
+      ...detail,
+      address: { ...detail.address, countryCode: 'es' },
+    });
     const result = mapCompanyFormValueToUpdateRequest(form);
 
     expect(result.address?.countryCode).toBe('ES');

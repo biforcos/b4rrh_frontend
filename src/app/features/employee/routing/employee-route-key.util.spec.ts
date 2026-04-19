@@ -35,7 +35,11 @@ describe('readEmployeeBusinessKeyFromParamMap', () => {
 
     const result = readEmployeeBusinessKeyFromParamMap(paramMap as any);
 
-    expect(result).toEqual({ ruleSystemCode: 'ESP', employeeTypeCode: 'ORD', employeeNumber: '00001' });
+    expect(result).toEqual({
+      ruleSystemCode: 'ESP',
+      employeeTypeCode: 'ORD',
+      employeeNumber: '00001',
+    });
   });
 
   it('returns null when ruleSystemCode is missing', () => {
