@@ -11,7 +11,7 @@ export function mapPayrollSummaryResponseToModel(response: PayrollSummaryRespons
     payrollPeriodCode: response.payrollPeriodCode,
     payrollTypeCode: response.payrollTypeCode,
     presenceNumber: response.presenceNumber,
-    status: response.status as PayrollSummaryModel['status'],
+    status: response.status,
     calculatedAt: response.calculatedAt,
   };
 }

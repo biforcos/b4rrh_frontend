@@ -1,6 +1,7 @@
+import { PayrollSummaryResponseStatusEnum } from '../../../../core/api/generated/model/payroll-summary-response';
 import { PayrollBusinessKey } from './payroll-business-key.model';
 
-export type PayrollStatus = 'NOT_VALID' | 'CALCULATED' | 'EXPLICIT_VALIDATED' | 'DEFINITIVE';
+export type PayrollStatus = `${PayrollSummaryResponseStatusEnum}`;
 
 export interface PayrollSummaryModel extends PayrollBusinessKey {
   status: PayrollStatus;
