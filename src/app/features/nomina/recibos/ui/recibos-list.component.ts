@@ -113,9 +113,12 @@ export class RecibosListComponent {
 
   isSelected(payroll: PayrollSummaryModel): boolean {
     const key = this.store.selectedKey();
-    return key?.employeeNumber === payroll.employeeNumber &&
+    return key?.ruleSystemCode === payroll.ruleSystemCode &&
+           key?.employeeTypeCode === payroll.employeeTypeCode &&
+           key?.employeeNumber === payroll.employeeNumber &&
            key?.payrollPeriodCode === payroll.payrollPeriodCode &&
-           key?.payrollTypeCode === payroll.payrollTypeCode;
+           key?.payrollTypeCode === payroll.payrollTypeCode &&
+           key?.presenceNumber === payroll.presenceNumber;
   }
 
   statusLabel(status: string): string {
@@ -123,6 +126,6 @@ export class RecibosListComponent {
   }
 
   trackPayroll(payroll: PayrollSummaryModel): string {
-    return `${payroll.employeeNumber}-${payroll.payrollPeriodCode}-${payroll.payrollTypeCode}`;
+    return `${payroll.ruleSystemCode}-${payroll.employeeTypeCode}-${payroll.employeeNumber}-${payroll.payrollPeriodCode}-${payroll.payrollTypeCode}-${payroll.presenceNumber}`;
   }
 }
