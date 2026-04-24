@@ -38,7 +38,7 @@ import { PayrollConceptModel } from '../models/payroll-concept.model';
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let concept of concepts" [class.row-total]="isTotal(concept)">
+          <tr *ngFor="let concept of concepts; trackBy: trackConcept" [class.row-total]="isTotal(concept)">
             <td>{{ concept.originPeriodCode ?? '—' }}</td>
             <td>{{ concept.conceptCode }}</td>
             <td>{{ concept.conceptLabel }}</td>
@@ -54,9 +54,9 @@ import { PayrollConceptModel } from '../models/payroll-concept.model';
         </tbody>
       </table>
 
-      <div *ngIf="netPayConcept" class="net-pay-footer">
+      <div *ngIf="netPayConcept && netPayConcept.amount != null" class="net-pay-footer">
         <span class="net-pay-label">Líquido total a percibir</span>
-        <span class="net-pay-amount">{{ formatNum(netPayConcept.amount!) }} €</span>
+        <span class="net-pay-amount">{{ formatNum(netPayConcept.amount) }} €</span>
       </div>
     </div>
   `,
@@ -108,5 +108,9 @@ export class RecibosFolioComponent {
 
   formatNum(value: number): string {
     return new Intl.NumberFormat('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
+  }
+
+  trackConcept(_index: number, concept: PayrollConceptModel): number {
+    return concept.lineNumber;
   }
 }

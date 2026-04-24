@@ -23,11 +23,11 @@ const STATUS_LABELS: Record<string, string> = {
         <div class="filter-row">
           <div class="filter-field">
             <label>PERÍODO</label>
-            <input [(ngModel)]="filters().payrollPeriodCode" (ngModelChange)="patchFilter('payrollPeriodCode', $event)" placeholder="202604" />
+            <input [ngModel]="filters().payrollPeriodCode" (ngModelChange)="patchFilter('payrollPeriodCode', $event)" placeholder="202604" />
           </div>
           <div class="filter-field">
             <label>ESTADO</label>
-            <select [(ngModel)]="filters().status" (ngModelChange)="patchFilter('status', $event)">
+            <select [ngModel]="filters().status" (ngModelChange)="patchFilter('status', $event)">
               <option value="">Todos</option>
               <option value="CALCULATED">CALCULADA</option>
               <option value="NOT_VALID">INVÁLIDA</option>
@@ -38,7 +38,7 @@ const STATUS_LABELS: Record<string, string> = {
         </div>
         <div class="filter-field">
           <label>EMPLEADO</label>
-          <input [(ngModel)]="filters().employeeNumber" (ngModelChange)="patchFilter('employeeNumber', $event)" placeholder="Número o nombre..." />
+          <input [ngModel]="filters().employeeNumber" (ngModelChange)="patchFilter('employeeNumber', $event)" placeholder="Número o nombre..." />
         </div>
         <button class="search-btn" (click)="search()">Buscar</button>
       </div>
