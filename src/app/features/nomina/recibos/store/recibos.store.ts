@@ -21,6 +21,7 @@ export class RecibosStore {
   private readonly selectedKeyState = signal<PayrollBusinessKey | null>(null);
   private readonly conceptsState = signal<ReadonlyArray<PayrollConceptModel>>([]);
   private readonly conceptsLoadingState = signal(false);
+  private readonly conceptsErrorState = signal<RecibosErrorCode | null>(null);
 
   private readonly transitioningState = signal(false);
   private readonly transitionErrorState = signal<string | null>(null);
@@ -31,6 +32,7 @@ export class RecibosStore {
   readonly selectedKey = this.selectedKeyState.asReadonly();
   readonly concepts = this.conceptsState.asReadonly();
   readonly conceptsLoading = this.conceptsLoadingState.asReadonly();
+  readonly conceptsError = this.conceptsErrorState.asReadonly();
   readonly transitioning = this.transitioningState.asReadonly();
   readonly transitionError = this.transitionErrorState.asReadonly();
 
@@ -139,6 +141,7 @@ export class RecibosStore {
   private loadConcepts(key: PayrollBusinessKey): void {
     this.conceptsLoadingState.set(true);
     this.conceptsState.set([]);
+    this.conceptsErrorState.set(null);
 
     this.gateway
       .getConcepts(key)
@@ -150,6 +153,7 @@ export class RecibosStore {
         },
         error: () => {
           this.conceptsLoadingState.set(false);
+          this.conceptsErrorState.set('request-failed');
         },
       });
   }
@@ -157,9 +161,12 @@ export class RecibosStore {
   private updatePayrollInList(updated: PayrollSummaryModel): void {
     this.payrollsState.update((list) =>
       list.map((p) =>
+        p.ruleSystemCode === updated.ruleSystemCode &&
+        p.employeeTypeCode === updated.employeeTypeCode &&
         p.employeeNumber === updated.employeeNumber &&
         p.payrollPeriodCode === updated.payrollPeriodCode &&
-        p.payrollTypeCode === updated.payrollTypeCode
+        p.payrollTypeCode === updated.payrollTypeCode &&
+        p.presenceNumber === updated.presenceNumber
           ? updated
           : p,
       ),
