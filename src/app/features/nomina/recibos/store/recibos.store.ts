@@ -1,0 +1,175 @@
+import { HttpErrorResponse } from '@angular/common/http';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { take } from 'rxjs';
+
+import { RecibosGateway } from '../gateway/recibos.gateway';
+import { PayrollBusinessKey } from '../models/payroll-business-key.model';
+import { PayrollConceptModel } from '../models/payroll-concept.model';
+import { PayrollSummaryModel } from '../models/payroll-summary.model';
+import { RecibosFilters } from '../models/recibos-filters.model';
+
+export type RecibosErrorCode = 'request-failed' | 'not-found' | 'transition-failed';
+
+@Injectable({ providedIn: 'root' })
+export class RecibosStore {
+  private readonly gateway = inject(RecibosGateway);
+
+  private readonly payrollsState = signal<ReadonlyArray<PayrollSummaryModel>>([]);
+  private readonly listLoadingState = signal(false);
+  private readonly listErrorState = signal<RecibosErrorCode | null>(null);
+
+  private readonly selectedKeyState = signal<PayrollBusinessKey | null>(null);
+  private readonly conceptsState = signal<ReadonlyArray<PayrollConceptModel>>([]);
+  private readonly conceptsLoadingState = signal(false);
+
+  private readonly transitioningState = signal(false);
+  private readonly transitionErrorState = signal<string | null>(null);
+
+  readonly payrolls = this.payrollsState.asReadonly();
+  readonly listLoading = this.listLoadingState.asReadonly();
+  readonly listError = this.listErrorState.asReadonly();
+  readonly selectedKey = this.selectedKeyState.asReadonly();
+  readonly concepts = this.conceptsState.asReadonly();
+  readonly conceptsLoading = this.conceptsLoadingState.asReadonly();
+  readonly transitioning = this.transitioningState.asReadonly();
+  readonly transitionError = this.transitionErrorState.asReadonly();
+
+  readonly selectedPayroll = computed(() => {
+    const key = this.selectedKeyState();
+    if (!key) return null;
+    return (
+      this.payrollsState().find(
+        (p) =>
+          p.ruleSystemCode === key.ruleSystemCode &&
+          p.employeeTypeCode === key.employeeTypeCode &&
+          p.employeeNumber === key.employeeNumber &&
+          p.payrollPeriodCode === key.payrollPeriodCode &&
+          p.payrollTypeCode === key.payrollTypeCode &&
+          p.presenceNumber === key.presenceNumber,
+      ) ?? null
+    );
+  });
+
+  search(filters: RecibosFilters): void {
+    this.listLoadingState.set(true);
+    this.listErrorState.set(null);
+
+    this.gateway
+      .search(filters)
+      .pipe(take(1))
+      .subscribe({
+        next: (payrolls) => {
+          this.payrollsState.set(payrolls);
+          this.listLoadingState.set(false);
+        },
+        error: () => {
+          this.listLoadingState.set(false);
+          this.listErrorState.set('request-failed');
+        },
+      });
+  }
+
+  selectPayroll(key: PayrollBusinessKey): void {
+    this.selectedKeyState.set(key);
+    this.transitionErrorState.set(null);
+    this.loadConcepts(key);
+  }
+
+  invalidate(key: PayrollBusinessKey): void {
+    if (this.transitioningState()) return;
+    this.transitioningState.set(true);
+    this.transitionErrorState.set(null);
+
+    this.gateway
+      .invalidate(key)
+      .pipe(take(1))
+      .subscribe({
+        next: (updated) => {
+          this.updatePayrollInList(updated);
+          this.transitioningState.set(false);
+        },
+        error: (err: HttpErrorResponse) => {
+          this.transitioningState.set(false);
+          this.transitionErrorState.set(this.mapTransitionError(err));
+        },
+      });
+  }
+
+  validate(key: PayrollBusinessKey): void {
+    if (this.transitioningState()) return;
+    this.transitioningState.set(true);
+    this.transitionErrorState.set(null);
+
+    this.gateway
+      .validate(key)
+      .pipe(take(1))
+      .subscribe({
+        next: (updated) => {
+          this.updatePayrollInList(updated);
+          this.transitioningState.set(false);
+        },
+        error: (err: HttpErrorResponse) => {
+          this.transitioningState.set(false);
+          this.transitionErrorState.set(this.mapTransitionError(err));
+        },
+      });
+  }
+
+  recalculate(key: PayrollBusinessKey): void {
+    if (this.transitioningState()) return;
+    this.transitioningState.set(true);
+    this.transitionErrorState.set(null);
+
+    this.gateway
+      .recalculate(key)
+      .pipe(take(1))
+      .subscribe({
+        next: (updated) => {
+          this.updatePayrollInList(updated);
+          this.transitioningState.set(false);
+          this.loadConcepts(key);
+        },
+        error: (err: HttpErrorResponse) => {
+          this.transitioningState.set(false);
+          this.transitionErrorState.set(this.mapTransitionError(err));
+        },
+      });
+  }
+
+  private loadConcepts(key: PayrollBusinessKey): void {
+    this.conceptsLoadingState.set(true);
+    this.conceptsState.set([]);
+
+    this.gateway
+      .getConcepts(key)
+      .pipe(take(1))
+      .subscribe({
+        next: (concepts) => {
+          this.conceptsState.set(concepts);
+          this.conceptsLoadingState.set(false);
+        },
+        error: () => {
+          this.conceptsLoadingState.set(false);
+        },
+      });
+  }
+
+  private updatePayrollInList(updated: PayrollSummaryModel): void {
+    this.payrollsState.update((list) =>
+      list.map((p) =>
+        p.employeeNumber === updated.employeeNumber &&
+        p.payrollPeriodCode === updated.payrollPeriodCode &&
+        p.payrollTypeCode === updated.payrollTypeCode
+          ? updated
+          : p,
+      ),
+    );
+  }
+
+  private mapTransitionError(err: HttpErrorResponse): string {
+    if (err.status === 409)
+      return err.error?.message ?? 'Transición no permitida en el estado actual.';
+    if (err.status === 404) return 'Nómina no encontrada.';
+    return 'Error al cambiar el estado. Inténtalo de nuevo.';
+  }
+}
