@@ -50,6 +50,14 @@ export class AppShellComponent {
       expanded: true,
       items: [{ label: this.texts.sectionRuleSystems, icon: 'pi pi-cog', routerLink: '/configuracion/rule-systems' }],
     },
+    {
+      label: this.texts.sectionPayroll,
+      icon: 'pi pi-file',
+      expanded: true,
+      items: [
+        { label: this.texts.sectionRecibos, icon: 'pi pi-receipt', routerLink: '/nomina/recibos' },
+      ],
+    },
   ];
 
   protected async logout(): Promise<void> {

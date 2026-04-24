@@ -58,6 +58,11 @@ export const routes: Routes = [
 					import('./rulesystem/rule-system/rule-system.routes').then((m) => m.ruleSystemRoutes),
 			},
 			{
+				path: 'nomina/recibos',
+				loadChildren: () =>
+					import('./features/nomina/recibos/recibos.routes').then((m) => m.recibosRoutes),
+			},
+			{
 				path: 'employees',
 				pathMatch: 'full',
 				redirectTo: 'personas/empleados',
