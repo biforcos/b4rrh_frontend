@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 
-import { PayrollResponse } from '../../../../core/api/generated/model/payroll-response';
+import { PayrollResponse, PayrollResponseStatusEnum } from '../../../../core/api/generated/model/payroll-response';
 import { RecibosClient } from '../client/recibos.client';
 import {
   mapPayrollSummaryResponseToModel,
@@ -45,6 +45,13 @@ export class RecibosGateway {
   }
 }
 
+const PAYROLL_RESPONSE_STATUS_MAP: Record<PayrollResponseStatusEnum, PayrollSummaryModel['status']> = {
+  [PayrollResponseStatusEnum.NotValid]: 'NOT_VALID',
+  [PayrollResponseStatusEnum.Calculated]: 'CALCULATED',
+  [PayrollResponseStatusEnum.ExplicitValidated]: 'EXPLICIT_VALIDATED',
+  [PayrollResponseStatusEnum.Definitive]: 'DEFINITIVE',
+};
+
 function payrollResponseToSummary(r: PayrollResponse): PayrollSummaryModel {
   return {
     ruleSystemCode: r.ruleSystemCode,
@@ -53,7 +60,7 @@ function payrollResponseToSummary(r: PayrollResponse): PayrollSummaryModel {
     payrollPeriodCode: r.payrollPeriodCode,
     payrollTypeCode: r.payrollTypeCode,
     presenceNumber: r.presenceNumber,
-    status: r.status as PayrollSummaryModel['status'],
+    status: PAYROLL_RESPONSE_STATUS_MAP[r.status],
     calculatedAt: r.calculatedAt,
   };
 }
