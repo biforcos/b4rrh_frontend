@@ -27,11 +27,19 @@ export class PeriodModalComponent {
     if (!this.saving() && this.submitEnabled()) this.submitted.emit();
   }
 
+  private _cancelInFlight = false;
+
   onCancel(): void {
+    this._cancelInFlight = true;
     this.cancelled.emit();
     this.visibleChange.emit(false);
   }
 
-  onHide(): void { this.onCancel(); }
+  onHide(): void {
+    if (!this._cancelInFlight) {
+      this.cancelled.emit();
+    }
+    this._cancelInFlight = false;
+  }
   onCloseAction(): void { this.closeActionClicked.emit(); }
 }
