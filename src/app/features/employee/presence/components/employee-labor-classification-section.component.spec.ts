@@ -154,5 +154,6 @@ describe('EmployeeLaborClassificationSectionComponent', () => {
     c.categoryOptionsState.set([{ value: 'CAT1', label: 'Categoria 1' }]);
     c['loadCategoryOptions']('AGR2', null, null);
     expect(c.categoryOptionsState()).toEqual([]);
+    expect(c['categoryLoadingState']()).toBe(false);
   });
 });
