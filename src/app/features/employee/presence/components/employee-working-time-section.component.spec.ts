@@ -13,7 +13,8 @@ class MockWorkingTimeStore {
   readonly workingTimes = this.workingTimesState.asReadonly();
   readonly loading = signal(false).asReadonly();
   readonly mutating = signal(false).asReadonly();
-  readonly success = signal<'created' | 'closed' | null>(null).asReadonly();
+  readonly successState = signal<'created' | 'closed' | null>(null);
+  readonly success = this.successState.asReadonly();
   readonly loadWorkingTimesByBusinessKey = vi.fn();
   readonly createWorkingTime = vi.fn();
   readonly closeWorkingTime = vi.fn();
@@ -123,5 +124,17 @@ describe('EmployeeWorkingTimeSectionComponent', () => {
     fix.detectChanges();
     const editBtns = fix.nativeElement.querySelectorAll('.period-table__icon-btn');
     expect(editBtns.length).toBe(1);
+  });
+
+  it('closes modal when store signals success', async () => {
+    fix.nativeElement.querySelector('.period-table__add-btn').click();
+    fix.detectChanges();
+    const c = fix.componentInstance as any;
+    expect(c.modalVisible()).toBe(true);
+
+    store.successState.set('created');
+    fix.detectChanges();
+
+    expect(c.modalVisible()).toBe(false);
   });
 });
