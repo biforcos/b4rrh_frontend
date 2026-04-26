@@ -106,6 +106,14 @@ describe('EmployeePresenceBlockComponent', () => {
     expect(hostText).toContain('Alta inicial · HIRE');
   });
 
+  it('renders empty message when there is no presence data', () => {
+    fixture.componentRef.setInput('presence', null);
+    fixture.detectChanges();
+
+    const hostText = fixture.nativeElement.textContent as string;
+    expect(hostText).toContain('No hay presencias disponibles.');
+  });
+
   it('keeps rendering when one backend catalog map is empty', () => {
     const model: EmployeePresenceBlockModel = {
       currentPresence: {
