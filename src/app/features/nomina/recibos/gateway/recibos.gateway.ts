@@ -11,6 +11,7 @@ import {
   mapPayrollConceptResponseToModel,
   mapCompanyProfileResponseToModel,
   mapEmployeeProfileResponseToModel,
+  mapAgreementProfileResponseToModel,
 } from '../mapper/recibos.mapper';
 import { PayrollBusinessKey } from '../models/payroll-business-key.model';
 import { PayrollConceptModel } from '../models/payroll-concept.model';
@@ -18,6 +19,7 @@ import {
   PayrollSummaryModel,
   PayrollCompanyProfileModel,
   PayrollEmployeeProfileModel,
+  PayrollAgreementProfileModel,
 } from '../models/payroll-summary.model';
 import { RecibosFilters } from '../models/recibos-filters.model';
 
@@ -25,6 +27,7 @@ export interface PayrollDetailModel {
   concepts: ReadonlyArray<PayrollConceptModel>;
   companyProfile: PayrollCompanyProfileModel | null;
   employeeProfile: PayrollEmployeeProfileModel | null;
+  agreementProfile: PayrollAgreementProfileModel | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -45,6 +48,7 @@ export class RecibosGateway {
           .sort((a, b) => a.displayOrder - b.displayOrder),
         companyProfile: mapCompanyProfileResponseToModel(response.companyProfile),
         employeeProfile: mapEmployeeProfileResponseToModel(response.employeeProfile),
+        agreementProfile: mapAgreementProfileResponseToModel(response.agreementProfile),
       })),
     );
   }

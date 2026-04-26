@@ -65,6 +65,7 @@ const STATUS_LABELS: Record<string, string> = {
             [payrollPeriodCode]="payroll.payrollPeriodCode"
             [companyProfile]="store.companyProfile()"
             [employeeProfile]="store.employeeProfile()"
+            [agreementProfile]="store.agreementProfile()"
           />
         }
       </div>

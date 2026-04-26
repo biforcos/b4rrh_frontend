@@ -23,3 +23,11 @@ export interface PayrollEmployeeProfileModel {
   city: string | null;
   postalCode: string | null;
 }
+
+export interface PayrollAgreementProfileModel {
+  officialAgreementNumber: string | null;
+  displayName: string | null;
+  shortName: string | null;
+  annualHours: string | null;
+  agreementCategoryCode: string | null;
+}

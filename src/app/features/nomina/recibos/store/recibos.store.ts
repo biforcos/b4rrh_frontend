@@ -9,6 +9,7 @@ import {
   PayrollSummaryModel,
   PayrollCompanyProfileModel,
   PayrollEmployeeProfileModel,
+  PayrollAgreementProfileModel,
 } from '../models/payroll-summary.model';
 import { RecibosFilters } from '../models/recibos-filters.model';
 
@@ -26,6 +27,7 @@ export class RecibosStore {
   private readonly conceptsState = signal<ReadonlyArray<PayrollConceptModel>>([]);
   private readonly companyProfileState = signal<PayrollCompanyProfileModel | null>(null);
   private readonly employeeProfileState = signal<PayrollEmployeeProfileModel | null>(null);
+  private readonly agreementProfileState = signal<PayrollAgreementProfileModel | null>(null);
   private readonly conceptsLoadingState = signal(false);
   private readonly conceptsErrorState = signal<RecibosErrorCode | null>(null);
 
@@ -39,6 +41,7 @@ export class RecibosStore {
   readonly concepts = this.conceptsState.asReadonly();
   readonly companyProfile = this.companyProfileState.asReadonly();
   readonly employeeProfile = this.employeeProfileState.asReadonly();
+  readonly agreementProfile = this.agreementProfileState.asReadonly();
   readonly conceptsLoading = this.conceptsLoadingState.asReadonly();
   readonly conceptsError = this.conceptsErrorState.asReadonly();
   readonly transitioning = this.transitioningState.asReadonly();
@@ -151,6 +154,7 @@ export class RecibosStore {
     this.conceptsState.set([]);
     this.companyProfileState.set(null);
     this.employeeProfileState.set(null);
+    this.agreementProfileState.set(null);
     this.conceptsErrorState.set(null);
 
     this.gateway
@@ -161,6 +165,7 @@ export class RecibosStore {
           this.conceptsState.set(detail.concepts);
           this.companyProfileState.set(detail.companyProfile);
           this.employeeProfileState.set(detail.employeeProfile);
+          this.agreementProfileState.set(detail.agreementProfile);
           this.conceptsLoadingState.set(false);
         },
         error: () => {

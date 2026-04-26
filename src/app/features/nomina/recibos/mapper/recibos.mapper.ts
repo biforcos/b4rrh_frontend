@@ -2,10 +2,12 @@ import { PayrollSummaryResponse } from '../../../../core/api/generated/model/pay
 import { PayrollConceptResponse } from '../../../../core/api/generated/model/payroll-concept-response';
 import { PayrollCompanyProfileResponse } from '../../../../core/api/generated/model/payroll-company-profile-response';
 import { PayrollEmployeeProfileResponse } from '../../../../core/api/generated/model/payroll-employee-profile-response';
+import { PayrollAgreementProfileResponse } from '../../../../core/api/generated/model/payroll-agreement-profile-response';
 import {
   PayrollSummaryModel,
   PayrollCompanyProfileModel,
   PayrollEmployeeProfileModel,
+  PayrollAgreementProfileModel,
 } from '../models/payroll-summary.model';
 import { PayrollConceptModel } from '../models/payroll-concept.model';
 
@@ -63,5 +65,18 @@ export function mapEmployeeProfileResponseToModel(
     street: response.street ?? null,
     city: response.city ?? null,
     postalCode: response.postalCode ?? null,
+  };
+}
+
+export function mapAgreementProfileResponseToModel(
+  response: PayrollAgreementProfileResponse | undefined,
+): PayrollAgreementProfileModel | null {
+  if (!response) return null;
+  return {
+    officialAgreementNumber: response.officialAgreementNumber ?? null,
+    displayName: response.displayName ?? null,
+    shortName: response.shortName ?? null,
+    annualHours: response.annualHours ?? null,
+    agreementCategoryCode: response.agreementCategoryCode ?? null,
   };
 }
