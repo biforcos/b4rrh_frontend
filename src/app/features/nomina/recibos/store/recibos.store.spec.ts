@@ -26,7 +26,7 @@ describe('RecibosStore', () => {
   let store: RecibosStore;
   let gatewayMock: {
     search: ReturnType<typeof vi.fn>;
-    getConcepts: ReturnType<typeof vi.fn>;
+    getDetail: ReturnType<typeof vi.fn>;
     invalidate: ReturnType<typeof vi.fn>;
     validate: ReturnType<typeof vi.fn>;
     recalculate: ReturnType<typeof vi.fn>;
@@ -35,7 +35,7 @@ describe('RecibosStore', () => {
   beforeEach(() => {
     gatewayMock = {
       search: vi.fn(),
-      getConcepts: vi.fn(),
+      getDetail: vi.fn(),
       invalidate: vi.fn(),
       validate: vi.fn(),
       recalculate: vi.fn(),
@@ -84,7 +84,7 @@ describe('RecibosStore', () => {
       originPeriodCode: '202604',
       displayOrder: 10,
     };
-    gatewayMock.getConcepts.mockReturnValue(of([concept]));
+    gatewayMock.getDetail.mockReturnValue(of({ concepts: [concept], companyProfile: null, employeeProfile: null }));
 
     store.selectPayroll(MOCK_KEY);
 

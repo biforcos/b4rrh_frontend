@@ -5,7 +5,7 @@ import { take } from 'rxjs';
 import { RecibosGateway } from '../gateway/recibos.gateway';
 import { PayrollBusinessKey } from '../models/payroll-business-key.model';
 import { PayrollConceptModel } from '../models/payroll-concept.model';
-import { PayrollSummaryModel } from '../models/payroll-summary.model';
+import { PayrollSummaryModel, PayrollCompanyProfileModel, PayrollEmployeeProfileModel } from '../models/payroll-summary.model';
 import { RecibosFilters } from '../models/recibos-filters.model';
 
 export type RecibosErrorCode = 'request-failed' | 'not-found' | 'transition-failed';
@@ -20,6 +20,8 @@ export class RecibosStore {
 
   private readonly selectedKeyState = signal<PayrollBusinessKey | null>(null);
   private readonly conceptsState = signal<ReadonlyArray<PayrollConceptModel>>([]);
+  private readonly companyProfileState = signal<PayrollCompanyProfileModel | null>(null);
+  private readonly employeeProfileState = signal<PayrollEmployeeProfileModel | null>(null);
   private readonly conceptsLoadingState = signal(false);
   private readonly conceptsErrorState = signal<RecibosErrorCode | null>(null);
 
@@ -31,6 +33,8 @@ export class RecibosStore {
   readonly listError = this.listErrorState.asReadonly();
   readonly selectedKey = this.selectedKeyState.asReadonly();
   readonly concepts = this.conceptsState.asReadonly();
+  readonly companyProfile = this.companyProfileState.asReadonly();
+  readonly employeeProfile = this.employeeProfileState.asReadonly();
   readonly conceptsLoading = this.conceptsLoadingState.asReadonly();
   readonly conceptsError = this.conceptsErrorState.asReadonly();
   readonly transitioning = this.transitioningState.asReadonly();
@@ -141,14 +145,18 @@ export class RecibosStore {
   private loadConcepts(key: PayrollBusinessKey): void {
     this.conceptsLoadingState.set(true);
     this.conceptsState.set([]);
+    this.companyProfileState.set(null);
+    this.employeeProfileState.set(null);
     this.conceptsErrorState.set(null);
 
     this.gateway
-      .getConcepts(key)
+      .getDetail(key)
       .pipe(take(1))
       .subscribe({
-        next: (concepts) => {
-          this.conceptsState.set(concepts);
+        next: (detail) => {
+          this.conceptsState.set(detail.concepts);
+          this.companyProfileState.set(detail.companyProfile);
+          this.employeeProfileState.set(detail.employeeProfile);
           this.conceptsLoadingState.set(false);
         },
         error: () => {

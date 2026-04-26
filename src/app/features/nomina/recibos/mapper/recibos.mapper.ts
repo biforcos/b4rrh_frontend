@@ -1,6 +1,8 @@
 import { PayrollSummaryResponse } from '../../../../core/api/generated/model/payroll-summary-response';
 import { PayrollConceptResponse } from '../../../../core/api/generated/model/payroll-concept-response';
-import { PayrollSummaryModel } from '../models/payroll-summary.model';
+import { PayrollCompanyProfileResponse } from '../../../../core/api/generated/model/payroll-company-profile-response';
+import { PayrollEmployeeProfileResponse } from '../../../../core/api/generated/model/payroll-employee-profile-response';
+import { PayrollSummaryModel, PayrollCompanyProfileModel, PayrollEmployeeProfileModel } from '../models/payroll-summary.model';
 import { PayrollConceptModel } from '../models/payroll-concept.model';
 
 export function mapPayrollSummaryResponseToModel(response: PayrollSummaryResponse): PayrollSummaryModel {
@@ -27,5 +29,31 @@ export function mapPayrollConceptResponseToModel(response: PayrollConceptRespons
     conceptNatureCode: response.conceptNatureCode,
     originPeriodCode: response.originPeriodCode ?? null,
     displayOrder: response.displayOrder,
+  };
+}
+
+export function mapCompanyProfileResponseToModel(
+  response: PayrollCompanyProfileResponse | undefined,
+): PayrollCompanyProfileModel | null {
+  if (!response) return null;
+  return {
+    legalName: response.legalName ?? null,
+    taxIdentifier: response.taxIdentifier ?? null,
+    street: response.street ?? null,
+    city: response.city ?? null,
+    postalCode: response.postalCode ?? null,
+  };
+}
+
+export function mapEmployeeProfileResponseToModel(
+  response: PayrollEmployeeProfileResponse | undefined,
+): PayrollEmployeeProfileModel | null {
+  if (!response) return null;
+  return {
+    fullName: response.fullName ?? null,
+    nif: response.nif ?? null,
+    street: response.street ?? null,
+    city: response.city ?? null,
+    postalCode: response.postalCode ?? null,
   };
 }

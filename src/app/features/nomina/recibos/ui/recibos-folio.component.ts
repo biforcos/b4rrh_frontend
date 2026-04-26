@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PayrollConceptModel } from '../models/payroll-concept.model';
+import { PayrollCompanyProfileModel, PayrollEmployeeProfileModel } from '../models/payroll-summary.model';
 
 @Component({
   selector: 'app-recibos-folio',
@@ -11,8 +12,11 @@ import { PayrollConceptModel } from '../models/payroll-concept.model';
     <div class="folio">
       <div class="folio-header">
         <div class="header-company">
-          <div class="company-name">EMPRESA EJEMPLO S.L.</div>
-          <div class="company-meta">CIF: B-12345678 · C/ Ejemplo, 1 · 28001 Madrid</div>
+          <div class="company-name">{{ companyProfile?.legalName ?? 'EMPRESA EJEMPLO S.L.' }}</div>
+          <div class="company-meta">
+            @if (companyProfile?.taxIdentifier) { CIF: {{ companyProfile!.taxIdentifier }} · }
+            {{ companyAddress }}
+          </div>
         </div>
         <div class="header-title">
           <div class="payslip-title">Recibo de Salarios</div>
@@ -21,7 +25,10 @@ import { PayrollConceptModel } from '../models/payroll-concept.model';
       </div>
 
       <div class="header-employee">
-        <span class="label">Trabajador: </span><strong>— (pendiente integración)</strong>
+        <span class="label">Trabajador: </span><strong>{{ employeeProfile?.fullName ?? '—' }}</strong>
+        @if (employeeProfile?.nif) {
+          <span class="label" style="margin-left:16px">NIF: </span><strong>{{ employeeProfile!.nif }}</strong>
+        }
         <span class="label" style="margin-left:16px">Nº emp.: </span><strong>{{ employeeNumber }}</strong>
       </div>
 
@@ -38,7 +45,7 @@ import { PayrollConceptModel } from '../models/payroll-concept.model';
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let concept of concepts; trackBy: trackConcept" [class.row-total]="isTotal(concept)">
+          <tr *ngFor="let concept of bodyConcepts; trackBy: trackConcept">
             <td>{{ concept.originPeriodCode ?? '—' }}</td>
             <td>{{ concept.conceptCode }}</td>
             <td>{{ concept.conceptLabel }}</td>
@@ -52,6 +59,17 @@ import { PayrollConceptModel } from '../models/payroll-concept.model';
             </td>
           </tr>
         </tbody>
+        <tfoot>
+          <tr class="row-totals">
+            <td colspan="5" class="totals-label">TOTALES</td>
+            <td class="text-right amount-earning">
+              {{ totalEarningConcept?.amount != null ? formatNum(totalEarningConcept!.amount!) : '—' }}
+            </td>
+            <td class="text-right amount-deduction">
+              {{ totalDeductionConcept?.amount != null ? formatNum(totalDeductionConcept!.amount!) : '—' }}
+            </td>
+          </tr>
+        </tfoot>
       </table>
 
       <div *ngIf="netPayConcept && netPayConcept.amount != null" class="net-pay-footer">
@@ -74,7 +92,8 @@ import { PayrollConceptModel } from '../models/payroll-concept.model';
     .concept-table td { padding: 5px 8px; border-bottom: 1px solid #f1f3f5; color: #212529; }
     .text-right { text-align: right; }
     .amount-earning, .amount-deduction { font-weight: 600; }
-    .row-total td { font-weight: 700; border-top: 2px solid #adb5bd; background: #f8f9fa; }
+    .row-totals td { font-weight: 700; border-top: 2px solid #adb5bd; background: #f8f9fa; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .totals-label { color: #6c757d; }
     .net-pay-footer { background: #212529; color: white; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; margin-top: 0; }
     .net-pay-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.6px; color: #adb5bd; }
     .net-pay-amount { font-size: 26px; font-weight: 700; color: #a6e3a1; }
@@ -89,21 +108,39 @@ export class RecibosFolioComponent {
   @Input() concepts: ReadonlyArray<PayrollConceptModel> = [];
   @Input() employeeNumber = '';
   @Input() payrollPeriodCode = '';
+  @Input() companyProfile: PayrollCompanyProfileModel | null = null;
+  @Input() employeeProfile: PayrollEmployeeProfileModel | null = null;
+
+  get bodyConcepts(): ReadonlyArray<PayrollConceptModel> {
+    return this.concepts.filter(
+      (c) => c.conceptNatureCode === 'EARNING' || c.conceptNatureCode === 'DEDUCTION',
+    );
+  }
 
   get netPayConcept(): PayrollConceptModel | null {
     return this.concepts.find((c) => c.conceptNatureCode === 'NET_PAY') ?? null;
   }
 
+  get totalEarningConcept(): PayrollConceptModel | null {
+    return this.concepts.find((c) => c.conceptNatureCode === 'TOTAL_EARNING') ?? null;
+  }
+
+  get totalDeductionConcept(): PayrollConceptModel | null {
+    return this.concepts.find((c) => c.conceptNatureCode === 'TOTAL_DEDUCTION') ?? null;
+  }
+
+  get companyAddress(): string {
+    if (!this.companyProfile) return 'C/ Ejemplo, 1 · 28001 Madrid';
+    const parts = [this.companyProfile.street, this.companyProfile.city, this.companyProfile.postalCode].filter(Boolean);
+    return parts.length ? parts.join(' · ') : '';
+  }
+
   isEarning(concept: PayrollConceptModel): boolean {
-    return concept.conceptNatureCode === 'EARNING' || concept.conceptNatureCode === 'TOTAL_EARNING';
+    return concept.conceptNatureCode === 'EARNING';
   }
 
   isDeduction(concept: PayrollConceptModel): boolean {
-    return concept.conceptNatureCode === 'DEDUCTION' || concept.conceptNatureCode === 'TOTAL_DEDUCTION';
-  }
-
-  isTotal(concept: PayrollConceptModel): boolean {
-    return concept.conceptNatureCode === 'TOTAL_EARNING' || concept.conceptNatureCode === 'TOTAL_DEDUCTION';
+    return concept.conceptNatureCode === 'DEDUCTION';
   }
 
   formatNum(value: number): string {

@@ -47,6 +47,8 @@ const STATUS_LABELS: Record<string, string> = {
             [concepts]="store.concepts()"
             [employeeNumber]="payroll.employeeNumber"
             [payrollPeriodCode]="payroll.payrollPeriodCode"
+            [companyProfile]="store.companyProfile()"
+            [employeeProfile]="store.employeeProfile()"
           />
         }
       </div>

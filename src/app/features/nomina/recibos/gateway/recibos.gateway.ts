@@ -6,11 +6,19 @@ import { RecibosClient } from '../client/recibos.client';
 import {
   mapPayrollSummaryResponseToModel,
   mapPayrollConceptResponseToModel,
+  mapCompanyProfileResponseToModel,
+  mapEmployeeProfileResponseToModel,
 } from '../mapper/recibos.mapper';
 import { PayrollBusinessKey } from '../models/payroll-business-key.model';
 import { PayrollConceptModel } from '../models/payroll-concept.model';
-import { PayrollSummaryModel } from '../models/payroll-summary.model';
+import { PayrollSummaryModel, PayrollCompanyProfileModel, PayrollEmployeeProfileModel } from '../models/payroll-summary.model';
 import { RecibosFilters } from '../models/recibos-filters.model';
+
+export interface PayrollDetailModel {
+  concepts: ReadonlyArray<PayrollConceptModel>;
+  companyProfile: PayrollCompanyProfileModel | null;
+  employeeProfile: PayrollEmployeeProfileModel | null;
+}
 
 @Injectable({ providedIn: 'root' })
 export class RecibosGateway {
@@ -22,13 +30,15 @@ export class RecibosGateway {
       .pipe(map((items) => items.map(mapPayrollSummaryResponseToModel)));
   }
 
-  getConcepts(key: PayrollBusinessKey): Observable<ReadonlyArray<PayrollConceptModel>> {
+  getDetail(key: PayrollBusinessKey): Observable<PayrollDetailModel> {
     return this.client.getByBusinessKey(key).pipe(
-      map((response) =>
-        (response.concepts ?? [])
+      map((response) => ({
+        concepts: (response.concepts ?? [])
           .map(mapPayrollConceptResponseToModel)
           .sort((a, b) => a.displayOrder - b.displayOrder),
-      ),
+        companyProfile: mapCompanyProfileResponseToModel(response.companyProfile),
+        employeeProfile: mapEmployeeProfileResponseToModel(response.employeeProfile),
+      })),
     );
   }
 
