@@ -28,6 +28,10 @@ export interface PayrollDetailModel {
   companyProfile: PayrollCompanyProfileModel | null;
   employeeProfile: PayrollEmployeeProfileModel | null;
   agreementProfile: PayrollAgreementProfileModel | null;
+  presenceStartDate: string | null;
+  presenceEndDate: string | null;
+  workCenterCode: string | null;
+  workCenterName: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -49,6 +53,10 @@ export class RecibosGateway {
         companyProfile: mapCompanyProfileResponseToModel(response.companyProfile),
         employeeProfile: mapEmployeeProfileResponseToModel(response.employeeProfile),
         agreementProfile: mapAgreementProfileResponseToModel(response.agreementProfile),
+        presenceStartDate: response.presenceStartDate ?? null,
+        presenceEndDate: response.presenceEndDate ?? null,
+        workCenterCode: response.workCenterCode ?? null,
+        workCenterName: response.workCenterName ?? null,
       })),
     );
   }

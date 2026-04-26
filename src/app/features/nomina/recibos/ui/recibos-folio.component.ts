@@ -78,8 +78,8 @@ const MONTH_NAMES_ES = [
             <span class="labor-value">{{ periodLabel }}</span>
           </div>
           <div class="labor-cell">
-            <span class="labor-label">Puesto</span>
-            <span class="labor-value">—</span>
+            <span class="labor-label">Centro de trabajo</span>
+            <span class="labor-value">{{ workCenterLabel }}</span>
           </div>
           <div class="labor-cell">
             <span class="labor-label">Antigüedad</span>
@@ -345,15 +345,41 @@ export class RecibosFolioComponent {
   @Input() companyProfile: PayrollCompanyProfileModel | null = null;
   @Input() employeeProfile: PayrollEmployeeProfileModel | null = null;
   @Input() agreementProfile: PayrollAgreementProfileModel | null = null;
+  @Input() presenceStartDate: string | null = null;
+  @Input() presenceEndDate: string | null = null;
+  @Input() workCenterCode: string | null = null;
+  @Input() workCenterName: string | null = null;
 
   get periodLabel(): string {
     const code = this.payrollPeriodCode;
     if (!code || code.length < 6) return code;
     const year = parseInt(code.substring(0, 4), 10);
     const month = parseInt(code.substring(4, 6), 10);
-    const lastDay = new Date(year, month, 0).getDate();
     const monthName = MONTH_NAMES_ES[month - 1] ?? '';
-    return `Del 1 al ${lastDay} de ${monthName} de ${year}`;
+    const lastDayOfMonth = new Date(year, month, 0).getDate();
+
+    let startDay = 1;
+    let endDay = lastDayOfMonth;
+
+    if (this.presenceStartDate) {
+      const parts = this.presenceStartDate.split('-').map(Number);
+      if (parts[0] === year && parts[1] === month && parts[2] > 1) {
+        startDay = parts[2];
+      }
+    }
+
+    if (this.presenceEndDate) {
+      const parts = this.presenceEndDate.split('-').map(Number);
+      if (parts[0] === year && parts[1] === month) {
+        endDay = parts[2];
+      }
+    }
+
+    return `Del ${startDay} al ${endDay} de ${monthName} de ${year}`;
+  }
+
+  get workCenterLabel(): string {
+    return this.workCenterName ?? this.workCenterCode ?? '—';
   }
 
   get companyCityLine(): string {

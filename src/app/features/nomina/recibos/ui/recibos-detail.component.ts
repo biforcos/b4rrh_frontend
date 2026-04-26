@@ -66,6 +66,10 @@ const STATUS_LABELS: Record<string, string> = {
             [companyProfile]="store.companyProfile()"
             [employeeProfile]="store.employeeProfile()"
             [agreementProfile]="store.agreementProfile()"
+            [presenceStartDate]="store.presenceStartDate()"
+            [presenceEndDate]="store.presenceEndDate()"
+            [workCenterCode]="store.workCenterCode()"
+            [workCenterName]="store.workCenterName()"
           />
         }
       </div>

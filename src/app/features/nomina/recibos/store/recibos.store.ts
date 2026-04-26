@@ -28,6 +28,10 @@ export class RecibosStore {
   private readonly companyProfileState = signal<PayrollCompanyProfileModel | null>(null);
   private readonly employeeProfileState = signal<PayrollEmployeeProfileModel | null>(null);
   private readonly agreementProfileState = signal<PayrollAgreementProfileModel | null>(null);
+  private readonly presenceStartDateState = signal<string | null>(null);
+  private readonly presenceEndDateState = signal<string | null>(null);
+  private readonly workCenterCodeState = signal<string | null>(null);
+  private readonly workCenterNameState = signal<string | null>(null);
   private readonly conceptsLoadingState = signal(false);
   private readonly conceptsErrorState = signal<RecibosErrorCode | null>(null);
 
@@ -42,6 +46,10 @@ export class RecibosStore {
   readonly companyProfile = this.companyProfileState.asReadonly();
   readonly employeeProfile = this.employeeProfileState.asReadonly();
   readonly agreementProfile = this.agreementProfileState.asReadonly();
+  readonly presenceStartDate = this.presenceStartDateState.asReadonly();
+  readonly presenceEndDate = this.presenceEndDateState.asReadonly();
+  readonly workCenterCode = this.workCenterCodeState.asReadonly();
+  readonly workCenterName = this.workCenterNameState.asReadonly();
   readonly conceptsLoading = this.conceptsLoadingState.asReadonly();
   readonly conceptsError = this.conceptsErrorState.asReadonly();
   readonly transitioning = this.transitioningState.asReadonly();
@@ -155,6 +163,10 @@ export class RecibosStore {
     this.companyProfileState.set(null);
     this.employeeProfileState.set(null);
     this.agreementProfileState.set(null);
+    this.presenceStartDateState.set(null);
+    this.presenceEndDateState.set(null);
+    this.workCenterCodeState.set(null);
+    this.workCenterNameState.set(null);
     this.conceptsErrorState.set(null);
 
     this.gateway
@@ -166,6 +178,10 @@ export class RecibosStore {
           this.companyProfileState.set(detail.companyProfile);
           this.employeeProfileState.set(detail.employeeProfile);
           this.agreementProfileState.set(detail.agreementProfile);
+          this.presenceStartDateState.set(detail.presenceStartDate);
+          this.presenceEndDateState.set(detail.presenceEndDate);
+          this.workCenterCodeState.set(detail.workCenterCode);
+          this.workCenterNameState.set(detail.workCenterName);
           this.conceptsLoadingState.set(false);
         },
         error: () => {
