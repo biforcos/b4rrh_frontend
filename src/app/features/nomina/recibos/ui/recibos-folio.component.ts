@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { PayrollConceptModel } from '../models/payroll-concept.model';
 import {
   PayrollCompanyProfileModel,
@@ -15,14 +14,13 @@ const MONTH_NAMES_ES = [
   selector: 'app-recibos-folio',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   template: `
     <div class="folio">
 
       <!-- TITLE -->
       <div class="folio-title">
         <span class="title-text">Recibo de Nómina</span>
-        <span class="title-period">{{ periodLabel }}</span>
       </div>
 
       <!-- HEADER: empresa | trabajador -->
@@ -98,21 +96,23 @@ const MONTH_NAMES_ES = [
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let concept of bodyConcepts; trackBy: trackConcept">
-            <td>{{ concept.originPeriodCode ?? '—' }}</td>
-            <td>{{ concept.conceptCode }}</td>
-            <td>{{ concept.conceptLabel }}</td>
-            <td class="text-right">
-              {{ concept.quantity != null ? formatNum(concept.quantity) : '—' }}
-            </td>
-            <td class="text-right">{{ concept.rate != null ? formatNum(concept.rate) : '—' }}</td>
-            <td class="text-right amount-earning">
-              {{ isEarning(concept) && concept.amount != null ? formatNum(concept.amount) : '—' }}
-            </td>
-            <td class="text-right amount-deduction">
-              {{ isDeduction(concept) && concept.amount != null ? formatNum(concept.amount) : '—' }}
-            </td>
-          </tr>
+          @for (concept of bodyConcepts; track concept.lineNumber) {
+            <tr>
+              <td>{{ concept.originPeriodCode ?? '—' }}</td>
+              <td>{{ concept.conceptCode }}</td>
+              <td>{{ concept.conceptLabel }}</td>
+              <td class="text-right">
+                {{ concept.quantity != null ? formatNum(concept.quantity) : '—' }}
+              </td>
+              <td class="text-right">{{ concept.rate != null ? formatNum(concept.rate) : '—' }}</td>
+              <td class="text-right amount-earning">
+                {{ isEarning(concept) && concept.amount != null ? formatNum(concept.amount) : '—' }}
+              </td>
+              <td class="text-right amount-deduction">
+                {{ isDeduction(concept) && concept.amount != null ? formatNum(concept.amount) : '—' }}
+              </td>
+            </tr>
+          }
         </tbody>
         <tfoot>
           <tr class="row-totals">
@@ -128,10 +128,12 @@ const MONTH_NAMES_ES = [
       </table>
 
       <!-- NET PAY -->
-      <div *ngIf="netPayConcept && netPayConcept.amount != null" class="net-pay-footer">
-        <span class="net-pay-label">Líquido total a percibir</span>
-        <span class="net-pay-amount">{{ formatNum(netPayConcept.amount) }} €</span>
-      </div>
+      @if (netPayConcept && netPayConcept.amount != null) {
+        <div class="net-pay-footer">
+          <span class="net-pay-label">Líquido total a percibir</span>
+          <span class="net-pay-amount">{{ formatNum(netPayConcept.amount) }} €</span>
+        </div>
+      }
 
     </div>
   `,
@@ -146,9 +148,7 @@ const MONTH_NAMES_ES = [
 
     /* TITLE */
     .folio-title {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
+      text-align: center;
       border-bottom: 2px solid #212529;
       padding-bottom: 10px;
       margin-bottom: 12px;
@@ -159,10 +159,6 @@ const MONTH_NAMES_ES = [
       text-transform: uppercase;
       letter-spacing: 1px;
       color: #212529;
-    }
-    .title-period {
-      font-size: 11px;
-      color: #6c757d;
     }
 
     /* HEADER BOXES */
@@ -362,7 +358,4 @@ export class RecibosFolioComponent {
     }).format(value);
   }
 
-  trackConcept(_index: number, concept: PayrollConceptModel): number {
-    return concept.lineNumber;
-  }
 }
