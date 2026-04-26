@@ -13,8 +13,16 @@ import { RecibosDetailComponent } from './recibos-detail.component';
       <app-recibos-detail />
     </div>
   `,
-  styles: [`
-    .page-layout { display: flex; height: 100%; overflow: hidden; font-family: 'Segoe UI', sans-serif; font-size: 12px; }
-  `],
+  styles: [
+    `
+      .page-layout {
+        display: flex;
+        height: 100%;
+        overflow: hidden;
+        font-family: 'Segoe UI', sans-serif;
+        font-size: 12px;
+      }
+    `,
+  ],
 })
 export class RecibosPageComponent {}

@@ -31,24 +31,52 @@ export class AppShellComponent {
       label: this.texts.sectionPeople,
       icon: 'pi pi-users',
       expanded: true,
-      items: [{ label: this.texts.sectionEmployees, icon: 'pi pi-id-card', routerLink: '/personas/empleados' }],
+      items: [
+        {
+          label: this.texts.sectionEmployees,
+          icon: 'pi pi-id-card',
+          routerLink: '/personas/empleados',
+        },
+      ],
     },
     {
       label: this.texts.sectionOrganization,
       icon: 'pi pi-sitemap',
       expanded: true,
       items: [
-        { label: this.texts.sectionCompanies, icon: 'pi pi-building', routerLink: '/organizacion/empresas' },
-        { label: this.texts.sectionWorkCenters, icon: 'pi pi-map-marker', routerLink: '/organizacion/centros-trabajo' },
-        { label: this.texts.sectionCostCenters, icon: 'pi pi-wallet', routerLink: '/organizacion/centros-coste' },
-        { label: this.texts.sectionCatalogs, icon: 'pi pi-book', routerLink: '/organizacion/catalogos' },
+        {
+          label: this.texts.sectionCompanies,
+          icon: 'pi pi-building',
+          routerLink: '/organizacion/empresas',
+        },
+        {
+          label: this.texts.sectionWorkCenters,
+          icon: 'pi pi-map-marker',
+          routerLink: '/organizacion/centros-trabajo',
+        },
+        {
+          label: this.texts.sectionCostCenters,
+          icon: 'pi pi-wallet',
+          routerLink: '/organizacion/centros-coste',
+        },
+        {
+          label: this.texts.sectionCatalogs,
+          icon: 'pi pi-book',
+          routerLink: '/organizacion/catalogos',
+        },
       ],
     },
     {
       label: this.texts.sectionSettings,
       icon: 'pi pi-sliders-h',
       expanded: true,
-      items: [{ label: this.texts.sectionRuleSystems, icon: 'pi pi-cog', routerLink: '/configuracion/rule-systems' }],
+      items: [
+        {
+          label: this.texts.sectionRuleSystems,
+          icon: 'pi pi-cog',
+          routerLink: '/configuracion/rule-systems',
+        },
+      ],
     },
     {
       label: this.texts.sectionPayroll,

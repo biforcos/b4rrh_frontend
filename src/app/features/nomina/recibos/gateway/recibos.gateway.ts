@@ -1,7 +1,10 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 
-import { PayrollResponse, PayrollResponseStatusEnum } from '../../../../core/api/generated/model/payroll-response';
+import {
+  PayrollResponse,
+  PayrollResponseStatusEnum,
+} from '../../../../core/api/generated/model/payroll-response';
 import { RecibosClient } from '../client/recibos.client';
 import {
   mapPayrollSummaryResponseToModel,
@@ -11,7 +14,11 @@ import {
 } from '../mapper/recibos.mapper';
 import { PayrollBusinessKey } from '../models/payroll-business-key.model';
 import { PayrollConceptModel } from '../models/payroll-concept.model';
-import { PayrollSummaryModel, PayrollCompanyProfileModel, PayrollEmployeeProfileModel } from '../models/payroll-summary.model';
+import {
+  PayrollSummaryModel,
+  PayrollCompanyProfileModel,
+  PayrollEmployeeProfileModel,
+} from '../models/payroll-summary.model';
 import { RecibosFilters } from '../models/recibos-filters.model';
 
 export interface PayrollDetailModel {
@@ -55,7 +62,10 @@ export class RecibosGateway {
   }
 }
 
-const PAYROLL_RESPONSE_STATUS_MAP: Record<PayrollResponseStatusEnum, PayrollSummaryModel['status']> = {
+const PAYROLL_RESPONSE_STATUS_MAP: Record<
+  PayrollResponseStatusEnum,
+  PayrollSummaryModel['status']
+> = {
   [PayrollResponseStatusEnum.NotValid]: 'NOT_VALID',
   [PayrollResponseStatusEnum.Calculated]: 'CALCULATED',
   [PayrollResponseStatusEnum.ExplicitValidated]: 'EXPLICIT_VALIDATED',

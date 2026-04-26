@@ -84,7 +84,9 @@ describe('RecibosStore', () => {
       originPeriodCode: '202604',
       displayOrder: 10,
     };
-    gatewayMock.getDetail.mockReturnValue(of({ concepts: [concept], companyProfile: null, employeeProfile: null }));
+    gatewayMock.getDetail.mockReturnValue(
+      of({ concepts: [concept], companyProfile: null, employeeProfile: null }),
+    );
 
     store.selectPayroll(MOCK_KEY);
 

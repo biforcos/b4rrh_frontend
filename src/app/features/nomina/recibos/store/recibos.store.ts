@@ -5,7 +5,11 @@ import { take } from 'rxjs';
 import { RecibosGateway } from '../gateway/recibos.gateway';
 import { PayrollBusinessKey } from '../models/payroll-business-key.model';
 import { PayrollConceptModel } from '../models/payroll-concept.model';
-import { PayrollSummaryModel, PayrollCompanyProfileModel, PayrollEmployeeProfileModel } from '../models/payroll-summary.model';
+import {
+  PayrollSummaryModel,
+  PayrollCompanyProfileModel,
+  PayrollEmployeeProfileModel,
+} from '../models/payroll-summary.model';
 import { RecibosFilters } from '../models/recibos-filters.model';
 
 export type RecibosErrorCode = 'request-failed' | 'not-found' | 'transition-failed';

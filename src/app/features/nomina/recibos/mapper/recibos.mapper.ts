@@ -2,10 +2,16 @@ import { PayrollSummaryResponse } from '../../../../core/api/generated/model/pay
 import { PayrollConceptResponse } from '../../../../core/api/generated/model/payroll-concept-response';
 import { PayrollCompanyProfileResponse } from '../../../../core/api/generated/model/payroll-company-profile-response';
 import { PayrollEmployeeProfileResponse } from '../../../../core/api/generated/model/payroll-employee-profile-response';
-import { PayrollSummaryModel, PayrollCompanyProfileModel, PayrollEmployeeProfileModel } from '../models/payroll-summary.model';
+import {
+  PayrollSummaryModel,
+  PayrollCompanyProfileModel,
+  PayrollEmployeeProfileModel,
+} from '../models/payroll-summary.model';
 import { PayrollConceptModel } from '../models/payroll-concept.model';
 
-export function mapPayrollSummaryResponseToModel(response: PayrollSummaryResponse): PayrollSummaryModel {
+export function mapPayrollSummaryResponseToModel(
+  response: PayrollSummaryResponse,
+): PayrollSummaryModel {
   return {
     ruleSystemCode: response.ruleSystemCode,
     employeeTypeCode: response.employeeTypeCode,
@@ -18,7 +24,9 @@ export function mapPayrollSummaryResponseToModel(response: PayrollSummaryRespons
   };
 }
 
-export function mapPayrollConceptResponseToModel(response: PayrollConceptResponse): PayrollConceptModel {
+export function mapPayrollConceptResponseToModel(
+  response: PayrollConceptResponse,
+): PayrollConceptModel {
   return {
     lineNumber: response.lineNumber,
     conceptCode: response.conceptCode,

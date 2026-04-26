@@ -5,7 +5,8 @@ export const appTexts = {
   authCurrentSubjectLabel: 'Sesion local',
   authLogoutAction: 'Cerrar sesion',
   authLoginTitle: 'Acceso local de desarrollo',
-  authLoginDescription: 'Introduce un subject local para solicitar un token dev y seguir trabajando contra el backend securizado.',
+  authLoginDescription:
+    'Introduce un subject local para solicitar un token dev y seguir trabajando contra el backend securizado.',
   authSubjectLabel: 'Subject',
   authSubjectPlaceholder: 'bifor',
   authSubjectHelpPrefix: 'Subjects locales disponibles de ejemplo:',
