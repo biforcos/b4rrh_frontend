@@ -1,76 +1,11 @@
-.employee-labor-classification-section__form-grid {
-  display: grid;
-  gap: 0.6rem 0.75rem;
-  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
-  max-width: 36rem;
-}
+.labor-classification-section {
+  &__cell {
+    font-size: 13px;
+    color: #374151;
+  }
 
-.employee-labor-classification-section__form-grid--create,
-.employee-labor-classification-section__form-grid--correct {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.employee-labor-classification-section__form-grid--create .employee-labor-classification-section__field--effective-date,
-.employee-labor-classification-section__form-grid--correct .employee-labor-classification-section__field--start-readonly {
-  grid-column: 1 / -1;
-}
-
-.employee-labor-classification-section__field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-}
-
-.employee-labor-classification-section__field span {
-  color: #475569;
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0;
-}
-
-.employee-labor-classification-section__field input,
-.employee-labor-classification-section__field select {
-  border: 1px solid #cbd5e1;
-  border-radius: 0.5rem;
-  font: inherit;
-  min-height: 2.5rem;
-  padding: 0.5rem 0.65rem;
-}
-
-.employee-labor-classification-section__field input[readonly] {
-  background: #f8fafc;
-  color: #334155;
-}
-
-.employee-labor-classification-section__hint {
-  margin: 0;
-  color: #475569;
-  font-size: 0.78rem;
-  line-height: 1.35;
-}
-
-.employee-labor-classification-section__field input:focus,
-.employee-labor-classification-section__field select:focus {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
-  outline: none;
-}
-
-.employee-labor-classification-section__field select:disabled {
-  background: #f1f5f9;
-  color: #64748b;
-}
-
-.employee-labor-classification-section__close-form {
-  display: grid;
-  gap: 0.75rem;
-  max-width: 20rem;
-}
-
-@media (max-width: 720px) {
-  .employee-labor-classification-section__form-grid--create,
-  .employee-labor-classification-section__form-grid--correct {
-    grid-template-columns: 1fr;
-    max-width: 100%;
+  &__cell--secondary {
+    color: #6b7280;
+    font-size: 12px;
   }
 }
