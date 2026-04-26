@@ -1,0 +1,36 @@
+<p-dialog
+  [header]="title()"
+  [visible]="visible()"
+  (visibleChange)="visibleChange.emit($event)"
+  (onHide)="onHide()"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '520px' }"
+  styleClass="period-modal-dialog"
+>
+  @if (subtitle()) {
+    <p class="period-modal__subtitle">{{ subtitle() }}</p>
+  }
+  <div class="period-modal__body">
+    <ng-content />
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="period-modal__footer">
+      @if (showCloseAction()) {
+        <button type="button" class="period-modal__close-action-btn" (click)="onCloseAction()">
+          {{ closeActionLabel() }}
+        </button>
+      }
+      <div class="period-modal__footer-actions">
+        <button type="button" class="period-modal__cancel-btn" (click)="onCancel()">Cancelar</button>
+        <button type="button" class="period-modal__submit-btn"
+          [disabled]="!submitEnabled() || saving()" (click)="onSubmit()">
+          @if (saving()) { <span class="period-modal__spinner" aria-hidden="true"></span> }
+          {{ submitLabel() }}
+        </button>
+      </div>
+    </div>
+  </ng-template>
+</p-dialog>
