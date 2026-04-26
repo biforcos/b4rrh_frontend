@@ -1,101 +1,65 @@
-<app-temporal-section
-  [title]="texts.contractSectionTitle"
-  [subtitle]="sectionSubtitle"
-  [state]="sectionState()"
-  [displayMode]="displayMode()"
-  [rows]="rows()"
-  [texts]="sectionTexts"
-  [confirmingCloseKey]="confirmingCloseKey()"
-  [correctingKey]="correctingKey()"
-  [canCreate]="supportedActions().canReplaceFromDate"
-  [canEditCurrent]="false"
-  [canCorrect]="supportedActions().canCorrect"
-  [canClose]="supportedActions().canClose"
-  [canDelete]="supportedActions().canDelete"
-  [createSubmitEnabled]="isReplaceDraftValid()"
-  [correctSubmitEnabled]="isCorrectDraftValid()"
-  (manageStarted)="startReplaceFromDate()"
-  (manageExited)="exitManage()"
-  (createStarted)="startReplaceFromDate()"
-  (correctStarted)="startCorrect($event)"
-  (closeRequested)="requestClose($event)"
-  (closeConfirmed)="confirmClose($event)"
-  (cancelled)="cancel()"
-  (createSubmitted)="submitReplaceFromDate()"
-  (correctSubmitted)="submitCorrect($event)"
->
-  <div temporalCreateForm class="employee-contract-section__form-grid employee-contract-section__form-grid--create">
-    <label class="employee-contract-section__field employee-contract-section__field--effective-date">
-      <span>{{ texts.contractSectionEffectiveDateLabel }}</span>
+<div class="contract-section">
+  <app-period-table
+    sectionTitle="Contrato"
+    [rows]="rows()"
+    (addClicked)="openCreate()"
+    (editClicked)="openEdit($event)"
+  >
+    <ng-template #columnHeaders>
+      <th>Tipo</th>
+      <th>Subtipo</th>
+    </ng-template>
+    <ng-template #cellContent let-row>
+      <td class="contract-section__cell">{{ row.contractCode }}</td>
+      <td class="contract-section__cell contract-section__cell--secondary">
+        {{ row.contractSubtypeCode || '—' }}
+      </td>
+    </ng-template>
+  </app-period-table>
+
+  <app-period-modal
+    [title]="modalTitle()"
+    [subtitle]="modalSubtitle()"
+    [visible]="modalVisible()"
+    [saving]="saving()"
+    [submitEnabled]="isSubmitEnabled()"
+    [showCloseAction]="modalMode() === 'edit' && editingIsActive()"
+    (visibleChange)="modalVisible.set($event)"
+    (submitted)="submit()"
+    (cancelled)="closeModal()"
+    (closeActionClicked)="switchToClose()"
+  >
+    @if (modalMode() === 'create') {
       <app-ui-date-input
-        [value]="replaceDraft().effectiveDate"
-        (valueChanged)="updateReplaceField('effectiveDate', $event)"
-      />
-    </label>
-
-    <label class="employee-contract-section__field employee-contract-section__field--contract">
-      <span>{{ texts.contractSectionContractLabel }}</span>
+        [value]="effectiveDateDraft()"
+        (valueChanged)="effectiveDateDraft.set($event)" />
       <app-ui-select
-        [value]="replaceDraft().contractCode"
         [options]="contractTypeOptions()"
-        [placeholder]="texts.contractSectionContractLabel"
-        [disabled]="contractTypeOptionsLoading()"
-        (valueChanged)="updateReplaceField('contractCode', $event)"
-      />
-    </label>
-
-    <label class="employee-contract-section__field employee-contract-section__field--subtype">
-      <span>{{ texts.contractSectionSubtypeLabel }}</span>
+        [value]="contractCodeDraft()"
+        (valueChanged)="updateContractCode($event)" />
       <app-ui-select
-        [value]="replaceDraft().contractSubtypeCode"
-        [options]="replaceSubtypeOptions()"
-        [placeholder]="texts.contractSectionSubtypeLabel"
-        [disabled]="replaceSubtypeDisabled()"
-        (valueChanged)="updateReplaceField('contractSubtypeCode', $event)"
-      />
-    </label>
-  </div>
-
-  <div temporalCorrectForm class="employee-contract-section__form-grid employee-contract-section__form-grid--correct">
-    @if (correctingOccurrence(); as correctingOccurrence) {
-      <label class="employee-contract-section__field employee-contract-section__field--start-readonly">
-        <span>{{ texts.contractSectionOccurrenceStartDateLabel }}</span>
-        <input pInputText type="text" [value]="correctingOccurrence.startDate" readonly />
-      </label>
+        [options]="subtypeOptions()"
+        [value]="contractSubtypeCodeDraft()"
+        [disabled]="subtypeDisabled()"
+        (valueChanged)="contractSubtypeCodeDraft.set($event)" />
     }
 
-    <label class="employee-contract-section__field employee-contract-section__field--contract">
-      <span>{{ texts.contractSectionContractLabel }}</span>
+    @if (modalMode() === 'edit') {
       <app-ui-select
-        [value]="correctDraft().contractCode"
         [options]="contractTypeOptions()"
-        [placeholder]="texts.contractSectionContractLabel"
-        [disabled]="contractTypeOptionsLoading()"
-        (valueChanged)="updateCorrectField('contractCode', $event)"
-      />
-    </label>
-
-    <label class="employee-contract-section__field employee-contract-section__field--subtype">
-      <span>{{ texts.contractSectionSubtypeLabel }}</span>
+        [value]="contractCodeDraft()"
+        (valueChanged)="updateContractCode($event)" />
       <app-ui-select
-        [value]="correctDraft().contractSubtypeCode"
-        [options]="correctSubtypeOptions()"
-        [placeholder]="texts.contractSectionSubtypeLabel"
-        [disabled]="correctSubtypeDisabled()"
-        (valueChanged)="updateCorrectField('contractSubtypeCode', $event)"
-      />
-    </label>
-  </div>
+        [options]="subtypeOptions()"
+        [value]="contractSubtypeCodeDraft()"
+        [disabled]="subtypeDisabled()"
+        (valueChanged)="contractSubtypeCodeDraft.set($event)" />
+    }
 
-  <div temporalConfirmCloseForm class="employee-contract-section__close-form">
-    <p class="employee-contract-section__hint">{{ texts.contractSectionCloseHint }}</p>
-
-    <label class="employee-contract-section__field employee-contract-section__field--close-date">
-      <span>{{ texts.contractSectionCloseDateLabel }}</span>
+    @if (modalMode() === 'close') {
       <app-ui-date-input
-        [value]="closeDraft().endDate"
-        (valueChanged)="updateCloseField('endDate', $event)"
-      />
-    </label>
-  </div>
-</app-temporal-section>
+        [value]="endDateDraft()"
+        (valueChanged)="endDateDraft.set($event)" />
+    }
+  </app-period-modal>
+</div>
