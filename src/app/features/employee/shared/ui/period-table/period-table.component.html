@@ -7,7 +7,7 @@
   @if (rows().length === 0) {
     <p class="period-table__empty">{{ emptyMessage() }}</p>
   } @else {
-    <table class="period-table__table">
+    <table class="period-table__table" [attr.aria-label]="sectionTitle() || null">
       <thead>
         <tr>
           <th class="period-table__th">Período</th>
@@ -19,7 +19,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (row of rows(); track trackBy($index)) {
+        @for (row of rows(); track row.startDate) {
           <tr class="period-table__row" [class.period-table__row--active]="row.isActive">
             <td class="period-table__td period-table__td--period">{{ formatPeriod(row) }}</td>
             @if (cellContentTemplate) {
@@ -36,11 +36,11 @@
               <div class="period-table__actions">
                 @if (showEdit(row)) {
                   <button type="button" class="period-table__icon-btn"
-                    aria-label="Editar" (click)="editClicked.emit($index)">✏</button>
+                    [attr.aria-label]="'Editar ' + row.startDate" (click)="editClicked.emit($index)">✏</button>
                 }
                 @if (showDelete(row)) {
                   <button type="button" class="period-table__icon-btn period-table__icon-btn--danger"
-                    aria-label="Eliminar" (click)="deleteClicked.emit($index)">🗑</button>
+                    [attr.aria-label]="'Eliminar ' + row.startDate" (click)="deleteClicked.emit($index)">🗑</button>
                 }
               </div>
             </td>

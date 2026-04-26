@@ -31,5 +31,4 @@ export class PeriodTableComponent<T extends PeriodTableRow = PeriodTableRow> {
 
   protected showEdit(row: T): boolean { return row.canEdit !== false; }
   protected showDelete(row: T): boolean { return !row.isActive && row.canDelete === true; }
-  protected trackBy(index: number): number { return index; }
 }

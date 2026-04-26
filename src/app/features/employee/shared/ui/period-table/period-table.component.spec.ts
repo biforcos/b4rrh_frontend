@@ -58,17 +58,17 @@ describe('PeriodTableComponent', () => {
       row({ isActive: true }),
       row({ isActive: false, canDelete: true }),
     ]);
-    expect(fix.nativeElement.querySelectorAll('[aria-label="Eliminar"]').length).toBe(1);
+    expect(fix.nativeElement.querySelectorAll('[aria-label^="Eliminar"]').length).toBe(1);
   });
 
   it('does not show delete for non-active rows when canDelete is false', () => {
     const { fix } = createHost([row({ isActive: false, canDelete: false })]);
-    expect(fix.nativeElement.querySelector('[aria-label="Eliminar"]')).toBeNull();
+    expect(fix.nativeElement.querySelector('[aria-label^="Eliminar"]')).toBeNull();
   });
 
   it('hides edit button when canEdit is false', () => {
     const { fix } = createHost([row({ canEdit: false })]);
-    expect(fix.nativeElement.querySelector('[aria-label="Editar"]')).toBeNull();
+    expect(fix.nativeElement.querySelector('[aria-label^="Editar"]')).toBeNull();
   });
 
   it('emits addClicked', () => {
@@ -79,13 +79,13 @@ describe('PeriodTableComponent', () => {
 
   it('emits editClicked with index', () => {
     const { fix, host } = createHost([row()]);
-    fix.nativeElement.querySelector('[aria-label="Editar"]').click();
+    fix.nativeElement.querySelector('[aria-label^="Editar"]').click();
     expect(host.editIdx).toBe(0);
   });
 
   it('emits deleteClicked with index', () => {
     const { fix, host } = createHost([row({ isActive: false, canDelete: true })]);
-    fix.nativeElement.querySelector('[aria-label="Eliminar"]').click();
+    fix.nativeElement.querySelector('[aria-label^="Eliminar"]').click();
     expect(host.delIdx).toBe(0);
   });
 
