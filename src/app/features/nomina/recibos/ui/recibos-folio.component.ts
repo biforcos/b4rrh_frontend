@@ -33,14 +33,21 @@ import {
       </div>
 
       <div class="header-employee">
-        <span class="label">Trabajador: </span
-        ><strong>{{ employeeProfile?.fullName ?? '—' }}</strong>
-        @if (employeeProfile?.nif) {
-          <span class="label" style="margin-left:16px">NIF: </span
-          ><strong>{{ employeeProfile!.nif }}</strong>
-        }
-        <span class="label" style="margin-left:16px">Nº emp.: </span
-        ><strong>{{ employeeNumber }}</strong>
+        <div class="employee-left">
+          <div class="employee-name">{{ employeeProfile?.fullName ?? '—' }}</div>
+          @if (employeeProfile?.nif) {
+            <div class="employee-meta">NIF: {{ employeeProfile!.nif }}</div>
+          }
+          @if (employeeProfile?.street) {
+            <div class="employee-meta">{{ employeeProfile!.street }}</div>
+          }
+          @if (employeeCityLine) {
+            <div class="employee-meta">{{ employeeCityLine }}</div>
+          }
+        </div>
+        <div class="employee-right">
+          <span class="label">Nº emp.:</span> <strong>{{ employeeNumber }}</strong>
+        </div>
       </div>
 
       <table class="concept-table">
@@ -135,10 +142,31 @@ import {
         margin-top: 2px;
       }
       .header-employee {
-        font-size: 11px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
         padding: 8px 0 12px;
         border-bottom: 1px solid #dee2e6;
         margin-bottom: 12px;
+      }
+      .employee-left {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .employee-name {
+        font-size: 12px;
+        font-weight: 700;
+        color: #212529;
+      }
+      .employee-meta {
+        font-size: 10px;
+        color: #6c757d;
+      }
+      .employee-right {
+        font-size: 11px;
+        color: #6c757d;
+        white-space: nowrap;
       }
       .label {
         color: #6c757d;
@@ -246,9 +274,11 @@ export class RecibosFolioComponent {
   }
 
   get companyCityLine(): string {
-    const postalCode = this.companyProfile?.postalCode;
-    const city = this.companyProfile?.city;
-    return [postalCode, city].filter(Boolean).join(' ');
+    return [this.companyProfile?.postalCode, this.companyProfile?.city].filter(Boolean).join(' ');
+  }
+
+  get employeeCityLine(): string {
+    return [this.employeeProfile?.postalCode, this.employeeProfile?.city].filter(Boolean).join(' ');
   }
 
   isEarning(concept: PayrollConceptModel): boolean {
