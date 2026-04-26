@@ -1,93 +1,35 @@
-<app-temporal-section
-  [title]="texts.workCenterSectionTitle"
-  [subtitle]="sectionSubtitle"
-  [state]="sectionState()"
-  [displayMode]="displayMode()"
-  [rows]="rows()"
-  [texts]="sectionTexts"
-  [confirmingCloseKey]="confirmingCloseKey()"
-  [confirmingDeleteKey]="confirmingDeleteKey()"
-  [correctingKey]="correctingKey()"
-  [canCreate]="true"
-  [canEditCurrent]="false"
-  [canCorrect]="true"
-  [canClose]="true"
-  [canDelete]="true"
-  [createSubmitEnabled]="isCreateDraftValid()"
-  [correctSubmitEnabled]="isCorrectDraftValid()"
-  (manageStarted)="startManage()"
-  (manageExited)="exitManage()"
-  (createStarted)="startCreate()"
-  (correctStarted)="startCorrect($event)"
-  (closeRequested)="requestClose($event)"
-  (deleteRequested)="requestDelete($event)"
-  (closeConfirmed)="confirmClose($event)"
-  (deleteConfirmed)="confirmDelete($event)"
-  (cancelled)="cancel()"
-  (createSubmitted)="submitCreate()"
-  (correctSubmitted)="submitCorrect($event)"
->
-  <div temporalCreateForm class="employee-work-center-section__form-grid">
-    <label class="employee-work-center-section__field employee-work-center-section__field--code">
-      <span>{{ texts.workCenterSectionCodeLabel }}</span>
-      <app-ui-select
-        [value]="createDraft().workCenterCode"
-        [options]="createWorkCenterCodeOptions()"
-        [placeholder]="texts.workCenterSectionCodeLabel"
-        [disabled]="catalogOptionsLoading()"
-        (valueChanged)="updateCreateField('workCenterCode', $event)"
-      />
-    </label>
+<div class="work-center-section">
+  <app-period-table
+    sectionTitle="Centro de trabajo"
+    [rows]="rows()"
+    (addClicked)="openCreate()"
+    (editClicked)="openEdit($event)"
+    (deleteClicked)="confirmDelete($event)"
+  >
+    <ng-template #columnHeaders><th>Centro</th></ng-template>
+    <ng-template #cellContent let-row>
+      <td>{{ row.workCenterName || row.workCenterCode }}</td>
+    </ng-template>
+  </app-period-table>
 
-    <label class="employee-work-center-section__field employee-work-center-section__field--start-date">
-      <span>{{ texts.workCenterSectionStartDateLabel }}</span>
-      <app-ui-date-input [value]="createDraft().startDate" (valueChanged)="updateCreateField('startDate', $event)" />
-    </label>
-
-    <label class="employee-work-center-section__field employee-work-center-section__field--end-date">
-      <span>{{ texts.workCenterSectionEndDateLabel }}</span>
-      <app-ui-date-input [value]="createDraft().endDate" (valueChanged)="updateCreateField('endDate', $event)" />
-    </label>
-  </div>
-
-  <div temporalCorrectForm class="employee-work-center-section__form-grid">
-    @if (correctingRow(); as correctingRow) {
-      <div class="employee-work-center-section__readonly-field">
-        <span>{{ texts.workCenterSectionAssignmentLabel }}</span>
-        <strong>#{{ correctingRow.workCenterAssignmentNumber }}</strong>
-      </div>
-
-      <p class="employee-work-center-section__hint">{{ texts.workCenterSectionCorrectionHint }}</p>
+  <app-period-modal
+    [title]="modalTitle()"
+    [visible]="modalVisible()"
+    [saving]="saving()"
+    [submitEnabled]="isSubmitEnabled()"
+    [showCloseAction]="modalMode() === 'edit' && editingIsActive()"
+    (visibleChange)="modalVisible.set($event)"
+    (submitted)="submit()"
+    (cancelled)="closeModal()"
+    (closeActionClicked)="switchToClose()"
+  >
+    @if (modalMode() !== 'close') {
+      <app-ui-select [options]="workCenterOptions()" [value]="workCenterCodeDraft()" (valueChanged)="workCenterCodeDraft.set($event)" />
+      <app-ui-date-input [value]="startDateDraft()" (valueChanged)="startDateDraft.set($event)" />
+      <app-ui-date-input [value]="endDateDraft()" (valueChanged)="endDateDraft.set($event)" />
     }
-
-    <label class="employee-work-center-section__field employee-work-center-section__field--code">
-      <span>{{ texts.workCenterSectionCodeLabel }}</span>
-      <app-ui-select
-        [value]="correctDraft().workCenterCode"
-        [options]="correctWorkCenterCodeOptions()"
-        [placeholder]="texts.workCenterSectionCodeLabel"
-        [disabled]="catalogOptionsLoading()"
-        (valueChanged)="updateCorrectField('workCenterCode', $event)"
-      />
-    </label>
-
-    <label class="employee-work-center-section__field employee-work-center-section__field--start-date">
-      <span>{{ texts.workCenterSectionStartDateLabel }}</span>
-      <app-ui-date-input [value]="correctDraft().startDate" (valueChanged)="updateCorrectField('startDate', $event)" />
-    </label>
-
-    <label class="employee-work-center-section__field employee-work-center-section__field--end-date">
-      <span>{{ texts.workCenterSectionEndDateLabel }}</span>
-      <app-ui-date-input [value]="correctDraft().endDate" (valueChanged)="updateCorrectField('endDate', $event)" />
-    </label>
-  </div>
-
-  <div temporalConfirmCloseForm class="employee-work-center-section__close-form">
-    <p class="employee-work-center-section__hint">{{ texts.workCenterSectionCloseHint }}</p>
-
-    <label class="employee-work-center-section__field employee-work-center-section__field--close-date">
-      <span>{{ texts.workCenterSectionCloseDateLabel }}</span>
-      <app-ui-date-input [value]="closeEndDate()" (valueChanged)="updateCloseEndDate($event)" />
-    </label>
-  </div>
-</app-temporal-section>
+    @if (modalMode() === 'close') {
+      <app-ui-date-input [value]="endDateDraft()" (valueChanged)="endDateDraft.set($event)" />
+    }
+  </app-period-modal>
+</div>
