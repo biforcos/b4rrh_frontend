@@ -1,6 +1,6 @@
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import { EmployeeContractCatalogGateway } from '../../data-access/employee-contract-catalog.gateway';
@@ -117,5 +117,33 @@ describe('EmployeeContractSectionComponent', () => {
     component.endDateDraft.set('2025-12-31');
     component.submit();
     expect(store.closeOccurrence).toHaveBeenCalledWith(employeeKey, '2024-01-01', { endDate: '2025-12-31' });
+  });
+
+  it('disables subtype select when contract code is empty', () => {
+    const component = fix.componentInstance as any;
+    component.modalMode.set('create');
+    component.contractCodeDraft.set('');
+    expect(component.subtypeDisabled()).toBe(true);
+  });
+
+  it('resets subtype draft and options when contract type changes', () => {
+    const component = fix.componentInstance as any;
+    component.contractCodeDraft.set('PERM');
+    component.contractSubtypeCodeDraft.set('PERM-FULL');
+    component.updateContractCode('TEMP');
+    expect(component.contractSubtypeCodeDraft()).toBe('');
+  });
+
+  it('clears subtype options on catalog load error', () => {
+    const component = fix.componentInstance as any;
+    // Override gateway to simulate error
+    catalogGateway.loadContractSubtypes.mockReturnValue(
+      new Observable((subscriber: any) => subscriber.error(new Error('network error')))
+    );
+    component.contractCodeDraft.set('PERM');
+    component.subtypeOptionsState.set([{ value: 'PERM-FULL', label: 'Full' }]); // pre-set stale options
+    component['loadSubtypeOptions']('TEMP', null, null);
+    // Options must be cleared even on error
+    expect(component.subtypeOptionsState()).toEqual([]);
   });
 });

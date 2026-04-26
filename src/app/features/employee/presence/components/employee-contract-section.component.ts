@@ -104,7 +104,7 @@ export class EmployeeContractSectionComponent {
 
     effect(() => {
       const success = this.contractStore.success();
-      if (success && this.modalVisible()) untracked(() => this.closeModal());
+      if (success) untracked(() => { if (this.modalVisible()) this.closeModal(); });
     });
   }
 
@@ -191,7 +191,12 @@ export class EmployeeContractSectionComponent {
         this.subtypeOptionsState.set(items.map((i: EmployeeContractCatalogItemModel) => ({ value: i.code, label: i.label })));
         this.subtypeLoadingState.set(false);
       },
-      error: () => { if (id === this.subtypeRequestId) this.subtypeLoadingState.set(false); },
+      error: () => {
+        if (id === this.subtypeRequestId) {
+          this.subtypeOptionsState.set([]);
+          this.subtypeLoadingState.set(false);
+        }
+      },
     });
   }
 }
