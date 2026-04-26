@@ -1,7 +1,10 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PayrollConceptModel } from '../models/payroll-concept.model';
-import { PayrollCompanyProfileModel, PayrollEmployeeProfileModel } from '../models/payroll-summary.model';
+import {
+  PayrollCompanyProfileModel,
+  PayrollEmployeeProfileModel,
+} from '../models/payroll-summary.model';
 
 @Component({
   selector: 'app-recibos-folio',
@@ -13,10 +16,15 @@ import { PayrollCompanyProfileModel, PayrollEmployeeProfileModel } from '../mode
       <div class="folio-header">
         <div class="header-company">
           <div class="company-name">{{ companyProfile?.legalName ?? 'EMPRESA EJEMPLO S.L.' }}</div>
-          <div class="company-meta">
-            @if (companyProfile?.taxIdentifier) { CIF: {{ companyProfile!.taxIdentifier }} · }
-            {{ companyAddress }}
-          </div>
+          @if (companyProfile?.taxIdentifier) {
+            <div class="company-meta">CIF: {{ companyProfile!.taxIdentifier }}</div>
+          }
+          @if (companyProfile?.street) {
+            <div class="company-meta">{{ companyProfile!.street }}</div>
+          }
+          @if (companyCityLine) {
+            <div class="company-meta">{{ companyCityLine }}</div>
+          }
         </div>
         <div class="header-title">
           <div class="payslip-title">Recibo de Salarios</div>
@@ -25,11 +33,14 @@ import { PayrollCompanyProfileModel, PayrollEmployeeProfileModel } from '../mode
       </div>
 
       <div class="header-employee">
-        <span class="label">Trabajador: </span><strong>{{ employeeProfile?.fullName ?? '—' }}</strong>
+        <span class="label">Trabajador: </span
+        ><strong>{{ employeeProfile?.fullName ?? '—' }}</strong>
         @if (employeeProfile?.nif) {
-          <span class="label" style="margin-left:16px">NIF: </span><strong>{{ employeeProfile!.nif }}</strong>
+          <span class="label" style="margin-left:16px">NIF: </span
+          ><strong>{{ employeeProfile!.nif }}</strong>
         }
-        <span class="label" style="margin-left:16px">Nº emp.: </span><strong>{{ employeeNumber }}</strong>
+        <span class="label" style="margin-left:16px">Nº emp.: </span
+        ><strong>{{ employeeNumber }}</strong>
       </div>
 
       <table class="concept-table">
@@ -49,7 +60,9 @@ import { PayrollCompanyProfileModel, PayrollEmployeeProfileModel } from '../mode
             <td>{{ concept.originPeriodCode ?? '—' }}</td>
             <td>{{ concept.conceptCode }}</td>
             <td>{{ concept.conceptLabel }}</td>
-            <td class="text-right">{{ concept.quantity != null ? formatNum(concept.quantity) : '—' }}</td>
+            <td class="text-right">
+              {{ concept.quantity != null ? formatNum(concept.quantity) : '—' }}
+            </td>
             <td class="text-right">{{ concept.rate != null ? formatNum(concept.rate) : '—' }}</td>
             <td class="text-right amount-earning">
               {{ isEarning(concept) && concept.amount != null ? formatNum(concept.amount) : '—' }}
@@ -63,10 +76,16 @@ import { PayrollCompanyProfileModel, PayrollEmployeeProfileModel } from '../mode
           <tr class="row-totals">
             <td colspan="5" class="totals-label">TOTALES</td>
             <td class="text-right amount-earning">
-              {{ totalEarningConcept?.amount != null ? formatNum(totalEarningConcept!.amount!) : '—' }}
+              {{
+                totalEarningConcept?.amount != null ? formatNum(totalEarningConcept!.amount!) : '—'
+              }}
             </td>
             <td class="text-right amount-deduction">
-              {{ totalDeductionConcept?.amount != null ? formatNum(totalDeductionConcept!.amount!) : '—' }}
+              {{
+                totalDeductionConcept?.amount != null
+                  ? formatNum(totalDeductionConcept!.amount!)
+                  : '—'
+              }}
             </td>
           </tr>
         </tfoot>
@@ -78,31 +97,128 @@ import { PayrollCompanyProfileModel, PayrollEmployeeProfileModel } from '../mode
       </div>
     </div>
   `,
-  styles: [`
-    .folio { background: white; padding: 24px 28px; box-shadow: 0 2px 12px rgba(0,0,0,0.18); max-width: 780px; }
-    .folio-header { display: flex; justify-content: space-between; border-bottom: 2px solid #212529; padding-bottom: 12px; margin-bottom: 10px; }
-    .company-name { font-weight: 700; font-size: 14px; color: #212529; }
-    .company-meta { color: #6c757d; font-size: 10px; margin-top: 2px; }
-    .payslip-title { font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: #212529; }
-    .payslip-period { color: #6c757d; font-size: 11px; margin-top: 2px; }
-    .header-employee { font-size: 11px; padding: 8px 0 12px; border-bottom: 1px solid #dee2e6; margin-bottom: 12px; }
-    .label { color: #6c757d; }
-    .concept-table { width: 100%; border-collapse: collapse; font-size: 11px; }
-    .concept-table th { background: #343a40; color: white; padding: 6px 8px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-    .concept-table td { padding: 5px 8px; border-bottom: 1px solid #f1f3f5; color: #212529; }
-    .text-right { text-align: right; }
-    .amount-earning, .amount-deduction { font-weight: 600; }
-    .row-totals td { font-weight: 700; border-top: 2px solid #adb5bd; background: #f8f9fa; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .totals-label { color: #6c757d; }
-    .net-pay-footer { background: #212529; color: white; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; margin-top: 0; }
-    .net-pay-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.6px; color: #adb5bd; }
-    .net-pay-amount { font-size: 26px; font-weight: 700; color: #a6e3a1; }
-    .col-period { width: 8%; }
-    .col-code { width: 7%; }
-    .col-label { width: 35%; }
-    .col-qty, .col-rate { width: 10%; }
-    .col-earning, .col-deduction { width: 15%; }
-  `],
+  styles: [
+    `
+      .folio {
+        background: white;
+        padding: 24px 28px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.18);
+        max-width: 780px;
+      }
+      .folio-header {
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 2px solid #212529;
+        padding-bottom: 12px;
+        margin-bottom: 10px;
+      }
+      .company-name {
+        font-weight: 700;
+        font-size: 14px;
+        color: #212529;
+      }
+      .company-meta {
+        color: #6c757d;
+        font-size: 10px;
+        margin-top: 2px;
+      }
+      .payslip-title {
+        font-weight: 700;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #212529;
+      }
+      .payslip-period {
+        color: #6c757d;
+        font-size: 11px;
+        margin-top: 2px;
+      }
+      .header-employee {
+        font-size: 11px;
+        padding: 8px 0 12px;
+        border-bottom: 1px solid #dee2e6;
+        margin-bottom: 12px;
+      }
+      .label {
+        color: #6c757d;
+      }
+      .concept-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 11px;
+      }
+      .concept-table th {
+        background: #343a40;
+        color: white;
+        padding: 6px 8px;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .concept-table td {
+        padding: 5px 8px;
+        border-bottom: 1px solid #f1f3f5;
+        color: #212529;
+      }
+      .text-right {
+        text-align: right;
+      }
+      .amount-earning,
+      .amount-deduction {
+        font-weight: 600;
+      }
+      .row-totals td {
+        font-weight: 700;
+        border-top: 2px solid #adb5bd;
+        background: #f8f9fa;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .totals-label {
+        color: #6c757d;
+      }
+      .net-pay-footer {
+        background: #212529;
+        color: white;
+        padding: 12px 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 0;
+      }
+      .net-pay-label {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        color: #adb5bd;
+      }
+      .net-pay-amount {
+        font-size: 26px;
+        font-weight: 700;
+        color: #a6e3a1;
+      }
+      .col-period {
+        width: 8%;
+      }
+      .col-code {
+        width: 7%;
+      }
+      .col-label {
+        width: 35%;
+      }
+      .col-qty,
+      .col-rate {
+        width: 10%;
+      }
+      .col-earning,
+      .col-deduction {
+        width: 15%;
+      }
+    `,
+  ],
 })
 export class RecibosFolioComponent {
   @Input() concepts: ReadonlyArray<PayrollConceptModel> = [];
@@ -129,10 +245,10 @@ export class RecibosFolioComponent {
     return this.concepts.find((c) => c.conceptNatureCode === 'TOTAL_DEDUCTION') ?? null;
   }
 
-  get companyAddress(): string {
-    if (!this.companyProfile) return 'C/ Ejemplo, 1 · 28001 Madrid';
-    const parts = [this.companyProfile.street, this.companyProfile.city, this.companyProfile.postalCode].filter(Boolean);
-    return parts.length ? parts.join(' · ') : '';
+  get companyCityLine(): string {
+    const postalCode = this.companyProfile?.postalCode;
+    const city = this.companyProfile?.city;
+    return [postalCode, city].filter(Boolean).join(' ');
   }
 
   isEarning(concept: PayrollConceptModel): boolean {
@@ -144,7 +260,10 @@ export class RecibosFolioComponent {
   }
 
   formatNum(value: number): string {
-    return new Intl.NumberFormat('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
+    return new Intl.NumberFormat('es-ES', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(value);
   }
 
   trackConcept(_index: number, concept: PayrollConceptModel): number {
