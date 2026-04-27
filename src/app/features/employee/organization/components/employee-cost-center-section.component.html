@@ -1,0 +1,47 @@
+<div class="cost-center-section">
+  <app-period-table
+    sectionTitle="Centro de coste"
+    addLabel="+ Nueva distribución"
+    [rows]="rows()"
+    (addClicked)="openNewDistribution()"
+    (editClicked)="openEdit($event)"
+  >
+    <ng-template #columnHeaders>
+      <th>Centros</th>
+      <th>Total</th>
+    </ng-template>
+    <ng-template #cellContent let-row>
+      <td class="cost-center-section__summary">{{ row.itemsSummary }}</td>
+      <td [class.cost-center-section__total--ok]="row.totalPercentage === 100"
+          [class.cost-center-section__total--err]="row.totalPercentage !== 100">
+        {{ row.totalPercentage }}%
+      </td>
+    </ng-template>
+  </app-period-table>
+
+  <app-period-modal
+    [title]="modalMode() === 'close' ? 'Cerrar distribución de coste' : 'Nueva distribución de coste'"
+    [visible]="modalVisible()"
+    [saving]="saving()"
+    [submitEnabled]="isSubmitEnabled()"
+    [showCloseAction]="modalMode() === 'replace' && !!costCenterStore.currentDistribution()"
+    closeActionLabel="Cerrar distribución"
+    (visibleChange)="modalVisible.set($event)"
+    (submitted)="submit()"
+    (cancelled)="closeModal()"
+    (closeActionClicked)="openClose()"
+  >
+    @if (modalMode() === 'replace') {
+      <app-employee-cost-center-distribution-editor
+        dateLabel="Efectivo desde"
+        [options]="costCenterOptions()"
+      />
+    }
+    @if (modalMode() === 'close') {
+      <app-ui-date-input
+        [value]="endDateDraft()"
+        (valueChanged)="endDateDraft.set($event)"
+      />
+    }
+  </app-period-modal>
+</div>
