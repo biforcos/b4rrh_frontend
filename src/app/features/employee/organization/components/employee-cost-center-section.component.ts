@@ -125,7 +125,8 @@ export class EmployeeCostCenterSectionComponent {
 
     if (this.modalMode() === 'replace') {
       const editor = this.editorRef();
-      if (!editor?.isValid()) return;
+      if (!editor) return;
+      if (!editor.isValid()) return;
       const v = editor.getValue();
       if (this.costCenterStore.currentDistribution()) {
         this.costCenterStore.replaceDistribution(key, { effectiveDate: v.startDate, items: v.items });

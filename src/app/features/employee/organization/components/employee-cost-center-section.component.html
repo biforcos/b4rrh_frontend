@@ -36,8 +36,7 @@
         dateLabel="Efectivo desde"
         [options]="costCenterOptions()"
       />
-    }
-    @if (modalMode() === 'close') {
+    } @else {
       <app-ui-date-input
         [value]="endDateDraft()"
         (valueChanged)="endDateDraft.set($event)"
