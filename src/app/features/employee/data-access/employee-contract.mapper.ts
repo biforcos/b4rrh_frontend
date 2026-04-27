@@ -13,6 +13,7 @@ export interface ContractReplaceDraft {
 }
 
 export interface ContractCorrectDraft {
+  startDate: string;
   contractCode: string;
   contractSubtypeCode: string;
 }
@@ -31,6 +32,7 @@ export function createEmptyContractReplaceDraft(): ContractReplaceDraft {
 
 export function createEmptyContractCorrectDraft(): ContractCorrectDraft {
   return {
+    startDate: '',
     contractCode: '',
     contractSubtypeCode: '',
   };
@@ -52,8 +54,11 @@ export function mapContractReplaceDraftToRequest(
   };
 }
 
-export function mapContractCorrectDraftToRequest(source: ContractCorrectDraft): UpdateContractRequest {
+export function mapContractCorrectDraftToRequest(
+  source: ContractCorrectDraft,
+): UpdateContractRequest {
   return {
+    startDate: source.startDate.trim() || null,
     contractCode: source.contractCode.trim().toUpperCase(),
     contractSubtypeCode: source.contractSubtypeCode.trim().toUpperCase(),
   };
@@ -65,7 +70,9 @@ export function mapContractCloseDraftToRequest(source: ContractCloseDraft): Clos
   };
 }
 
-export function mapContractCreateDraftToRequest(source: ContractReplaceDraft): CreateContractRequest {
+export function mapContractCreateDraftToRequest(
+  source: ContractReplaceDraft,
+): CreateContractRequest {
   return {
     contractCode: source.contractCode.trim().toUpperCase(),
     contractSubtypeCode: source.contractSubtypeCode.trim().toUpperCase(),

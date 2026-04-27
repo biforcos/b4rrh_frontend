@@ -34,12 +34,24 @@ describe('EmployeeContractSectionComponent', () => {
   beforeEach(async () => {
     store = new MockContractStore();
     fieldCatalog = {
-      loadContractTypeOptions: vi.fn().mockReturnValue(of([{ value: 'PERM', label: 'Indefinido' }])),
+      loadContractTypeOptions: vi
+        .fn()
+        .mockReturnValue(of([{ value: 'PERM', label: 'Indefinido' }])),
     };
     catalogGateway = {
-      loadContractSubtypes: vi.fn().mockReturnValue(
-        of([{ code: 'PERM-FULL', label: 'Full · PERM-FULL', name: 'Full', startDate: '2020-01-01', endDate: null }]),
-      ),
+      loadContractSubtypes: vi
+        .fn()
+        .mockReturnValue(
+          of([
+            {
+              code: 'PERM-FULL',
+              label: 'Full · PERM-FULL',
+              name: 'Full',
+              startDate: '2020-01-01',
+              endDate: null,
+            },
+          ]),
+        ),
     };
 
     await TestBed.configureTestingModule({
@@ -62,7 +74,13 @@ describe('EmployeeContractSectionComponent', () => {
 
   it('shows a row per contract', () => {
     store.contractsState.set([
-      { contractCode: 'PERM', contractSubtypeCode: 'PERM-FULL', startDate: '2024-01-01', endDate: null, isActive: true },
+      {
+        contractCode: 'PERM',
+        contractSubtypeCode: 'PERM-FULL',
+        startDate: '2024-01-01',
+        endDate: null,
+        isActive: true,
+      },
     ]);
     fix.detectChanges();
     expect(fix.nativeElement.querySelectorAll('.period-table__row').length).toBe(1);
@@ -92,7 +110,13 @@ describe('EmployeeContractSectionComponent', () => {
 
   it('calls correctOccurrence on edit submit', () => {
     store.contractsState.set([
-      { contractCode: 'PERM', contractSubtypeCode: 'PERM-FULL', startDate: '2024-01-01', endDate: null, isActive: true },
+      {
+        contractCode: 'PERM',
+        contractSubtypeCode: 'PERM-FULL',
+        startDate: '2024-01-01',
+        endDate: null,
+        isActive: true,
+      },
     ]);
     fix.detectChanges();
     const component = fix.componentInstance as any;
@@ -101,6 +125,7 @@ describe('EmployeeContractSectionComponent', () => {
     component.contractSubtypeCodeDraft.set('TEMP-EVT');
     component.submit();
     expect(store.correctOccurrence).toHaveBeenCalledWith(employeeKey, '2024-01-01', {
+      startDate: '2024-01-01',
       contractCode: 'TEMP',
       contractSubtypeCode: 'TEMP-EVT',
     });
@@ -108,7 +133,13 @@ describe('EmployeeContractSectionComponent', () => {
 
   it('calls closeOccurrence after switchToClose', () => {
     store.contractsState.set([
-      { contractCode: 'PERM', contractSubtypeCode: null, startDate: '2024-01-01', endDate: null, isActive: true },
+      {
+        contractCode: 'PERM',
+        contractSubtypeCode: null,
+        startDate: '2024-01-01',
+        endDate: null,
+        isActive: true,
+      },
     ]);
     fix.detectChanges();
     const component = fix.componentInstance as any;
@@ -116,7 +147,9 @@ describe('EmployeeContractSectionComponent', () => {
     component.switchToClose();
     component.endDateDraft.set('2025-12-31');
     component.submit();
-    expect(store.closeOccurrence).toHaveBeenCalledWith(employeeKey, '2024-01-01', { endDate: '2025-12-31' });
+    expect(store.closeOccurrence).toHaveBeenCalledWith(employeeKey, '2024-01-01', {
+      endDate: '2025-12-31',
+    });
   });
 
   it('disables subtype select when contract code is empty', () => {
@@ -138,7 +171,7 @@ describe('EmployeeContractSectionComponent', () => {
     const component = fix.componentInstance as any;
     // Override gateway to simulate error
     catalogGateway.loadContractSubtypes.mockReturnValue(
-      new Observable((subscriber: any) => subscriber.error(new Error('network error')))
+      new Observable((subscriber: any) => subscriber.error(new Error('network error'))),
     );
     component.contractCodeDraft.set('PERM');
     component.subtypeOptionsState.set([{ value: 'PERM-FULL', label: 'Full' }]); // pre-set stale options

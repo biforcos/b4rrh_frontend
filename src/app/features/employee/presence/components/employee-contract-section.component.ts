@@ -1,5 +1,12 @@
 import {
-  ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, untracked
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  signal,
+  untracked,
 } from '@angular/core';
 import { take } from 'rxjs';
 
@@ -43,6 +50,7 @@ export class EmployeeContractSectionComponent {
   protected readonly editingStartDate = signal<string | null>(null);
   protected readonly editingIsActive = signal(false);
   protected readonly effectiveDateDraft = signal('');
+  protected readonly newStartDateDraft = signal('');
   protected readonly contractCodeDraft = signal('');
   protected readonly contractSubtypeCodeDraft = signal('');
   protected readonly endDateDraft = signal('');
@@ -74,6 +82,12 @@ export class EmployeeContractSectionComponent {
     () => !this.contractCodeDraft() || this.subtypeLoadingState(),
   );
   protected readonly saving = computed(() => this.contractStore.mutating());
+  protected readonly showCascadeWarning = computed(
+    () =>
+      this.modalMode() === 'edit' &&
+      !!this.newStartDateDraft() &&
+      this.newStartDateDraft() !== this.editingStartDate(),
+  );
 
   protected readonly modalTitle = computed(() => {
     if (this.modalMode() === 'create') return 'Nuevo período — Contrato';
@@ -88,8 +102,16 @@ export class EmployeeContractSectionComponent {
 
   protected readonly isSubmitEnabled = computed(() => {
     const mode = this.modalMode();
-    if (mode === 'create') return !!this.effectiveDateDraft() && !!this.contractCodeDraft() && !!this.contractSubtypeCodeDraft();
-    if (mode === 'edit') return !!this.contractCodeDraft() && !!this.contractSubtypeCodeDraft();
+    if (mode === 'create')
+      return (
+        !!this.effectiveDateDraft() &&
+        !!this.contractCodeDraft() &&
+        !!this.contractSubtypeCodeDraft()
+      );
+    if (mode === 'edit')
+      return (
+        !!this.newStartDateDraft() && !!this.contractCodeDraft() && !!this.contractSubtypeCodeDraft()
+      );
     return !!this.endDateDraft();
   });
 
@@ -104,7 +126,10 @@ export class EmployeeContractSectionComponent {
 
     effect(() => {
       const success = this.contractStore.success();
-      if (success) untracked(() => { if (this.modalVisible()) this.closeModal(); });
+      if (success)
+        untracked(() => {
+          if (this.modalVisible()) this.closeModal();
+        });
     });
   }
 
@@ -125,6 +150,7 @@ export class EmployeeContractSectionComponent {
     this.modalMode.set('edit');
     this.editingStartDate.set(row.startDate);
     this.editingIsActive.set(row.isActive);
+    this.newStartDateDraft.set(row.startDate);
     this.contractCodeDraft.set(row.contractCode);
     this.contractSubtypeCodeDraft.set(row.contractSubtypeCode ?? '');
     this.loadSubtypeOptions(row.contractCode, row.startDate, row.contractSubtypeCode ?? null);
@@ -149,11 +175,14 @@ export class EmployeeContractSectionComponent {
       });
     } else if (mode === 'edit') {
       this.contractStore.correctOccurrence(key, this.editingStartDate()!, {
+        startDate: this.newStartDateDraft(),
         contractCode: this.contractCodeDraft(),
         contractSubtypeCode: this.contractSubtypeCodeDraft(),
       });
     } else {
-      this.contractStore.closeOccurrence(key, this.editingStartDate()!, { endDate: this.endDateDraft() });
+      this.contractStore.closeOccurrence(key, this.editingStartDate()!, {
+        endDate: this.endDateDraft(),
+      });
     }
   }
 
@@ -172,31 +201,51 @@ export class EmployeeContractSectionComponent {
   }
 
   private loadContractTypeOptions(ruleSystemCode: string | null): void {
-    if (!ruleSystemCode) { this.contractTypeOptionsState.set([]); return; }
+    if (!ruleSystemCode) {
+      this.contractTypeOptionsState.set([]);
+      return;
+    }
     const id = ++this.contractTypeRequestId;
-    this.fieldCatalogService.loadContractTypeOptions(ruleSystemCode).pipe(take(1)).subscribe({
-      next: (opts) => { if (id === this.contractTypeRequestId) this.contractTypeOptionsState.set(opts); },
-    });
+    this.fieldCatalogService
+      .loadContractTypeOptions(ruleSystemCode)
+      .pipe(take(1))
+      .subscribe({
+        next: (opts) => {
+          if (id === this.contractTypeRequestId) this.contractTypeOptionsState.set(opts);
+        },
+      });
   }
 
-  private loadSubtypeOptions(contractCode: string, referenceDate: string | null, preferred: string | null): void {
-    if (!contractCode) { this.subtypeOptionsState.set([]); return; }
+  private loadSubtypeOptions(
+    contractCode: string,
+    referenceDate: string | null,
+    preferred: string | null,
+  ): void {
+    if (!contractCode) {
+      this.subtypeOptionsState.set([]);
+      return;
+    }
     const rsc = this.employeeBusinessKey()?.ruleSystemCode ?? '';
     if (!rsc) return;
     const id = ++this.subtypeRequestId;
     this.subtypeLoadingState.set(true);
-    this.contractCatalogGateway.loadContractSubtypes(rsc, contractCode, referenceDate).pipe(take(1)).subscribe({
-      next: (items) => {
-        if (id !== this.subtypeRequestId) return;
-        this.subtypeOptionsState.set(items.map((i: EmployeeContractCatalogItemModel) => ({ value: i.code, label: i.label })));
-        this.subtypeLoadingState.set(false);
-      },
-      error: () => {
-        if (id === this.subtypeRequestId) {
-          this.subtypeOptionsState.set([]);
+    this.contractCatalogGateway
+      .loadContractSubtypes(rsc, contractCode, referenceDate)
+      .pipe(take(1))
+      .subscribe({
+        next: (items) => {
+          if (id !== this.subtypeRequestId) return;
+          this.subtypeOptionsState.set(
+            items.map((i: EmployeeContractCatalogItemModel) => ({ value: i.code, label: i.label })),
+          );
           this.subtypeLoadingState.set(false);
-        }
-      },
-    });
+        },
+        error: () => {
+          if (id === this.subtypeRequestId) {
+            this.subtypeOptionsState.set([]);
+            this.subtypeLoadingState.set(false);
+          }
+        },
+      });
   }
 }
