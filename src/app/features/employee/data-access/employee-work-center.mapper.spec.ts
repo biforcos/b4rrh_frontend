@@ -1,94 +1,17 @@
-import { EmployeeWorkCenterModel } from '../models/employee-work-center.model';
-import { mapEmployeeWorkCenterModelToTemporalRow } from './employee-work-center.mapper';
+import { mapWorkCenterCreateDraftToRequest, mapWorkCenterCorrectDraftToRequest, mapWorkCenterCloseDateToRequest } from './employee-work-center.mapper';
 
-const rowTexts = {
-  currentStatus: 'Vigente',
-  closedStatus: 'Historica',
-  currentPeriodLabel: 'actual',
-  periodPrefix: 'Periodo',
-  assignmentPrefix: 'Asignacion',
-  deleteDisabledPresenceStartReason: 'No se puede eliminar porque inicia una presence del empleado.',
-} as const;
-
-describe('mapEmployeeWorkCenterModelToTemporalRow', () => {
-  it('allows delete for active occurrence when canDelete is true', () => {
-    const source: EmployeeWorkCenterModel = {
-      workCenterAssignmentNumber: 10,
-      workCenterCode: 'MAD-01',
-      workCenterName: null,
-      startDate: '2025-01-01',
-      endDate: null,
-      isActive: true,
-      canDelete: true,
-      startsAtPresenceStart: false,
-      deleteForbiddenReason: null,
-    };
-
-    const row = mapEmployeeWorkCenterModelToTemporalRow(source, rowTexts);
-
-    expect(row.isCurrent).toBe(true);
-    expect(row.closeable).toBe(true);
-    expect(row.deletable).toBe(true);
-    expect(row.deleteDisabledReason).toBeNull();
-    expect(row.title).toBe('MAD-01');
-    expect(row.titleSecondary).toBeUndefined();
+describe('employee-work-center.mapper', () => {
+  it('maps create draft to request normalizing code', () => {
+    expect(mapWorkCenterCreateDraftToRequest({ workCenterCode: 'wc1', startDate: '2026-01-01', endDate: '' }))
+      .toEqual({ workCenterCode: 'WC1', startDate: '2026-01-01', endDate: null });
   });
 
-  it('disables delete with explicit reason when occurrence starts at presence start', () => {
-    const source: EmployeeWorkCenterModel = {
-      workCenterAssignmentNumber: 11,
-      workCenterCode: 'SEV-03',
-      workCenterName: null,
-      startDate: '2025-02-01',
-      endDate: null,
-      isActive: true,
-      canDelete: false,
-      startsAtPresenceStart: true,
-      deleteForbiddenReason: 'starts-at-presence-start',
-    };
-
-    const row = mapEmployeeWorkCenterModelToTemporalRow(source, rowTexts);
-
-    expect(row.deletable).toBe(false);
-    expect(row.deleteDisabledReason).toBe(rowTexts.deleteDisabledPresenceStartReason);
+  it('maps correct draft to request', () => {
+    expect(mapWorkCenterCorrectDraftToRequest({ workCenterCode: 'wc2', startDate: '2026-02-01', endDate: '2026-12-31' }))
+      .toEqual({ workCenterCode: 'WC2', startDate: '2026-02-01', endDate: '2026-12-31' });
   });
 
-  it('allows delete for historical occurrence when canDelete is true', () => {
-    const source: EmployeeWorkCenterModel = {
-      workCenterAssignmentNumber: 9,
-      workCenterCode: 'BCN-02',
-      workCenterName: null,
-      startDate: '2024-01-01',
-      endDate: '2024-12-31',
-      isActive: false,
-      canDelete: true,
-      startsAtPresenceStart: false,
-      deleteForbiddenReason: null,
-    };
-
-    const row = mapEmployeeWorkCenterModelToTemporalRow(source, rowTexts);
-
-    expect(row.isCurrent).toBe(false);
-    expect(row.closeable).toBe(false);
-    expect(row.deletable).toBe(true);
-  });
-
-  it('uses work center name as primary title and code as secondary subtitle', () => {
-    const source: EmployeeWorkCenterModel = {
-      workCenterAssignmentNumber: 12,
-      workCenterCode: 'ZAR-07',
-      workCenterName: 'Planta Zaragoza',
-      startDate: '2025-03-01',
-      endDate: null,
-      isActive: true,
-      canDelete: true,
-      startsAtPresenceStart: false,
-      deleteForbiddenReason: null,
-    };
-
-    const row = mapEmployeeWorkCenterModelToTemporalRow(source, rowTexts);
-
-    expect(row.title).toBe('Planta Zaragoza');
-    expect(row.titleSecondary).toBe('ZAR-07');
+  it('maps close date to request', () => {
+    expect(mapWorkCenterCloseDateToRequest('2026-12-31')).toEqual({ endDate: '2026-12-31' });
   });
 });
