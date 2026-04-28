@@ -46,3 +46,6 @@ Thumbs.db
 # OpenAPI Generated
 /src/app/core/api/generated/*
 .superpowers/.worktrees/
+
+# Git worktrees
+.worktrees/
