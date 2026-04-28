@@ -45,6 +45,14 @@
     }
 
     @if (modalMode() === 'edit') {
+      <app-ui-date-input
+        [value]="newStartDateDraft()"
+        (valueChanged)="newStartDateDraft.set($event)" />
+      @if (showCascadeWarning()) {
+        <p class="labor-classification-section__cascade-warning">
+          La fecha de inicio del período anterior se ajustará automáticamente.
+        </p>
+      }
       <app-ui-select
         [options]="agreementOptions()"
         [value]="agreementCodeDraft()"

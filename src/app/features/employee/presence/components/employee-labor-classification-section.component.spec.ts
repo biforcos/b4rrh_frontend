@@ -34,13 +34,21 @@ describe('EmployeeLaborClassificationSectionComponent', () => {
   beforeEach(async () => {
     store = new MockClassificationStore();
     fieldCatalog = {
-      loadLaborClassificationAgreementOptions: vi.fn().mockReturnValue(
-        of([{ value: 'AGR1', label: 'Convenio 1 · AGR1' }]),
-      ),
+      loadLaborClassificationAgreementOptions: vi
+        .fn()
+        .mockReturnValue(of([{ value: 'AGR1', label: 'Convenio 1 · AGR1' }])),
     };
     catalogGateway = {
       loadAgreementCategories: vi.fn().mockReturnValue(
-        of([{ code: 'CAT1', name: 'Categoria 1', label: 'Categoria 1 · CAT1', startDate: '2020-01-01', endDate: null }]),
+        of([
+          {
+            code: 'CAT1',
+            name: 'Categoria 1',
+            label: 'Categoria 1 · CAT1',
+            startDate: '2020-01-01',
+            endDate: null,
+          },
+        ]),
       ),
     };
 
@@ -64,7 +72,15 @@ describe('EmployeeLaborClassificationSectionComponent', () => {
 
   it('shows a row per classification', () => {
     store.classificationsState.set([
-      { agreementCode: 'AGR1', agreementName: null, agreementCategoryCode: 'CAT1', agreementCategoryName: null, startDate: '2024-01-01', endDate: null, isActive: true },
+      {
+        agreementCode: 'AGR1',
+        agreementName: null,
+        agreementCategoryCode: 'CAT1',
+        agreementCategoryName: null,
+        startDate: '2024-01-01',
+        endDate: null,
+        isActive: true,
+      },
     ]);
     fix.detectChanges();
     expect(fix.nativeElement.querySelectorAll('.period-table__row').length).toBe(1);
@@ -94,7 +110,15 @@ describe('EmployeeLaborClassificationSectionComponent', () => {
 
   it('calls correctOccurrence on edit submit', () => {
     store.classificationsState.set([
-      { agreementCode: 'AGR1', agreementName: null, agreementCategoryCode: 'CAT1', agreementCategoryName: null, startDate: '2024-01-01', endDate: null, isActive: true },
+      {
+        agreementCode: 'AGR1',
+        agreementName: null,
+        agreementCategoryCode: 'CAT1',
+        agreementCategoryName: null,
+        startDate: '2024-01-01',
+        endDate: null,
+        isActive: true,
+      },
     ]);
     fix.detectChanges();
     const c = fix.componentInstance as any;
@@ -103,6 +127,7 @@ describe('EmployeeLaborClassificationSectionComponent', () => {
     c.agreementCategoryCodeDraft.set('CAT2');
     c.submit();
     expect(store.correctOccurrence).toHaveBeenCalledWith(employeeKey, '2024-01-01', {
+      startDate: '2024-01-01',
       agreementCode: 'AGR2',
       agreementCategoryCode: 'CAT2',
     });
@@ -110,7 +135,15 @@ describe('EmployeeLaborClassificationSectionComponent', () => {
 
   it('calls closeOccurrence after switchToClose', () => {
     store.classificationsState.set([
-      { agreementCode: 'AGR1', agreementName: null, agreementCategoryCode: 'CAT1', agreementCategoryName: null, startDate: '2024-01-01', endDate: null, isActive: true },
+      {
+        agreementCode: 'AGR1',
+        agreementName: null,
+        agreementCategoryCode: 'CAT1',
+        agreementCategoryName: null,
+        startDate: '2024-01-01',
+        endDate: null,
+        isActive: true,
+      },
     ]);
     fix.detectChanges();
     const c = fix.componentInstance as any;
@@ -118,7 +151,9 @@ describe('EmployeeLaborClassificationSectionComponent', () => {
     c.switchToClose();
     c.endDateDraft.set('2025-12-31');
     c.submit();
-    expect(store.closeOccurrence).toHaveBeenCalledWith(employeeKey, '2024-01-01', { endDate: '2025-12-31' });
+    expect(store.closeOccurrence).toHaveBeenCalledWith(employeeKey, '2024-01-01', {
+      endDate: '2025-12-31',
+    });
   });
 
   it('closes modal when store signals success', async () => {

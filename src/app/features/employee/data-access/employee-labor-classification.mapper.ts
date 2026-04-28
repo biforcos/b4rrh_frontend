@@ -13,6 +13,7 @@ export interface LaborClassificationReplaceDraft {
 }
 
 export interface LaborClassificationCorrectDraft {
+  startDate: string;
   agreementCode: string;
   agreementCategoryCode: string;
 }
@@ -31,6 +32,7 @@ export function createEmptyLaborClassificationReplaceDraft(): LaborClassificatio
 
 export function createEmptyLaborClassificationCorrectDraft(): LaborClassificationCorrectDraft {
   return {
+    startDate: '',
     agreementCode: '',
     agreementCategoryCode: '',
   };
@@ -56,6 +58,7 @@ export function mapLaborClassificationCorrectDraftToRequest(
   source: LaborClassificationCorrectDraft,
 ): UpdateLaborClassificationRequest {
   return {
+    startDate: source.startDate.trim() || null,
     agreementCode: source.agreementCode.trim().toUpperCase(),
     agreementCategoryCode: source.agreementCategoryCode.trim().toUpperCase(),
   };

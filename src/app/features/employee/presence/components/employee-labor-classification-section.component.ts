@@ -1,5 +1,12 @@
 import {
-  ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, untracked
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  signal,
+  untracked,
 } from '@angular/core';
 import { take } from 'rxjs';
 
@@ -44,6 +51,7 @@ export class EmployeeLaborClassificationSectionComponent {
   protected readonly editingStartDate = signal<string | null>(null);
   protected readonly editingIsActive = signal(false);
   protected readonly effectiveDateDraft = signal('');
+  protected readonly newStartDateDraft = signal('');
   protected readonly agreementCodeDraft = signal('');
   protected readonly agreementCategoryCodeDraft = signal('');
   protected readonly endDateDraft = signal('');
@@ -75,6 +83,12 @@ export class EmployeeLaborClassificationSectionComponent {
     () => !this.agreementCodeDraft() || this.categoryLoadingState(),
   );
   protected readonly saving = computed(() => this.classificationStore.mutating());
+  protected readonly showCascadeWarning = computed(
+    () =>
+      this.modalMode() === 'edit' &&
+      !!this.newStartDateDraft() &&
+      this.newStartDateDraft() !== this.editingStartDate(),
+  );
 
   protected readonly modalTitle = computed(() => {
     if (this.modalMode() === 'create') return 'Nuevo período — Convenio';
@@ -89,8 +103,18 @@ export class EmployeeLaborClassificationSectionComponent {
 
   protected readonly isSubmitEnabled = computed(() => {
     const mode = this.modalMode();
-    if (mode === 'create') return !!this.effectiveDateDraft() && !!this.agreementCodeDraft() && !!this.agreementCategoryCodeDraft();
-    if (mode === 'edit') return !!this.agreementCodeDraft() && !!this.agreementCategoryCodeDraft();
+    if (mode === 'create')
+      return (
+        !!this.effectiveDateDraft() &&
+        !!this.agreementCodeDraft() &&
+        !!this.agreementCategoryCodeDraft()
+      );
+    if (mode === 'edit')
+      return (
+        !!this.newStartDateDraft() &&
+        !!this.agreementCodeDraft() &&
+        !!this.agreementCategoryCodeDraft()
+      );
     return !!this.endDateDraft();
   });
 
@@ -105,7 +129,10 @@ export class EmployeeLaborClassificationSectionComponent {
 
     effect(() => {
       const success = this.classificationStore.success();
-      if (success) untracked(() => { if (this.modalVisible()) this.closeModal(); });
+      if (success)
+        untracked(() => {
+          if (this.modalVisible()) this.closeModal();
+        });
     });
   }
 
@@ -126,6 +153,7 @@ export class EmployeeLaborClassificationSectionComponent {
     this.modalMode.set('edit');
     this.editingStartDate.set(row.startDate);
     this.editingIsActive.set(row.isActive);
+    this.newStartDateDraft.set(row.startDate);
     this.agreementCodeDraft.set(row.agreementCode);
     this.agreementCategoryCodeDraft.set(row.agreementCategoryCode ?? '');
     this.loadCategoryOptions(row.agreementCode, row.startDate, row.agreementCategoryCode ?? null);
@@ -150,11 +178,14 @@ export class EmployeeLaborClassificationSectionComponent {
       });
     } else if (mode === 'edit') {
       this.classificationStore.correctOccurrence(key, this.editingStartDate()!, {
+        startDate: this.newStartDateDraft(),
         agreementCode: this.agreementCodeDraft(),
         agreementCategoryCode: this.agreementCategoryCodeDraft(),
       });
     } else {
-      this.classificationStore.closeOccurrence(key, this.editingStartDate()!, { endDate: this.endDateDraft() });
+      this.classificationStore.closeOccurrence(key, this.editingStartDate()!, {
+        endDate: this.endDateDraft(),
+      });
     }
   }
 
@@ -173,31 +204,54 @@ export class EmployeeLaborClassificationSectionComponent {
   }
 
   private loadAgreementOptions(ruleSystemCode: string | null): void {
-    if (!ruleSystemCode) { this.agreementOptionsState.set([]); return; }
+    if (!ruleSystemCode) {
+      this.agreementOptionsState.set([]);
+      return;
+    }
     const id = ++this.agreementRequestId;
-    this.fieldCatalogService.loadLaborClassificationAgreementOptions(ruleSystemCode).pipe(take(1)).subscribe({
-      next: (opts) => { if (id === this.agreementRequestId) this.agreementOptionsState.set(opts); },
-    });
+    this.fieldCatalogService
+      .loadLaborClassificationAgreementOptions(ruleSystemCode)
+      .pipe(take(1))
+      .subscribe({
+        next: (opts) => {
+          if (id === this.agreementRequestId) this.agreementOptionsState.set(opts);
+        },
+      });
   }
 
-  private loadCategoryOptions(agreementCode: string, referenceDate: string | null, preferred: string | null): void {
-    if (!agreementCode) { this.categoryOptionsState.set([]); return; }
+  private loadCategoryOptions(
+    agreementCode: string,
+    referenceDate: string | null,
+    preferred: string | null,
+  ): void {
+    if (!agreementCode) {
+      this.categoryOptionsState.set([]);
+      return;
+    }
     const rsc = this.employeeBusinessKey()?.ruleSystemCode ?? '';
     if (!rsc) return;
     const id = ++this.categoryRequestId;
     this.categoryLoadingState.set(true);
-    this.catalogGateway.loadAgreementCategories(rsc, agreementCode, referenceDate).pipe(take(1)).subscribe({
-      next: (items) => {
-        if (id !== this.categoryRequestId) return;
-        this.categoryOptionsState.set(items.map((i: EmployeeLaborClassificationCatalogItemModel) => ({ value: i.code, label: i.label })));
-        this.categoryLoadingState.set(false);
-      },
-      error: () => {
-        if (id === this.categoryRequestId) {
-          this.categoryOptionsState.set([]);
+    this.catalogGateway
+      .loadAgreementCategories(rsc, agreementCode, referenceDate)
+      .pipe(take(1))
+      .subscribe({
+        next: (items) => {
+          if (id !== this.categoryRequestId) return;
+          this.categoryOptionsState.set(
+            items.map((i: EmployeeLaborClassificationCatalogItemModel) => ({
+              value: i.code,
+              label: i.label,
+            })),
+          );
           this.categoryLoadingState.set(false);
-        }
-      },
-    });
+        },
+        error: () => {
+          if (id === this.categoryRequestId) {
+            this.categoryOptionsState.set([]);
+            this.categoryLoadingState.set(false);
+          }
+        },
+      });
   }
 }

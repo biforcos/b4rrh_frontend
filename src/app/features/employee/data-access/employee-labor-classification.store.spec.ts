@@ -125,6 +125,7 @@ describe('EmployeeLaborClassificationStore', () => {
     store.loadLaborClassificationsByBusinessKey(employeeBusinessKey);
 
     store.correctOccurrence(employeeBusinessKey, '2022-01-01', {
+      startDate: '2022-01-01',
       agreementCode: 'AGREE-01',
       agreementCategoryCode: 'CAT-Z',
     });
@@ -133,6 +134,7 @@ describe('EmployeeLaborClassificationStore', () => {
       employeeBusinessKey,
       '2022-01-01',
       {
+        startDate: '2022-01-01',
         agreementCode: 'AGREE-01',
         agreementCategoryCode: 'CAT-Z',
       },
