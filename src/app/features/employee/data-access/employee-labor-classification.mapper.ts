@@ -5,8 +5,6 @@ import {
   UpdateLaborClassificationRequest,
 } from '../../../core/api/generated/model/models';
 import { EmployeeLaborClassificationModel } from '../models/employee-labor-classification.model';
-import { TemporalRowViewModel } from '../shared/ui/section/temporal-section.model';
-import { getCatalogDisplay } from '../shared/utils/catalog-display.util';
 
 export interface LaborClassificationReplaceDraft {
   effectiveDate: string;
@@ -15,19 +13,13 @@ export interface LaborClassificationReplaceDraft {
 }
 
 export interface LaborClassificationCorrectDraft {
+  startDate: string;
   agreementCode: string;
   agreementCategoryCode: string;
 }
 
 export interface LaborClassificationCloseDraft {
   endDate: string;
-}
-
-export interface EmployeeLaborClassificationRowTexts {
-  activeStatus: string;
-  closedStatus: string;
-  currentPeriodLabel: string;
-  periodPrefix: string;
 }
 
 export function createEmptyLaborClassificationReplaceDraft(): LaborClassificationReplaceDraft {
@@ -40,6 +32,7 @@ export function createEmptyLaborClassificationReplaceDraft(): LaborClassificatio
 
 export function createEmptyLaborClassificationCorrectDraft(): LaborClassificationCorrectDraft {
   return {
+    startDate: '',
     agreementCode: '',
     agreementCategoryCode: '',
   };
@@ -48,33 +41,6 @@ export function createEmptyLaborClassificationCorrectDraft(): LaborClassificatio
 export function createEmptyLaborClassificationCloseDraft(): LaborClassificationCloseDraft {
   return {
     endDate: '',
-  };
-}
-
-export function mapLaborClassificationToTemporalRow(
-  source: EmployeeLaborClassificationModel,
-  rowTexts: EmployeeLaborClassificationRowTexts,
-): TemporalRowViewModel<number> {
-  const key = Number(source.startDate.replaceAll('-', ''));
-  const agreementDisplay = getCatalogDisplay(source.agreementName, source.agreementCode);
-  const categoryDisplay = getCatalogDisplay(source.agreementCategoryName, source.agreementCategoryCode);
-
-  return {
-    key,
-    title: agreementDisplay.label,
-    titleSecondary: agreementDisplay.code,
-    detailText: categoryDisplay.label,
-    detailSecondary: categoryDisplay.code,
-    periodText: source.endDate
-      ? `${source.startDate} - ${source.endDate}`
-      : `${source.startDate} - ${rowTexts.currentPeriodLabel}`,
-    statusLabel: source.isActive ? rowTexts.activeStatus : rowTexts.closedStatus,
-    isCurrent: source.isActive,
-    canCorrect: true,
-    canClose: source.isActive,
-    canDelete: false,
-    closeable: source.isActive,
-    deletable: false,
   };
 }
 
@@ -92,6 +58,7 @@ export function mapLaborClassificationCorrectDraftToRequest(
   source: LaborClassificationCorrectDraft,
 ): UpdateLaborClassificationRequest {
   return {
+    startDate: source.startDate.trim() || null,
     agreementCode: source.agreementCode.trim().toUpperCase(),
     agreementCategoryCode: source.agreementCategoryCode.trim().toUpperCase(),
   };

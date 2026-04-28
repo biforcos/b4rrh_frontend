@@ -3,10 +3,6 @@ import {
   EmployeeCreateWorkCenterRequest,
   EmployeeUpdateWorkCenterRequest,
 } from '../../../core/api/generated/model/models';
-import { EmployeeWorkCenterModel } from '../models/employee-work-center.model';
-import { TemporalRowViewModel } from '../shared/ui/section/temporal-section.model';
-import { getCatalogDisplay } from '../shared/utils/catalog-display.util';
-
 export interface WorkCenterCreateDraft {
   workCenterCode: string;
   startDate: string;
@@ -17,38 +13,6 @@ export interface WorkCenterCorrectDraft {
   workCenterCode: string;
   startDate: string;
   endDate: string;
-}
-
-export interface EmployeeWorkCenterRowTexts {
-  currentStatus: string;
-  closedStatus: string;
-  currentPeriodLabel: string;
-  periodPrefix: string;
-  assignmentPrefix: string;
-  deleteDisabledPresenceStartReason: string;
-}
-
-export function mapEmployeeWorkCenterModelToTemporalRow(
-  source: EmployeeWorkCenterModel,
-  texts: EmployeeWorkCenterRowTexts,
-): TemporalRowViewModel<number> {
-  const display = buildDisplay(source);
-
-  return {
-    key: source.workCenterAssignmentNumber,
-    title: display.title,
-    titleSecondary: display.code,
-    subtitle: null,
-    periodText: buildPeriodText(source.startDate, source.endDate, texts.currentPeriodLabel, texts.periodPrefix),
-    statusLabel: source.isActive ? texts.currentStatus : texts.closedStatus,
-    isCurrent: source.isActive,
-    closeable: source.isActive,
-    deletable: source.canDelete,
-    deleteDisabledReason:
-      source.canDelete || source.deleteForbiddenReason !== 'starts-at-presence-start'
-        ? null
-        : texts.deleteDisabledPresenceStartReason,
-  };
 }
 
 export function mapWorkCenterCreateDraftToRequest(draft: WorkCenterCreateDraft): EmployeeCreateWorkCenterRequest {
@@ -70,23 +34,6 @@ export function mapWorkCenterCorrectDraftToRequest(draft: WorkCenterCorrectDraft
 export function mapWorkCenterCloseDateToRequest(endDate: string): CloseWorkCenterRequest {
   return {
     endDate: normalizeRequiredValue(endDate),
-  };
-}
-
-function buildPeriodText(startDate: string, endDate: string | null, currentPeriodLabel: string, periodPrefix: string): string {
-  if (!endDate) {
-    return `${periodPrefix}: ${startDate} - ${currentPeriodLabel}`;
-  }
-
-  return `${periodPrefix}: ${startDate} - ${endDate}`;
-}
-
-function buildDisplay(source: EmployeeWorkCenterModel): { title: string; code?: string } {
-  const display = getCatalogDisplay(source.workCenterName, source.workCenterCode);
-
-  return {
-    title: display.label,
-    code: display.code,
   };
 }
 

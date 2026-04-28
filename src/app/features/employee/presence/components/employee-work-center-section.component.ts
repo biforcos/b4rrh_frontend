@@ -1,44 +1,33 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
+import {
+  ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, untracked
+} from '@angular/core';
 import { take } from 'rxjs';
 
-import {
-  EmployeeWorkCenterRowTexts,
-  WorkCenterCorrectDraft,
-  WorkCenterCreateDraft,
-  mapEmployeeWorkCenterModelToTemporalRow,
-} from '../../data-access/employee-work-center.mapper';
-import { EmployeeFieldCatalogService } from '../../data-access/employee-field-catalog.service';
 import { EmployeeWorkCenterStore } from '../../data-access/employee-work-center.store';
+import { EmployeeFieldCatalogService } from '../../data-access/employee-field-catalog.service';
+import { SlotKeyOption } from '../../shared/ui/section/editable-slot-section.model';
 import { employeeTexts } from '../../employee.texts';
 import { EmployeeBusinessKey } from '../../models/employee-business-key.model';
+import { EmployeeWorkCenterModel } from '../../models/employee-work-center.model';
 import { UiDateInputComponent } from '../../../../shared/ui/date-input/ui-date-input.component';
 import { UiSelectComponent } from '../../../../shared/ui/select/ui-select.component';
+import { PeriodTableComponent } from '../../shared/ui/period-table/period-table.component';
+import { PeriodModalComponent } from '../../shared/ui/period-modal/period-modal.component';
+import { PeriodTableRow } from '../../shared/ui/period-table/period-table.model';
 import { currentLocalDate } from '../../../../shared/utils/local-date.util';
-import { SlotKeyOption } from '../../shared/ui/section/editable-slot-section.model';
-import { TemporalSectionComponent } from '../../shared/ui/section/temporal-section.component';
-import { TemporalDisplayMode, TemporalRowViewModel, TemporalSectionTexts } from '../../shared/ui/section/temporal-section.model';
-import { SectionMode, SectionUiState } from '../../shared/ui/section/section-ui-state.model';
 
-function createEmptyWorkCenterCreateDraft(): WorkCenterCreateDraft {
-  return {
-    workCenterCode: '',
-    startDate: '',
-    endDate: '',
-  };
-}
+type WorkCenterModalMode = 'create' | 'edit' | 'close';
 
-function createEmptyWorkCenterCorrectDraft(): WorkCenterCorrectDraft {
-  return {
-    workCenterCode: '',
-    startDate: '',
-    endDate: '',
-  };
+interface WorkCenterPeriodRow extends PeriodTableRow {
+  assignmentNumber: number;
+  workCenterCode: string;
+  workCenterName: string | null;
 }
 
 @Component({
   selector: 'app-employee-work-center-section',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TemporalSectionComponent, UiDateInputComponent, UiSelectComponent],
+  imports: [PeriodTableComponent, PeriodModalComponent, UiDateInputComponent, UiSelectComponent],
   templateUrl: './employee-work-center-section.component.html',
   styleUrl: './employee-work-center-section.component.scss',
 })
@@ -47,518 +36,123 @@ export class EmployeeWorkCenterSectionComponent {
 
   private readonly workCenterStore = inject(EmployeeWorkCenterStore);
   private readonly fieldCatalogService = inject(EmployeeFieldCatalogService);
-  private readonly displayModeState = signal<TemporalDisplayMode>('view');
-  private readonly localErrorMessageState = signal<string | null>(null);
-  private readonly confirmingCloseKeyState = signal<number | null>(null);
-  private readonly confirmingDeleteKeyState = signal<number | null>(null);
-  private readonly correctingKeyState = signal<number | null>(null);
-  private readonly createDraftState = signal<WorkCenterCreateDraft>(createEmptyWorkCenterCreateDraft());
-  private readonly correctDraftState = signal<WorkCenterCorrectDraft>(createEmptyWorkCenterCorrectDraft());
-  private readonly closeEndDateState = signal<string>('');
-  private readonly availableWorkCenterOptionsState = signal<ReadonlyArray<SlotKeyOption<string>>>([]);
-  private readonly catalogLoadingState = signal(false);
 
-  private catalogRequestId = 0;
+  protected readonly modalVisible = signal(false);
+  protected readonly modalMode = signal<WorkCenterModalMode>('create');
+  protected readonly editingNumber = signal<number | null>(null);
+  protected readonly editingIsActive = signal(false);
+  protected readonly startDateDraft = signal(currentLocalDate());
+  protected readonly endDateDraft = signal('');
+  protected readonly workCenterCodeDraft = signal('');
+  protected readonly workCenterOptions = signal<ReadonlyArray<SlotKeyOption<string>>>([]);
 
   protected readonly texts = employeeTexts;
-  protected readonly sectionSubtitle = this.texts.workCenterSectionSubtitle;
-  protected readonly sectionTexts: TemporalSectionTexts = {
-    manageAction: this.texts.workCenterSectionManageAction,
-    exitManageAction: this.texts.workCenterSectionExitManageAction,
-    addAction: this.texts.workCenterSectionAddAction,
-    editCurrentAction: this.texts.workCenterSectionCorrectAction,
-    correctAction: this.texts.workCenterSectionCorrectAction,
-    closeAction: this.texts.workCenterSectionCloseAction,
-    deleteAction: this.texts.workCenterSectionDeleteAction,
-    cancelAction: this.texts.workCenterSectionCancelAction,
-    saveCreateAction: this.texts.workCenterSectionSaveCreateAction,
-    saveEditCurrentAction: this.texts.workCenterSectionSaveCorrectAction,
-    saveCorrectAction: this.texts.workCenterSectionSaveCorrectAction,
-    confirmCloseMessage: this.texts.workCenterSectionConfirmCloseMessage,
-    confirmCloseAction: this.texts.workCenterSectionConfirmCloseAction,
-    confirmDeleteMessage: this.texts.workCenterSectionConfirmDeleteMessage,
-    confirmDeleteAction: this.texts.workCenterSectionConfirmDeleteAction,
-    emptyMessage: this.texts.workCenterSectionEmptyMessage,
-  };
-  protected readonly rowTexts: EmployeeWorkCenterRowTexts = {
-    currentStatus: this.texts.workCenterSectionCurrentStatus,
-    closedStatus: this.texts.workCenterSectionClosedStatus,
-    currentPeriodLabel: this.texts.workCenterSectionCurrentPeriodLabel,
-    periodPrefix: this.texts.workCenterSectionPeriodPrefix,
-    assignmentPrefix: this.texts.workCenterSectionAssignmentPrefix,
-    deleteDisabledPresenceStartReason: this.texts.workCenterSectionDeleteDisabledPresenceStartReason,
-  };
-  protected readonly rows = computed<ReadonlyArray<TemporalRowViewModel<number>>>(() =>
-    [...this.workCenterStore.workCenters()]
-      .sort((left, right) => this.compareWorkCenterOrder(left, right))
-      .map((workCenter) => mapEmployeeWorkCenterModelToTemporalRow(workCenter, this.rowTexts)),
+
+  protected readonly rows = computed<ReadonlyArray<WorkCenterPeriodRow>>(() =>
+    this.workCenterStore.workCenters().map((wc: EmployeeWorkCenterModel) => ({
+      startDate: wc.startDate,
+      endDate: wc.endDate,
+      isActive: wc.isActive,
+      canEdit: true,
+      canDelete: !wc.isActive && wc.canDelete,
+      assignmentNumber: wc.workCenterAssignmentNumber,
+      workCenterCode: wc.workCenterCode,
+      workCenterName: wc.workCenterName ?? null,
+    })),
   );
-  protected readonly displayMode = this.displayModeState.asReadonly();
-  protected readonly confirmingCloseKey = this.confirmingCloseKeyState.asReadonly();
-  protected readonly confirmingDeleteKey = this.confirmingDeleteKeyState.asReadonly();
-  protected readonly correctingKey = this.correctingKeyState.asReadonly();
-  protected readonly createDraft = this.createDraftState.asReadonly();
-  protected readonly correctDraft = this.correctDraftState.asReadonly();
-  protected readonly closeEndDate = this.closeEndDateState.asReadonly();
-  protected readonly availableWorkCenterOptions = this.availableWorkCenterOptionsState.asReadonly();
-  protected readonly catalogOptionsLoading = this.catalogLoadingState.asReadonly();
-  protected readonly createWorkCenterCodeOptions = computed(() =>
-    this.withCurrentCodeOption(this.availableWorkCenterOptionsState(), this.createDraftState().workCenterCode),
-  );
-  protected readonly correctWorkCenterCodeOptions = computed(() =>
-    this.withCurrentCodeOption(this.availableWorkCenterOptionsState(), this.correctDraftState().workCenterCode),
-  );
-  protected readonly correctingRow = computed(() => {
-    const correctingKey = this.correctingKeyState();
-    if (correctingKey === null) {
-      return null;
-    }
 
-    return this.workCenterStore.workCenters().find((workCenter) => workCenter.workCenterAssignmentNumber === correctingKey) ?? null;
+  protected readonly saving = computed(() => this.workCenterStore.mutating());
+  protected readonly isSubmitEnabled = computed(() => {
+    if (this.modalMode() === 'close') return !!this.endDateDraft();
+    return !!this.startDateDraft() && !!this.workCenterCodeDraft();
   });
-  protected readonly isCreateDraftValid = computed(() => {
-    const draft = this.createDraftState();
-    if (this.normalizeRequiredValue(draft.workCenterCode).length === 0) {
-      return false;
-    }
-
-    return this.isValidPeriod(draft.startDate, draft.endDate);
-  });
-  protected readonly isCorrectDraftValid = computed(() => {
-    const draft = this.correctDraftState();
-    if (this.normalizeRequiredValue(draft.workCenterCode).length === 0) {
-      return false;
-    }
-
-    return this.isValidPeriod(draft.startDate, draft.endDate);
-  });
-  protected readonly isCloseDraftValid = computed(() => {
-    const closeKey = this.confirmingCloseKeyState();
-    if (closeKey === null) {
-      return false;
-    }
-
-    const row = this.workCenterStore.workCenters().find((workCenter) => workCenter.workCenterAssignmentNumber === closeKey);
-    if (!row) {
-      return false;
-    }
-
-    const closeEndDate = this.normalizeRequiredValue(this.closeEndDateState());
-    if (closeEndDate.length === 0) {
-      return false;
-    }
-
-    return closeEndDate >= row.startDate;
-  });
-  protected readonly sectionState = computed<SectionUiState>(() => {
-    const isBusy = this.workCenterStore.loading() || this.workCenterStore.mutating();
-
-    return {
-      mode: isBusy ? 'submitting' : this.toSectionMode(this.displayModeState()),
-      dirty:
-        this.displayModeState() === 'creating' ||
-        this.displayModeState() === 'correcting' ||
-        this.displayModeState() === 'confirmingClose' ||
-        this.displayModeState() === 'confirmingDelete',
-      busy: isBusy,
-      errorMessage: this.resolveErrorMessage(),
-      successMessage: this.resolveSuccessMessage(),
-    };
+  protected readonly modalTitle = computed(() => {
+    if (this.modalMode() === 'create') return 'Nuevo centro de trabajo';
+    if (this.modalMode() === 'close') return 'Cerrar período — Centro de trabajo';
+    return 'Editar centro de trabajo';
   });
 
   constructor() {
     effect(() => {
-      const activeEmployeeKey = this.employeeKey();
-
+      const key = this.employeeKey();
       untracked(() => {
-        this.workCenterStore.loadWorkCenters(activeEmployeeKey);
-        this.loadCatalogOptions(activeEmployeeKey?.ruleSystemCode ?? null);
-        this.enterViewMode();
+        this.workCenterStore.loadWorkCenters(key);
+        this.loadWorkCenterOptions(key?.ruleSystemCode ?? null);
       });
     });
-
     effect(() => {
-      const successCode = this.workCenterStore.success();
-      const mode = this.displayModeState();
-
-      if (!successCode) {
-        return;
-      }
-
-      if (mode === 'creating' || mode === 'correcting' || mode === 'confirmingClose' || mode === 'confirmingDelete') {
-        this.enterManageMode();
-      }
+      const success = this.workCenterStore.success();
+      if (success) untracked(() => { if (this.modalVisible()) this.closeModal(); });
     });
   }
 
-  protected startManage(): void {
-    if (!this.canStartInteraction()) {
-      return;
-    }
-
-    this.clearInteractionFeedback();
-    this.enterManageMode();
-  }
-
-  protected exitManage(): void {
-    this.clearInteractionFeedback();
-    this.enterViewMode();
-  }
-
-  protected startCreate(): void {
-    if (!this.canStartInteraction()) {
-      return;
-    }
-
-    this.clearInteractionFeedback();
-    this.enterCreateMode();
-  }
-
-  protected startCorrect(workCenterAssignmentNumber: number): void {
-    if (!this.canStartInteraction()) {
-      return;
-    }
-
-    const row = this.workCenterStore
-      .workCenters()
-      .find((workCenter) => workCenter.workCenterAssignmentNumber === workCenterAssignmentNumber);
-    if (!row) {
-      return;
-    }
-
-    this.clearInteractionFeedback();
-    this.enterCorrectingMode(row.workCenterAssignmentNumber, {
-      workCenterCode: row.workCenterCode,
-      startDate: row.startDate,
-      endDate: row.endDate ?? '',
-    });
-  }
-
-  protected requestClose(workCenterAssignmentNumber: number): void {
-    if (!this.canStartInteraction()) {
-      return;
-    }
-
-    const row = this.rows().find((item) => item.key === workCenterAssignmentNumber);
-    if (!row || row.closeable !== true) {
-      return;
-    }
-
-    this.clearInteractionFeedback();
-    this.enterConfirmingCloseMode(workCenterAssignmentNumber, this.currentBusinessDate());
-  }
-
-  protected requestDelete(workCenterAssignmentNumber: number): void {
-    if (!this.canStartInteraction()) {
-      return;
-    }
-
-    const row = this.rows().find((item) => item.key === workCenterAssignmentNumber);
-    if (!row || row.deletable !== true) {
-      return;
-    }
-
-    this.clearInteractionFeedback();
-    this.enterConfirmingDeleteMode(workCenterAssignmentNumber);
-  }
-
-  protected submitCreate(): void {
-    const activeEmployeeKey = this.employeeKey();
-    if (!activeEmployeeKey || this.workCenterStore.mutating()) {
-      return;
-    }
-
-    const draft = this.createDraftState();
-    if (!this.isCreateDraftValid()) {
-      this.localErrorMessageState.set(this.texts.workCenterSectionInvalidPeriodMessage);
-      return;
-    }
-
-    this.clearLocalError();
-    this.workCenterStore.createWorkCenter(activeEmployeeKey, draft);
-  }
-
-  protected confirmClose(workCenterAssignmentNumber: number): void {
-    const activeEmployeeKey = this.employeeKey();
-    if (!activeEmployeeKey || this.workCenterStore.mutating()) {
-      return;
-    }
-
-    const closeEndDate = this.normalizeRequiredValue(this.closeEndDateState());
-    if (!this.isCloseDraftValid()) {
-      this.localErrorMessageState.set(this.texts.workCenterSectionCloseDateInvalidMessage);
-      return;
-    }
-
-    this.clearLocalError();
-    this.workCenterStore.closeWorkCenter(activeEmployeeKey, workCenterAssignmentNumber, closeEndDate);
-  }
-
-  protected confirmDelete(workCenterAssignmentNumber: number): void {
-    const activeEmployeeKey = this.employeeKey();
-    if (!activeEmployeeKey || this.workCenterStore.mutating()) {
-      return;
-    }
-
-    this.clearLocalError();
-    this.workCenterStore.deleteWorkCenter(activeEmployeeKey, workCenterAssignmentNumber);
-  }
-
-  protected submitCorrect(workCenterAssignmentNumber: number): void {
-    const activeEmployeeKey = this.employeeKey();
-    if (!activeEmployeeKey || this.workCenterStore.mutating()) {
-      return;
-    }
-
-    const draft = this.correctDraftState();
-    if (!this.isCorrectDraftValid()) {
-      this.localErrorMessageState.set(this.texts.workCenterSectionInvalidPeriodMessage);
-      return;
-    }
-
-    this.clearLocalError();
-    this.workCenterStore.correctWorkCenter(activeEmployeeKey, workCenterAssignmentNumber, draft);
-  }
-
-  protected cancel(): void {
-    this.clearInteractionFeedback();
-    this.enterManageMode();
-  }
-
-  protected updateCreateField(field: keyof WorkCenterCreateDraft, value: string): void {
-    this.createDraftState.set({
-      ...this.createDraftState(),
-      [field]: value,
-    });
-    this.clearInteractionFeedback();
-  }
-
-  protected updateCorrectField(field: keyof WorkCenterCorrectDraft, value: string): void {
-    this.correctDraftState.set({
-      ...this.correctDraftState(),
-      [field]: value,
-    });
-    this.clearInteractionFeedback();
-  }
-
-  protected updateCloseEndDate(value: string): void {
-    this.closeEndDateState.set(value);
-    this.clearInteractionFeedback();
-  }
-
-  private canStartInteraction(): boolean {
-    const activeEmployeeKey = this.employeeKey();
-    if (!activeEmployeeKey) {
-      return false;
-    }
-
-    return !this.workCenterStore.mutating();
-  }
-
-  private enterViewMode(): void {
-    this.displayModeState.set('view');
-    this.resetOperationContext();
-  }
-
-  private enterManageMode(): void {
-    this.displayModeState.set('manage');
-    this.resetOperationContext();
-  }
-
-  private enterCreateMode(): void {
-    this.displayModeState.set('creating');
-    this.correctingKeyState.set(null);
-    this.confirmingCloseKeyState.set(null);
-    this.confirmingDeleteKeyState.set(null);
-    this.createDraftState.set(createEmptyWorkCenterCreateDraft());
-    this.correctDraftState.set(createEmptyWorkCenterCorrectDraft());
-    this.closeEndDateState.set('');
-  }
-
-  private enterCorrectingMode(workCenterAssignmentNumber: number, draft: WorkCenterCorrectDraft): void {
-    this.displayModeState.set('correcting');
-    this.correctingKeyState.set(workCenterAssignmentNumber);
-    this.confirmingCloseKeyState.set(null);
-    this.confirmingDeleteKeyState.set(null);
-    this.createDraftState.set(createEmptyWorkCenterCreateDraft());
-    this.correctDraftState.set(draft);
-    this.closeEndDateState.set('');
-  }
-
-  private enterConfirmingCloseMode(workCenterAssignmentNumber: number, defaultEndDate: string): void {
-    this.displayModeState.set('confirmingClose');
-    this.correctingKeyState.set(null);
-    this.confirmingCloseKeyState.set(workCenterAssignmentNumber);
-    this.confirmingDeleteKeyState.set(null);
-    this.createDraftState.set(createEmptyWorkCenterCreateDraft());
-    this.correctDraftState.set(createEmptyWorkCenterCorrectDraft());
-    this.closeEndDateState.set(defaultEndDate);
-  }
-
-  private enterConfirmingDeleteMode(workCenterAssignmentNumber: number): void {
-    this.displayModeState.set('confirmingDelete');
-    this.correctingKeyState.set(null);
-    this.confirmingCloseKeyState.set(null);
-    this.confirmingDeleteKeyState.set(workCenterAssignmentNumber);
-    this.createDraftState.set(createEmptyWorkCenterCreateDraft());
-    this.correctDraftState.set(createEmptyWorkCenterCorrectDraft());
-    this.closeEndDateState.set('');
-  }
-
-  private clearInteractionFeedback(): void {
+  protected openCreate(): void {
     this.workCenterStore.clearFeedback();
-    this.clearLocalError();
+    this.modalMode.set('create');
+    this.startDateDraft.set(currentLocalDate());
+    this.endDateDraft.set('');
+    this.workCenterCodeDraft.set('');
+    this.modalVisible.set(true);
   }
 
-  private clearLocalError(): void {
-    this.localErrorMessageState.set(null);
+  protected openEdit(index: number): void {
+    const row = this.rows()[index];
+    if (!row) return;
+    this.workCenterStore.clearFeedback();
+    this.editingNumber.set(row.assignmentNumber);
+    this.editingIsActive.set(row.isActive);
+    this.workCenterCodeDraft.set(row.workCenterCode);
+    this.startDateDraft.set(row.startDate);
+    this.endDateDraft.set(row.endDate ?? '');
+    this.modalMode.set('edit');
+    this.modalVisible.set(true);
   }
 
-  private resetOperationContext(): void {
-    this.correctingKeyState.set(null);
-    this.confirmingCloseKeyState.set(null);
-    this.confirmingDeleteKeyState.set(null);
-    this.createDraftState.set(createEmptyWorkCenterCreateDraft());
-    this.correctDraftState.set(createEmptyWorkCenterCorrectDraft());
-    this.closeEndDateState.set('');
+  protected switchToClose(): void {
+    this.modalMode.set('close');
+    this.endDateDraft.set(currentLocalDate());
   }
 
-  private toSectionMode(displayMode: TemporalDisplayMode): SectionMode {
-    if (displayMode === 'creating' || displayMode === 'correcting' || displayMode === 'editingCurrent') {
-      return 'editing';
+  protected confirmDelete(index: number): void {
+    const row = this.rows()[index];
+    if (!row || !row.canDelete) return;
+    const key = this.employeeKey();
+    if (!key) return;
+    if (confirm('¿Eliminar este período de centro de trabajo?')) {
+      this.workCenterStore.deleteWorkCenter(key, row.assignmentNumber);
     }
-
-    if (displayMode === 'confirmingClose') {
-      return 'confirming';
-    }
-
-    if (displayMode === 'confirmingDelete') {
-      return 'confirming';
-    }
-
-    return 'view';
   }
 
-  private resolveErrorMessage(): string | null {
-    return this.localErrorMessageState();
-  }
+  protected submit(): void {
+    const key = this.employeeKey();
+    if (!key || this.workCenterStore.mutating()) return;
 
-  private resolveSuccessMessage(): string | null {
-    const successCode = this.workCenterStore.success();
-
-    if (successCode === 'created') {
-      return this.texts.workCenterSectionCreateSuccessMessage;
-    }
-
-    if (successCode === 'corrected') {
-      return this.texts.workCenterSectionCorrectSuccessMessage;
-    }
-
-    if (successCode === 'closed') {
-      return this.texts.workCenterSectionCloseSuccessMessage;
-    }
-
-    if (successCode === 'deleted') {
-      return this.texts.workCenterSectionDeleteSuccessMessage;
-    }
-
-    return null;
-  }
-
-  private compareWorkCenterOrder(
-    left: { isActive: boolean; startDate: string; workCenterAssignmentNumber: number },
-    right: { isActive: boolean; startDate: string; workCenterAssignmentNumber: number },
-  ): number {
-    if (left.isActive !== right.isActive) {
-      return left.isActive ? -1 : 1;
-    }
-
-    const startDateOrder = right.startDate.localeCompare(left.startDate);
-    if (startDateOrder !== 0) {
-      return startDateOrder;
-    }
-
-    return right.workCenterAssignmentNumber - left.workCenterAssignmentNumber;
-  }
-
-  private currentBusinessDate(): string {
-    return currentLocalDate();
-  }
-
-  private isValidPeriod(startDate: string, endDate: string): boolean {
-    const normalizedStartDate = this.normalizeRequiredValue(startDate);
-    if (normalizedStartDate.length === 0) {
-      return false;
-    }
-
-    const normalizedEndDate = this.normalizeOptionalValue(endDate);
-    if (!normalizedEndDate) {
-      return true;
-    }
-
-    return normalizedEndDate >= normalizedStartDate;
-  }
-
-  private normalizeRequiredValue(value: string | null | undefined): string {
-    return value?.trim() ?? '';
-  }
-
-  private normalizeOptionalValue(value: string | null | undefined): string | null {
-    const normalizedValue = value?.trim() ?? '';
-    return normalizedValue.length > 0 ? normalizedValue : null;
-  }
-
-  private loadCatalogOptions(ruleSystemCode: string | null): void {
-    const normalizedRuleSystemCode = ruleSystemCode?.trim() ?? '';
-
-    if (!normalizedRuleSystemCode) {
-      this.catalogRequestId += 1;
-      this.catalogLoadingState.set(false);
-      this.availableWorkCenterOptionsState.set([]);
-      this.createDraftState.update((draft) => ({ ...draft, workCenterCode: '' }));
-      this.correctDraftState.update((draft) => ({ ...draft, workCenterCode: '' }));
-      return;
-    }
-
-    const requestId = ++this.catalogRequestId;
-    this.catalogLoadingState.set(true);
-
-    this.fieldCatalogService
-      .loadWorkCenterOptions(normalizedRuleSystemCode)
-      .pipe(take(1))
-      .subscribe({
-        next: (options) => {
-          if (requestId !== this.catalogRequestId) {
-            return;
-          }
-
-          this.availableWorkCenterOptionsState.set(options);
-          this.catalogLoadingState.set(false);
-        },
-        error: () => {
-          if (requestId !== this.catalogRequestId) {
-            return;
-          }
-
-          this.catalogLoadingState.set(false);
-          this.localErrorMessageState.set(this.texts.catalogLoadFailedMessage);
-        },
+    if (this.modalMode() === 'create') {
+      this.workCenterStore.createWorkCenter(key, {
+        workCenterCode: this.workCenterCodeDraft(),
+        startDate: this.startDateDraft(),
+        endDate: this.endDateDraft(),
       });
+    } else if (this.modalMode() === 'edit') {
+      this.workCenterStore.correctWorkCenter(key, this.editingNumber()!, {
+        workCenterCode: this.workCenterCodeDraft(),
+        startDate: this.startDateDraft(),
+        endDate: this.endDateDraft(),
+      });
+    } else {
+      this.workCenterStore.closeWorkCenter(key, this.editingNumber()!, this.endDateDraft());
+    }
   }
 
-  private withCurrentCodeOption(
-    options: ReadonlyArray<SlotKeyOption<string>>,
-    currentCode: string,
-  ): ReadonlyArray<SlotKeyOption<string>> {
-    const normalizedCurrentCode = this.normalizeRequiredValue(currentCode);
-    if (!normalizedCurrentCode) {
-      return options;
-    }
+  protected closeModal(): void {
+    this.modalVisible.set(false);
+    this.workCenterStore.clearFeedback();
+  }
 
-    if (options.some((option) => option.value === normalizedCurrentCode)) {
-      return options;
-    }
-
-    return [{ value: normalizedCurrentCode, label: normalizedCurrentCode }, ...options];
+  private loadWorkCenterOptions(ruleSystemCode: string | null): void {
+    if (!ruleSystemCode) { this.workCenterOptions.set([]); return; }
+    this.fieldCatalogService.loadWorkCenterOptions(ruleSystemCode).pipe(take(1)).subscribe({
+      next: (opts) => this.workCenterOptions.set(opts),
+    });
   }
 }

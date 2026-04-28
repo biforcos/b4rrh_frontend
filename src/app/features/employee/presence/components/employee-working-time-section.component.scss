@@ -1,39 +1,7 @@
-.employee-working-time-section__form-grid {
-  display: grid;
-  gap: 0.6rem 0.75rem;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  max-width: 34rem;
-}
-
-.employee-working-time-section__field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-}
-
-.employee-working-time-section__field span {
-  color: #475569;
-  font-size: 0.78rem;
-  font-weight: 600;
-}
-
-.employee-working-time-section__hint {
-  grid-column: 1 / -1;
-  margin: 0;
-  color: #475569;
-  font-size: 0.78rem;
-  line-height: 1.35;
-}
-
-.employee-working-time-section__close-form {
-  display: grid;
-  gap: 0.75rem;
-  max-width: 20rem;
-}
-
-@media (max-width: 720px) {
-  .employee-working-time-section__form-grid {
-    grid-template-columns: 1fr;
-    max-width: 100%;
+.working-time-section {
+  &__sub {
+    font-size: 11px;
+    color: #9ca3af;
   }
+  &__cascade-warning { font-size: 12px; color: #b45309; margin: 2px 0 4px; }
 }

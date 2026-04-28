@@ -123,6 +123,7 @@ describe('EmployeeContractStore', () => {
     store.loadContractsByBusinessKey(employeeBusinessKey);
 
     store.correctOccurrence(employeeBusinessKey, '2023-01-01', {
+      startDate: '2023-01-01',
       contractCode: 'TEMPORARY',
       contractSubtypeCode: 'PROJECT',
     });
@@ -131,6 +132,7 @@ describe('EmployeeContractStore', () => {
       employeeBusinessKey,
       '2023-01-01',
       {
+        startDate: '2023-01-01',
         contractCode: 'TEMPORARY',
         contractSubtypeCode: 'PROJECT',
       },

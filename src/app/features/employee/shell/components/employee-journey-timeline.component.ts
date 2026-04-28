@@ -150,6 +150,16 @@ export class EmployeeJourneyTimelineComponent {
     this.expandedPresences.update((m) => ({ ...m, [presenceId]: !Boolean(m[presenceId]) }));
   }
 
+  protected resolveGroupIconBackground(group: PresenceDateGroupViewModel): string {
+    const label = (group.semanticLabel ?? group.primaryEventLabel).toLowerCase();
+    if (label.includes('alta') || label.includes('reingreso')) return '#dcfce7';
+    if (label.includes('baja') || label.includes('terminac') || label.includes('despido')) return '#fee2e2';
+    if (label.includes('contrato')) return '#ede9fe';
+    if (label.includes('jornada')) return '#e0f2fe';
+    if (label.includes('clasificac') || label.includes('convenio')) return '#eef2ff';
+    return '#f3f4f6';
+  }
+
   protected resolveStatusLabel(status: EmployeeJourneyEventStatus): string {
     if (status === 'current') {
       return this.texts.timelineStatusCurrentLabel;

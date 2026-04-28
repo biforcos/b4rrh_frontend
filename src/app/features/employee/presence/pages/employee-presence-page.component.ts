@@ -44,7 +44,7 @@ export class EmployeePresencePageComponent {
   private readonly fieldCatalogService = inject(EmployeeFieldCatalogService);
   private readonly globalMessageService = inject(GlobalMessageService);
   private previousContractSuccess: 'replaced' | 'corrected' | 'closed' | null = null;
-  private previousWorkingTimeSuccess: 'created' | 'closed' | null = null;
+  private previousWorkingTimeSuccess: 'created' | 'updated' | 'closed' | null = null;
   private previousLaborClassificationSuccess: 'replaced' | 'corrected' | 'closed' | null = null;
 
   private readonly companyCatalogLabelsByCodeState = signal<Readonly<Record<string, string>>>({});
@@ -204,10 +204,10 @@ export class EmployeePresencePageComponent {
     return this.texts.contractSectionCloseSuccessMessage;
   }
 
-  private mapWorkingTimeSuccessMessage(success: 'created' | 'closed'): string {
-    return success === 'created'
-      ? this.texts.workingTimeSectionCreateSuccessMessage
-      : this.texts.workingTimeSectionCloseSuccessMessage;
+  private mapWorkingTimeSuccessMessage(success: 'created' | 'updated' | 'closed'): string {
+    if (success === 'created') return this.texts.workingTimeSectionCreateSuccessMessage;
+    if (success === 'updated') return 'Jornada actualizada correctamente.';
+    return this.texts.workingTimeSectionCloseSuccessMessage;
   }
 
   private mapLaborClassificationSuccessMessage(success: 'replaced' | 'corrected' | 'closed'): string {

@@ -16,7 +16,7 @@ describe('EmployeePresenceBlockComponent', () => {
     fixture = TestBed.createComponent(EmployeePresenceBlockComponent);
   });
 
-  it('renders Name · CODE when companyName exists', () => {
+  it('renders company name and entry reason when labels exist', () => {
     const model: EmployeePresenceBlockModel = {
       currentPresence: {
         presenceNumber: 1,
@@ -37,18 +37,14 @@ describe('EmployeePresenceBlockComponent', () => {
     fixture.componentRef.setInput('presence', model);
     fixture.detectChanges();
 
-    const identity =
-      fixture.nativeElement.querySelector('.employee-presence-block__current .employee-presence-block__identity')
-        ?.textContent ?? '';
+    const hostText = fixture.nativeElement.textContent as string;
 
-    expect(identity).toContain('Empresa Activa');
-    expect(identity).toContain('AC01');
-    expect(identity).toContain('#1');
-    expect(fixture.nativeElement.textContent as string).toContain('Alta inicial');
-    expect(fixture.nativeElement.textContent as string).toContain('ENT01');
+    expect(hostText).toContain('Empresa Activa');
+    expect(hostText).toContain('#1');
+    expect(hostText).toContain('Alta inicial');
   });
 
-  it('falls back to CODE when companyName is missing and keeps period/reason rendering', () => {
+  it('falls back to CODE when companyName is missing and renders entry reason code', () => {
     const model: EmployeePresenceBlockModel = {
       currentPresence: {
         presenceNumber: 1,
@@ -72,11 +68,7 @@ describe('EmployeePresenceBlockComponent', () => {
     const hostText = fixture.nativeElement.textContent as string;
 
     expect(hostText).toContain('AC01');
-    expect(hostText).toContain('Periodo');
-    expect(hostText).toContain('Motivo entrada');
     expect(hostText).toContain('ENT01');
-    expect(hostText).toContain('Motivo salida');
-    expect(hostText).toContain('EXT01');
   });
 
   it('renders backend catalog labels in Name · CODE format when label maps are provided', () => {
@@ -112,7 +104,14 @@ describe('EmployeePresenceBlockComponent', () => {
     const hostText = fixture.nativeElement.textContent as string;
     expect(hostText).toContain('Compania Espana · COMP-ES');
     expect(hostText).toContain('Alta inicial · HIRE');
-    expect(hostText).toContain('Fin de relacion · END');
+  });
+
+  it('renders empty message when there is no presence data', () => {
+    fixture.componentRef.setInput('presence', null);
+    fixture.detectChanges();
+
+    const hostText = fixture.nativeElement.textContent as string;
+    expect(hostText).toContain('No hay presencias disponibles.');
   });
 
   it('keeps rendering when one backend catalog map is empty', () => {
@@ -146,6 +145,5 @@ describe('EmployeePresenceBlockComponent', () => {
     const hostText = fixture.nativeElement.textContent as string;
     expect(hostText).toContain('Compania Espana · COMP-ES');
     expect(hostText).toContain('Alta inicial · HIRE');
-    expect(hostText).toContain('END');
   });
 });

@@ -1,323 +1,152 @@
-import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, signal, viewChild, effect, input, untracked } from '@angular/core';
+import {
+  ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, untracked, viewChild
+} from '@angular/core';
 import { take } from 'rxjs';
 
-import { UiButtonComponent } from '../../../../shared/ui/button/ui-button.component';
-import { UiDateInputComponent } from '../../../../shared/ui/date-input/ui-date-input.component';
 import { EmployeeCostCenterStore } from '../../data-access/employee-cost-center.store';
-import { EmployeeBusinessKey } from '../../models/employee-business-key.model';
-import { employeeTexts } from '../../employee.texts';
-import { EmployeeSectionShellComponent } from '../../shared/ui/section/employee-section-shell.component';
-import { SectionUiState } from '../../shared/ui/section/section-ui-state.model';
-import { EmployeeCostCenterDistributionEditorComponent } from './employee-cost-center-distribution-editor.component';
-import { EmployeeCostCenterWindowDisplayComponent } from './employee-cost-center-window-display.component';
 import { EmployeeFieldCatalogService } from '../../data-access/employee-field-catalog.service';
 import { SlotKeyOption } from '../../shared/ui/section/editable-slot-section.model';
+import { employeeTexts } from '../../employee.texts';
+import { EmployeeBusinessKey } from '../../models/employee-business-key.model';
+import { EmployeeCostCenterWindowModel } from '../../models/employee-cost-center.model';
+import { PeriodTableComponent } from '../../shared/ui/period-table/period-table.component';
+import { PeriodModalComponent } from '../../shared/ui/period-modal/period-modal.component';
+import { PeriodTableRow } from '../../shared/ui/period-table/period-table.model';
+import { EmployeeCostCenterDistributionEditorComponent } from './employee-cost-center-distribution-editor.component';
+import { UiDateInputComponent } from '../../../../shared/ui/date-input/ui-date-input.component';
+import { currentLocalDate } from '../../../../shared/utils/local-date.util';
 
-export type CostCenterDisplayMode = 'view' | 'manage' | 'creating' | 'replacing' | 'closing';
+type CostCenterModalMode = 'replace' | 'close';
+
+interface CostCenterPeriodRow extends PeriodTableRow {
+  window: EmployeeCostCenterWindowModel;
+  totalPercentage: number;
+  itemsSummary: string;
+}
 
 @Component({
   selector: 'app-employee-cost-center-section',
-  standalone: true,
-  imports: [
-    CommonModule,
-    EmployeeSectionShellComponent,
-    UiButtonComponent,
-    UiDateInputComponent,
-    EmployeeCostCenterDistributionEditorComponent,
-    EmployeeCostCenterWindowDisplayComponent,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <app-employee-section-shell
-      [title]="texts.costCenterSectionTitle"
-      [subtitle]="texts.costCenterSectionSubtitle"
-      [state]="sectionState()"
-    >
-      <app-ui-button
-        sectionCardActions
-        severity="secondary"
-        [outlined]="true"
-        size="small"
-        [label]="isViewMode() ? texts.workCenterSectionManageAction : texts.workCenterSectionExitManageAction"
-        [disabled]="store.loading() || store.mutating()"
-        (pressed)="toggleManage()"
-      />
-
-      <div class="cost-center-section">
-        @if (isViewMode() || isManageMode()) {
-          <div class="cost-center-section__content">
-            @if (store.currentDistribution(); as current) {
-              <div class="cost-center-section__current">
-                <h4 class="cost-center-section__label">{{ texts.costCenterSectionCurrentStatus }}</h4>
-                <app-employee-cost-center-window-display [window]="current" />
-
-                @if (isManageMode()) {
-                  <div class="cost-center-section__manage-actions">
-                    <app-ui-button
-                      severity="secondary"
-                      size="small"
-                      [label]="texts.costCenterSectionReplaceAction"
-                      (pressed)="startReplace()"
-                    />
-                    <app-ui-button
-                      severity="danger"
-                      size="small"
-                      [label]="texts.costCenterSectionCloseAction"
-                      (pressed)="startClose()"
-                    />
-                  </div>
-                }
-              </div>
-            } @else if (!store.loading() && (isViewMode() || isManageMode())) {
-              <div class="cost-center-section__empty">
-                <p>{{ texts.costCenterSectionEmptyMessage }}</p>
-                @if (isManageMode()) {
-                  <app-ui-button severity="primary" size="small" [label]="texts.costCenterSectionAddAction" (pressed)="startCreate()" />
-                }
-              </div>
-            }
-
-            @if (historicalWindows().length > 0) {
-              <div class="cost-center-section__history">
-                <h4 class="cost-center-section__history-title">{{ texts.costCenterSectionHistoryTitle }}</h4>
-                <div class="cost-center-section__history-list">
-                  @for (window of historicalWindows(); track window.startDate) {
-                    <app-employee-cost-center-window-display [window]="window" class="cost-center-section__history-item" />
-                  }
-                </div>
-              </div>
-            }
-          </div>
-        }
-
-        @if (isCreating() || isReplacing()) {
-          <div class="cost-center-section__editor">
-            <app-employee-cost-center-distribution-editor
-              #editor
-              [dateLabel]="isCreating() ? texts.costCenterSectionStartDateLabel : texts.costCenterSectionEffectiveDateLabel"
-              [initialValue]="editorInitialValue()"
-              [options]="availableCostCenterOptions()"
-              [loading]="catalogOptionsLoading()"
-            />
-            <div class="cost-center-section__form-actions">
-              <app-ui-button [label]="texts.costCenterSectionSaveAction" [disabled]="store.mutating()" (pressed)="submitForm()" />
-              <app-ui-button severity="secondary" [outlined]="true" [label]="texts.costCenterSectionCancelAction" [disabled]="store.mutating()" (pressed)="cancel()" />
-            </div>
-          </div>
-        }
-
-        @if (isClosing()) {
-          <div class="cost-center-section__close-form">
-            <p class="cost-center-section__close-hint">{{ texts.costCenterSectionConfirmCloseMessage }}</p>
-            <div class="cost-center-section__close-field">
-              <label class="cost-center-section__label">{{ texts.costCenterSectionCloseDateLabel }}</label>
-              <app-ui-date-input [value]="closeDate()" (valueChanged)="closeDate.set($event)" />
-            </div>
-            <div class="cost-center-section__form-actions">
-              <app-ui-button severity="danger" [label]="texts.costCenterSectionConfirmCloseAction" [disabled]="store.mutating() || !closeDate()" (pressed)="submitClose()" />
-              <app-ui-button severity="secondary" [outlined]="true" [label]="texts.costCenterSectionCancelAction" [disabled]="store.mutating()" (pressed)="cancel()" />
-            </div>
-          </div>
-        }
-      </div>
-    </app-employee-section-shell>
-  `,
-  styles: [`
-    .cost-center-section { display: flex; flex-direction: column; gap: 1.5rem; }
-    .cost-center-section__label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--color-text-tertiary); margin-bottom: 0.75rem; }
-    .cost-center-section__manage-actions { display: flex; gap: 1rem; margin-top: 1rem; padding-left: 1rem; border-left: 2px solid var(--color-primary-100); }
-    .cost-center-section__empty { padding: 2rem; text-align: center; color: var(--color-text-tertiary); border: 2px dashed var(--color-border); border-radius: 8px; display: flex; flex-direction: column; align-items: center; gap: 1rem; }
-    .cost-center-section__history { margin-top: 1rem; }
-    .cost-center-section__history-title { font-size: 0.8125rem; font-weight: 600; color: var(--color-text-secondary); margin-bottom: 1rem; text-transform: uppercase; border-bottom: 1px solid var(--color-divider); padding-bottom: 0.5rem; }
-    .cost-center-section__history-list { display: flex; flex-direction: column; gap: 1rem; opacity: 0.8; }
-    .cost-center-section__history-item { display: block; }
-    .cost-center-section__form-actions { display: flex; gap: 1rem; margin-top: 2rem; border-top: 1px solid var(--color-divider); padding-top: 1.5rem; }
-    .cost-center-section__close-form { padding: 1.5rem; border: 1px solid var(--color-danger-200); border-radius: 8px; background: var(--color-danger-50); }
-    .cost-center-section__close-hint { margin-bottom: 1.5rem; font-size: 0.875rem; color: var(--color-danger-800); }
-    .cost-center-section__close-field { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.5rem; }
-  `],
+  imports: [PeriodTableComponent, PeriodModalComponent, EmployeeCostCenterDistributionEditorComponent, UiDateInputComponent],
+  templateUrl: './employee-cost-center-section.component.html',
+  styleUrl: './employee-cost-center-section.component.scss',
 })
 export class EmployeeCostCenterSectionComponent {
   readonly employeeKey = input<EmployeeBusinessKey | null>(null);
-  readonly store = inject(EmployeeCostCenterStore);
-  readonly texts = employeeTexts;
 
-  readonly displayMode = signal<CostCenterDisplayMode>('view');
-  readonly closeDate = signal<string>('');
-  readonly availableCostCenterOptionsState = signal<ReadonlyArray<SlotKeyOption<string>>>([]);
-  readonly catalogLoadingState = signal(false);
-
-  private readonly localErrorMessageState = signal<string | null>(null);
+  protected readonly costCenterStore = inject(EmployeeCostCenterStore);
   private readonly fieldCatalogService = inject(EmployeeFieldCatalogService);
-  private catalogRequestId = 0;
 
-  private readonly editor = viewChild(EmployeeCostCenterDistributionEditorComponent);
+  protected readonly editorRef = viewChild(EmployeeCostCenterDistributionEditorComponent);
 
-  protected readonly isViewMode = computed(() => this.displayMode() === 'view');
-  protected readonly isManageMode = computed(() => this.displayMode() === 'manage');
-  protected readonly isCreating = computed(() => this.displayMode() === 'creating');
-  protected readonly isReplacing = computed(() => this.displayMode() === 'replacing');
-  protected readonly isClosing = computed(() => this.displayMode() === 'closing');
-  protected readonly availableCostCenterOptions = this.availableCostCenterOptionsState.asReadonly();
-  protected readonly catalogOptionsLoading = this.catalogLoadingState.asReadonly();
+  protected readonly modalVisible = signal(false);
+  protected readonly modalMode = signal<CostCenterModalMode>('replace');
+  protected readonly closingStartDate = signal<string | null>(null);
+  protected readonly endDateDraft = signal('');
+  protected readonly costCenterOptions = signal<ReadonlyArray<SlotKeyOption<string>>>([]);
 
-  protected readonly sectionState = computed<SectionUiState>(() => {
-    const isBusy = this.store.loading() || this.store.mutating();
-    return {
-      mode: isBusy ? 'submitting' : (this.isViewMode() ? 'view' : 'editing'),
-      dirty: !this.isViewMode(),
-      busy: isBusy,
-      errorMessage: this.localErrorMessageState(),
-      successMessage: this.mapSuccessType(this.store.success()),
-    };
-  });
+  protected readonly texts = employeeTexts;
 
-  protected readonly historicalWindows = computed(() => {
-    const current = this.store.currentDistribution();
-    return this.store.history().filter((w) => w.startDate !== current?.startDate);
-  });
-
-  protected readonly editorInitialValue = computed(() => {
-    if (this.isReplacing()) {
-      const current = this.store.currentDistribution();
-      return current ? { startDate: '', items: current.items } : null;
+  protected readonly rows = computed<ReadonlyArray<CostCenterPeriodRow>>(() => {
+    const current = this.costCenterStore.currentDistribution();
+    const history = this.costCenterStore.history() ?? [];
+    const seen = new Set<string>();
+    const all: EmployeeCostCenterWindowModel[] = [];
+    if (current) {
+      all.push(current);
+      seen.add(`${current.startDate}|${current.endDate ?? ''}`);
     }
-    return null;
+    for (const w of history) {
+      const key = `${w.startDate}|${w.endDate ?? ''}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      all.push(w);
+    }
+    return all.map((w) => ({
+      startDate: w.startDate,
+      endDate: w.endDate ?? null,
+      isActive: !w.endDate,
+      canEdit: !w.endDate,
+      canDelete: false,
+      window: w,
+      totalPercentage: w.totalAllocationPercentage,
+      itemsSummary: w.items
+        .map((i) => `${i.costCenterName || i.costCenterCode} (${i.allocationPercentage}%)`)
+        .join(', '),
+    }));
   });
+
+  protected readonly saving = computed(() => this.costCenterStore.mutating());
+  protected readonly isSubmitEnabled = computed(() =>
+    this.modalMode() === 'close' ? !!this.endDateDraft() : true,
+  );
 
   constructor() {
     effect(() => {
       const key = this.employeeKey();
       untracked(() => {
-        this.store.loadCostCenters(key);
-        this.loadCatalogOptions(key?.ruleSystemCode ?? null);
-        this.displayMode.set('view');
+        this.costCenterStore.loadCostCenters(key);
+        this.loadCostCenterOptions(key?.ruleSystemCode ?? null);
       });
     });
-
-    // Reset mode on success
     effect(() => {
-      if (this.store.success()) {
-        this.displayMode.set('view');
+      const success = this.costCenterStore.success();
+      if (success) untracked(() => { if (this.modalVisible()) this.closeModal(); });
+    });
+  }
+
+  protected openEdit(index: number): void {
+    const row = this.rows()[index];
+    if (!row || !row.isActive) return;
+    this.costCenterStore.clearFeedback();
+    this.modalMode.set('replace');
+    this.modalVisible.set(true);
+  }
+
+  protected openNewDistribution(): void {
+    this.costCenterStore.clearFeedback();
+    this.modalMode.set('replace');
+    this.modalVisible.set(true);
+  }
+
+  protected openClose(): void {
+    const current = this.costCenterStore.currentDistribution();
+    if (!current) return;
+    this.costCenterStore.clearFeedback();
+    this.closingStartDate.set(current.startDate);
+    this.endDateDraft.set(currentLocalDate());
+    this.modalMode.set('close');
+    this.modalVisible.set(true);
+  }
+
+  protected submit(): void {
+    const key = this.employeeKey();
+    if (!key || this.costCenterStore.mutating()) return;
+
+    if (this.modalMode() === 'replace') {
+      const editor = this.editorRef();
+      if (!editor) return;
+      if (!editor.isValid()) return;
+      const v = editor.getValue();
+      if (this.costCenterStore.currentDistribution()) {
+        this.costCenterStore.replaceDistribution(key, { effectiveDate: v.startDate, items: v.items });
+      } else {
+        this.costCenterStore.createDistribution(key, { startDate: v.startDate, items: v.items });
       }
-    });
-
-    // Reset feedback on mode change
-    effect(() => {
-      this.displayMode();
-      untracked(() => {
-        this.store.clearFeedback();
-        this.localErrorMessageState.set(null);
-      });
-    });
-  }
-
-  toggleManage(): void {
-    if (this.isViewMode()) {
-      this.displayMode.set('manage');
     } else {
-      this.displayMode.set('view');
+      this.costCenterStore.closeDistribution(key, this.closingStartDate()!, this.endDateDraft());
     }
   }
 
-  startCreate(): void {
-    this.displayMode.set('creating');
+  protected closeModal(): void {
+    this.modalVisible.set(false);
+    this.costCenterStore.clearFeedback();
   }
 
-  startReplace(): void {
-    this.displayMode.set('replacing');
-  }
-
-  startClose(): void {
-    const current = this.store.currentDistribution();
-    this.closeDate.set(current?.endDate ?? '');
-    this.displayMode.set('closing');
-  }
-
-  cancel(): void {
-    if (this.isCreating() || this.isReplacing() || this.isClosing()) {
-      this.displayMode.set('manage');
-    } else {
-      this.displayMode.set('view');
-    }
-  }
-
-  submitForm(): void {
-    const editor = this.editor();
-    if (!editor || !editor.isValid()) return;
-
-    const draft = editor.getValue();
-    const key = this.store.selectedEmployeeKey();
-    if (!key) return;
-
-    if (this.isCreating()) {
-      this.store.createDistribution(key, { startDate: draft.startDate, items: draft.items });
-    } else if (this.isReplacing()) {
-      this.store.replaceDistribution(key, { effectiveDate: draft.startDate, items: draft.items });
-    }
-  }
-
-  submitClose(): void {
-    const key = this.store.selectedEmployeeKey();
-    const current = this.store.currentDistribution();
-    if (!key || !current) return;
-
-    this.store.closeDistribution(key, current.startDate, this.closeDate());
-  }
-
-  private mapErrorCode(code: string | null): string | null {
-    if (!code) return null;
-    // Map functional codes to user-friendly messages if needed, otherwise generic text
-    switch (code) {
-      case 'COST_CENTER_INVALID_WINDOW': return this.texts.costCenterSectionInvalidTotalMessage;
-      case 'request-failed': return this.texts.costCenterSectionRequestFailedMessage;
-      default: return this.texts.costCenterSectionRequestFailedMessage;
-    }
-  }
-
-  private mapSuccessType(type: 'created' | 'replaced' | 'closed' | null): string | null {
-    if (!type) return null;
-    switch (type) {
-      case 'created': return this.texts.costCenterSectionCreateSuccessMessage;
-      case 'replaced': return this.texts.costCenterSectionReplaceSuccessMessage;
-      case 'closed': return this.texts.costCenterSectionCloseSuccessMessage;
-    }
-  }
-
-  private loadCatalogOptions(ruleSystemCode: string | null): void {
-    const normalizedRuleSystemCode = ruleSystemCode?.trim() ?? '';
-
-    if (!normalizedRuleSystemCode) {
-      this.catalogRequestId += 1;
-      this.catalogLoadingState.set(false);
-      this.availableCostCenterOptionsState.set([]);
-      return;
-    }
-
-    const requestId = ++this.catalogRequestId;
-    this.catalogLoadingState.set(true);
-
-    this.fieldCatalogService
-      .loadCostCenterOptions(normalizedRuleSystemCode)
-      .pipe(take(1))
-      .subscribe({
-        next: (options) => {
-          if (requestId !== this.catalogRequestId) {
-            return;
-          }
-
-          this.availableCostCenterOptionsState.set(options);
-          this.catalogLoadingState.set(false);
-        },
-        error: () => {
-          if (requestId !== this.catalogRequestId) {
-            return;
-          }
-
-          this.catalogLoadingState.set(false);
-          this.localErrorMessageState.set(this.texts.catalogLoadFailedMessage);
-        }
-      });
+  private loadCostCenterOptions(ruleSystemCode: string | null): void {
+    if (!ruleSystemCode) { this.costCenterOptions.set([]); return; }
+    this.fieldCatalogService.loadCostCenterOptions(ruleSystemCode).pipe(take(1)).subscribe({
+      next: (opts) => this.costCenterOptions.set(opts),
+    });
   }
 }

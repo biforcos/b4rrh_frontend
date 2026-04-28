@@ -1,26 +1,28 @@
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
-import { EmployeeFieldCatalogService } from '../../data-access/employee-field-catalog.service';
 import { EmployeeWorkCenterStore } from '../../data-access/employee-work-center.store';
-import { employeeTexts } from '../../employee.texts';
+import { EmployeeFieldCatalogService } from '../../data-access/employee-field-catalog.service';
 import { EmployeeWorkCenterModel } from '../../models/employee-work-center.model';
 import { EmployeeWorkCenterSectionComponent } from './employee-work-center-section.component';
 
-class MockEmployeeWorkCenterStore {
+const employeeKey = { ruleSystemCode: 'RS1', employeeTypeCode: 'EMP', employeeNumber: '0001' };
+
+const wc = (overrides: Partial<EmployeeWorkCenterModel> = {}): EmployeeWorkCenterModel => ({
+  workCenterAssignmentNumber: 1, workCenterCode: 'WC1', workCenterName: 'Centro 1',
+  startDate: '2024-01-01', endDate: null, isActive: true, canDelete: false,
+  startsAtPresenceStart: false, deleteForbiddenReason: null, ...overrides,
+});
+
+class MockWorkCenterStore {
   readonly workCentersState = signal<ReadonlyArray<EmployeeWorkCenterModel>>([]);
-  readonly loadingState = signal(false);
-  readonly mutatingState = signal(false);
-  readonly errorState = signal<ReturnType<EmployeeWorkCenterStore['error']>>(null);
-  readonly successState = signal<ReturnType<EmployeeWorkCenterStore['success']>>(null);
-
   readonly workCenters = this.workCentersState.asReadonly();
-  readonly loading = this.loadingState.asReadonly();
-  readonly mutating = this.mutatingState.asReadonly();
-  readonly error = this.errorState.asReadonly();
+  readonly loading = signal(false).asReadonly();
+  readonly mutating = signal(false).asReadonly();
+  readonly successState = signal<'created' | 'corrected' | 'closed' | 'deleted' | null>(null);
   readonly success = this.successState.asReadonly();
-
   readonly loadWorkCenters = vi.fn();
   readonly createWorkCenter = vi.fn();
   readonly correctWorkCenter = vi.fn();
@@ -30,123 +32,82 @@ class MockEmployeeWorkCenterStore {
 }
 
 describe('EmployeeWorkCenterSectionComponent', () => {
-  let fixture: ComponentFixture<EmployeeWorkCenterSectionComponent>;
-  let workCenterStore: MockEmployeeWorkCenterStore;
-  let fieldCatalogService: { loadWorkCenterOptions: ReturnType<typeof vi.fn> };
-
-  const employeeBusinessKey = {
-    ruleSystemCode: 'RS1',
-    employeeTypeCode: 'EMP',
-    employeeNumber: '0001',
-  };
+  let fix: ComponentFixture<EmployeeWorkCenterSectionComponent>;
+  let store: MockWorkCenterStore;
+  let fieldCatalog: { loadWorkCenterOptions: ReturnType<typeof vi.fn> };
 
   beforeEach(async () => {
-    workCenterStore = new MockEmployeeWorkCenterStore();
-    fieldCatalogService = {
-      loadWorkCenterOptions: vi.fn().mockReturnValue(
-        of([{ value: 'MADRID-01', label: 'Madrid Centro · MADRID-01' }]),
-      ),
-    };
+    store = new MockWorkCenterStore();
+    fieldCatalog = { loadWorkCenterOptions: vi.fn().mockReturnValue(of([{ value: 'WC1', label: 'Centro 1' }])) };
 
     await TestBed.configureTestingModule({
-      imports: [EmployeeWorkCenterSectionComponent],
+      imports: [EmployeeWorkCenterSectionComponent, NoopAnimationsModule],
       providers: [
-        { provide: EmployeeWorkCenterStore, useValue: workCenterStore },
-        { provide: EmployeeFieldCatalogService, useValue: fieldCatalogService },
+        { provide: EmployeeWorkCenterStore, useValue: store },
+        { provide: EmployeeFieldCatalogService, useValue: fieldCatalog },
       ],
     }).compileComponents();
-
-    fixture = TestBed.createComponent(EmployeeWorkCenterSectionComponent);
+    fix = TestBed.createComponent(EmployeeWorkCenterSectionComponent);
+    fix.componentRef.setInput('employeeKey', employeeKey);
+    fix.detectChanges();
   });
 
-  it('loads work center DIRECT options and renders Name · CODE in create select', () => {
-    fixture.componentRef.setInput('employeeKey', employeeBusinessKey);
-    fixture.detectChanges();
-
-    enterCreateMode();
-
-    const select = getFirstSelect();
-    const optionTexts = Array.from(select.querySelectorAll('option')).map((option) => option.textContent?.trim() ?? '');
-
-    expect(fieldCatalogService.loadWorkCenterOptions).toHaveBeenCalledWith('RS1');
-    expect(optionTexts).toContain('Madrid Centro · MADRID-01');
+  it('renders period-table with add button', () => {
+    expect(fix.nativeElement.querySelector('.period-table__add-btn')).toBeTruthy();
   });
 
-  it('keeps component stable when work center catalog returns empty list', () => {
-    fieldCatalogService.loadWorkCenterOptions.mockReturnValue(of([]));
-
-    fixture.componentRef.setInput('employeeKey', employeeBusinessKey);
-    fixture.detectChanges();
-
-    enterCreateMode();
-
-    const select = getFirstSelect();
-    const options = Array.from(select.querySelectorAll('option'));
-
-    expect(options.length).toBe(1);
-    expect(options[0].value).toBe('');
+  it('shows a row per work center', () => {
+    store.workCentersState.set([wc()]);
+    fix.detectChanges();
+    expect(fix.nativeElement.querySelectorAll('.period-table__row').length).toBe(1);
   });
 
-  it('keeps create action working with catalog-backed workCenterCode', () => {
-    fixture.componentRef.setInput('employeeKey', employeeBusinessKey);
-    fixture.detectChanges();
+  it('opens create modal on add click', () => {
+    fix.nativeElement.querySelector('.period-table__add-btn').click();
+    fix.detectChanges();
+    const c = fix.componentInstance as any;
+    expect(c.modalVisible()).toBe(true);
+    expect(c.modalMode()).toBe('create');
+  });
 
-    enterCreateMode();
-
-    setSelectValue(0, 'MADRID-01');
-    setDateInput(0, '2026-03-01');
-    clickByText(employeeTexts.workCenterSectionSaveCreateAction);
-
-    expect(workCenterStore.createWorkCenter).toHaveBeenCalledWith(employeeBusinessKey, {
-      workCenterCode: 'MADRID-01',
-      startDate: '2026-03-01',
-      endDate: '',
+  it('calls createWorkCenter on create submit', () => {
+    const c = fix.componentInstance as any;
+    c.modalMode.set('create');
+    c.workCenterCodeDraft.set('WC1');
+    c.startDateDraft.set('2025-06-01');
+    c.endDateDraft.set('');
+    c.submit();
+    expect(store.createWorkCenter).toHaveBeenCalledWith(employeeKey, {
+      workCenterCode: 'WC1', startDate: '2025-06-01', endDate: '',
     });
   });
 
-  function clickByText(text: string): void {
-    const root = fixture.nativeElement as HTMLElement;
-    const button = Array.from(root.querySelectorAll('button')).find(
-      (candidate) => candidate.textContent?.trim() === text,
-    ) as HTMLButtonElement | undefined;
+  it('calls correctWorkCenter on edit submit', () => {
+    store.workCentersState.set([wc()]);
+    fix.detectChanges();
+    const c = fix.componentInstance as any;
+    c.openEdit(0);
+    c.workCenterCodeDraft.set('WC2');
+    c.submit();
+    expect(store.correctWorkCenter).toHaveBeenCalledWith(employeeKey, 1, expect.objectContaining({ workCenterCode: 'WC2' }));
+  });
 
-    expect(button).toBeDefined();
-    button?.click();
-    fixture.detectChanges();
-  }
+  it('calls closeWorkCenter after switchToClose', () => {
+    store.workCentersState.set([wc({ isActive: true })]);
+    fix.detectChanges();
+    const c = fix.componentInstance as any;
+    c.openEdit(0);
+    c.switchToClose();
+    c.endDateDraft.set('2025-12-31');
+    c.submit();
+    expect(store.closeWorkCenter).toHaveBeenCalledWith(employeeKey, 1, '2025-12-31');
+  });
 
-  function enterCreateMode(): void {
-    clickByText(employeeTexts.workCenterSectionManageAction);
-    clickByText(employeeTexts.workCenterSectionAddAction);
-  }
-
-  function getFirstSelect(): HTMLSelectElement {
-    const root = fixture.nativeElement as HTMLElement;
-    const select = root.querySelector('select') as HTMLSelectElement | null;
-
-    expect(select).toBeTruthy();
-    return select as HTMLSelectElement;
-  }
-
-  function setSelectValue(index: number, value: string): void {
-    const root = fixture.nativeElement as HTMLElement;
-    const selects = Array.from(root.querySelectorAll('select')) as HTMLSelectElement[];
-    const select = selects[index];
-
-    expect(select).toBeDefined();
-    select.value = value;
-    select.dispatchEvent(new Event('change'));
-    fixture.detectChanges();
-  }
-
-  function setDateInput(index: number, value: string): void {
-    const root = fixture.nativeElement as HTMLElement;
-    const inputs = Array.from(root.querySelectorAll('input[type="date"]')) as HTMLInputElement[];
-    const input = inputs[index];
-
-    expect(input).toBeDefined();
-    input.value = value;
-    input.dispatchEvent(new Event('input'));
-    fixture.detectChanges();
-  }
+  it('closes modal when store signals success', () => {
+    fix.nativeElement.querySelector('.period-table__add-btn').click();
+    fix.detectChanges();
+    store.successState.set('created');
+    fix.detectChanges();
+    expect((fix.componentInstance as any).modalVisible()).toBe(false);
+  });
 });

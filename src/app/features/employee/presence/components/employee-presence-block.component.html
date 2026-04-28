@@ -1,100 +1,20 @@
-<section class="employee-presence-block" aria-labelledby="employee-presence-block-title">
-  <header class="employee-presence-block__header">
-    <h4 id="employee-presence-block-title">{{ texts.presenceBlockTitle }}</h4>
-  </header>
-
+<section class="presence-card" [attr.aria-label]="texts.presenceBlockTitle">
   @if (hasAnyData()) {
     @if (currentPresence(); as p) {
-      <article class="employee-presence-block__current">
-        <div class="employee-presence-block__card-top">
-          <span class="employee-presence-block__eyebrow">{{ resolveCurrentSectionLabel() }}</span>
-          <span
-            class="employee-presence-block__badge"
-            [class.employee-presence-block__badge--active]="p.isActive"
-          >{{ resolveStatusLabel(p) }}</span>
+      <div class="presence-card__content">
+        <div class="presence-card__main">
+          <span class="presence-card__company">{{ resolveCompanyLabel(p) }}</span>
+          <span class="presence-card__meta">
+            {{ resolveEntryReasonLabel(p) }} · {{ buildPeriodLabel(p) }} · #{{ p.presenceNumber }}
+          </span>
         </div>
-
-        <div class="employee-presence-block__identity">
-          <span class="employee-presence-block__identity-name">{{ resolveCompanyLabel(p) }}</span>
-          <div class="employee-presence-block__codes">
-            @if (resolveCompanyCodeSecondary(p); as code) {
-              <span class="employee-presence-block__code">{{ code }}</span>
-            }
-            <span class="employee-presence-block__code">
-              {{ texts.presenceBlockPeriodNumberPrefix }} #{{ p.presenceNumber }}
-            </span>
-          </div>
-        </div>
-
-        <div class="employee-presence-block__fields">
-          <div class="employee-presence-block__field">
-            <span class="employee-presence-block__field-label">{{ texts.presenceBlockPeriodLabel }}</span>
-            <span class="employee-presence-block__field-value employee-presence-block__period">
-              {{ buildPeriodLabel(p) }}
-            </span>
-          </div>
-
-          <div class="employee-presence-block__field">
-            <span class="employee-presence-block__field-label">{{ texts.presenceBlockEntryReasonLabel }}</span>
-            <span class="employee-presence-block__field-value">
-              {{ resolveEntryReasonLabel(p) }}
-              @if (resolveEntryReasonCodeSecondary(p); as code) {
-                <span class="employee-presence-block__code">{{ code }}</span>
-              }
-            </span>
-          </div>
-
-          @if (p.exitReasonCode) {
-            <div class="employee-presence-block__field">
-              <span class="employee-presence-block__field-label">{{ texts.presenceBlockExitReasonLabel }}</span>
-              <span class="employee-presence-block__field-value">
-                {{ resolveExitReasonLabel(p) }}
-                @if (resolveExitReasonCodeSecondary(p); as code) {
-                  <span class="employee-presence-block__code">{{ code }}</span>
-                }
-              </span>
-            </div>
-          }
-        </div>
-      </article>
+        <span class="presence-card__badge" [class.presence-card__badge--active]="p.isActive"
+          [attr.aria-label]="texts.detailHeaderStatusLabel + ': ' + resolveStatusLabel(p)">
+          {{ resolveStatusLabel(p) }}
+        </span>
+      </div>
     }
-
-    <section class="employee-presence-block__history" [attr.aria-label]="texts.presenceBlockHistoryTitle">
-      <h5 class="employee-presence-block__history-title">{{ texts.presenceBlockHistoryTitle }}</h5>
-
-      @if (hasHistory()) {
-        <div class="employee-presence-block__history-list" role="list">
-          @for (presence of presenceHistory(); track presence.presenceNumber + '-' + presence.startDate) {
-            <article class="employee-presence-block__history-item" role="listitem">
-              <div class="employee-presence-block__history-item-head">
-                <span class="employee-presence-block__history-company">
-                  {{ resolveCompanyLabel(presence) }}
-                  @if (resolveCompanyCodeSecondary(presence); as code) {
-                    <span class="employee-presence-block__code">{{ code }}</span>
-                  }
-                </span>
-                <span
-                  class="employee-presence-block__badge"
-                  [class.employee-presence-block__badge--active]="presence.isActive"
-                >{{ resolveStatusLabel(presence) }}</span>
-              </div>
-              <span class="employee-presence-block__period">{{ buildPeriodLabel(presence) }}</span>
-              @if (presence.exitReasonCode) {
-                <span class="employee-presence-block__history-exit">
-                  {{ resolveExitReasonLabel(presence) }}
-                  @if (resolveExitReasonCodeSecondary(presence); as code) {
-                    <span class="employee-presence-block__code">{{ code }}</span>
-                  }
-                </span>
-              }
-            </article>
-          }
-        </div>
-      } @else {
-        <p class="employee-presence-block__history-empty">{{ texts.presenceBlockHistoryEmptyMessage }}</p>
-      }
-    </section>
   } @else {
-    <p class="employee-presence-block__empty">{{ texts.presenceBlockEmptyMessage }}</p>
+    <p class="presence-card__empty">{{ texts.presenceBlockEmptyMessage }}</p>
   }
 </section>

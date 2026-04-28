@@ -1,27 +1,43 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  signal,
+  untracked,
+} from '@angular/core';
 
+import { EmployeeWorkingTimeStore } from '../../data-access/employee-working-time.store';
 import { employeeTexts } from '../../employee.texts';
 import { EmployeeBusinessKey } from '../../models/employee-business-key.model';
+import { EmployeeWorkingTimeModel } from '../../models/employee-working-time.model';
 import { UiDateInputComponent } from '../../../../shared/ui/date-input/ui-date-input.component';
 import { UiInputNumberComponent } from '../../../../shared/ui/input-number/ui-input-number.component';
-import { TemporalSectionComponent } from '../../shared/ui/section/temporal-section.component';
-import { TemporalDisplayMode, TemporalRowViewModel, TemporalSectionTexts } from '../../shared/ui/section/temporal-section.model';
-import { SectionMode, SectionUiState } from '../../shared/ui/section/section-ui-state.model';
-import {
-  EmployeeWorkingTimeRowTexts,
-  WorkingTimeCloseDraft,
-  WorkingTimeCreateDraft,
-  createEmptyWorkingTimeCloseDraft,
-  createEmptyWorkingTimeCreateDraft,
-  mapEmployeeWorkingTimeModelToTemporalRow,
-} from '../../data-access/employee-working-time.mapper';
-import { EmployeeWorkingTimeStore } from '../../data-access/employee-working-time.store';
+import { PeriodTableComponent } from '../../shared/ui/period-table/period-table.component';
+import { PeriodModalComponent } from '../../shared/ui/period-modal/period-modal.component';
+import { PeriodTableRow } from '../../shared/ui/period-table/period-table.model';
 import { currentLocalDate } from '../../../../shared/utils/local-date.util';
+
+type WorkingTimeModalMode = 'create' | 'edit' | 'close';
+
+interface WorkingTimePeriodRow extends PeriodTableRow {
+  workingTimeNumber: number;
+  workingTimePercentage: number;
+  weeklyHours: number;
+  dailyHours: number;
+}
 
 @Component({
   selector: 'app-employee-working-time-section',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TemporalSectionComponent, UiDateInputComponent, UiInputNumberComponent],
+  imports: [
+    PeriodTableComponent,
+    PeriodModalComponent,
+    UiDateInputComponent,
+    UiInputNumberComponent,
+  ],
   templateUrl: './employee-working-time-section.component.html',
   styleUrl: './employee-working-time-section.component.scss',
 })
@@ -29,295 +45,124 @@ export class EmployeeWorkingTimeSectionComponent {
   readonly employeeBusinessKey = input<EmployeeBusinessKey | null>(null);
 
   private readonly workingTimeStore = inject(EmployeeWorkingTimeStore);
-  private readonly displayModeState = signal<TemporalDisplayMode>('view');
-  private readonly localErrorMessageState = signal<string | null>(null);
-  private readonly confirmingCloseKeyState = signal<number | null>(null);
-  private readonly createDraftState = signal<WorkingTimeCreateDraft>(createEmptyWorkingTimeCreateDraft());
-  private readonly closeDraftState = signal<WorkingTimeCloseDraft>(createEmptyWorkingTimeCloseDraft());
+
+  protected readonly modalVisible = signal(false);
+  protected readonly modalMode = signal<WorkingTimeModalMode>('create');
+  protected readonly editingNumber = signal<number | null>(null);
+  protected readonly editingStartDate = signal<string | null>(null);
+  protected readonly editingIsActive = signal(false);
+  protected readonly startDateDraft = signal(currentLocalDate());
+  protected readonly newStartDateDraft = signal('');
+  protected readonly percentageDraft = signal(100);
+  protected readonly endDateDraft = signal('');
 
   protected readonly texts = employeeTexts;
-  protected readonly sectionSubtitle = this.texts.workingTimeSectionSubtitle;
-  protected readonly sectionTexts: TemporalSectionTexts = {
-    manageAction: this.texts.workingTimeSectionManageAction,
-    exitManageAction: this.texts.workingTimeSectionExitManageAction,
-    addAction: this.texts.workingTimeSectionAddAction,
-    editCurrentAction: this.texts.workingTimeSectionEditCurrentAction,
-    correctAction: this.texts.workingTimeSectionCorrectAction,
-    closeAction: this.texts.workingTimeSectionCloseAction,
-    deleteAction: this.texts.workingTimeSectionDeleteAction,
-    cancelAction: this.texts.workingTimeSectionCancelAction,
-    saveCreateAction: this.texts.workingTimeSectionSaveCreateAction,
-    saveEditCurrentAction: this.texts.workingTimeSectionSaveEditCurrentAction,
-    saveCorrectAction: this.texts.workingTimeSectionSaveCorrectAction,
-    confirmCloseMessage: this.texts.workingTimeSectionConfirmCloseMessage,
-    confirmCloseAction: this.texts.workingTimeSectionConfirmCloseAction,
-    confirmDeleteMessage: this.texts.workingTimeSectionConfirmDeleteMessage,
-    confirmDeleteAction: this.texts.workingTimeSectionConfirmDeleteAction,
-    emptyMessage: this.texts.workingTimeSectionEmptyMessage,
-  };
-  protected readonly rowTexts: EmployeeWorkingTimeRowTexts = {
-    activeStatus: this.texts.workingTimeSectionStatusActive,
-    closedStatus: this.texts.workingTimeSectionStatusClosed,
-    currentPeriodLabel: this.texts.workingTimeSectionCurrentPeriodLabel,
-    periodPrefix: this.texts.workingTimeSectionPeriodPrefix,
-    percentageLabel: this.texts.workingTimeSectionPercentageLabel,
-    weeklyHoursLabel: this.texts.workingTimeSectionWeeklyHoursLabel,
-    dailyHoursLabel: this.texts.workingTimeSectionDailyHoursLabel,
-    monthlyHoursLabel: this.texts.workingTimeSectionMonthlyHoursLabel,
-  };
 
-  protected readonly rows = computed<ReadonlyArray<TemporalRowViewModel<number>>>(() =>
-    this.workingTimeStore.workingTimes().map((item) => ({
-      ...mapEmployeeWorkingTimeModelToTemporalRow(item, this.rowTexts),
-      titleSecondary: null,
+  protected readonly rows = computed<ReadonlyArray<WorkingTimePeriodRow>>(() =>
+    this.workingTimeStore.workingTimes().map((wt: EmployeeWorkingTimeModel) => ({
+      startDate: wt.startDate,
+      endDate: wt.endDate,
+      isActive: wt.isActive,
+      canEdit: wt.isActive,
+      canDelete: false,
+      workingTimeNumber: wt.workingTimeNumber,
+      workingTimePercentage: wt.workingTimePercentage,
+      weeklyHours: wt.weeklyHours,
+      dailyHours: wt.dailyHours,
     })),
   );
-  protected readonly displayMode = this.displayModeState.asReadonly();
-  protected readonly confirmingCloseKey = this.confirmingCloseKeyState.asReadonly();
-  protected readonly createDraft = this.createDraftState.asReadonly();
-  protected readonly closeDraft = this.closeDraftState.asReadonly();
-  protected readonly isCreateDraftValid = computed(() => {
-    const draft = this.createDraftState();
-    return this.normalizeRequiredValue(draft.startDate).length > 0
-      && Number.isFinite(draft.workingTimePercentage)
-      && draft.workingTimePercentage > 0
-      && draft.workingTimePercentage <= 100;
+
+  protected readonly saving = computed(() => this.workingTimeStore.mutating());
+  protected readonly showCascadeWarning = computed(
+    () =>
+      this.modalMode() === 'edit' &&
+      !!this.newStartDateDraft() &&
+      this.newStartDateDraft() !== this.editingStartDate(),
+  );
+
+  protected readonly modalTitle = computed(() => {
+    if (this.modalMode() === 'create') return 'Nueva jornada';
+    if (this.modalMode() === 'close') return 'Cerrar período — Jornada';
+    return 'Editar jornada';
   });
-  protected readonly isCloseDraftValid = computed(() => {
-    const closeKey = this.confirmingCloseKeyState();
-    if (closeKey === null) {
-      return false;
-    }
 
-    const occurrence = this.workingTimeStore.workingTimes().find((item) => item.workingTimeNumber === closeKey);
-    if (!occurrence) {
-      return false;
-    }
-
-    const endDate = this.normalizeRequiredValue(this.closeDraftState().endDate);
-    return endDate.length > 0 && endDate >= occurrence.startDate;
+  protected readonly modalSubtitle = computed(() => {
+    const sd = this.editingStartDate();
+    return sd ? `Desde ${sd}` : null;
   });
-  protected readonly sectionState = computed<SectionUiState>(() => {
-    const isBusy = this.workingTimeStore.loading() || this.workingTimeStore.mutating();
 
-    return {
-      mode: isBusy ? 'submitting' : this.toSectionMode(this.displayModeState()),
-      dirty: this.displayModeState() === 'creating' || this.displayModeState() === 'confirmingClose',
-      busy: isBusy,
-      errorMessage: this.resolveErrorMessage(),
-      successMessage: this.resolveSuccessMessage(),
-    };
+  protected readonly isSubmitEnabled = computed(() => {
+    const mode = this.modalMode();
+    if (mode === 'create') return !!this.startDateDraft();
+    if (mode === 'edit') return !!this.newStartDateDraft();
+    return !!this.endDateDraft();
   });
 
   constructor() {
     effect(() => {
-      const activeEmployeeKey = this.employeeBusinessKey();
-
-      untracked(() => {
-        this.workingTimeStore.loadWorkingTimesByBusinessKey(activeEmployeeKey);
-        this.enterViewMode();
-      });
+      const key = this.employeeBusinessKey();
+      untracked(() => this.workingTimeStore.loadWorkingTimesByBusinessKey(key));
     });
 
     effect(() => {
-      const successCode = this.workingTimeStore.success();
-
-      if (!successCode) {
-        return;
-      }
-
-      if (this.displayModeState() === 'creating' || this.displayModeState() === 'confirmingClose') {
-        this.enterViewMode();
-      }
+      const success = this.workingTimeStore.success();
+      if (success)
+        untracked(() => {
+          if (this.modalVisible()) this.closeModal();
+        });
     });
   }
 
-  protected startManage(): void {
-    if (!this.canStartInteraction()) {
-      return;
-    }
-
-    this.clearInteractionFeedback();
-    this.enterCreateMode();
-  }
-
-  protected exitManage(): void {
-    this.clearInteractionFeedback();
-    this.enterViewMode();
-  }
-
-  protected startCreate(): void {
-    if (!this.canStartInteraction()) {
-      return;
-    }
-
-    this.clearInteractionFeedback();
-    this.enterCreateMode();
-  }
-
-  protected requestClose(workingTimeNumber: number): void {
-    if (!this.canStartInteraction()) {
-      return;
-    }
-
-    const occurrence = this.workingTimeStore.workingTimes().find((item) => item.workingTimeNumber === workingTimeNumber);
-    if (!occurrence || !occurrence.isActive) {
-      return;
-    }
-
-    this.clearInteractionFeedback();
-    this.enterConfirmingCloseMode(workingTimeNumber, this.currentBusinessDate());
-  }
-
-  protected submitCreate(): void {
-    const activeEmployeeKey = this.employeeBusinessKey();
-    if (!activeEmployeeKey || this.workingTimeStore.mutating()) {
-      return;
-    }
-
-    if (!this.isCreateDraftValid()) {
-      this.localErrorMessageState.set(this.texts.workingTimeSectionInvalidDataMessage);
-      return;
-    }
-
-    this.clearLocalError();
-    this.workingTimeStore.createWorkingTime(activeEmployeeKey, this.createDraftState());
-  }
-
-  protected confirmClose(workingTimeNumber: number): void {
-    const activeEmployeeKey = this.employeeBusinessKey();
-    if (!activeEmployeeKey || this.workingTimeStore.mutating()) {
-      return;
-    }
-
-    if (!this.isCloseDraftValid()) {
-      this.localErrorMessageState.set(this.texts.workingTimeSectionCloseDateInvalidMessage);
-      return;
-    }
-
-    this.clearLocalError();
-    this.workingTimeStore.closeWorkingTime(activeEmployeeKey, workingTimeNumber, this.closeDraftState());
-  }
-
-  protected cancel(): void {
-    this.clearInteractionFeedback();
-    this.enterManageMode();
-  }
-
-  protected updateCreateField(field: keyof WorkingTimeCreateDraft, value: string | number): void {
-    this.createDraftState.update((draft) => ({
-      ...draft,
-      [field]: field === 'workingTimePercentage' ? this.normalizePercentageValue(value) : this.normalizeRequiredValue(value),
-    }));
-  }
-
-  protected updateCloseField(field: keyof WorkingTimeCloseDraft, value: string): void {
-    this.closeDraftState.update((draft) => ({
-      ...draft,
-      [field]: this.normalizeRequiredValue(value),
-    }));
-  }
-
-  private enterViewMode(): void {
-    this.displayModeState.set('view');
-    this.confirmingCloseKeyState.set(null);
-    this.createDraftState.set(createEmptyWorkingTimeCreateDraft());
-    this.closeDraftState.set(createEmptyWorkingTimeCloseDraft());
-  }
-
-  private enterManageMode(): void {
-    this.displayModeState.set('manage');
-    this.confirmingCloseKeyState.set(null);
-    this.createDraftState.set(createEmptyWorkingTimeCreateDraft());
-    this.closeDraftState.set(createEmptyWorkingTimeCloseDraft());
-  }
-
-  private enterCreateMode(): void {
-    this.displayModeState.set('creating');
-    this.confirmingCloseKeyState.set(null);
-    this.createDraftState.set(createEmptyWorkingTimeCreateDraft());
-    this.closeDraftState.set(createEmptyWorkingTimeCloseDraft());
-  }
-
-  private enterConfirmingCloseMode(workingTimeNumber: number, defaultEndDate: string): void {
-    this.displayModeState.set('confirmingClose');
-    this.confirmingCloseKeyState.set(workingTimeNumber);
-    this.closeDraftState.set({ endDate: defaultEndDate });
-  }
-
-  private resolveErrorMessage(): string | null {
-    return this.localErrorMessageState();
-  }
-
-  private resolveSuccessMessage(): string | null {
-    switch (this.workingTimeStore.success()) {
-      case 'created':
-        return this.texts.workingTimeSectionCreateSuccessMessage;
-      case 'closed':
-        return this.texts.workingTimeSectionCloseSuccessMessage;
-      default:
-        return null;
-    }
-  }
-
-  private toSectionMode(displayMode: TemporalDisplayMode): SectionMode {
-    switch (displayMode) {
-      case 'manage':
-        return 'editing';
-      case 'creating':
-        return 'creating';
-      case 'confirmingClose':
-        return 'confirming';
-      default:
-        return 'view';
-    }
-  }
-
-  private clearInteractionFeedback(): void {
-    this.clearLocalError();
+  protected openCreate(): void {
     this.workingTimeStore.clearFeedback();
+    this.modalMode.set('create');
+    this.startDateDraft.set(currentLocalDate());
+    this.percentageDraft.set(100);
+    this.modalVisible.set(true);
   }
 
-  private clearLocalError(): void {
-    this.localErrorMessageState.set(null);
+  protected openEdit(index: number): void {
+    const row = this.rows()[index];
+    if (!row || !row.isActive) return;
+    this.workingTimeStore.clearFeedback();
+    this.modalMode.set('edit');
+    this.editingNumber.set(row.workingTimeNumber);
+    this.editingStartDate.set(row.startDate);
+    this.editingIsActive.set(row.isActive);
+    this.newStartDateDraft.set(row.startDate);
+    this.percentageDraft.set(row.workingTimePercentage);
+    this.modalVisible.set(true);
   }
 
-  private canStartInteraction(): boolean {
-    return !this.workingTimeStore.loading() && !this.workingTimeStore.mutating();
+  protected switchToClose(): void {
+    this.modalMode.set('close');
+    this.endDateDraft.set(currentLocalDate());
   }
 
-  private currentBusinessDate(): string {
-    return currentLocalDate();
-  }
+  protected submit(): void {
+    const key = this.employeeBusinessKey();
+    if (!key || this.workingTimeStore.mutating()) return;
+    const mode = this.modalMode();
 
-  private normalizeRequiredValue(value: string | number | null | undefined): string {
-    return typeof value === 'string' ? value.trim() : `${value ?? ''}`.trim();
-  }
-
-  private normalizePercentageValue(value: string | number): number {
-    const normalizedValue = this.clampPercentageValue(this.parsePercentageValue(value));
-
-    return Number.isFinite(normalizedValue) ? normalizedValue : 0;
-  }
-
-  private parsePercentageValue(value: string | number): number {
-    if (typeof value === 'number' && Number.isFinite(value)) {
-      return value;
+    if (mode === 'create') {
+      this.workingTimeStore.createWorkingTime(key, {
+        startDate: this.startDateDraft(),
+        workingTimePercentage: this.percentageDraft(),
+      });
+    } else if (mode === 'edit') {
+      this.workingTimeStore.updateWorkingTime(key, this.editingNumber()!, {
+        startDate: this.newStartDateDraft(),
+        workingTimePercentage: this.percentageDraft(),
+      });
+    } else {
+      this.workingTimeStore.closeWorkingTime(key, this.editingNumber()!, {
+        endDate: this.endDateDraft(),
+      });
     }
-
-    const parsed = Number.parseFloat(`${value}`);
-    return Number.isFinite(parsed) ? parsed : 0;
   }
 
-  private clampPercentageValue(value: number): number {
-    if (value < 0) {
-      return 0;
-    }
-
-    if (value > 100) {
-      return 100;
-    }
-
-    return value;
+  protected closeModal(): void {
+    this.modalVisible.set(false);
+    this.workingTimeStore.clearFeedback();
   }
 }

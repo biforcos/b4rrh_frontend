@@ -1,91 +1,43 @@
-import { EmployeeLaborClassificationModel } from '../models/employee-labor-classification.model';
-import { mapLaborClassificationToTemporalRow } from './employee-labor-classification.mapper';
+import {
+  mapLaborClassificationReplaceDraftToRequest,
+  mapLaborClassificationCorrectDraftToRequest,
+  mapLaborClassificationCloseDraftToRequest,
+} from './employee-labor-classification.mapper';
 
-const rowTexts = {
-  activeStatus: 'Vigente',
-  closedStatus: 'Historica',
-  currentPeriodLabel: 'actual',
-  periodPrefix: 'Periodo',
-} as const;
-
-describe('mapLaborClassificationToTemporalRow', () => {
-  it('maps current occurrence as closeable and non-deletable', () => {
-    const activeOccurrence: EmployeeLaborClassificationModel = {
-      agreementCode: 'AGREEMENT-A',
-      agreementName: null,
-      agreementCategoryCode: 'CAT-A',
-      agreementCategoryName: null,
-      startDate: '2025-01-01',
-      endDate: null,
-      isActive: true,
-    };
-
-    const row = mapLaborClassificationToTemporalRow(activeOccurrence, rowTexts);
-
-    expect(row.isCurrent).toBe(true);
-    expect(row.closeable).toBe(true);
-    expect(row.deletable).toBe(false);
-    expect(row.periodText).toBe('2025-01-01 - actual');
-    expect(row.title).toBe('AGREEMENT-A');
-    expect(row.titleSecondary).toBeUndefined();
-    expect(row.detailText).toBe('CAT-A');
-    expect(row.detailSecondary).toBeUndefined();
+describe('employee-labor-classification.mapper', () => {
+  it('maps replace draft to request normalizing codes', () => {
+    expect(
+      mapLaborClassificationReplaceDraftToRequest({
+        effectiveDate: '2026-01-01',
+        agreementCode: 'ag1',
+        agreementCategoryCode: 'cat1',
+      }),
+    ).toEqual({ effectiveDate: '2026-01-01', agreementCode: 'AG1', agreementCategoryCode: 'CAT1' });
   });
 
-  it('maps historical occurrence as not closeable and non-deletable', () => {
-    const historicalOccurrence: EmployeeLaborClassificationModel = {
-      agreementCode: 'AGREEMENT-A',
-      agreementName: null,
-      agreementCategoryCode: 'CAT-B',
-      agreementCategoryName: null,
-      startDate: '2024-01-01',
-      endDate: '2024-12-31',
-      isActive: false,
-    };
-
-    const row = mapLaborClassificationToTemporalRow(historicalOccurrence, rowTexts);
-
-    expect(row.isCurrent).toBe(false);
-    expect(row.closeable).toBe(false);
-    expect(row.deletable).toBe(false);
-    expect(row.periodText).toBe('2024-01-01 - 2024-12-31');
+  it('maps correct draft to request with unchanged startDate as null', () => {
+    expect(
+      mapLaborClassificationCorrectDraftToRequest({
+        startDate: '',
+        agreementCode: 'ag2',
+        agreementCategoryCode: 'cat2',
+      }),
+    ).toEqual({ startDate: null, agreementCode: 'AG2', agreementCategoryCode: 'CAT2' });
   });
 
-  it('shows agreement and category names as primary with code as secondary when both labels are present', () => {
-    const occurrence: EmployeeLaborClassificationModel = {
-      agreementCode: 'AGR-01',
-      agreementName: 'Convenio Tecnico',
-      agreementCategoryCode: 'CAT-02',
-      agreementCategoryName: 'Tecnico Nivel 2',
-      startDate: '2025-01-01',
-      endDate: null,
-      isActive: true,
-    };
-
-    const row = mapLaborClassificationToTemporalRow(occurrence, rowTexts);
-
-    expect(row.title).toBe('Convenio Tecnico');
-    expect(row.titleSecondary).toBe('AGR-01');
-    expect(row.detailText).toBe('Tecnico Nivel 2');
-    expect(row.detailSecondary).toBe('CAT-02');
+  it('maps correct draft to request with corrected startDate', () => {
+    expect(
+      mapLaborClassificationCorrectDraftToRequest({
+        startDate: '2026-02-01',
+        agreementCode: 'ag2',
+        agreementCategoryCode: 'cat2',
+      }),
+    ).toEqual({ startDate: '2026-02-01', agreementCode: 'AG2', agreementCategoryCode: 'CAT2' });
   });
 
-  it('falls back to category code when category label is missing and keeps agreement label', () => {
-    const occurrence: EmployeeLaborClassificationModel = {
-      agreementCode: 'AGR-01',
-      agreementName: 'Convenio Tecnico',
-      agreementCategoryCode: 'CAT-02',
-      agreementCategoryName: null,
-      startDate: '2025-01-01',
-      endDate: null,
-      isActive: true,
-    };
-
-    const row = mapLaborClassificationToTemporalRow(occurrence, rowTexts);
-
-    expect(row.title).toBe('Convenio Tecnico');
-    expect(row.titleSecondary).toBe('AGR-01');
-    expect(row.detailText).toBe('CAT-02');
-    expect(row.detailSecondary).toBeUndefined();
+  it('maps close draft to request', () => {
+    expect(mapLaborClassificationCloseDraftToRequest({ endDate: '2026-12-31' })).toEqual({
+      endDate: '2026-12-31',
+    });
   });
 });
