@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  signal,
+  untracked,
+} from '@angular/core';
 
 import { EmployeeWorkingTimeStore } from '../../data-access/employee-working-time.store';
 import { employeeTexts } from '../../employee.texts';
@@ -11,7 +20,7 @@ import { PeriodModalComponent } from '../../shared/ui/period-modal/period-modal.
 import { PeriodTableRow } from '../../shared/ui/period-table/period-table.model';
 import { currentLocalDate } from '../../../../shared/utils/local-date.util';
 
-type WorkingTimeModalMode = 'create' | 'close';
+type WorkingTimeModalMode = 'create' | 'edit' | 'close';
 
 interface WorkingTimePeriodRow extends PeriodTableRow {
   workingTimeNumber: number;
@@ -23,7 +32,12 @@ interface WorkingTimePeriodRow extends PeriodTableRow {
 @Component({
   selector: 'app-employee-working-time-section',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [PeriodTableComponent, PeriodModalComponent, UiDateInputComponent, UiInputNumberComponent],
+  imports: [
+    PeriodTableComponent,
+    PeriodModalComponent,
+    UiDateInputComponent,
+    UiInputNumberComponent,
+  ],
   templateUrl: './employee-working-time-section.component.html',
   styleUrl: './employee-working-time-section.component.scss',
 })
@@ -35,7 +49,10 @@ export class EmployeeWorkingTimeSectionComponent {
   protected readonly modalVisible = signal(false);
   protected readonly modalMode = signal<WorkingTimeModalMode>('create');
   protected readonly editingNumber = signal<number | null>(null);
+  protected readonly editingStartDate = signal<string | null>(null);
+  protected readonly editingIsActive = signal(false);
   protected readonly startDateDraft = signal(currentLocalDate());
+  protected readonly newStartDateDraft = signal('');
   protected readonly percentageDraft = signal(100);
   protected readonly endDateDraft = signal('');
 
@@ -56,14 +73,30 @@ export class EmployeeWorkingTimeSectionComponent {
   );
 
   protected readonly saving = computed(() => this.workingTimeStore.mutating());
-
-  protected readonly modalTitle = computed(() =>
-    this.modalMode() === 'create' ? 'Nueva jornada' : 'Cerrar período — Jornada',
+  protected readonly showCascadeWarning = computed(
+    () =>
+      this.modalMode() === 'edit' &&
+      !!this.newStartDateDraft() &&
+      this.newStartDateDraft() !== this.editingStartDate(),
   );
 
-  protected readonly isSubmitEnabled = computed(() =>
-    this.modalMode() === 'create' ? !!this.startDateDraft() : !!this.endDateDraft(),
-  );
+  protected readonly modalTitle = computed(() => {
+    if (this.modalMode() === 'create') return 'Nueva jornada';
+    if (this.modalMode() === 'close') return 'Cerrar período — Jornada';
+    return 'Editar jornada';
+  });
+
+  protected readonly modalSubtitle = computed(() => {
+    const sd = this.editingStartDate();
+    return sd ? `Desde ${sd}` : null;
+  });
+
+  protected readonly isSubmitEnabled = computed(() => {
+    const mode = this.modalMode();
+    if (mode === 'create') return !!this.startDateDraft();
+    if (mode === 'edit') return !!this.newStartDateDraft();
+    return !!this.endDateDraft();
+  });
 
   constructor() {
     effect(() => {
@@ -73,7 +106,10 @@ export class EmployeeWorkingTimeSectionComponent {
 
     effect(() => {
       const success = this.workingTimeStore.success();
-      if (success) untracked(() => { if (this.modalVisible()) this.closeModal(); });
+      if (success)
+        untracked(() => {
+          if (this.modalVisible()) this.closeModal();
+        });
     });
   }
 
@@ -89,23 +125,39 @@ export class EmployeeWorkingTimeSectionComponent {
     const row = this.rows()[index];
     if (!row || !row.isActive) return;
     this.workingTimeStore.clearFeedback();
-    this.modalMode.set('close');
+    this.modalMode.set('edit');
     this.editingNumber.set(row.workingTimeNumber);
-    this.endDateDraft.set(currentLocalDate());
+    this.editingStartDate.set(row.startDate);
+    this.editingIsActive.set(row.isActive);
+    this.newStartDateDraft.set(row.startDate);
+    this.percentageDraft.set(row.workingTimePercentage);
     this.modalVisible.set(true);
+  }
+
+  protected switchToClose(): void {
+    this.modalMode.set('close');
+    this.endDateDraft.set(currentLocalDate());
   }
 
   protected submit(): void {
     const key = this.employeeBusinessKey();
     if (!key || this.workingTimeStore.mutating()) return;
+    const mode = this.modalMode();
 
-    if (this.modalMode() === 'create') {
+    if (mode === 'create') {
       this.workingTimeStore.createWorkingTime(key, {
         startDate: this.startDateDraft(),
         workingTimePercentage: this.percentageDraft(),
       });
+    } else if (mode === 'edit') {
+      this.workingTimeStore.updateWorkingTime(key, this.editingNumber()!, {
+        startDate: this.newStartDateDraft(),
+        workingTimePercentage: this.percentageDraft(),
+      });
     } else {
-      this.workingTimeStore.closeWorkingTime(key, this.editingNumber()!, { endDate: this.endDateDraft() });
+      this.workingTimeStore.closeWorkingTime(key, this.editingNumber()!, {
+        endDate: this.endDateDraft(),
+      });
     }
   }
 

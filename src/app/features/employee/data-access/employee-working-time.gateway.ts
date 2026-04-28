@@ -12,8 +12,10 @@ import { toEmployeeBusinessKey } from '../routing/employee-route-key.util';
 import {
   WorkingTimeCloseDraft,
   WorkingTimeCreateDraft,
+  WorkingTimeUpdateDraft,
   mapWorkingTimeCloseDraftToRequest,
   mapWorkingTimeCreateDraftToRequest,
+  mapWorkingTimeUpdateDraftToRequest,
 } from './employee-working-time.mapper';
 
 @Injectable({
@@ -46,6 +48,18 @@ export class EmployeeWorkingTimeGateway {
 
     return this.workingTimeClient
       .createWorkingTimeByBusinessKey(normalizedKey, mapWorkingTimeCreateDraftToRequest(draft))
+      .pipe(map(() => undefined));
+  }
+
+  updateEmployeeWorkingTime(
+    employeeKey: EmployeeBusinessKey,
+    workingTimeNumber: number,
+    draft: WorkingTimeUpdateDraft,
+  ): Observable<void> {
+    const normalizedKey = toEmployeeBusinessKey(employeeKey);
+
+    return this.workingTimeClient
+      .updateWorkingTimeByBusinessKey(normalizedKey, workingTimeNumber, mapWorkingTimeUpdateDraftToRequest(draft))
       .pipe(map(() => undefined));
   }
 

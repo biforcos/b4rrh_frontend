@@ -13,10 +13,11 @@ class MockWorkingTimeStore {
   readonly workingTimes = this.workingTimesState.asReadonly();
   readonly loading = signal(false).asReadonly();
   readonly mutating = signal(false).asReadonly();
-  readonly successState = signal<'created' | 'closed' | null>(null);
+  readonly successState = signal<'created' | 'updated' | 'closed' | null>(null);
   readonly success = this.successState.asReadonly();
   readonly loadWorkingTimesByBusinessKey = vi.fn();
   readonly createWorkingTime = vi.fn();
+  readonly updateWorkingTime = vi.fn();
   readonly closeWorkingTime = vi.fn();
   readonly clearFeedback = vi.fn();
 }
@@ -77,6 +78,30 @@ describe('EmployeeWorkingTimeSectionComponent', () => {
     });
   });
 
+  it('calls updateWorkingTime on edit submit', () => {
+    store.workingTimesState.set([
+      {
+        workingTimeNumber: 3,
+        startDate: '2024-01-01',
+        endDate: null,
+        workingTimePercentage: 100,
+        weeklyHours: 40,
+        dailyHours: 8,
+        monthlyHours: 160,
+        isActive: true,
+      },
+    ]);
+    fix.detectChanges();
+    const c = fix.componentInstance as any;
+    c.openEdit(0);
+    c.percentageDraft.set(80);
+    c.submit();
+    expect(store.updateWorkingTime).toHaveBeenCalledWith(employeeKey, 3, {
+      startDate: '2024-01-01',
+      workingTimePercentage: 80,
+    });
+  });
+
   it('calls closeWorkingTime on close submit', () => {
     store.workingTimesState.set([
       {
@@ -93,6 +118,7 @@ describe('EmployeeWorkingTimeSectionComponent', () => {
     fix.detectChanges();
     const c = fix.componentInstance as any;
     c.openEdit(0);
+    c.switchToClose();
     c.endDateDraft.set('2025-12-31');
     c.submit();
     expect(store.closeWorkingTime).toHaveBeenCalledWith(employeeKey, 3, { endDate: '2025-12-31' });

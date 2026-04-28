@@ -5,7 +5,11 @@ import { EmployeeBusinessKey } from '../models/employee-business-key.model';
 import { EmployeeWorkingTimeModel } from '../models/employee-working-time.model';
 import { areEmployeeBusinessKeysEqual, toEmployeeBusinessKey } from '../routing/employee-route-key.util';
 import { EmployeeWorkingTimeErrorCode, mapEmployeeWorkingTimeErrorCode } from './employee-working-time-error.mapper';
-import { WorkingTimeCreateDraft, WorkingTimeCloseDraft } from './employee-working-time.mapper';
+import {
+  WorkingTimeCloseDraft,
+  WorkingTimeCreateDraft,
+  WorkingTimeUpdateDraft,
+} from './employee-working-time.mapper';
 import { EmployeeWorkingTimeGateway } from './employee-working-time.gateway';
 
 @Injectable({
@@ -18,7 +22,7 @@ export class EmployeeWorkingTimeStore {
   private readonly loadingState = signal(false);
   private readonly mutatingState = signal(false);
   private readonly errorState = signal<EmployeeWorkingTimeErrorCode | null>(null);
-  private readonly successState = signal<'created' | 'closed' | null>(null);
+  private readonly successState = signal<'created' | 'updated' | 'closed' | null>(null);
   private requestId = 0;
 
   readonly selectedEmployeeKey = this.selectedEmployeeKeyState.asReadonly();
@@ -55,6 +59,37 @@ export class EmployeeWorkingTimeStore {
         next: () => {
           this.mutatingState.set(false);
           this.successState.set('created');
+          this.loadWorkingTimesByBusinessKeyInternal(normalizedEmployeeKey, true);
+        },
+        error: (error) => {
+          this.mutatingState.set(false);
+          this.errorState.set(mapEmployeeWorkingTimeErrorCode(error));
+        },
+      });
+  }
+
+  updateWorkingTime(
+    employeeKey: EmployeeBusinessKey,
+    workingTimeNumber: number,
+    draft: WorkingTimeUpdateDraft,
+  ): void {
+    if (this.mutatingState()) {
+      return;
+    }
+
+    const normalizedEmployeeKey = toEmployeeBusinessKey(employeeKey);
+
+    this.mutatingState.set(true);
+    this.errorState.set(null);
+    this.successState.set(null);
+
+    this.employeeWorkingTimeGateway
+      .updateEmployeeWorkingTime(normalizedEmployeeKey, workingTimeNumber, draft)
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          this.mutatingState.set(false);
+          this.successState.set('updated');
           this.loadWorkingTimesByBusinessKeyInternal(normalizedEmployeeKey, true);
         },
         error: (error) => {

@@ -19,16 +19,28 @@
 
   <app-period-modal
     [title]="modalTitle()"
+    [subtitle]="modalSubtitle()"
     [visible]="modalVisible()"
     [saving]="saving()"
     [submitEnabled]="isSubmitEnabled()"
     [submitLabel]="modalMode() === 'close' ? 'Cerrar jornada' : 'Guardar'"
+    [showCloseAction]="modalMode() === 'edit' && editingIsActive()"
     (visibleChange)="modalVisible.set($event)"
     (submitted)="submit()"
     (cancelled)="closeModal()"
+    (closeActionClicked)="switchToClose()"
   >
     @if (modalMode() === 'create') {
       <app-ui-date-input [value]="startDateDraft()" (valueChanged)="startDateDraft.set($event)" />
+      <app-ui-input-number [value]="percentageDraft()" (valueChanged)="percentageDraft.set($event)" [min]="1" [max]="100" />
+    }
+    @if (modalMode() === 'edit') {
+      <app-ui-date-input [value]="newStartDateDraft()" (valueChanged)="newStartDateDraft.set($event)" />
+      @if (showCascadeWarning()) {
+        <p class="working-time-section__cascade-warning">
+          La fecha de inicio del período anterior se ajustará automáticamente.
+        </p>
+      }
       <app-ui-input-number [value]="percentageDraft()" (valueChanged)="percentageDraft.set($event)" [min]="1" [max]="100" />
     }
     @if (modalMode() === 'close') {

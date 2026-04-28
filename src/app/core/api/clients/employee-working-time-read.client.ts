@@ -6,6 +6,7 @@ import { EmployeeWorkingTimeService } from '../generated/api/employee-working-ti
 import {
   CloseWorkingTimeRequest,
   CreateWorkingTimeRequest,
+  UpdateWorkingTimeRequest,
   WorkingTimeResponse,
 } from '../generated/model/models';
 import { EmployeeBusinessKeyApiQuery } from './employee-read.client';
@@ -76,6 +77,22 @@ export class EmployeeWorkingTimeReadClient {
         closeWorkingTimeRequest: {
           endDate: request.endDate.trim(),
         },
+      })
+      .pipe(map((item: WorkingTimeResponse) => this.toEmployeeWorkingTimeApiModel(item)));
+  }
+
+  updateWorkingTimeByBusinessKey(
+    key: EmployeeBusinessKeyApiQuery,
+    workingTimeNumber: number,
+    request: UpdateWorkingTimeRequest,
+  ): Observable<EmployeeWorkingTimeApiModel> {
+    const normalizedKey = this.normalizeKey(key);
+
+    return this.api
+      .updateWorkingTimeByBusinessKey({
+        ...normalizedKey,
+        workingTimeNumber,
+        updateWorkingTimeRequest: request,
       })
       .pipe(map((item: WorkingTimeResponse) => this.toEmployeeWorkingTimeApiModel(item)));
   }
