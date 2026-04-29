@@ -1,7 +1,13 @@
 import { EmployeeBusinessKey } from '../models/employee-business-key.model';
 import { employeeRouteParamNames, toEmployeeBusinessKey } from './employee-route-key.util';
 
-export const employeeRouteSections = ['overview', 'contact', 'presence', 'organization'] as const;
+export const employeeRouteSections = [
+  'overview',
+  'contact',
+  'presence',
+  'organization',
+  'payroll',
+] as const;
 export type EmployeeRouteSection = (typeof employeeRouteSections)[number];
 
 export const employeeRouteBaseSegment = 'personas/empleados';

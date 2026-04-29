@@ -1,0 +1,19 @@
+.employee-area {
+  display: grid;
+  gap: 0.54rem;
+  margin-top: 0.14rem;
+}
+
+.employee-area__modules {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.56rem;
+}
+
+.employee-area__module {
+  align-self: start;
+  border: 1px solid #d1dce8;
+  border-radius: 0.62rem;
+  background: #f9fafb;
+  padding: 0.5rem 0.56rem;
+}

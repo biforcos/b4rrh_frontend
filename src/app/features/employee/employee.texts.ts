@@ -60,7 +60,8 @@ export const employeeTexts = {
   terminatePanelSummaryReasonLabel: 'Motivo',
   terminatePanelSummaryStatusLabel: 'Estado',
   terminatePanelSummaryWorkingTimeTitle: 'Jornada cerrada',
-  terminatePanelLoadExitReasonsErrorMessage: 'No se pudieron cargar los motivos de baja. Reintenta.',
+  terminatePanelLoadExitReasonsErrorMessage:
+    'No se pudieron cargar los motivos de baja. Reintenta.',
   terminatePanelMissingEmployeeKeyMessage: 'Falta la clave del empleado.',
   terminatePanelInvalidPayloadMessage: 'La solicitud no es válida.',
   terminatePanelEmployeeNotFoundMessage: 'No se encontró el empleado o el sistema.',
@@ -92,7 +93,8 @@ export const employeeTexts = {
   unknownEmployeeStatus: 'Estado no informado',
   detailLoadingMessage: 'Cargando detalle del empleado...',
   detailNotFoundMessage: 'No se encontro detalle para la clave de negocio seleccionada.',
-  detailLoadFailedMessage: 'No se pudo cargar el detalle del empleado. Reintenta navegando de nuevo.',
+  detailLoadFailedMessage:
+    'No se pudo cargar el detalle del empleado. Reintenta navegando de nuevo.',
   directoryLoadingMessage: 'Cargando listado de empleados...',
   directoryLoadFailedMessage: 'No se pudo cargar el listado de empleados. Reintenta.',
   catalogLoadFailedMessage: 'Error al cargar las opciones de catálogo.',
@@ -144,6 +146,33 @@ export const employeeTexts = {
   areaDisabledLabel: 'Disponible en siguiente iteracion',
   navRoutingHint:
     'Personales, Laborales y Organizativos ya navegan sobre verticales activos. Nomina queda preparada.',
+  payrollInputsSectionTitle: 'Entradas de nomina',
+  payrollInputsSectionSubtitle:
+    'Cantidades de entrada por periodo que consume el motor de calculo.',
+  payrollInputsPeriodLabel: 'Periodo',
+  payrollInputsPrevPeriodAriaLabel: 'Periodo anterior',
+  payrollInputsNextPeriodAriaLabel: 'Periodo siguiente',
+  payrollInputsConceptCodeLabel: 'Concepto',
+  payrollInputsConceptCodePlaceholder: 'Ej: HE_QTY',
+  payrollInputsQuantityLabel: 'Cantidad',
+  payrollInputsQuantityPlaceholder: '0',
+  payrollInputsAddAction: 'Agregar entrada',
+  payrollInputsEditAction: 'Editar',
+  payrollInputsDeleteAction: 'Eliminar',
+  payrollInputsCancelAction: 'Cancelar',
+  payrollInputsSaveCreateAction: 'Guardar',
+  payrollInputsSaveEditAction: 'Guardar',
+  payrollInputsConfirmDeleteMessage: 'Confirma la eliminacion de esta entrada de nomina.',
+  payrollInputsConfirmDeleteAction: 'Confirmar eliminacion',
+  payrollInputsEmptyMessage: 'No hay entradas de nomina para este periodo.',
+  payrollInputsLoadFailedMessage: 'No se pudieron cargar las entradas de nomina.',
+  payrollInputsRequestFailedMessage: 'No se pudo procesar la operacion. Reintenta.',
+  payrollInputsDuplicateMessage: 'Ya existe una entrada para ese concepto y periodo.',
+  payrollInputsNotFoundMessage: 'No se encontro la entrada seleccionada.',
+  payrollInputsCreateSuccessMessage: 'Entrada creada correctamente.',
+  payrollInputsEditSuccessMessage: 'Entrada actualizada correctamente.',
+  payrollInputsDeleteSuccessMessage: 'Entrada eliminada correctamente.',
+  payrollAreaLoadingMessage: 'Cargando entradas de nomina...',
   timelineTitle: 'Historial',
   timelineEventsSingularLabel: 'evento',
   timelineEventsPluralLabel: 'eventos',
@@ -174,9 +203,11 @@ export const employeeTexts = {
   sectionDemoTitle: 'Seccion editable (demo)',
   sectionDemoSubtitle: 'Patron base para separar estado local de UI y datos remotos.',
   sectionDemoViewMessage: 'Estado de lectura. Usa Crear o Editar para abrir modo de trabajo local.',
-  sectionDemoCreatingMessage: 'Modo creating. Simula la captura de un nuevo registro sin backend real.',
+  sectionDemoCreatingMessage:
+    'Modo creating. Simula la captura de un nuevo registro sin backend real.',
   sectionDemoEditingMessage: 'Modo editing. Simula cambios locales antes de confirmar envio.',
-  sectionDemoConfirmingMessage: 'Modo confirming. Punto intermedio antes de ejecutar una accion destructiva.',
+  sectionDemoConfirmingMessage:
+    'Modo confirming. Punto intermedio antes de ejecutar una accion destructiva.',
   sectionDemoSubmitCreateAction: 'Simular submitCreate()',
   sectionDemoSubmitEditAction: 'Simular submitEdit()',
   sectionDemoConfirmCloseAction: 'Simular confirmClose()',
@@ -185,7 +216,8 @@ export const employeeTexts = {
   sectionDemoDeleteSuccessMessage: 'Demo: baja simulada completada.',
   sectionDemoCloseSuccessMessage: 'Demo: cierre simulado completado.',
   slotDemoTitle: 'Contactos por slot (demo)',
-  slotDemoSubtitle: 'Patron reusable para alta, edicion y baja por fila con una sola operacion activa.',
+  slotDemoSubtitle:
+    'Patron reusable para alta, edicion y baja por fila con una sola operacion activa.',
   slotManageAction: 'Gestionar',
   slotExitManageAction: 'Salir de gestion',
   slotAddAction: 'Agregar',
@@ -307,7 +339,8 @@ export const employeeTexts = {
   addressesSectionConfirmCloseMessage: 'Confirma el cierre de esta direccion.',
   addressesSectionConfirmCloseAction: 'Confirmar cierre',
   addressesSectionEmptyMessage: 'No hay direcciones cargadas.',
-  addressesSectionRequestFailedMessage: 'No se pudo procesar la operacion de direcciones. Reintenta.',
+  addressesSectionRequestFailedMessage:
+    'No se pudo procesar la operacion de direcciones. Reintenta.',
   addressesSectionCreateSuccessMessage: 'Direccion creada correctamente.',
   addressesSectionEditCurrentSuccessMessage: 'Direccion corregida correctamente.',
   addressesSectionCloseSuccessMessage: 'Direccion cerrada correctamente.',
@@ -365,8 +398,7 @@ export const employeeTexts = {
     'No se puede eliminar esta asignacion porque inicia una presence del empleado. Corrigela si necesitas cambiarla.',
   workCenterSectionDeleteDisabledPresenceStartReason:
     'No eliminable: inicia una presence del empleado. Usa Corregir ocurrencia.',
-  workCenterSectionLoadFailedMessage:
-    'No se pudo cargar la informacion de centro de trabajo.',
+  workCenterSectionLoadFailedMessage: 'No se pudo cargar la informacion de centro de trabajo.',
   workCenterSectionCreateSuccessMessage: 'Asignacion creada correctamente.',
   workCenterSectionCorrectSuccessMessage: 'Asignacion corregida correctamente.',
   workCenterSectionCloseSuccessMessage: 'Asignacion cerrada correctamente.',
@@ -381,8 +413,10 @@ export const employeeTexts = {
   workCenterSectionPeriodPrefix: 'Periodo',
   workCenterSectionAssignmentPrefix: 'Asignacion',
   workCenterSectionAssignmentLabel: 'Numero de asignacion',
-  workCenterSectionCorrectionHint: 'Corrigiendo la ocurrencia seleccionada sin crear una nueva asignacion.',
-  workCenterSectionCloseHint: 'Define la fecha de cierre para finalizar la vigencia de la asignacion actual.',
+  workCenterSectionCorrectionHint:
+    'Corrigiendo la ocurrencia seleccionada sin crear una nueva asignacion.',
+  workCenterSectionCloseHint:
+    'Define la fecha de cierre para finalizar la vigencia de la asignacion actual.',
   workCenterSectionCodeLabel: 'Centro de trabajo',
   workCenterSectionStartDateLabel: 'Fecha inicio',
   workCenterSectionEndDateLabel: 'Fecha fin',
@@ -397,7 +431,8 @@ export const employeeTexts = {
   personalAddressesBlockDescription:
     'Bloque preparado para direccion principal, historico y vigencias.',
   laborAreaTitle: 'Laborales',
-  laborAreaSubtitle: 'Bloques vinculados a presencia, condicion contractual, jornada y clasificacion laboral.',
+  laborAreaSubtitle:
+    'Bloques vinculados a presencia, condicion contractual, jornada y clasificacion laboral.',
   laborLoadingMessage: 'Cargando datos laborales...',
   organizationLoadingMessage: 'Cargando datos organizativos...',
   organizationFutureTitle: 'Proximas asignaciones organizativas',
@@ -530,12 +565,10 @@ export const employeeTexts = {
     'La jornada debe quedar dentro de un periodo de presencia del empleado.',
   workingTimeSectionAlreadyClosedMessage:
     'La jornada ya estaba cerrada y no admite un nuevo cierre.',
-  workingTimeSectionNotFoundMessage:
-    'No se encontro la jornada seleccionada para este empleado.',
+  workingTimeSectionNotFoundMessage: 'No se encontro la jornada seleccionada para este empleado.',
   workingTimeSectionNumberConflictMessage:
     'Se ha producido un conflicto de numeracion funcional al crear la jornada. Reintenta.',
-  workingTimeSectionRequestFailedMessage:
-    'No se pudo procesar la operacion de jornada. Reintenta.',
+  workingTimeSectionRequestFailedMessage: 'No se pudo procesar la operacion de jornada. Reintenta.',
   workingTimeSectionCreateSuccessMessage: 'Jornada creada correctamente.',
   workingTimeSectionCloseSuccessMessage: 'Jornada cerrada correctamente.',
   laborClassificationBlockTitle: 'Clasificacion laboral',
@@ -550,7 +583,8 @@ export const employeeTexts = {
   laborClassificationBlockHistoryTitle: 'Historial de clasificaciones',
   laborClassificationBlockHistoryEmptyMessage: 'Sin periodos anteriores registrados.',
   laborClassificationBlockEmptyMessage: 'No hay clasificaciones laborales disponibles.',
-  laborClassificationLoadFailedMessage: 'No se pudo cargar la informacion de clasificacion laboral.',
+  laborClassificationLoadFailedMessage:
+    'No se pudo cargar la informacion de clasificacion laboral.',
   laborClassificationBlockStatusActive: 'Activa',
   laborClassificationBlockStatusClosed: 'Cerrada',
   laborClassificationBlockPeriodLabel: 'Periodo',
@@ -558,8 +592,7 @@ export const employeeTexts = {
   laborClassificationBlockAgreementLabel: 'Convenio',
   laborClassificationBlockCategoryLabel: 'Categoria',
   laborClassificationSectionTitle: 'Clasificacion laboral',
-  laborClassificationSectionSubtitle:
-    'Gestiona la clasificacion laboral vigente y su historico.',
+  laborClassificationSectionSubtitle: 'Gestiona la clasificacion laboral vigente y su historico.',
   laborClassificationSectionManageAction: 'Cambiar clasificacion desde fecha',
   laborClassificationSectionExitManageAction: 'Salir',
   laborClassificationSectionReplaceAction: 'Cambiar clasificacion desde fecha',
@@ -650,7 +683,8 @@ export const employeeTexts = {
   hireEmployeeWorkingTimeTitle: 'Jornada inicial',
   hireEmployeeWorkingTimeHint: 'Las horas se calculan automáticamente a partir del porcentaje.',
   hireEmployeeWorkingTimeRequiredMessage: 'Indica el porcentaje de jornada inicial.',
-  hireEmployeeWorkingTimeRangeMessage: 'El porcentaje de jornada debe ser mayor que 0 y menor o igual que 100.',
+  hireEmployeeWorkingTimeRangeMessage:
+    'El porcentaje de jornada debe ser mayor que 0 y menor o igual que 100.',
   hireEmployeeSummaryTitle: 'Resultado de la contratación',
   hireEmployeeSummaryEmployeeLabel: 'Empleado',
   hireEmployeeSummaryStatusLabel: 'Estado',
@@ -668,18 +702,23 @@ export const employeeTexts = {
   rehireEmployeeNotFoundMessage: 'No se encontró el empleado o el sistema.',
   rehireEmployeeAlreadyActiveMessage: 'El empleado ya está activo.',
   rehireEmployeeInvalidDateMessage: 'La fecha de reincorporación no es válida.',
-  rehireEmployeeConflictMessage: 'La reincorporación entra en conflicto con el estado actual del empleado.',
-  rehireEmployeeInvalidWorkingTimeMessage: 'La jornada inicial no es válida para la reincorporación.',
+  rehireEmployeeConflictMessage:
+    'La reincorporación entra en conflicto con el estado actual del empleado.',
+  rehireEmployeeInvalidWorkingTimeMessage:
+    'La jornada inicial no es válida para la reincorporación.',
   rehireEmployeeInvalidDistributionMessage: 'La distribución de centros de coste no es válida.',
-  rehireEmployeeInvalidDependentRelationMessage: 'Existe una relación dependiente no válida para la reincorporación.',
-  rehireEmployeeInvalidCatalogMessage: 'Uno o más valores de catálogo son inválidos para la fecha seleccionada.',
+  rehireEmployeeInvalidDependentRelationMessage:
+    'Existe una relación dependiente no válida para la reincorporación.',
+  rehireEmployeeInvalidCatalogMessage:
+    'Uno o más valores de catálogo son inválidos para la fecha seleccionada.',
   rehireEmployeeRequestFailedMessage: 'No se pudo completar la reincorporación. Reintenta.',
   rehireEmployeeMissingKeyRouteMessage: 'Falta la clave del empleado en la ruta.',
   rehireEmployeeMissingKeyMessage: 'Falta la clave del empleado.',
   rehireEmployeeWorkingTimeTitle: 'Porcentaje de jornada',
   rehireEmployeeWorkingTimeHint: 'Las horas se calculan automáticamente a partir del porcentaje.',
   rehireEmployeeWorkingTimeRequiredMessage: 'Indica el porcentaje de jornada inicial.',
-  rehireEmployeeWorkingTimeRangeMessage: 'El porcentaje de jornada debe ser mayor que 0 y menor o igual que 100.',
+  rehireEmployeeWorkingTimeRangeMessage:
+    'El porcentaje de jornada debe ser mayor que 0 y menor o igual que 100.',
   rehireEmployeeSummaryTitle: 'Resultado de la reincorporación',
   rehireEmployeeSummaryEmployeeLabel: 'Empleado',
   rehireEmployeeSummaryStatusLabel: 'Estado',

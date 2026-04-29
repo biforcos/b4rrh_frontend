@@ -46,6 +46,10 @@ tags:
     description: Rule entity type administration endpoints.
   - name: Rule Entities
     description: Rule entity administration endpoints.
+  - name: Payroll Engine
+    description: Payroll concept designer, operand/feed configuration, and assignment rule management.
+  - name: Employee Payroll Input
+    description: Per-employee payroll quantity inputs (overtime hours, transport units, etc.)
 
 paths:
   /employees:
@@ -4240,6 +4244,478 @@ paths:
               schema:
                 $ref: "#/components/schemas/PayrollErrorResponse"
 
+  /payroll-engine/{ruleSystemCode}/concepts:
+    get:
+      tags:
+        - Payroll Engine
+      summary: List all concepts for a rule system
+      operationId: listPayrollConcepts
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: ruleSystemCode
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PayrollConceptDesignerResponse'
+    post:
+      tags:
+        - Payroll Engine
+      summary: Create a payroll concept
+      operationId: createPayrollConcept
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: ruleSystemCode
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePayrollConceptRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PayrollConceptDesignerResponse'
+        '409':
+          description: Concept already exists
+
+  /payroll-engine/{ruleSystemCode}/concepts/{conceptCode}:
+    delete:
+      tags:
+        - Payroll Engine
+      summary: Delete a payroll concept
+      operationId: deletePayrollConcept
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: ruleSystemCode
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: conceptCode
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Deleted
+        '404':
+          description: Not found
+
+  /payroll-engine/{ruleSystemCode}/concepts/{conceptCode}/operands:
+    get:
+      tags:
+        - Payroll Engine
+      summary: List operands for a concept
+      operationId: listConceptOperands
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: ruleSystemCode
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: conceptCode
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConceptOperandResponse'
+    put:
+      tags:
+        - Payroll Engine
+      summary: Replace all operands for a concept
+      operationId: replaceConceptOperands
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: ruleSystemCode
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: conceptCode
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateConceptOperandsRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConceptOperandResponse'
+
+  /payroll-engine/{ruleSystemCode}/concepts/{conceptCode}/feeds:
+    get:
+      tags:
+        - Payroll Engine
+      summary: List feed relations for a concept
+      operationId: listConceptFeeds
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: ruleSystemCode
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: conceptCode
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConceptFeedResponse'
+    put:
+      tags:
+        - Payroll Engine
+      summary: Replace all feed relations for a concept
+      operationId: replaceConceptFeeds
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: ruleSystemCode
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: conceptCode
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateConceptFeedsRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConceptFeedResponse'
+
+  /payroll-engine/{ruleSystemCode}/assignments:
+    get:
+      tags:
+        - Payroll Engine
+      summary: List concept assignment rules
+      operationId: listConceptAssignments
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: ruleSystemCode
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: conceptCode
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConceptAssignmentResponse'
+    post:
+      tags:
+        - Payroll Engine
+      summary: Create a concept assignment rule
+      operationId: createConceptAssignment
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: ruleSystemCode
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateConceptAssignmentRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConceptAssignmentResponse'
+
+  /payroll-engine/{ruleSystemCode}/assignments/{assignmentCode}:
+    delete:
+      tags:
+        - Payroll Engine
+      summary: Delete a concept assignment rule
+      operationId: deleteConceptAssignment
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: ruleSystemCode
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: assignmentCode
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Deleted
+        '404':
+          description: Not found
+
+  /employees/{ruleSystemCode}/{employeeTypeCode}/{employeeNumber}/payroll-inputs:
+    post:
+      operationId: createEmployeePayrollInputByBusinessKey
+      summary: Register a payroll input quantity for an employee and period
+      tags:
+        - Employee Payroll Input
+      parameters:
+        - in: path
+          name: ruleSystemCode
+          required: true
+          schema:
+            type: string
+            maxLength: 10
+        - in: path
+          name: employeeTypeCode
+          required: true
+          schema:
+            type: string
+            maxLength: 10
+        - in: path
+          name: employeeNumber
+          required: true
+          schema:
+            type: string
+            maxLength: 20
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateEmployeePayrollInputRequest"
+      responses:
+        "201":
+          description: Payroll input created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmployeePayrollInputResponse"
+        "400":
+          description: Invalid request
+        "404":
+          description: Employee not found
+        "409":
+          description: Payroll input already exists for this concept and period
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmployeePayrollInputErrorResponse"
+    get:
+      operationId: listEmployeePayrollInputsByBusinessKey
+      summary: List payroll inputs for an employee and period
+      tags:
+        - Employee Payroll Input
+      parameters:
+        - in: path
+          name: ruleSystemCode
+          required: true
+          schema:
+            type: string
+            maxLength: 10
+        - in: path
+          name: employeeTypeCode
+          required: true
+          schema:
+            type: string
+            maxLength: 10
+        - in: path
+          name: employeeNumber
+          required: true
+          schema:
+            type: string
+            maxLength: 20
+        - in: query
+          name: period
+          required: true
+          schema:
+            type: integer
+          description: "Format yyyyMM, e.g. 202604"
+      responses:
+        "200":
+          description: Payroll inputs list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmployeePayrollInputsResponse"
+        "404":
+          description: Employee not found
+
+  /employees/{ruleSystemCode}/{employeeTypeCode}/{employeeNumber}/payroll-inputs/{conceptCode}:
+    put:
+      operationId: updateEmployeePayrollInputByBusinessKey
+      summary: Update the quantity of a payroll input
+      tags:
+        - Employee Payroll Input
+      parameters:
+        - in: path
+          name: ruleSystemCode
+          required: true
+          schema:
+            type: string
+            maxLength: 10
+        - in: path
+          name: employeeTypeCode
+          required: true
+          schema:
+            type: string
+            maxLength: 10
+        - in: path
+          name: employeeNumber
+          required: true
+          schema:
+            type: string
+            maxLength: 20
+        - in: path
+          name: conceptCode
+          required: true
+          schema:
+            type: string
+            maxLength: 20
+        - in: query
+          name: period
+          required: true
+          schema:
+            type: integer
+          description: "Format yyyyMM, e.g. 202604"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateEmployeePayrollInputRequest"
+      responses:
+        "200":
+          description: Payroll input updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmployeePayrollInputResponse"
+        "400":
+          description: Invalid request
+        "404":
+          description: Payroll input not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmployeePayrollInputErrorResponse"
+    delete:
+      operationId: deleteEmployeePayrollInputByBusinessKey
+      summary: Delete a payroll input for an employee, concept, and period
+      tags:
+        - Employee Payroll Input
+      parameters:
+        - in: path
+          name: ruleSystemCode
+          required: true
+          schema:
+            type: string
+            maxLength: 10
+        - in: path
+          name: employeeTypeCode
+          required: true
+          schema:
+            type: string
+            maxLength: 10
+        - in: path
+          name: employeeNumber
+          required: true
+          schema:
+            type: string
+            maxLength: 20
+        - in: path
+          name: conceptCode
+          required: true
+          schema:
+            type: string
+            maxLength: 20
+        - in: query
+          name: period
+          required: true
+          schema:
+            type: integer
+          description: "Format yyyyMM, e.g. 202604"
+      responses:
+        "204":
+          description: Payroll input deleted
+        "404":
+          description: Payroll input not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmployeePayrollInputErrorResponse"
+
 components:
   schemas:
     HireEmployeeRequest:
@@ -7089,3 +7565,223 @@ components:
       properties:
         message:
           type: string
+
+    CreatePayrollConceptRequest:
+      type: object
+      required: [conceptCode, conceptMnemonic, calculationType, functionalNature, resultCompositionMode, executionScope]
+      properties:
+        conceptCode:
+          type: string
+          example: "201"
+        conceptMnemonic:
+          type: string
+          example: "PLUS_TRANSPORTE"
+        calculationType:
+          type: string
+          enum: [DIRECT_AMOUNT, RATE_BY_QUANTITY, PERCENTAGE, AGGREGATE, JAVA_PROVIDED, EMPLOYEE_INPUT]
+        functionalNature:
+          type: string
+          enum: [EARNING, DEDUCTION, BASE, INFORMATIONAL, TECHNICAL, TOTAL_EARNING, TOTAL_DEDUCTION, NET_PAY]
+        resultCompositionMode:
+          type: string
+          enum: [REPLACE, ACCUMULATE]
+        executionScope:
+          type: string
+          enum: [SEGMENT, PERIOD]
+        payslipOrderCode:
+          type: string
+          nullable: true
+
+    PayrollConceptDesignerResponse:
+      type: object
+      required: [ruleSystemCode, conceptCode, conceptMnemonic, calculationType, functionalNature, resultCompositionMode, executionScope]
+      properties:
+        ruleSystemCode:
+          type: string
+        conceptCode:
+          type: string
+        conceptMnemonic:
+          type: string
+        calculationType:
+          type: string
+        functionalNature:
+          type: string
+        resultCompositionMode:
+          type: string
+        executionScope:
+          type: string
+        payslipOrderCode:
+          type: string
+          nullable: true
+
+    UpdateConceptOperandsRequest:
+      type: object
+      required: [operands]
+      properties:
+        operands:
+          type: array
+          items:
+            type: object
+            required: [operandRole, sourceObjectCode]
+            properties:
+              operandRole:
+                type: string
+                enum: [QUANTITY, RATE, BASE, PERCENTAGE]
+              sourceObjectCode:
+                type: string
+
+    UpdateConceptFeedsRequest:
+      type: object
+      required: [feeds]
+      properties:
+        feeds:
+          type: array
+          items:
+            type: object
+            required: [sourceObjectCode, invertSign, effectiveFrom]
+            properties:
+              sourceObjectCode:
+                type: string
+              invertSign:
+                type: boolean
+              effectiveFrom:
+                type: string
+                format: date
+              effectiveTo:
+                type: string
+                format: date
+                nullable: true
+
+    ConceptOperandResponse:
+      type: object
+      required: [operandRole, sourceObjectCode]
+      properties:
+        operandRole:
+          type: string
+        sourceObjectCode:
+          type: string
+
+    ConceptFeedResponse:
+      type: object
+      required: [sourceObjectCode, invertSign, effectiveFrom]
+      properties:
+        sourceObjectCode:
+          type: string
+        invertSign:
+          type: boolean
+        effectiveFrom:
+          type: string
+          format: date
+        effectiveTo:
+          type: string
+          format: date
+          nullable: true
+
+    CreateConceptAssignmentRequest:
+      type: object
+      required: [conceptCode, validFrom, priority]
+      properties:
+        conceptCode:
+          type: string
+        companyCode:
+          type: string
+          nullable: true
+        agreementCode:
+          type: string
+          nullable: true
+        employeeTypeCode:
+          type: string
+          nullable: true
+        validFrom:
+          type: string
+          format: date
+        validTo:
+          type: string
+          format: date
+          nullable: true
+        priority:
+          type: integer
+
+    ConceptAssignmentResponse:
+      type: object
+      required: [assignmentCode, ruleSystemCode, conceptCode, validFrom, priority]
+      properties:
+        assignmentCode:
+          type: string
+        ruleSystemCode:
+          type: string
+        conceptCode:
+          type: string
+        companyCode:
+          type: string
+          nullable: true
+        agreementCode:
+          type: string
+          nullable: true
+        employeeTypeCode:
+          type: string
+          nullable: true
+        validFrom:
+          type: string
+          format: date
+        validTo:
+          type: string
+          format: date
+          nullable: true
+        priority:
+          type: integer
+
+    CreateEmployeePayrollInputRequest:
+      type: object
+      required: [conceptCode, period, quantity]
+      properties:
+        conceptCode:
+          type: string
+          maxLength: 20
+        period:
+          type: integer
+          description: "Format yyyyMM"
+        quantity:
+          type: number
+          format: double
+
+    UpdateEmployeePayrollInputRequest:
+      type: object
+      required: [quantity]
+      properties:
+        quantity:
+          type: number
+          format: double
+
+    EmployeePayrollInputResponse:
+      type: object
+      required: [conceptCode, period, quantity]
+      properties:
+        conceptCode:
+          type: string
+        period:
+          type: integer
+        quantity:
+          type: number
+          format: double
+
+    EmployeePayrollInputsResponse:
+      type: object
+      required: [period, inputs]
+      properties:
+        period:
+          type: integer
+        inputs:
+          type: array
+          items:
+            $ref: "#/components/schemas/EmployeePayrollInputResponse"
+
+    EmployeePayrollInputErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: object

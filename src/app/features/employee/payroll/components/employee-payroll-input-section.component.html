@@ -1,0 +1,177 @@
+<app-employee-section-shell
+  [title]="texts.payrollInputsSectionTitle"
+  [subtitle]="texts.payrollInputsSectionSubtitle"
+  [state]="sectionState()"
+>
+  <div sectionCardActions class="employee-payroll-input-section__header-actions">
+    <div class="employee-payroll-input-section__period-nav">
+      <button
+        type="button"
+        class="employee-payroll-input-section__period-btn"
+        [attr.aria-label]="texts.payrollInputsPrevPeriodAriaLabel"
+        [disabled]="sectionState().busy"
+        (click)="prevPeriod()"
+      >&#8249;</button>
+      <span class="employee-payroll-input-section__period-label">{{ periodLabel() }}</span>
+      <button
+        type="button"
+        class="employee-payroll-input-section__period-btn"
+        [attr.aria-label]="texts.payrollInputsNextPeriodAriaLabel"
+        [disabled]="sectionState().busy"
+        (click)="nextPeriod()"
+      >&#8250;</button>
+    </div>
+
+    <app-ui-button
+      type="button"
+      size="small"
+      [label]="texts.payrollInputsAddAction"
+      [disabled]="sectionState().busy || creating()"
+      (pressed)="startCreate()"
+    />
+  </div>
+
+  <div class="employee-payroll-input-section__body">
+    @if (creating()) {
+      <article class="employee-payroll-input-section__slot employee-payroll-input-section__slot--create">
+        <div class="employee-payroll-input-section__form-grid">
+          <label class="employee-payroll-input-section__field">
+            <span>{{ texts.payrollInputsConceptCodeLabel }}</span>
+            <input
+              type="text"
+              class="employee-payroll-input-section__input"
+              [placeholder]="texts.payrollInputsConceptCodePlaceholder"
+              [value]="createDraft().conceptCode"
+              [disabled]="sectionState().busy"
+              (input)="updateCreateConceptCode($any($event.target).value)"
+            />
+          </label>
+
+          <label class="employee-payroll-input-section__field">
+            <span>{{ texts.payrollInputsQuantityLabel }}</span>
+            <input
+              type="number"
+              class="employee-payroll-input-section__input"
+              [placeholder]="texts.payrollInputsQuantityPlaceholder"
+              [value]="createDraft().quantity"
+              [disabled]="sectionState().busy"
+              min="0"
+              step="any"
+              (input)="updateCreateQuantity($any($event.target).value)"
+            />
+          </label>
+        </div>
+
+        <div class="employee-payroll-input-section__row-actions">
+          <app-ui-button
+            type="button"
+            size="small"
+            [label]="texts.payrollInputsSaveCreateAction"
+            [disabled]="!canSaveCreate() || sectionState().busy"
+            (pressed)="submitCreate()"
+          />
+          <app-ui-button
+            type="button"
+            size="small"
+            severity="secondary"
+            [outlined]="true"
+            [label]="texts.payrollInputsCancelAction"
+            [disabled]="sectionState().busy"
+            (pressed)="cancelCreate()"
+          />
+        </div>
+      </article>
+    }
+
+    @if (hasRows()) {
+      <ul class="employee-payroll-input-section__list" role="list">
+        @for (row of rows(); track row.conceptCode) {
+          <li class="employee-payroll-input-section__row">
+            <div class="employee-payroll-input-section__row-main">
+              <p class="employee-payroll-input-section__row-code">{{ row.conceptCode }}</p>
+
+              @if (editingCode() === row.conceptCode) {
+                <label class="employee-payroll-input-section__field employee-payroll-input-section__field--inline">
+                  <span>{{ texts.payrollInputsQuantityLabel }}</span>
+                  <input
+                    type="number"
+                    class="employee-payroll-input-section__input"
+                    [value]="editQuantity()"
+                    [disabled]="sectionState().busy"
+                    min="0"
+                    step="any"
+                    (input)="updateEditQuantity($any($event.target).value)"
+                  />
+                </label>
+              } @else if (deletingCode() === row.conceptCode) {
+                <p class="employee-payroll-input-section__confirm-text">{{ texts.payrollInputsConfirmDeleteMessage }}</p>
+              } @else {
+                <p class="employee-payroll-input-section__row-quantity">{{ row.quantity }}</p>
+              }
+            </div>
+
+            <div class="employee-payroll-input-section__row-actions">
+              @if (editingCode() === row.conceptCode) {
+                <app-ui-button
+                  type="button"
+                  size="small"
+                  [label]="texts.payrollInputsSaveEditAction"
+                  [disabled]="!canSaveEdit() || sectionState().busy"
+                  (pressed)="submitEdit(row.conceptCode)"
+                />
+                <app-ui-button
+                  type="button"
+                  size="small"
+                  severity="secondary"
+                  [outlined]="true"
+                  [label]="texts.payrollInputsCancelAction"
+                  [disabled]="sectionState().busy"
+                  (pressed)="cancelEdit()"
+                />
+              } @else if (deletingCode() === row.conceptCode) {
+                <app-ui-button
+                  type="button"
+                  size="small"
+                  severity="danger"
+                  [label]="texts.payrollInputsConfirmDeleteAction"
+                  [disabled]="sectionState().busy"
+                  (pressed)="confirmDelete(row.conceptCode)"
+                />
+                <app-ui-button
+                  type="button"
+                  size="small"
+                  severity="secondary"
+                  [outlined]="true"
+                  [label]="texts.payrollInputsCancelAction"
+                  [disabled]="sectionState().busy"
+                  (pressed)="cancelDelete()"
+                />
+              } @else {
+                <app-ui-button
+                  type="button"
+                  size="small"
+                  severity="secondary"
+                  [outlined]="true"
+                  [label]="texts.payrollInputsEditAction"
+                  [disabled]="sectionState().busy"
+                  (pressed)="startEdit(row.conceptCode)"
+                />
+                <app-ui-button
+                  type="button"
+                  size="small"
+                  severity="danger"
+                  [outlined]="true"
+                  [label]="texts.payrollInputsDeleteAction"
+                  [disabled]="sectionState().busy"
+                  (pressed)="requestDelete(row.conceptCode)"
+                />
+              }
+            </div>
+          </li>
+        }
+      </ul>
+    } @else if (!creating()) {
+      <p class="employee-payroll-input-section__empty">{{ texts.payrollInputsEmptyMessage }}</p>
+    }
+  </div>
+</app-employee-section-shell>

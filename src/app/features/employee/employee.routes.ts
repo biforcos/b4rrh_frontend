@@ -17,7 +17,9 @@ export const employeeRoutes: Routes = [
   {
     path: '',
     loadComponent: () =>
-      import('./shell/pages/employee-shell-page.component').then((m) => m.EmployeeShellPageComponent),
+      import('./shell/pages/employee-shell-page.component').then(
+        (m) => m.EmployeeShellPageComponent,
+      ),
     children: [
       {
         path: buildEmployeeDetailRoutePath('overview'),
@@ -29,7 +31,9 @@ export const employeeRoutes: Routes = [
       {
         path: buildEmployeeDetailRoutePath('contact'),
         loadComponent: () =>
-          import('./contact/pages/employee-contact-page.component').then((m) => m.EmployeeContactPageComponent),
+          import('./contact/pages/employee-contact-page.component').then(
+            (m) => m.EmployeeContactPageComponent,
+          ),
       },
       {
         path: buildEmployeeDetailRoutePath('presence'),
@@ -43,6 +47,13 @@ export const employeeRoutes: Routes = [
         loadComponent: () =>
           import('./organization/pages/employee-organization-page.component').then(
             (m) => m.EmployeeOrganizationPageComponent,
+          ),
+      },
+      {
+        path: buildEmployeeDetailRoutePath('payroll'),
+        loadComponent: () =>
+          import('./payroll/pages/employee-payroll-page.component').then(
+            (m) => m.EmployeePayrollPageComponent,
           ),
       },
       {
