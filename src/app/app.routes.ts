@@ -69,6 +69,13 @@ export const routes: Routes = [
           import('./features/nomina/recibos/recibos.routes').then((m) => m.recibosRoutes),
       },
       {
+        path: 'nomina/operaciones',
+        loadChildren: () =>
+          import('./features/nomina/operaciones/operaciones.routes').then(
+            (m) => m.operacionesRoutes,
+          ),
+      },
+      {
         path: 'employees',
         pathMatch: 'full',
         redirectTo: 'personas/empleados',

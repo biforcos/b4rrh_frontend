@@ -27,6 +27,7 @@ export const appTexts = {
   sectionRuleSystems: 'Rule systems',
   sectionPayroll: 'Nómina',
   sectionRecibos: 'Recibos',
+  sectionOperaciones: 'Operaciones',
   homeTitle: 'Inicio',
   homeDescription:
     'Aplicacion de administracion de personal preparada para crecer por secciones funcionales.',
