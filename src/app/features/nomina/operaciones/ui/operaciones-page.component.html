@@ -1,0 +1,241 @@
+<section class="ops-page" aria-label="Operaciones de cálculo">
+
+  <!-- Contexto compartido -->
+  <div class="ops-page__context">
+    <div class="ops-page__context-fields">
+      <label class="ops-page__field">
+        <span class="ops-page__field-label">Sistema</span>
+        <input
+          type="text"
+          class="ops-page__input"
+          [value]="store.ruleSystemCode()"
+          (input)="store.setRuleSystemCode($any($event.target).value)"
+        />
+      </label>
+
+      <div class="ops-page__field">
+        <span class="ops-page__field-label">Periodo</span>
+        <div class="ops-page__period-nav">
+          <button
+            type="button"
+            class="ops-page__period-btn"
+            aria-label="Periodo anterior"
+            (click)="store.prevPeriod()"
+          >&#8249;</button>
+          <span class="ops-page__period-label">{{ store.periodLabel() }}</span>
+          <button
+            type="button"
+            class="ops-page__period-btn"
+            aria-label="Periodo siguiente"
+            (click)="store.nextPeriod()"
+          >&#8250;</button>
+        </div>
+      </div>
+
+      <label class="ops-page__field">
+        <span class="ops-page__field-label">Tipo de nómina</span>
+        <input
+          type="text"
+          class="ops-page__input"
+          [value]="store.payrollTypeCode()"
+          (input)="store.setPayrollTypeCode($any($event.target).value)"
+        />
+      </label>
+    </div>
+
+    <div class="ops-page__target-section">
+      <span class="ops-page__field-label">Empleados objetivo</span>
+      <div class="ops-page__target-tabs">
+        @for (mode of targetModes; track mode.value) {
+          <button
+            type="button"
+            class="ops-page__target-tab"
+            [class.ops-page__target-tab--active]="store.targetMode() === mode.value"
+            (click)="store.setTargetMode(mode.value)"
+          >{{ mode.label }}</button>
+        }
+      </div>
+
+      @if (store.targetMode() === 'LIST') {
+        <textarea
+          class="ops-page__textarea"
+          placeholder="Una línea por empleado, formato TIPO:NÚMERO&#10;Ejemplo:&#10;EMP:EMP001&#10;EMP:EMP002"
+          rows="4"
+          [value]="store.employeeListText()"
+          (input)="store.setEmployeeListText($any($event.target).value)"
+        ></textarea>
+      }
+
+      @if (store.targetMode() === 'SINGLE') {
+        <div class="ops-page__single-employee">
+          <label class="ops-page__field">
+            <span class="ops-page__field-label">Tipo</span>
+            <input
+              type="text"
+              class="ops-page__input"
+              placeholder="EMP"
+              [value]="store.singleEmployeeType()"
+              (input)="store.setSingleEmployeeType($any($event.target).value)"
+            />
+          </label>
+          <label class="ops-page__field">
+            <span class="ops-page__field-label">Número</span>
+            <input
+              type="text"
+              class="ops-page__input"
+              placeholder="EMP001"
+              [value]="store.singleEmployeeNumber()"
+              (input)="store.setSingleEmployeeNumber($any($event.target).value)"
+            />
+          </label>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Paneles paralelos -->
+  <div class="ops-page__panels">
+
+    <!-- Panel invalidar -->
+    <div class="ops-page__panel ops-page__panel--invalidate">
+      <h2 class="ops-page__panel-title ops-page__panel-title--invalidate">Invalidar masivamente</h2>
+
+      <label class="ops-page__field">
+        <span class="ops-page__field-label">Motivo de invalidación</span>
+        <input
+          type="text"
+          class="ops-page__input"
+          [value]="store.statusReasonCode()"
+          [disabled]="store.invalidating()"
+          (input)="store.setStatusReasonCode($any($event.target).value)"
+        />
+      </label>
+
+      <app-ui-button
+        label="Invalidar"
+        severity="danger"
+        [disabled]="!store.canInvalidate()"
+        (pressed)="store.invalidate()"
+      />
+
+      @if (store.invalidating()) {
+        <p class="ops-page__status-text">Procesando…</p>
+      }
+
+      @if (store.invalidateError()) {
+        <p class="ops-page__error">No se pudo procesar la invalidación. Reintenta.</p>
+      }
+
+      @if (store.invalidateResult(); as result) {
+        <div class="ops-page__result-grid">
+          <div class="ops-page__counter">
+            <span class="ops-page__counter-value">{{ result.totalCandidates }}</span>
+            <span class="ops-page__counter-label">Candidatos</span>
+          </div>
+          <div class="ops-page__counter ops-page__counter--success">
+            <span class="ops-page__counter-value">{{ result.totalInvalidated }}</span>
+            <span class="ops-page__counter-label">Invalidadas</span>
+          </div>
+          <div class="ops-page__counter ops-page__counter--warn">
+            <span class="ops-page__counter-value">{{ result.totalSkippedAlreadyNotValid }}</span>
+            <span class="ops-page__counter-label">Ya inv.</span>
+          </div>
+          <div class="ops-page__counter ops-page__counter--warn">
+            <span class="ops-page__counter-value">{{ result.totalSkippedProtected }}</span>
+            <span class="ops-page__counter-label">Protegidas</span>
+          </div>
+          <div class="ops-page__counter ops-page__counter--error">
+            <span class="ops-page__counter-value">{{ result.totalSkippedNotFound }}</span>
+            <span class="ops-page__counter-label">No encontradas</span>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Panel calcular -->
+    <div class="ops-page__panel ops-page__panel--calculate">
+      <h2 class="ops-page__panel-title ops-page__panel-title--calculate">Lanzar cálculo</h2>
+
+      <div class="ops-page__engine-fields">
+        <label class="ops-page__field">
+          <span class="ops-page__field-label">Motor</span>
+          <input
+            type="text"
+            class="ops-page__input"
+            [value]="store.engineCode()"
+            [disabled]="store.launching()"
+            (input)="store.setEngineCode($any($event.target).value)"
+          />
+        </label>
+        <label class="ops-page__field">
+          <span class="ops-page__field-label">Versión</span>
+          <input
+            type="text"
+            class="ops-page__input"
+            [value]="store.engineVersion()"
+            [disabled]="store.launching()"
+            (input)="store.setEngineVersion($any($event.target).value)"
+          />
+        </label>
+      </div>
+
+      <app-ui-button
+        label="Lanzar"
+        [disabled]="!store.canLaunch()"
+        (pressed)="store.launch()"
+      />
+
+      @if (store.launching()) {
+        <p class="ops-page__status-text">Lanzando run…</p>
+      }
+
+      @if (store.launchError()) {
+        <p class="ops-page__error">
+          @if (store.launchError() === 'launch-failed') { No se pudo lanzar el cálculo. Reintenta. }
+          @if (store.launchError() === 'poll-failed') { Error al seguir el estado del run. Recarga la página para ver el resultado. }
+        </p>
+      }
+
+      @if (store.run(); as run) {
+        <div class="ops-page__run-panel">
+          <div class="ops-page__run-header">
+            <span class="ops-page__run-title">Run #{{ run.runId }}</span>
+            <span class="ops-badge" [ngClass]="runStatusSeverity[run.status]">
+              {{ runStatusLabels[run.status] ?? run.status }}
+            </span>
+          </div>
+
+          <div class="ops-page__result-grid">
+            <div class="ops-page__counter">
+              <span class="ops-page__counter-value">{{ run.totalCandidates }}</span>
+              <span class="ops-page__counter-label">Candidatos</span>
+            </div>
+            <div class="ops-page__counter ops-page__counter--info">
+              <span class="ops-page__counter-value">{{ run.totalEligible }}</span>
+              <span class="ops-page__counter-label">Elegibles</span>
+            </div>
+            <div class="ops-page__counter ops-page__counter--success">
+              <span class="ops-page__counter-value">{{ run.totalCalculated }}</span>
+              <span class="ops-page__counter-label">Calculadas</span>
+            </div>
+            <div class="ops-page__counter ops-page__counter--error">
+              <span class="ops-page__counter-value">{{ run.totalErrors }}</span>
+              <span class="ops-page__counter-label">Errores</span>
+            </div>
+            <div class="ops-page__counter">
+              <span class="ops-page__counter-value">{{ run.totalNotValid }}</span>
+              <span class="ops-page__counter-label">No válidas</span>
+            </div>
+          </div>
+
+          @if (store.isRunActive()) {
+            <div class="ops-page__progress-bar">
+              <div class="ops-page__progress-fill" [style.width.%]="store.runProgress()"></div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+  </div>
+</section>
