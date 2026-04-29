@@ -8,7 +8,15 @@ import {
   signal,
   untracked,
 } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { of, switchMap } from 'rxjs';
+import { SelectModule } from 'primeng/select';
 
+import {
+  EmployeePayrollInputGateway,
+  EmployeeInputConcept,
+} from '../../data-access/employee-payroll-input.gateway';
 import { EmployeePayrollInputStore } from '../../data-access/employee-payroll-input.store';
 import { employeeTexts } from '../../employee.texts';
 import { EmployeeBusinessKey } from '../../models/employee-business-key.model';
@@ -63,7 +71,7 @@ interface InputRow {
 @Component({
   selector: 'app-employee-payroll-input-section',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [EmployeeSectionShellComponent, UiButtonComponent],
+  imports: [EmployeeSectionShellComponent, UiButtonComponent, SelectModule, FormsModule],
   templateUrl: './employee-payroll-input-section.component.html',
   styleUrl: './employee-payroll-input-section.component.scss',
 })
@@ -71,6 +79,16 @@ export class EmployeePayrollInputSectionComponent {
   readonly employeeKey = input<EmployeeBusinessKey | null>(null);
 
   private readonly store = inject(EmployeePayrollInputStore);
+  private readonly gateway = inject(EmployeePayrollInputGateway);
+
+  protected readonly employeeInputConcepts = toSignal(
+    toObservable(this.employeeKey).pipe(
+      switchMap((key) =>
+        key ? this.gateway.listEmployeeInputConcepts(key.ruleSystemCode) : of([]),
+      ),
+    ),
+    { initialValue: [] as EmployeeInputConcept[] },
+  );
   private readonly periodState = signal<number>(currentPeriod());
   private readonly creatingState = signal(false);
   private readonly editingCodeState = signal<string | null>(null);

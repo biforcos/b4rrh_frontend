@@ -35,17 +35,22 @@
     @if (creating()) {
       <article class="employee-payroll-input-section__slot employee-payroll-input-section__slot--create">
         <div class="employee-payroll-input-section__form-grid">
-          <label class="employee-payroll-input-section__field">
+          <div class="employee-payroll-input-section__field">
             <span>{{ texts.payrollInputsConceptCodeLabel }}</span>
-            <input
-              type="text"
-              class="employee-payroll-input-section__input"
-              [placeholder]="texts.payrollInputsConceptCodePlaceholder"
-              [value]="createDraft().conceptCode"
+            <p-select
+              [options]="employeeInputConcepts()"
+              [ngModel]="createDraft().conceptCode"
+              (ngModelChange)="updateCreateConceptCode($event)"
+              optionLabel="label"
+              optionValue="conceptCode"
+              placeholder="Selecciona un concepto"
               [disabled]="sectionState().busy"
-              (input)="updateCreateConceptCode($any($event.target).value)"
-            />
-          </label>
+              [filter]="true"
+              filterBy="label"
+              appendTo="body"
+              styleClass="employee-payroll-input-section__select"
+            ></p-select>
+          </div>
 
           <label class="employee-payroll-input-section__field">
             <span>{{ texts.payrollInputsQuantityLabel }}</span>

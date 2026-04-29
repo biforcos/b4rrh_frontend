@@ -104,6 +104,17 @@
   color: #8a9eb0;
 }
 
+.employee-payroll-input-section__select.p-select {
+  width: 100%;
+  font-size: 0.75rem;
+  min-height: 2rem;
+
+  .p-select-label {
+    font-size: 0.75rem;
+    padding: 0.34rem 0.42rem;
+  }
+}
+
 .employee-payroll-input-section__row-actions {
   display: flex;
   align-items: center;

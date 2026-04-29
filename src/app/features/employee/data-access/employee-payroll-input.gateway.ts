@@ -3,8 +3,14 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, map, of } from 'rxjs';
 
 import { EmployeePayrollInputService } from '../../../core/api/generated/api/employee-payroll-input.service';
+import { PayrollEngineService } from '../../../core/api/generated/api/payroll-engine.service';
 import { EmployeeBusinessKey } from '../models/employee-business-key.model';
 import { toEmployeeBusinessKey } from '../routing/employee-route-key.util';
+
+export interface EmployeeInputConcept {
+  label: string;
+  conceptCode: string;
+}
 
 export interface PayrollInputItem {
   conceptCode: string;
@@ -20,6 +26,21 @@ export interface PayrollInputCreateDraft {
 @Injectable({ providedIn: 'root' })
 export class EmployeePayrollInputGateway {
   private readonly api = inject(EmployeePayrollInputService);
+  private readonly payrollEngineApi = inject(PayrollEngineService);
+
+  listEmployeeInputConcepts(ruleSystemCode: string): Observable<EmployeeInputConcept[]> {
+    return this.payrollEngineApi.listPayrollConcepts({ ruleSystemCode }).pipe(
+      map((concepts) =>
+        concepts
+          .filter((c) => c.calculationType === 'EMPLOYEE_INPUT')
+          .map((c) => ({
+            label: `${c.conceptCode} — ${c.conceptMnemonic}`,
+            conceptCode: c.conceptCode,
+          })),
+      ),
+      catchError(() => of([])),
+    );
+  }
 
   listInputs(
     key: EmployeeBusinessKey,
