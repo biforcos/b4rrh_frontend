@@ -21,7 +21,7 @@ export class OperacionesPageComponent {
     { value: 'SINGLE', label: 'Empleado único' },
   ];
 
-  protected readonly runStatusLabels: Record<string, string> = {
+  protected readonly runStatusLabels: Record<string, string | undefined> = {
     REQUESTED: 'Solicitado',
     RUNNING: 'En curso…',
     COMPLETED: 'Completado',

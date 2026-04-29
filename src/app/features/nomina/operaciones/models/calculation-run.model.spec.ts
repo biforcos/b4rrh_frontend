@@ -19,9 +19,14 @@ const base: CalculationRun = {
 };
 
 describe('isRunFinished', () => {
-  it('returns true for COMPLETED', () => expect(isRunFinished({ ...base, status: 'COMPLETED' })).toBe(true));
-  it('returns true for COMPLETED_WITH_ERRORS', () => expect(isRunFinished({ ...base, status: 'COMPLETED_WITH_ERRORS' })).toBe(true));
-  it('returns true for FAILED', () => expect(isRunFinished({ ...base, status: 'FAILED' })).toBe(true));
-  it('returns false for RUNNING', () => expect(isRunFinished({ ...base, status: 'RUNNING' })).toBe(false));
-  it('returns false for REQUESTED', () => expect(isRunFinished({ ...base, status: 'REQUESTED' })).toBe(false));
+  it('returns true for COMPLETED', () =>
+    expect(isRunFinished({ ...base, status: 'COMPLETED' })).toBe(true));
+  it('returns true for COMPLETED_WITH_ERRORS', () =>
+    expect(isRunFinished({ ...base, status: 'COMPLETED_WITH_ERRORS' })).toBe(true));
+  it('returns true for FAILED', () =>
+    expect(isRunFinished({ ...base, status: 'FAILED' })).toBe(true));
+  it('returns false for RUNNING', () =>
+    expect(isRunFinished({ ...base, status: 'RUNNING' })).toBe(false));
+  it('returns false for REQUESTED', () =>
+    expect(isRunFinished({ ...base, status: 'REQUESTED' })).toBe(false));
 });

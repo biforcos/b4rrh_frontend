@@ -22,8 +22,6 @@ export interface CalculationRun {
 
 export function isRunFinished(run: CalculationRun): boolean {
   return (
-    run.status === 'COMPLETED' ||
-    run.status === 'COMPLETED_WITH_ERRORS' ||
-    run.status === 'FAILED'
+    run.status === 'COMPLETED' || run.status === 'COMPLETED_WITH_ERRORS' || run.status === 'FAILED'
   );
 }

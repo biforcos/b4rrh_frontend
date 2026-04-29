@@ -14,7 +14,20 @@ function currentPeriod(): number {
 function formatPeriod(period: number): string {
   const month = period % 100;
   const year = Math.floor(period / 100);
-  const names = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+  const names = [
+    'Ene',
+    'Feb',
+    'Mar',
+    'Abr',
+    'May',
+    'Jun',
+    'Jul',
+    'Ago',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dic',
+  ];
   return `${names[month - 1]} ${year}`;
 }
 
@@ -93,17 +106,39 @@ export class OperacionesStore implements OnDestroy {
       this.engineVersionState().trim().length > 0,
   );
 
-  setRuleSystemCode(v: string): void { this.ruleSystemCodeState.set(v); }
-  setPayrollTypeCode(v: string): void { this.payrollTypeCodeState.set(v); }
-  setTargetMode(v: TargetSelectionMode): void { this.targetModeState.set(v); }
-  setEmployeeListText(v: string): void { this.employeeListTextState.set(v); }
-  setSingleEmployeeType(v: string): void { this.singleEmployeeTypeState.set(v); }
-  setSingleEmployeeNumber(v: string): void { this.singleEmployeeNumberState.set(v); }
-  setStatusReasonCode(v: string): void { this.statusReasonCodeState.set(v); }
-  setEngineCode(v: string): void { this.engineCodeState.set(v); }
-  setEngineVersion(v: string): void { this.engineVersionState.set(v); }
-  prevPeriod(): void { this.periodState.update((p) => movePeriod(p, -1)); }
-  nextPeriod(): void { this.periodState.update((p) => movePeriod(p, 1)); }
+  setRuleSystemCode(v: string): void {
+    this.ruleSystemCodeState.set(v);
+  }
+  setPayrollTypeCode(v: string): void {
+    this.payrollTypeCodeState.set(v);
+  }
+  setTargetMode(v: TargetSelectionMode): void {
+    this.targetModeState.set(v);
+  }
+  setEmployeeListText(v: string): void {
+    this.employeeListTextState.set(v);
+  }
+  setSingleEmployeeType(v: string): void {
+    this.singleEmployeeTypeState.set(v);
+  }
+  setSingleEmployeeNumber(v: string): void {
+    this.singleEmployeeNumberState.set(v);
+  }
+  setStatusReasonCode(v: string): void {
+    this.statusReasonCodeState.set(v);
+  }
+  setEngineCode(v: string): void {
+    this.engineCodeState.set(v);
+  }
+  setEngineVersion(v: string): void {
+    this.engineVersionState.set(v);
+  }
+  prevPeriod(): void {
+    this.periodState.update((p) => movePeriod(p, -1));
+  }
+  nextPeriod(): void {
+    this.periodState.update((p) => movePeriod(p, 1));
+  }
 
   invalidate(): void {
     if (!this.canInvalidate()) return;

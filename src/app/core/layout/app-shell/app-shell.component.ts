@@ -84,7 +84,11 @@ export class AppShellComponent {
       expanded: true,
       items: [
         { label: this.texts.sectionRecibos, icon: 'pi pi-receipt', routerLink: '/nomina/recibos' },
-        { label: this.texts.sectionOperaciones, icon: 'pi pi-bolt', routerLink: '/nomina/operaciones' },
+        {
+          label: this.texts.sectionOperaciones,
+          icon: 'pi pi-bolt',
+          routerLink: '/nomina/operaciones',
+        },
       ],
     },
   ];
