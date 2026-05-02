@@ -37,21 +37,10 @@ export class EmployeeShellPageComponent {
 
   protected readonly texts = employeeTexts;
   protected readonly searchValue = signal('');
-  protected readonly employees = this.directoryStore.filteredEmployees;
   protected readonly loading = this.directoryStore.loading;
   protected readonly error = this.directoryStore.error;
 
-  protected readonly displayedEmployees = computed(() => {
-    const q = this.searchValue().trim().toLowerCase();
-    if (!q) return this.employees();
-    return this.employees().filter(
-      (e) =>
-        e.displayName.toLowerCase().includes(q) ||
-        e.employeeNumber.toLowerCase().includes(q) ||
-        e.ruleSystemCode.toLowerCase().includes(q) ||
-        e.employeeTypeCode.toLowerCase().includes(q),
-    );
-  });
+  protected readonly tableData = computed(() => [...this.directoryStore.filteredEmployees()]);
 
   protected updateSearch(value: string): void {
     this.searchValue.set(value);

@@ -24,7 +24,7 @@
         (input)="updateSearch($any($event.target).value)"
       />
     </p-iconfield>
-    <span class="employee-directory__count">{{ displayedEmployees().length }} empleados</span>
+    <span class="employee-directory__count">{{ tableData().length }} empleados</span>
   </div>
 
   <!-- DataTable -->
@@ -34,10 +34,10 @@
     }
 
     <p-table
-      [value]="$any(displayedEmployees())"
+      [value]="tableData()"
       [loading]="loading()"
       [rows]="50"
-      [paginator]="displayedEmployees().length > 50"
+      [paginator]="tableData().length > 50"
       styleClass="employee-directory__table"
     >
       <ng-template pTemplate="header">
