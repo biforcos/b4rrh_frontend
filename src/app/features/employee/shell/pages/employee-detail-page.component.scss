@@ -1,0 +1,137 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.employee-detail {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+/* Breadcrumb */
+.employee-detail__breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 24px;
+  background: var(--surface-panel);
+  border-bottom: 1px solid var(--border-default);
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.employee-detail__breadcrumb-link {
+  color: var(--accent-primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.employee-detail__breadcrumb-link:hover {
+  text-decoration: underline;
+}
+
+.employee-detail__breadcrumb-sep {
+  color: var(--text-tertiary);
+}
+
+.employee-detail__breadcrumb-current {
+  color: var(--text-primary);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Two-column body */
+.employee-detail__body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Content (right column) */
+.employee-detail__content {
+  flex: 1;
+  min-width: 0;
+  background: var(--surface-app);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.employee-detail__identity-editor {
+  display: contents;
+}
+
+.employee-detail__messages {
+  display: contents;
+  pointer-events: none;
+}
+
+/* Sections + timeline side-by-side */
+.employee-detail__sections-timeline {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(22rem, 24rem);
+  gap: 16px;
+  align-items: start;
+}
+
+.employee-detail__section-area {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.employee-detail__timeline-area {
+  background: var(--surface-panel);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-default);
+  box-shadow: var(--shadow-card);
+  padding: 16px;
+  align-self: start;
+  position: sticky;
+  top: 16px;
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+}
+
+.employee-detail__loading {
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+@keyframes detail-section-highlight {
+  0%   { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0); }
+  25%  { box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15); }
+  100% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0); }
+}
+
+@media (max-width: 1280px) {
+  .employee-detail__sections-timeline {
+    grid-template-columns: minmax(0, 1fr) minmax(20rem, 22rem);
+  }
+}
+
+@media (max-width: 960px) {
+  .employee-detail__sections-timeline {
+    grid-template-columns: 1fr;
+  }
+
+  .employee-detail__timeline-area {
+    position: static;
+    max-height: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .employee-detail__body {
+    flex-direction: column;
+  }
+
+  .employee-detail__content {
+    padding: 16px;
+  }
+}

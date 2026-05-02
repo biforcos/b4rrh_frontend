@@ -1,0 +1,88 @@
+<div class="employee-detail">
+
+  <!-- Breadcrumb -->
+  <nav class="employee-detail__breadcrumb" aria-label="Breadcrumb">
+    <a class="employee-detail__breadcrumb-link" routerLink="/personas/empleados">{{ texts.masterTitle }}</a>
+    <span class="employee-detail__breadcrumb-sep" aria-hidden="true">›</span>
+    <span class="employee-detail__breadcrumb-current">{{ selectedEmployee()?.displayName ?? '...' }}</span>
+  </nav>
+
+  @if (activeEmployeeKey(); as key) {
+    <div class="employee-detail__body">
+
+      <!-- Identity panel (left column) -->
+      <app-employee-identity-panel
+        [employeeKey]="key"
+        [employee]="selectedEmployee()"
+        [hireDate]="headerHireDate()"
+        [status]="headerStatus()"
+      />
+
+      <!-- Content area (right column) -->
+      <div class="employee-detail__content">
+
+        <!-- Hidden identity editor drawer -->
+        @if (selectedEmployee(); as employee) {
+          <app-employee-detail-header
+            class="employee-detail__identity-editor"
+            [employee]="employee"
+            [editorOnly]="true"
+            [openEditorRequestId]="openIdentityEditorRequestId()"
+            [updating]="updatingIdentity()"
+            [updateError]="updateIdentityError()"
+            [updateSuccess]="updateIdentitySuccess()"
+            (updateRequested)="submitIdentityUpdate($event)"
+            (editInteractionStarted)="clearIdentityFeedback()"
+          />
+        }
+
+        <!-- Global messages -->
+        <div class="employee-detail__messages" aria-live="polite">
+          <app-global-message-rail
+            [messages]="globalMessages()"
+            [summary]="globalMessageSummary()"
+            [expanded]="globalMessageExpanded()"
+            (toggleRequested)="toggleGlobalMessages()"
+            (closeRequested)="closeGlobalMessages()"
+            (sectionRequested)="navigateToMessageSection($event)"
+          />
+        </div>
+
+        <!-- Sections + timeline grid -->
+        <div class="employee-detail__sections-timeline">
+
+          <!-- Section router outlet -->
+          <section class="employee-detail__section-area">
+            @if (!isRehireWorkflow()) {
+              @if (loadingDetail()) {
+                <p class="employee-detail__loading">{{ texts.detailLoadingMessage }}</p>
+              }
+            }
+            <router-outlet />
+          </section>
+
+          <!-- Journey timeline (kept intact) -->
+          @if (!isRehireWorkflow()) {
+            <aside class="employee-detail__timeline-area" id="employee-section-journey" aria-label="Historial del empleado">
+              @if (!terminatePanelOpen()) {
+                <app-employee-journey-timeline
+                  [journey]="journey()"
+                  [loading]="loadingJourney()"
+                  [error]="journeyError()"
+                  [presences]="presences()"
+                />
+              } @else {
+                <app-employee-terminate-panel
+                  [employeeKey]="key"
+                  (closed)="closeTerminatePanel()"
+                />
+              }
+            </aside>
+          }
+
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

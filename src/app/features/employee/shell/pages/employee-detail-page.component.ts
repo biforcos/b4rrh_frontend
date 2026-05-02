@@ -1,0 +1,389 @@
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+  untracked,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router';
+import { filter, startWith } from 'rxjs';
+
+import { EmployeeIdentityPanelComponent } from '../../identity/employee-identity-panel.component';
+import { EmployeeJourneyTimelineComponent } from '../components/employee-journey-timeline.component';
+import { EmployeeTerminatePanelComponent } from '../components/employee-terminate-panel.component';
+import { GlobalMessageRailComponent } from '../components/global-message-rail.component';
+import { EmployeeDetailStore } from '../../data-access/employee-detail.store';
+import { EmployeePresenceStore } from '../../data-access/employee-presence.store';
+import { EmployeeJourneyStore } from '../../data-access/employee-journey.store';
+import { EmployeeContractStore } from '../../data-access/employee-contract.store';
+import { EmployeeWorkCenterStore } from '../../data-access/employee-work-center.store';
+import { EmployeeContactStore } from '../../data-access/employee-contact.store';
+import { GlobalMessageService } from '../../data-access/employee-global-message.store';
+import { EmployeePdfService } from '../services/employee-pdf.service';
+import { employeeTexts } from '../../employee.texts';
+import { EmployeeBusinessKey } from '../../models/employee-business-key.model';
+import { EmployeeContactModel } from '../../models/employee-contact.model';
+import { EmployeeCoreIdentityDraft } from '../../models/employee-core-identity-draft.model';
+import { EmployeeDetailModel } from '../../models/employee-detail.model';
+import { EmployeePresenceModel } from '../../models/employee-presence.model';
+import {
+  buildEmployeeDetailRouteCommands,
+  EmployeeRouteSection,
+  employeeRouteSections,
+} from '../../routing/employee-route-builder.util';
+import {
+  areEmployeeBusinessKeysEqual,
+  readEmployeeBusinessKeyFromParamMap,
+} from '../../routing/employee-route-key.util';
+import { GlobalUiMessage } from '../../models/global-ui-message.model';
+import { EmployeeDetailHeaderComponent } from '../components/employee-detail-header.component';
+
+@Component({
+  selector: 'app-employee-detail-page',
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    RouterLink,
+    RouterOutlet,
+    EmployeeIdentityPanelComponent,
+    EmployeeJourneyTimelineComponent,
+    EmployeeTerminatePanelComponent,
+    GlobalMessageRailComponent,
+    EmployeeDetailHeaderComponent,
+  ],
+  templateUrl: './employee-detail-page.component.html',
+  styleUrl: './employee-detail-page.component.scss',
+})
+export class EmployeeDetailPageComponent {
+  protected readonly isRehireWorkflow = computed(() => {
+    let snapshot = this.route.snapshot;
+    while (snapshot.firstChild) snapshot = snapshot.firstChild;
+    return snapshot.url.some((seg: any) => seg.path === 'rehire');
+  });
+
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  private readonly detailStore = inject(EmployeeDetailStore);
+  private readonly contactStore = inject(EmployeeContactStore);
+  private readonly presenceStore = inject(EmployeePresenceStore);
+  private readonly workCenterStore = inject(EmployeeWorkCenterStore);
+  private readonly journeyStore = inject(EmployeeJourneyStore);
+  private readonly contractStore = inject(EmployeeContractStore);
+  private readonly pdfService = inject(EmployeePdfService);
+  private readonly globalMessageService = inject(GlobalMessageService);
+  private highlightedSectionResetHandle: number | null = null;
+  private previousIdentitySuccess: 'updated' | null = null;
+
+  protected readonly texts = employeeTexts;
+  protected readonly activeEmployeeKey = signal<EmployeeBusinessKey | null>(null);
+  protected readonly activeDetailSection = signal<EmployeeRouteSection>('contact');
+  protected readonly selectedEmployeeDetail = this.detailStore.selectedEmployeeDetail;
+  protected readonly loadingDetail = this.detailStore.loadingDetail;
+  protected readonly detailError = this.detailStore.detailError;
+  protected readonly journey = this.journeyStore.journey;
+  protected readonly loadingJourney = this.journeyStore.loading;
+  protected readonly journeyError = this.journeyStore.error;
+  protected readonly contacts = this.contactStore.contacts;
+  protected readonly presences = this.presenceStore.presences;
+  protected readonly workCenters = this.workCenterStore.workCenters;
+  protected readonly globalMessages = this.globalMessageService.messages;
+  protected readonly globalMessageSummary = this.globalMessageService.summary;
+  protected readonly globalMessageExpanded = this.globalMessageService.expanded;
+  protected readonly updatingIdentity = this.detailStore.mutating;
+  protected readonly updateIdentityError = computed(
+    () => this.detailStore.mutationError() === 'request-failed',
+  );
+  protected readonly updateIdentitySuccess = computed(
+    () => this.detailStore.mutationSuccess() === 'updated',
+  );
+  protected readonly openIdentityEditorRequestId = signal(0);
+  protected readonly terminatePanelOpen = signal(false);
+
+  protected readonly selectedEmployee = computed<EmployeeDetailModel | null>(() => {
+    const activeEmployeeKey = this.activeEmployeeKey();
+    if (!activeEmployeeKey) return null;
+    const detail = this.selectedEmployeeDetail();
+    if (detail && areEmployeeBusinessKeysEqual(detail, activeEmployeeKey)) return detail;
+    return null;
+  });
+
+  protected readonly headerStatus = computed<'ACTIVE' | 'TERMINATED'>(() => {
+    const employee = this.selectedEmployee();
+    if (!employee) return 'TERMINATED';
+    const n = employee.statusLabel.trim().toLowerCase();
+    return n.includes('active') || n.includes('alta') ? 'ACTIVE' : 'TERMINATED';
+  });
+
+  protected readonly activePresence = computed(() =>
+    this.resolveActivePresence(this.presences()),
+  );
+
+  protected readonly headerHireDate = computed(() => {
+    const presences = this.presences();
+    if (presences.length === 0) return null;
+    const earliest = [...presences].sort((l, r) => l.startDate.localeCompare(r.startDate))[0];
+    return earliest?.startDate ?? null;
+  });
+
+  protected readonly headerEmail = computed(() =>
+    this.findPreferredContactValue(this.contacts(), 'email'),
+  );
+
+  protected readonly headerPhone = computed(() =>
+    this.findPreferredContactValue(this.contacts(), 'phone'),
+  );
+
+  constructor() {
+    this.router.events
+      .pipe(
+        filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+        startWith(null),
+        takeUntilDestroyed(),
+      )
+      .subscribe(() => {
+        const previousKey = this.activeEmployeeKey();
+        const activeKey = this.resolveActiveEmployeeKey();
+        const shouldForceRefresh = this.shouldForceRefreshAfterRehire();
+        if (!areEmployeeBusinessKeysEqual(previousKey, activeKey)) {
+          this.globalMessageService.reset();
+        }
+        this.activeEmployeeKey.set(activeKey);
+        this.activeDetailSection.set(this.resolveActiveDetailSection());
+
+        if (shouldForceRefresh) {
+          this.detailStore.refreshEmployeeDetailByBusinessKey(activeKey);
+          this.presenceStore.refreshPresencesByBusinessKey(activeKey);
+          this.workCenterStore.refreshWorkCenters(activeKey);
+          this.journeyStore.refreshJourneyByBusinessKey(activeKey);
+          this.contractStore.loadContractsByBusinessKey(activeKey);
+        } else {
+          this.detailStore.loadEmployeeDetailByBusinessKey(activeKey);
+          this.presenceStore.loadPresencesByBusinessKey(activeKey);
+          this.workCenterStore.loadWorkCenters(activeKey);
+          this.journeyStore.loadJourneyByBusinessKey(activeKey);
+          this.contractStore.loadContractsByBusinessKey(activeKey);
+        }
+        this.contactStore.loadContactsByBusinessKey(activeKey);
+
+        if (shouldForceRefresh) {
+          void this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: { refresh: null },
+            queryParamsHandling: 'merge',
+            replaceUrl: true,
+          });
+        }
+      });
+
+    effect((onCleanup) => {
+      const messages = this.buildShellMessages();
+      untracked(() => this.globalMessageService.setSourceMessages('employee-detail-page', messages));
+      onCleanup(() => untracked(() => this.globalMessageService.clearSourceMessages('employee-detail-page')));
+    });
+
+    effect(() => {
+      const identitySuccess = this.detailStore.mutationSuccess();
+      if (identitySuccess && identitySuccess !== this.previousIdentitySuccess) {
+        untracked(() => {
+          this.globalMessageService.success(this.texts.detailHeaderUpdateSuccessMessage, {
+            id: 'employee-detail-identity-updated',
+            sectionId: 'overview',
+            sectionLabel: this.texts.detailPanelTitle,
+          });
+        });
+      }
+      this.previousIdentitySuccess = identitySuccess;
+    });
+  }
+
+  protected openIdentityEditorFromHeader(): void {
+    this.detailStore.clearMutationFeedback();
+    this.openIdentityEditorRequestId.update((v) => v + 1);
+  }
+
+  protected openTerminatePanel(): void {
+    this.terminatePanelOpen.set(true);
+  }
+
+  protected closeTerminatePanel(): void {
+    this.terminatePanelOpen.set(false);
+  }
+
+  protected toggleGlobalMessages(): void {
+    this.globalMessageService.toggleExpanded();
+  }
+
+  protected closeGlobalMessages(): void {
+    const summary = this.globalMessageSummary();
+    if (summary.errorCount === 0 && summary.warningCount === 0) {
+      this.globalMessageService.dismissTransientMessages();
+      return;
+    }
+    this.globalMessageService.collapse();
+  }
+
+  protected navigateToMessageSection(message: GlobalUiMessage): void {
+    const sectionId = message.sectionId?.trim();
+    if (!sectionId) return;
+    const activeKey = this.activeEmployeeKey();
+    if (!activeKey) return;
+    if (employeeRouteSections.includes(sectionId as EmployeeRouteSection)) {
+      const routeSection = sectionId as EmployeeRouteSection;
+      if (this.activeDetailSection() !== routeSection) {
+        void this.router.navigate(buildEmployeeDetailRouteCommands(activeKey, routeSection)).then((navigated) => {
+          if (navigated) window.setTimeout(() => this.focusSection(sectionId), 120);
+        });
+        return;
+      }
+    }
+    this.focusSection(sectionId);
+  }
+
+  protected submitIdentityUpdate(draft: EmployeeCoreIdentityDraft): void {
+    const key = this.activeEmployeeKey();
+    if (!key) return;
+    this.detailStore.updateEmployeeCoreIdentity(key, draft);
+  }
+
+  protected clearIdentityFeedback(): void {
+    this.detailStore.clearMutationFeedback();
+  }
+
+  protected onRehireRequested(): void {
+    const key = this.activeEmployeeKey();
+    if (!key) return;
+    void this.router.navigate([
+      '/personas/empleados',
+      key.ruleSystemCode,
+      key.employeeTypeCode,
+      key.employeeNumber,
+      'rehire',
+    ]);
+  }
+
+  protected onPrintRequested(): void {
+    const employee = this.selectedEmployee();
+    if (!employee) return;
+    const contracts = this.contractStore.contracts();
+    const activeContract =
+      contracts.find((c) => c.isActive) ??
+      [...contracts].sort((a, b) => b.startDate.localeCompare(a.startDate))[0] ??
+      null;
+    const empty = this.texts.employeePageHeaderEmptyValue;
+    const nullIfEmpty = (v: string | null | undefined) =>
+      !v || v === empty || !v.trim() ? null : v;
+    this.pdfService.print({
+      fullName: employee.displayName,
+      employeeNumber: employee.employeeNumber,
+      employeeTypeCode: employee.employeeTypeCode,
+      ruleSystemCode: employee.ruleSystemCode,
+      statusLabel: this.headerStatus() === 'ACTIVE'
+        ? this.texts.employeeStatusActiveLabel
+        : this.texts.employeeStatusInactiveLabel,
+      isActive: this.headerStatus() === 'ACTIVE',
+      company: nullIfEmpty(this.resolveHeaderCompany()),
+      workCenter: nullIfEmpty(this.resolveHeaderWorkCenter()),
+      hireDate: nullIfEmpty(this.headerHireDate()),
+      contractTypeName: activeContract?.contractTypeName ?? null,
+      contractSubtypeName: activeContract?.contractSubtypeName ?? null,
+      contractCode: activeContract?.contractCode ?? null,
+      contractStartDate: activeContract?.startDate ?? null,
+      contractEndDate: activeContract?.endDate ?? null,
+      contractIsActive: activeContract?.isActive ?? false,
+      email: nullIfEmpty(this.headerEmail()),
+      phone: nullIfEmpty(this.headerPhone()),
+    });
+  }
+
+  private resolveActiveEmployeeKey(): EmployeeBusinessKey | null {
+    let snapshot = this.route.snapshot;
+    while (snapshot.firstChild) snapshot = snapshot.firstChild;
+    return readEmployeeBusinessKeyFromParamMap(snapshot.paramMap);
+  }
+
+  private resolveActiveDetailSection(): EmployeeRouteSection {
+    let snapshot = this.route.snapshot;
+    while (snapshot.firstChild) snapshot = snapshot.firstChild;
+    const routeSection = snapshot.url.at(-1)?.path ?? '';
+    if (employeeRouteSections.includes(routeSection as EmployeeRouteSection)) {
+      return routeSection as EmployeeRouteSection;
+    }
+    return 'contact';
+  }
+
+  private resolveActivePresence(
+    presences: ReadonlyArray<EmployeePresenceModel>,
+  ): EmployeePresenceModel | null {
+    if (presences.length === 0) return null;
+    return (
+      presences.find((p) => p.isActive) ??
+      [...presences].sort((l, r) => r.startDate.localeCompare(l.startDate))[0] ??
+      null
+    );
+  }
+
+  private resolveHeaderCompany(): string {
+    const presence = this.activePresence();
+    if (!presence) return this.texts.employeePageHeaderEmptyValue;
+    return (
+      [presence.companyName ?? '', presence.companyCode]
+        .map((v) => v.trim())
+        .find((v) => v.length > 0) ?? this.texts.employeePageHeaderEmptyValue
+    );
+  }
+
+  private resolveHeaderWorkCenter(): string {
+    const wcs = this.workCenters();
+    if (wcs && wcs.length > 0) {
+      const active = wcs.find((w) => w.isActive);
+      if (active) return (active.workCenterName ?? active.workCenterCode ?? '').trim() || this.texts.employeePageHeaderEmptyValue;
+      const recent = [...wcs].sort((l, r) => r.startDate.localeCompare(l.startDate))[0];
+      if (recent) return (recent.workCenterName ?? recent.workCenterCode ?? '').trim() || this.texts.employeePageHeaderEmptyValue;
+    }
+    return this.selectedEmployee()?.workCenter ?? this.texts.employeePageHeaderEmptyValue;
+  }
+
+  private findPreferredContactValue(
+    contacts: ReadonlyArray<EmployeeContactModel>,
+    type: EmployeeContactModel['type'],
+  ): string {
+    const match = contacts.find((c) => c.type === type);
+    const value = match?.value?.trim() ?? '';
+    return value.length > 0 ? value : this.texts.employeePageHeaderEmptyValue;
+  }
+
+  private buildShellMessages(): ReadonlyArray<Omit<GlobalUiMessage, 'createdAt'>> {
+    const messages: Array<Omit<GlobalUiMessage, 'createdAt'>> = [];
+    if (this.detailError() === 'not-found') {
+      messages.push({ id: 'employee-detail-not-found', level: 'warning', text: this.texts.detailNotFoundMessage, sectionId: 'overview', sectionLabel: this.texts.detailPanelTitle, sticky: true });
+    }
+    if (this.detailError() === 'request-failed') {
+      messages.push({ id: 'employee-detail-load-error', level: 'error', text: this.texts.detailLoadFailedMessage, sectionId: 'overview', sectionLabel: this.texts.detailPanelTitle, sticky: true });
+    }
+    if (this.updateIdentityError()) {
+      messages.push({ id: 'employee-identity-update-error', level: 'error', text: this.texts.detailHeaderUpdateErrorMessage, sectionId: 'overview', sectionLabel: this.texts.detailPanelTitle, sticky: true });
+    }
+    return messages;
+  }
+
+  private shouldForceRefreshAfterRehire(): boolean {
+    let snapshot = this.route.snapshot;
+    while (snapshot.firstChild) snapshot = snapshot.firstChild;
+    return snapshot.queryParamMap.get('refresh') === 'rehire';
+  }
+
+  private focusSection(sectionId: string): void {
+    const target = document.getElementById(`employee-section-${sectionId}`);
+    if (!(target instanceof HTMLElement)) return;
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    target.classList.add('employee-detail__section-highlight');
+    if (this.highlightedSectionResetHandle !== null) window.clearTimeout(this.highlightedSectionResetHandle);
+    this.highlightedSectionResetHandle = window.setTimeout(() => {
+      target.classList.remove('employee-detail__section-highlight');
+      this.highlightedSectionResetHandle = null;
+    }, 1800);
+  }
+}
