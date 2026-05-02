@@ -1,6 +1,8 @@
 import { EmployeeBusinessKey } from '../models/employee-business-key.model';
 import { employeeRouteParamNames, toEmployeeBusinessKey } from './employee-route-key.util';
 
+// 'rehire' is intentionally excluded — it is a transient lifecycle flow,
+// not a navigable section in the identity panel.
 export const employeeRouteSections = [
   'overview',
   'contact',
