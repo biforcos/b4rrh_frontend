@@ -1,0 +1,63 @@
+<p-dialog
+  header="Subir foto de empleado"
+  [modal]="true"
+  [(visible)]="visible"
+  [style]="{ width: '420px' }"
+  (onHide)="cancel()"
+>
+  <div class="photo-dialog">
+    @if (!imageChangedEvent()) {
+      <div class="photo-dialog__select">
+        <input
+          #fileInput
+          type="file"
+          accept="image/jpeg,image/png"
+          class="photo-dialog__file-input"
+          (change)="onFileSelected($event)"
+        />
+        <p-button
+          label="Seleccionar archivo"
+          severity="secondary"
+          [outlined]="true"
+          (onClick)="fileInput.click()"
+        />
+        <p class="photo-dialog__hint">JPEG o PNG · máx. 5 MB</p>
+        @if (fileTooBig()) {
+          <p class="photo-dialog__error">El archivo supera el límite de 5 MB.</p>
+        }
+      </div>
+    }
+
+    @if (imageChangedEvent()) {
+      <image-cropper
+        [imageChangedEvent]="imageChangedEvent()"
+        [maintainAspectRatio]="true"
+        [aspectRatio]="1"
+        [roundCropper]="true"
+        [resizeToWidth]="800"
+        [resizeToHeight]="800"
+        format="jpeg"
+        (imageCropped)="onImageCropped($event)"
+      />
+    }
+
+    @if (uploadError()) {
+      <p class="photo-dialog__error">{{ uploadError() }}</p>
+    }
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      label="Cancelar"
+      severity="secondary"
+      [outlined]="true"
+      [disabled]="uploading()"
+      (onClick)="cancel()"
+    />
+    <p-button
+      label="{{ uploading() ? 'Subiendo...' : 'Subir foto' }}"
+      [disabled]="!croppedBlob() || uploading()"
+      (onClick)="upload()"
+    />
+  </ng-template>
+</p-dialog>
