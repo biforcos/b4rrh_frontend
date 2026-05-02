@@ -12,6 +12,7 @@ export interface EmployeeDetailReadModel {
   displayName: string;
   statusLabel: string;
   workCenter: string;
+  photoUrl: string | null;
 }
 
 const pendingWorkCenterLabel = 'Pending assignment';
@@ -29,6 +30,7 @@ export function mapEmployeeReadApiToDetailModel(source: EmployeeReadApiModel): E
     displayName: buildDisplayName(source),
     statusLabel: source.status,
     workCenter: pendingWorkCenterLabel,
+    photoUrl: source.photoUrl ?? null,
   };
 }
 

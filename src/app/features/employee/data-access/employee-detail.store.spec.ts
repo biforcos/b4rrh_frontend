@@ -24,6 +24,7 @@ const employeeDetailFixture: EmployeeDetailModel = {
   displayName: 'Lidia Lopez',
   statusLabel: 'ACTIVE',
   workCenter: 'MAD-01',
+  photoUrl: null,
 };
 
 describe('EmployeeDetailStore', () => {

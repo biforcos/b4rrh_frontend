@@ -40,6 +40,7 @@ export class EmployeeDetailReadGateway {
       displayName: source.displayName,
       statusLabel: source.statusLabel,
       workCenter: source.workCenter,
+      photoUrl: source.photoUrl,
     };
   }
 }

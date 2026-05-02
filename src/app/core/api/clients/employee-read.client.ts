@@ -25,6 +25,7 @@ export interface EmployeeReadApiModel {
   lastName2: string | null;
   preferredName: string | null;
   status: string;
+  photoUrl: string | null;
 }
 
 export interface EmployeeDirectoryApiModel {
@@ -117,6 +118,7 @@ export class EmployeeReadClient {
       lastName2: source.lastName2 ?? null,
       preferredName: source.preferredName ?? null,
       status: source.status,
+      photoUrl: source.photoUrl ?? null,
     };
   }
 }
