@@ -1,33 +1,66 @@
 <div class="app-shell">
-  <div class="app-shell__workspace">
-    <aside class="app-shell__sidebar" [attr.aria-label]="texts.navigationAriaLabel">
-      <a class="app-shell__brand" [routerLink]="['/inicio']" [attr.aria-label]="texts.brandHomeAriaLabel">
-        <span class="app-shell__brand-mark">B4</span>
-        <span class="app-shell__brand-copy">
-          <strong>{{ texts.brandName }}</strong>
-        </span>
+  <aside class="app-shell__sidebar" [attr.aria-label]="texts.navigationAriaLabel">
+    <a class="app-shell__brand" [routerLink]="['/inicio']" [attr.aria-label]="texts.brandHomeAriaLabel">
+      <span class="app-shell__brand-mark">B4</span>
+      <span class="app-shell__brand-name"><strong>{{ texts.brandName }}</strong></span>
+    </a>
+
+    <nav class="app-shell__nav">
+
+      <span class="app-shell__nav-group-label">PERSONAS</span>
+      <a class="app-shell__nav-item" routerLink="/personas/empleados" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }">
+        <i class="pi pi-id-card app-shell__nav-icon"></i>
+        <span>{{ texts.sectionEmployees }}</span>
       </a>
 
-      <section class="app-shell__auth" [attr.aria-label]="texts.authCurrentSubjectLabel">
-        <div class="app-shell__auth-copy">
-          <span>{{ texts.authCurrentSubjectLabel }}</span>
-          <strong>{{ auth.subject() ?? '—' }}</strong>
-        </div>
+      <span class="app-shell__nav-group-label">ORGANIZACIÓN</span>
+      <a class="app-shell__nav-item" routerLink="/organizacion/empresas" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }">
+        <i class="pi pi-building app-shell__nav-icon"></i>
+        <span>{{ texts.sectionCompanies }}</span>
+      </a>
+      <a class="app-shell__nav-item" routerLink="/organizacion/centros-trabajo" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }">
+        <i class="pi pi-map-marker app-shell__nav-icon"></i>
+        <span>{{ texts.sectionWorkCenters }}</span>
+      </a>
+      <a class="app-shell__nav-item" routerLink="/organizacion/centros-coste" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }">
+        <i class="pi pi-wallet app-shell__nav-icon"></i>
+        <span>{{ texts.sectionCostCenters }}</span>
+      </a>
+      <a class="app-shell__nav-item" routerLink="/organizacion/catalogos" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }">
+        <i class="pi pi-book app-shell__nav-icon"></i>
+        <span>{{ texts.sectionCatalogs }}</span>
+      </a>
 
-        <app-ui-button
-          [label]="texts.authLogoutAction"
-          severity="secondary"
-          [outlined]="true"
-          [fluid]="true"
-          (pressed)="logout()"
-        />
-      </section>
+      <span class="app-shell__nav-group-label">NÓMINA</span>
+      <a class="app-shell__nav-item" routerLink="/nomina/recibos" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }">
+        <i class="pi pi-receipt app-shell__nav-icon"></i>
+        <span>{{ texts.sectionRecibos }}</span>
+      </a>
+      <a class="app-shell__nav-item" routerLink="/nomina/operaciones" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }">
+        <i class="pi pi-bolt app-shell__nav-icon"></i>
+        <span>{{ texts.sectionOperaciones }}</span>
+      </a>
 
-      <p-panelmenu class="app-shell__panelmenu" [model]="sideNavItems" />
-    </aside>
+      <span class="app-shell__nav-group-label">CONFIGURACIÓN</span>
+      <a class="app-shell__nav-item" routerLink="/configuracion/rule-systems" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }">
+        <i class="pi pi-cog app-shell__nav-icon"></i>
+        <span>{{ texts.sectionRuleSystems }}</span>
+      </a>
 
-    <main class="app-shell__main" aria-live="polite">
-      <router-outlet />
-    </main>
-  </div>
+    </nav>
+
+    <footer class="app-shell__footer">
+      <div class="app-shell__user">
+        <span class="app-shell__user-avatar">{{ userInitials() }}</span>
+        <span class="app-shell__user-name">{{ auth.subject() ?? '—' }}</span>
+      </div>
+      <button class="app-shell__logout-btn" type="button" (click)="logout()" [title]="texts.authLogoutAction" [attr.aria-label]="texts.authLogoutAction">
+        <i class="pi pi-sign-out"></i>
+      </button>
+    </footer>
+  </aside>
+
+  <main class="app-shell__main" aria-live="polite">
+    <router-outlet />
+  </main>
 </div>
