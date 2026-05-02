@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   computed,
   effect,
   inject,
@@ -58,12 +59,9 @@ import { EmployeeDetailHeaderComponent } from '../components/employee-detail-hea
   styleUrl: './employee-detail-page.component.scss',
 })
 export class EmployeeDetailPageComponent {
-  protected readonly isRehireWorkflow = computed(() => {
-    let snapshot = this.route.snapshot;
-    while (snapshot.firstChild) snapshot = snapshot.firstChild;
-    return snapshot.url.some((seg: any) => seg.path === 'rehire');
-  });
+  protected readonly isRehireWorkflow = signal(false);
 
+  private readonly destroyRef = inject(DestroyRef);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly detailStore = inject(EmployeeDetailStore);
@@ -152,6 +150,7 @@ export class EmployeeDetailPageComponent {
         }
         this.activeEmployeeKey.set(activeKey);
         this.activeDetailSection.set(this.resolveActiveDetailSection());
+        this.isRehireWorkflow.set(this.resolveIsRehireWorkflow());
 
         if (shouldForceRefresh) {
           this.detailStore.refreshEmployeeDetailByBusinessKey(activeKey);
@@ -186,16 +185,22 @@ export class EmployeeDetailPageComponent {
 
     effect(() => {
       const identitySuccess = this.detailStore.mutationSuccess();
-      if (identitySuccess && identitySuccess !== this.previousIdentitySuccess) {
-        untracked(() => {
+      untracked(() => {
+        if (identitySuccess && identitySuccess !== this.previousIdentitySuccess) {
           this.globalMessageService.success(this.texts.detailHeaderUpdateSuccessMessage, {
             id: 'employee-detail-identity-updated',
             sectionId: 'overview',
             sectionLabel: this.texts.detailPanelTitle,
           });
-        });
+        }
+        this.previousIdentitySuccess = identitySuccess;
+      });
+    });
+
+    this.destroyRef.onDestroy(() => {
+      if (this.highlightedSectionResetHandle !== null) {
+        window.clearTimeout(this.highlightedSectionResetHandle);
       }
-      this.previousIdentitySuccess = identitySuccess;
     });
   }
 
@@ -385,5 +390,11 @@ export class EmployeeDetailPageComponent {
       target.classList.remove('employee-detail__section-highlight');
       this.highlightedSectionResetHandle = null;
     }, 1800);
+  }
+
+  private resolveIsRehireWorkflow(): boolean {
+    let snapshot = this.route.snapshot;
+    while (snapshot.firstChild) snapshot = snapshot.firstChild;
+    return snapshot.url.some((seg) => seg.path === 'rehire');
   }
 }
