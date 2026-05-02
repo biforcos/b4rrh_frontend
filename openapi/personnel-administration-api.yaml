@@ -4371,6 +4371,41 @@ paths:
         '409':
           description: Concept already exists
 
+  /payroll-engine/{ruleSystemCode}/concepts/{conceptCode}/summary:
+    patch:
+      tags:
+        - Payroll Engine
+      summary: Update the summary description of a payroll concept
+      operationId: updatePayrollConceptSummary
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: ruleSystemCode
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: conceptCode
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateConceptSummaryRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PayrollConceptDesignerResponse'
+        '404':
+          description: Not found
+
   /payroll-engine/{ruleSystemCode}/concepts/{conceptCode}:
     delete:
       tags:
@@ -4575,6 +4610,39 @@ paths:
                 $ref: '#/components/schemas/ConceptAssignmentResponse'
 
   /payroll-engine/{ruleSystemCode}/assignments/{assignmentCode}:
+    put:
+      tags:
+        - Payroll Engine
+      summary: Update a concept assignment rule
+      operationId: updateConceptAssignment
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: ruleSystemCode
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: assignmentCode
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateConceptAssignmentRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConceptAssignmentResponse'
+        '404':
+          description: Not found
     delete:
       tags:
         - Payroll Engine
@@ -4790,6 +4858,237 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/EmployeePayrollInputErrorResponse"
+
+  /employees/{ruleSystemCode}/{employeeTypeCode}/{employeeNumber}/photo/upload-url:
+    post:
+      operationId: generatePhotoUploadUrl
+      summary: Generate a presigned MinIO PUT URL for employee photo upload
+      parameters:
+        - name: ruleSystemCode
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: employeeTypeCode
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: employeeNumber
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Presigned upload URL and object key
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneratePhotoUploadUrlResponse'
+
+  /employees/{ruleSystemCode}/{employeeTypeCode}/{employeeNumber}/photo:
+    put:
+      operationId: confirmEmployeePhoto
+      summary: Confirm photo upload and persist the public URL
+      parameters:
+        - name: ruleSystemCode
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: employeeTypeCode
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: employeeNumber
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfirmEmployeePhotoRequest'
+      responses:
+        '200':
+          description: Updated employee with new photoUrl
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmployeeResponse'
+    delete:
+      operationId: deleteEmployeePhoto
+      summary: Delete employee photo from MinIO and clear photo_url
+      parameters:
+        - name: ruleSystemCode
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: employeeTypeCode
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: employeeNumber
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Photo deleted
+
+  /payroll-engine/{ruleSystemCode}/tables:
+    post:
+      operationId: createPayrollTable
+      summary: Create a new salary table
+      tags: [PayrollEngine]
+      parameters:
+        - name: ruleSystemCode
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePayrollTableRequest"
+      responses:
+        "201":
+          description: Table created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PayrollTableResponse"
+        "409":
+          description: Table already exists
+
+  /payroll-engine/{ruleSystemCode}/tables/{tableCode}/rows:
+    get:
+      operationId: listTableRows
+      summary: List all rows for a salary table
+      tags: [PayrollEngine]
+      parameters:
+        - name: ruleSystemCode
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: tableCode
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Rows listed
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TableRowResponse"
+    post:
+      operationId: createTableRow
+      summary: Add a row to a salary table
+      tags: [PayrollEngine]
+      parameters:
+        - name: ruleSystemCode
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: tableCode
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTableRowRequest"
+      responses:
+        "201":
+          description: Row created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TableRowResponse"
+        "409":
+          description: Row already exists
+
+  /payroll-engine/{ruleSystemCode}/tables/{tableCode}/rows/{rowId}:
+    put:
+      operationId: updateTableRow
+      summary: Update a salary table row
+      tags: [PayrollEngine]
+      parameters:
+        - name: ruleSystemCode
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: tableCode
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: rowId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTableRowRequest"
+      responses:
+        "200":
+          description: Row updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TableRowResponse"
+        "404":
+          description: Row not found
+    delete:
+      operationId: deleteTableRow
+      summary: Delete a salary table row
+      tags: [PayrollEngine]
+      parameters:
+        - name: ruleSystemCode
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: tableCode
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: rowId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "204":
+          description: Row deleted
+        "404":
+          description: Row not found
 
 components:
   schemas:
@@ -5797,6 +6096,9 @@ components:
           nullable: true
         status:
           type: string
+        photoUrl:
+          type: string
+          nullable: true
 
     EmployeeDirectoryItemResponse:
       type: object
@@ -7842,10 +8144,16 @@ components:
         payslipOrderCode:
           type: string
           nullable: true
+        persistToConcepts:
+          type: boolean
+          default: true
+        summary:
+          type: string
+          nullable: true
 
     PayrollConceptDesignerResponse:
       type: object
-      required: [ruleSystemCode, conceptCode, conceptMnemonic, calculationType, functionalNature, resultCompositionMode, executionScope]
+      required: [ruleSystemCode, conceptCode, conceptMnemonic, calculationType, functionalNature, resultCompositionMode, executionScope, persistToConcepts]
       properties:
         ruleSystemCode:
           type: string
@@ -7862,6 +8170,18 @@ components:
         executionScope:
           type: string
         payslipOrderCode:
+          type: string
+          nullable: true
+        persistToConcepts:
+          type: boolean
+        summary:
+          type: string
+          nullable: true
+
+    UpdateConceptSummaryRequest:
+      type: object
+      properties:
+        summary:
           type: string
           nullable: true
 
@@ -7927,6 +8247,29 @@ components:
           type: string
           format: date
           nullable: true
+
+    UpdateConceptAssignmentRequest:
+      type: object
+      required: [validFrom, priority]
+      properties:
+        companyCode:
+          type: string
+          nullable: true
+        agreementCode:
+          type: string
+          nullable: true
+        employeeTypeCode:
+          type: string
+          nullable: true
+        validFrom:
+          type: string
+          format: date
+        validTo:
+          type: string
+          format: date
+          nullable: true
+        priority:
+          type: integer
 
     CreateConceptAssignmentRequest:
       type: object
@@ -8036,3 +8379,126 @@ components:
           type: string
         details:
           type: object
+
+    CreatePayrollTableRequest:
+      type: object
+      required: [objectCode]
+      properties:
+        objectCode:
+          type: string
+          example: "SB_99002405012025"
+
+    PayrollTableResponse:
+      type: object
+      properties:
+        ruleSystemCode:
+          type: string
+        objectCode:
+          type: string
+
+    CreateTableRowRequest:
+      type: object
+      required: [searchCode, startDate, monthlyValue, annualValue, dailyValue, hourlyValue]
+      properties:
+        searchCode:
+          type: string
+          example: "99002405-G1"
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+          nullable: true
+        monthlyValue:
+          type: number
+          format: double
+        annualValue:
+          type: number
+          format: double
+        dailyValue:
+          type: number
+          format: double
+        hourlyValue:
+          type: number
+          format: double
+
+    UpdateTableRowRequest:
+      type: object
+      properties:
+        searchCode:
+          type: string
+          nullable: true
+        startDate:
+          type: string
+          format: date
+          nullable: true
+        endDate:
+          type: string
+          format: date
+          nullable: true
+        monthlyValue:
+          type: number
+          format: double
+          nullable: true
+        annualValue:
+          type: number
+          format: double
+          nullable: true
+        dailyValue:
+          type: number
+          format: double
+          nullable: true
+        hourlyValue:
+          type: number
+          format: double
+          nullable: true
+        active:
+          type: boolean
+          nullable: true
+
+    TableRowResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        searchCode:
+          type: string
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+          nullable: true
+        monthlyValue:
+          type: number
+          format: double
+        annualValue:
+          type: number
+          format: double
+        dailyValue:
+          type: number
+          format: double
+        hourlyValue:
+          type: number
+          format: double
+        active:
+          type: boolean
+
+    GeneratePhotoUploadUrlResponse:
+      type: object
+      properties:
+        uploadUrl:
+          type: string
+        objectKey:
+          type: string
+
+    ConfirmEmployeePhotoRequest:
+      type: object
+      required:
+        - objectKey
+      properties:
+        objectKey:
+          type: string
