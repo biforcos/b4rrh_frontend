@@ -1,7 +1,29 @@
 <div class="identity-panel">
   <!-- Avatar + name + status -->
   <div class="identity-panel__hero">
-    <div class="identity-panel__avatar" [attr.aria-hidden]="true">{{ initials() }}</div>
+    <div
+      class="identity-panel__avatar"
+      [class.identity-panel__avatar--clickable]="isAdmin()"
+      [attr.aria-hidden]="true"
+      (click)="openUploadDialog()"
+    >
+      @if (photoUrl()) {
+        <img class="identity-panel__avatar-photo" [src]="photoUrl()" alt="Foto del empleado" />
+        @if (isAdmin()) {
+          <div class="identity-panel__avatar-overlay">
+            <i class="pi pi-pencil"></i>
+          </div>
+        }
+      } @else {
+        {{ initials() }}
+        @if (isAdmin()) {
+          <div class="identity-panel__avatar-overlay">
+            <i class="pi pi-camera"></i>
+          </div>
+        }
+      }
+    </div>
+
     <div class="identity-panel__name-row">
       <span class="identity-panel__name">{{ employee()?.displayName ?? '—' }}</span>
       <p-tag
@@ -10,6 +32,16 @@
         [severity]="statusSeverity()"
       />
     </div>
+
+    @if (isAdmin() && photoUrl()) {
+      <button
+        class="identity-panel__delete-photo"
+        type="button"
+        (click)="deletePhoto()"
+      >
+        ✕ Eliminar foto
+      </button>
+    }
   </div>
 
   <!-- Key data fields -->
@@ -48,3 +80,12 @@
     }
   </nav>
 </div>
+
+<!-- Photo upload dialog -->
+@if (isAdmin()) {
+  <app-employee-photo-upload-dialog
+    [employeeKey]="employeeKey()"
+    [(visible)]="uploadDialogVisible"
+    (photoConfirmed)="onPhotoConfirmed()"
+  />
+}

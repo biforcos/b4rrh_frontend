@@ -17,6 +17,7 @@ type EmployeeStatus = 'ACTIVE' | 'TERMINATED';
   styleUrl: './employee-page-header.component.scss',
 })
 export class EmployeePageHeaderComponent {
+  readonly photoUrl = input<string | null>(null);
   readonly fullName = input('Marina Lopez Ortega');
   readonly employeeNumber = input('EMP-004218');
   readonly ruleSystemCode = input('RS-ES-01');

@@ -9,4 +9,5 @@ export interface EmployeeDetailModel extends EmployeeBusinessKey {
   displayName: string;
   statusLabel: string;
   workCenter: string;
+  photoUrl: string | null;
 }
