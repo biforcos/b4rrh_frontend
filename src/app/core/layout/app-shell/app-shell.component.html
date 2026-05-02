@@ -1,19 +1,19 @@
 <div class="app-shell">
-  <aside class="app-shell__sidebar" [attr.aria-label]="texts.navigationAriaLabel">
+  <aside class="app-shell__sidebar">
     <a class="app-shell__brand" [routerLink]="['/inicio']" [attr.aria-label]="texts.brandHomeAriaLabel">
       <span class="app-shell__brand-mark">B4</span>
       <span class="app-shell__brand-name"><strong>{{ texts.brandName }}</strong></span>
     </a>
 
-    <nav class="app-shell__nav">
+    <nav class="app-shell__nav" [attr.aria-label]="texts.navigationAriaLabel">
 
-      <span class="app-shell__nav-group-label">PERSONAS</span>
+      <span class="app-shell__nav-group-label">{{ texts.sectionPeople }}</span>
       <a class="app-shell__nav-item" routerLink="/personas/empleados" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }">
         <i class="pi pi-id-card app-shell__nav-icon"></i>
         <span>{{ texts.sectionEmployees }}</span>
       </a>
 
-      <span class="app-shell__nav-group-label">ORGANIZACIÓN</span>
+      <span class="app-shell__nav-group-label">{{ texts.sectionOrganization }}</span>
       <a class="app-shell__nav-item" routerLink="/organizacion/empresas" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }">
         <i class="pi pi-building app-shell__nav-icon"></i>
         <span>{{ texts.sectionCompanies }}</span>
@@ -31,7 +31,7 @@
         <span>{{ texts.sectionCatalogs }}</span>
       </a>
 
-      <span class="app-shell__nav-group-label">NÓMINA</span>
+      <span class="app-shell__nav-group-label">{{ texts.sectionPayroll }}</span>
       <a class="app-shell__nav-item" routerLink="/nomina/recibos" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }">
         <i class="pi pi-receipt app-shell__nav-icon"></i>
         <span>{{ texts.sectionRecibos }}</span>
@@ -41,7 +41,7 @@
         <span>{{ texts.sectionOperaciones }}</span>
       </a>
 
-      <span class="app-shell__nav-group-label">CONFIGURACIÓN</span>
+      <span class="app-shell__nav-group-label">{{ texts.sectionSettings }}</span>
       <a class="app-shell__nav-item" routerLink="/configuracion/rule-systems" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }">
         <i class="pi pi-cog app-shell__nav-icon"></i>
         <span>{{ texts.sectionRuleSystems }}</span>
