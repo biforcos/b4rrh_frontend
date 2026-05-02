@@ -60,6 +60,7 @@ import { EmployeeDetailHeaderComponent } from '../components/employee-detail-hea
 })
 export class EmployeeDetailPageComponent {
   protected readonly isRehireWorkflow = signal(false);
+  protected readonly isAdmin = signal(true);
 
   private readonly destroyRef = inject(DestroyRef);
   private readonly router = inject(Router);
