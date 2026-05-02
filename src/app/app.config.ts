@@ -1,7 +1,7 @@
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideAnimations } from '@angular/platform-browser/animations';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withRouterConfig } from '@angular/router';
 import { providePrimeNG } from 'primeng/config';
 
 import { b4rrhhPrimeNgThemePreset } from './core/theme/b4rrhh-primeng-theme.preset';
@@ -14,7 +14,7 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideAnimations(),
     provideHttpClient(withInterceptors([authInterceptor])),
-    provideRouter(routes),
+    provideRouter(routes, withRouterConfig({ paramsInheritanceStrategy: 'always' })),
     providePrimeNG({
       theme: {
         preset: b4rrhhPrimeNgThemePreset,
