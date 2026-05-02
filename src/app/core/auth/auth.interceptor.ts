@@ -8,6 +8,10 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
     return next(request);
   }
 
+  if (!request.url.startsWith('/')) {
+    return next(request);
+  }
+
   const token = inject(AuthStore).getAccessToken();
   if (!token) {
     return next(request);

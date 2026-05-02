@@ -64,4 +64,23 @@ describe('authInterceptor', () => {
     expect(request.request.headers.has('Authorization')).toBe(false);
     request.flush({ tokenType: 'Bearer', token: 'next-token', subject: 'bifor', expiresAt: '2099-01-01T00:00:00.000Z' });
   });
+
+  it('does NOT add Authorization header for absolute MinIO URLs', () => {
+    localStorage.setItem(
+      AUTH_STORAGE_KEY,
+      JSON.stringify({
+        token: 'stored-token',
+        subject: 'bifor',
+        expiresAt: '2099-01-01T00:00:00.000Z',
+      }),
+    );
+
+    http.put('http://localhost:9000/b4rrhh-employee-photos/photos/key.jpg', {}).subscribe();
+
+    const request = httpTestingController.expectOne(
+      'http://localhost:9000/b4rrhh-employee-photos/photos/key.jpg',
+    );
+    expect(request.request.headers.has('Authorization')).toBe(false);
+    request.flush({});
+  });
 });
