@@ -115,9 +115,7 @@ export class EmployeeDetailPageComponent {
     return n.includes('active') || n.includes('alta') ? 'ACTIVE' : 'TERMINATED';
   });
 
-  protected readonly activePresence = computed(() =>
-    this.resolveActivePresence(this.presences()),
-  );
+  protected readonly activePresence = computed(() => this.resolveActivePresence(this.presences()));
 
   protected readonly headerHireDate = computed(() => {
     const presences = this.presences();
@@ -179,8 +177,12 @@ export class EmployeeDetailPageComponent {
 
     effect((onCleanup) => {
       const messages = this.buildShellMessages();
-      untracked(() => this.globalMessageService.setSourceMessages('employee-detail-page', messages));
-      onCleanup(() => untracked(() => this.globalMessageService.clearSourceMessages('employee-detail-page')));
+      untracked(() =>
+        this.globalMessageService.setSourceMessages('employee-detail-page', messages),
+      );
+      onCleanup(() =>
+        untracked(() => this.globalMessageService.clearSourceMessages('employee-detail-page')),
+      );
     });
 
     effect(() => {
@@ -238,9 +240,11 @@ export class EmployeeDetailPageComponent {
     if (employeeRouteSections.includes(sectionId as EmployeeRouteSection)) {
       const routeSection = sectionId as EmployeeRouteSection;
       if (this.activeDetailSection() !== routeSection) {
-        void this.router.navigate(buildEmployeeDetailRouteCommands(activeKey, routeSection)).then((navigated) => {
-          if (navigated) window.setTimeout(() => this.focusSection(sectionId), 120);
-        });
+        void this.router
+          .navigate(buildEmployeeDetailRouteCommands(activeKey, routeSection))
+          .then((navigated) => {
+            if (navigated) window.setTimeout(() => this.focusSection(sectionId), 120);
+          });
         return;
       }
     }
@@ -285,9 +289,10 @@ export class EmployeeDetailPageComponent {
       employeeNumber: employee.employeeNumber,
       employeeTypeCode: employee.employeeTypeCode,
       ruleSystemCode: employee.ruleSystemCode,
-      statusLabel: this.headerStatus() === 'ACTIVE'
-        ? this.texts.employeeStatusActiveLabel
-        : this.texts.employeeStatusInactiveLabel,
+      statusLabel:
+        this.headerStatus() === 'ACTIVE'
+          ? this.texts.employeeStatusActiveLabel
+          : this.texts.employeeStatusInactiveLabel,
       isActive: this.headerStatus() === 'ACTIVE',
       company: nullIfEmpty(this.resolveHeaderCompany()),
       workCenter: nullIfEmpty(this.resolveHeaderWorkCenter()),
@@ -304,9 +309,8 @@ export class EmployeeDetailPageComponent {
   }
 
   private resolveActiveEmployeeKey(): EmployeeBusinessKey | null {
-    let snapshot = this.route.snapshot;
-    while (snapshot.firstChild) snapshot = snapshot.firstChild;
-    return readEmployeeBusinessKeyFromParamMap(snapshot.paramMap);
+    // Params are on this component's own route (:rs/:type/:num), not the section children
+    return readEmployeeBusinessKeyFromParamMap(this.route.snapshot.paramMap);
   }
 
   private resolveActiveDetailSection(): EmployeeRouteSection {
@@ -344,9 +348,17 @@ export class EmployeeDetailPageComponent {
     const wcs = this.workCenters();
     if (wcs && wcs.length > 0) {
       const active = wcs.find((w) => w.isActive);
-      if (active) return (active.workCenterName ?? active.workCenterCode ?? '').trim() || this.texts.employeePageHeaderEmptyValue;
+      if (active)
+        return (
+          (active.workCenterName ?? active.workCenterCode ?? '').trim() ||
+          this.texts.employeePageHeaderEmptyValue
+        );
       const recent = [...wcs].sort((l, r) => r.startDate.localeCompare(l.startDate))[0];
-      if (recent) return (recent.workCenterName ?? recent.workCenterCode ?? '').trim() || this.texts.employeePageHeaderEmptyValue;
+      if (recent)
+        return (
+          (recent.workCenterName ?? recent.workCenterCode ?? '').trim() ||
+          this.texts.employeePageHeaderEmptyValue
+        );
     }
     return this.selectedEmployee()?.workCenter ?? this.texts.employeePageHeaderEmptyValue;
   }
@@ -363,13 +375,34 @@ export class EmployeeDetailPageComponent {
   private buildShellMessages(): ReadonlyArray<Omit<GlobalUiMessage, 'createdAt'>> {
     const messages: Array<Omit<GlobalUiMessage, 'createdAt'>> = [];
     if (this.detailError() === 'not-found') {
-      messages.push({ id: 'employee-detail-not-found', level: 'warning', text: this.texts.detailNotFoundMessage, sectionId: 'overview', sectionLabel: this.texts.detailPanelTitle, sticky: true });
+      messages.push({
+        id: 'employee-detail-not-found',
+        level: 'warning',
+        text: this.texts.detailNotFoundMessage,
+        sectionId: 'overview',
+        sectionLabel: this.texts.detailPanelTitle,
+        sticky: true,
+      });
     }
     if (this.detailError() === 'request-failed') {
-      messages.push({ id: 'employee-detail-load-error', level: 'error', text: this.texts.detailLoadFailedMessage, sectionId: 'overview', sectionLabel: this.texts.detailPanelTitle, sticky: true });
+      messages.push({
+        id: 'employee-detail-load-error',
+        level: 'error',
+        text: this.texts.detailLoadFailedMessage,
+        sectionId: 'overview',
+        sectionLabel: this.texts.detailPanelTitle,
+        sticky: true,
+      });
     }
     if (this.updateIdentityError()) {
-      messages.push({ id: 'employee-identity-update-error', level: 'error', text: this.texts.detailHeaderUpdateErrorMessage, sectionId: 'overview', sectionLabel: this.texts.detailPanelTitle, sticky: true });
+      messages.push({
+        id: 'employee-identity-update-error',
+        level: 'error',
+        text: this.texts.detailHeaderUpdateErrorMessage,
+        sectionId: 'overview',
+        sectionLabel: this.texts.detailPanelTitle,
+        sticky: true,
+      });
     }
     return messages;
   }
@@ -385,7 +418,8 @@ export class EmployeeDetailPageComponent {
     if (!(target instanceof HTMLElement)) return;
     target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     target.classList.add('employee-detail__section-highlight');
-    if (this.highlightedSectionResetHandle !== null) window.clearTimeout(this.highlightedSectionResetHandle);
+    if (this.highlightedSectionResetHandle !== null)
+      window.clearTimeout(this.highlightedSectionResetHandle);
     this.highlightedSectionResetHandle = window.setTimeout(() => {
       target.classList.remove('employee-detail__section-highlight');
       this.highlightedSectionResetHandle = null;
