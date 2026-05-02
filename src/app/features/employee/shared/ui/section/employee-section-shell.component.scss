@@ -4,8 +4,13 @@
 
 .employee-section-shell__header-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
   align-items: center;
+}
+
+.employee-section-shell__header-actions :where(app-ui-button) {
+  min-width: 5.8rem;
 }
 
 .employee-section-shell__footer {
