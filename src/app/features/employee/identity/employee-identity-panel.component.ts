@@ -26,7 +26,6 @@ interface IdentityNavItem {
 export class EmployeeIdentityPanelComponent {
   readonly employeeKey = input.required<EmployeeBusinessKey>();
   readonly employee = input<EmployeeDetailModel | null>(null);
-  readonly activeSection = input<EmployeeRouteSection>('contact');
   readonly hireDate = input<string | null>(null);
   readonly status = input<'ACTIVE' | 'TERMINATED'>('TERMINATED');
 
@@ -34,17 +33,18 @@ export class EmployeeIdentityPanelComponent {
 
   protected readonly initials = computed(() => {
     const name = this.employee()?.displayName ?? '';
-    const parts = name.trim().split(/\s+/);
+    const parts = name.trim().split(/\s+/).filter(Boolean);
+    if (parts.length === 0) return '?';
     if (parts.length >= 2) {
       return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
     }
-    return name.slice(0, 2).toUpperCase() || '?';
+    return parts[0].slice(0, 2).toUpperCase() || '?';
   });
 
   protected readonly navItems = computed<ReadonlyArray<IdentityNavItem>>(() => {
     const key = this.employeeKey();
     return [
-      { section: 'overview', label: this.texts.detailPanelTitle, routeCommands: buildEmployeeDetailRouteCommands(key, 'overview') },
+      { section: 'overview', label: this.texts.overviewNavLabel, routeCommands: buildEmployeeDetailRouteCommands(key, 'overview') },
       { section: 'contact', label: this.texts.personalAreaLabel, routeCommands: buildEmployeeDetailRouteCommands(key, 'contact') },
       { section: 'presence', label: this.texts.laborAreaLabel, routeCommands: buildEmployeeDetailRouteCommands(key, 'presence') },
       { section: 'organization', label: this.texts.organizationalAreaLabel, routeCommands: buildEmployeeDetailRouteCommands(key, 'organization') },
