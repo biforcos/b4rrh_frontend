@@ -55,23 +55,21 @@ import { UiButtonComponent } from '../../../shared/ui/button/ui-button.component
       min-height: 100dvh;
       place-items: center;
       padding: 1.25rem;
-      background:
-        radial-gradient(circle at top left, rgba(14, 116, 144, 0.14), transparent 34%),
-        linear-gradient(180deg, #eef6fa 0%, #f8fbfd 100%);
+      background: var(--surface-app);
     }
 
     .local-dev-login {
-      width: min(100%, 28rem);
+      width: min(100%, 400px);
     }
 
     .local-dev-login__card {
       display: grid;
       gap: 1rem;
-      background: #ffffff;
-      border: 1px solid rgba(14, 116, 144, 0.14);
-      border-radius: 1rem;
+      background: var(--surface-panel);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
       box-shadow: var(--shadow-panel);
-      padding: 1.25rem;
+      padding: 40px;
     }
 
     .local-dev-login__header,
@@ -82,34 +80,37 @@ import { UiButtonComponent } from '../../../shared/ui/button/ui-button.component
 
     .local-dev-login__header h1 {
       margin: 0;
-      color: #0a2d3e;
+      color: var(--text-primary);
       font-size: 1.25rem;
+      font-weight: 600;
     }
 
     .local-dev-login__header p,
     .local-dev-login__help {
       margin: 0;
-      color: var(--text-muted);
+      color: var(--text-secondary);
       line-height: 1.45;
-      font-size: 0.92rem;
+      font-size: 0.88rem;
     }
 
     .local-dev-login__field {
       display: grid;
-      gap: 0.35rem;
-      color: #12324e;
-      font-size: 0.9rem;
+      gap: 4px;
+      color: var(--text-secondary);
+      font-size: 11px;
       font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
     }
 
     .local-dev-login__error {
       margin: 0;
-      color: #a11d2d;
-      background: #fff1f2;
+      color: #dc2626;
+      background: #fee2e2;
       border: 1px solid #fecdd3;
-      border-radius: 0.7rem;
+      border-radius: var(--radius-sm);
       padding: 0.7rem 0.8rem;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
     }
   `,
 })
