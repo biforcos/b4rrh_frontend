@@ -2,7 +2,7 @@
   display: grid;
   gap: 0;
   border: 1px solid #e5e7eb;
-  border-top: 2px solid #0e7490;
+  border-top: 2px solid var(--accent-primary);
   border-radius: 0.82rem;
   background: #ffffff;
   box-shadow: var(--elevation-1);
@@ -12,7 +12,7 @@
 /* ─── HEADER ─── */
 .employee-contract-block__header {
   padding: 0.62rem 1rem;
-  background: linear-gradient(180deg, rgba(14, 116, 144, 0.06) 0%, rgba(14, 116, 144, 0.02) 100%);
+  background: linear-gradient(180deg, rgba(79, 70, 229, 0.06) 0%, rgba(79, 70, 229, 0.02) 100%);
   border-bottom: 1px solid #f1f5f9;
 }
 

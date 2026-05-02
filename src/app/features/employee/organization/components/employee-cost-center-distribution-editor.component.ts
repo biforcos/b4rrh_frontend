@@ -111,7 +111,7 @@ export interface CostCenterDistributionDraft {
     }
     .cost-center-editor__input:focus {
       outline: none;
-      border-color: var(--accent-soft, #22d3ee);
+      border-color: var(--accent-soft, #818cf8);
       box-shadow: var(--focus-ring);
     }
     .cost-center-editor__col-code { flex: 2; }

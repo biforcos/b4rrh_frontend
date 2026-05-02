@@ -37,9 +37,9 @@
   justify-content: space-between;
   gap: 0.5rem;
   padding: 0.6rem 0.82rem 0.48rem;
-  background: linear-gradient(180deg, rgba(14, 116, 144, 0.07) 0%, rgba(14, 116, 144, 0.03) 100%);
-  border-top: 2px solid rgba(14, 116, 144, 0.38);
-  border-bottom: 1px solid rgba(14, 116, 144, 0.1);
+  background: linear-gradient(180deg, rgba(79, 70, 229, 0.07) 0%, rgba(79, 70, 229, 0.03) 100%);
+  border-top: 2px solid rgba(79, 70, 229, 0.38);
+  border-bottom: 1px solid rgba(79, 70, 229, 0.1);
 }
 
 .employee-overview__card-title {
@@ -146,12 +146,12 @@
 }
 
 .employee-overview__quick-link:hover {
-  background: rgba(14, 116, 144, 0.05);
+  background: rgba(79, 70, 229, 0.05);
 }
 
 .employee-overview__quick-link:hover .employee-overview__quick-link-arrow {
   transform: translateX(2px);
-  color: #0e7490;
+  color: var(--accent-primary);
 }
 
 .employee-overview__quick-link-icon {
@@ -161,8 +161,8 @@
   height: 2rem;
   min-width: 2rem;
   border-radius: 0.52rem;
-  background: rgba(14, 116, 144, 0.1);
-  color: #0e7490;
+  background: rgba(79, 70, 229, 0.1);
+  color: var(--accent-primary);
   font-size: 0.82rem;
 }
 

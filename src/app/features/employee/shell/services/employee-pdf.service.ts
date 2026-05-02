@@ -51,12 +51,12 @@ export class EmployeePdfService {
     const yearsOfService = this.computeYears(d.hireDate);
     const isActive = d.isActive;
 
-    const accentColor = isActive ? '#0e7490' : '#64748b';
+    const accentColor = isActive ? '#4f46e5' : '#64748b';
     const statusBg = isActive ? '#dcfce7' : '#f1f5f9';
     const statusColor = isActive ? '#15803d' : '#475569';
     const statusBorder = isActive ? '#86efac' : '#cbd5e1';
     const heroBg = isActive
-      ? 'linear-gradient(135deg, #0c5f74 0%, #0e7490 45%, #0891b2 100%)'
+      ? 'linear-gradient(135deg, #3730a3 0%, #4f46e5 45%, #4f46e5 100%)'
       : 'linear-gradient(135deg, #334155 0%, #475569 45%, #64748b 100%)';
 
     const fmtDate = (iso: string | null) => {
@@ -319,7 +319,7 @@ export class EmployeePdfService {
     .section-divider {
       flex: 1;
       height: 1px;
-      background: linear-gradient(to right, rgba(14,116,144,0.2), transparent);
+      background: linear-gradient(to right, rgba(79,70,229,0.2), transparent);
     }
 
     .fields {
@@ -360,9 +360,9 @@ export class EmployeePdfService {
       font-size: 0.58rem;
       font-weight: 700;
       padding: 0.14rem 0.42rem;
-      background: rgba(14,116,144,0.1);
+      background: rgba(79,70,229,0.1);
       color: ${accentColor};
-      border: 1px solid rgba(14,116,144,0.2);
+      border: 1px solid rgba(79,70,229,0.2);
       margin-left: 0.36rem;
       vertical-align: middle;
     }
@@ -375,17 +375,17 @@ export class EmployeePdfService {
       font-size: 0.6rem;
       font-weight: 700;
       padding: 0.16rem 0.5rem;
-      background: rgba(14,116,144,0.08);
+      background: rgba(79,70,229,0.08);
       color: ${accentColor};
-      border: 1px solid rgba(14,116,144,0.15);
+      border: 1px solid rgba(79,70,229,0.15);
       margin-left: 0.4rem;
     }
 
     /* ─── NOTES AREA ─── */
     .notes-box {
-      border: 1px dashed rgba(14,116,144,0.2);
+      border: 1px dashed rgba(79,70,229,0.2);
       border-radius: 0.5rem;
-      background: rgba(14,116,144,0.02);
+      background: rgba(79,70,229,0.02);
       padding: 0.6rem 0.8rem;
       min-height: 2.4rem;
     }

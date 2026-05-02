@@ -78,7 +78,7 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  box-shadow: 0 8px 16px -12px rgba(14, 116, 144, 0.6);
+  box-shadow: 0 8px 16px -12px rgba(79, 70, 229, 0.6);
 }
 
 .employee-detail-header__avatar-initials {
@@ -138,7 +138,7 @@
   padding: 1.2rem 1.2rem 1rem;
   border-bottom: 1px solid #f1f5f9;
   background: linear-gradient(180deg, #fafcff 0%, #ffffff 100%);
-  border-top: 3px solid #0e7490;
+  border-top: 3px solid var(--accent-primary);
 }
 
 .employee-detail-header__drawer-title-row {
@@ -151,7 +151,7 @@
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: #0e7490;
+  color: var(--accent-primary);
 }
 
 .employee-detail-header__drawer-title {
