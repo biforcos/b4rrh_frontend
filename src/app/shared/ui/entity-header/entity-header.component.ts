@@ -27,6 +27,7 @@ export class EntityHeaderComponent {
   readonly metadata = input<ReadonlyArray<EntityHeaderMetadataItem>>([]);
   readonly status = input<EntityHeaderStatus | null>(null);
   readonly avatarText = input<string | null>(null);
+  readonly photoUrl = input<string | null>(null);
 
   protected readonly hasMetadata = computed(() => this.metadata().length > 0);
   protected readonly copiedLabel = signal<string | null>(null);

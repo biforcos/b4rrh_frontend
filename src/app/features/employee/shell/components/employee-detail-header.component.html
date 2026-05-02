@@ -26,7 +26,15 @@
       </div>
 
       <div class="employee-detail-header__avatar" [attr.aria-label]="texts.detailAvatarPlaceholderAriaLabel">
-        <span class="employee-detail-header__avatar-initials">{{ avatarInitials() }}</span>
+        @if (employee().photoUrl) {
+          <img
+            class="employee-detail-header__avatar-photo"
+            [src]="employee().photoUrl"
+            alt="Foto del empleado"
+          />
+        } @else {
+          <span class="employee-detail-header__avatar-initials">{{ avatarInitials() }}</span>
+        }
       </div>
     </div>
   }
