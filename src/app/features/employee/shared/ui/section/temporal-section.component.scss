@@ -46,7 +46,7 @@
 .temporal-section__row--current {
   border-color: #a8c6e2;
   background: #f6f7f9;
-  box-shadow: inset 3px 0 0 #0e7490;
+  box-shadow: inset 3px 0 0 var(--accent-primary);
 }
 
 .temporal-section__row:not(.temporal-section__row--current):not(.temporal-section__row--draft):not(.temporal-section__row--editing-current) {
@@ -62,13 +62,13 @@
 .temporal-section__row--editing-current {
   border-color: #9ac0e2;
   background: #f3f4f6;
-  box-shadow: inset 3px 0 0 #0e7490;
+  box-shadow: inset 3px 0 0 var(--accent-primary);
 }
 
 .temporal-section__row--correcting {
   border-color: #9ac0e2;
   background: #f3f4f6;
-  box-shadow: inset 3px 0 0 #0e7490;
+  box-shadow: inset 3px 0 0 var(--accent-primary);
 }
 
 .temporal-section__summary {
