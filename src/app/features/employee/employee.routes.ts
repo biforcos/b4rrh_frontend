@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
 
 import {
-  buildEmployeeDetailRoutePath,
   buildEmployeeKeyRoutePath,
   buildEmployeeUnknownSectionRoutePath,
 } from './routing/employee-route-builder.util';
@@ -16,75 +15,76 @@ export const employeeRoutes: Routes = [
   },
   {
     path: '',
+    pathMatch: 'full',
     loadComponent: () =>
       import('./shell/pages/employee-shell-page.component').then(
         (m) => m.EmployeeShellPageComponent,
       ),
+  },
+  {
+    path: buildEmployeeKeyRoutePath(),
+    loadComponent: () =>
+      import('./shell/pages/employee-detail-page.component').then(
+        (m) => m.EmployeeDetailPageComponent,
+      ),
     children: [
       {
-        path: buildEmployeeDetailRoutePath('overview'),
+        path: 'overview',
         loadComponent: () =>
           import('./overview/pages/employee-overview-page.component').then(
             (m) => m.EmployeeOverviewPageComponent,
           ),
       },
       {
-        path: buildEmployeeDetailRoutePath('contact'),
+        path: 'contact',
         loadComponent: () =>
           import('./contact/pages/employee-contact-page.component').then(
             (m) => m.EmployeeContactPageComponent,
           ),
       },
       {
-        path: buildEmployeeDetailRoutePath('presence'),
+        path: 'presence',
         loadComponent: () =>
           import('./presence/pages/employee-presence-page.component').then(
             (m) => m.EmployeePresencePageComponent,
           ),
       },
       {
-        path: buildEmployeeDetailRoutePath('organization'),
+        path: 'organization',
         loadComponent: () =>
           import('./organization/pages/employee-organization-page.component').then(
             (m) => m.EmployeeOrganizationPageComponent,
           ),
       },
       {
-        path: buildEmployeeDetailRoutePath('payroll'),
+        path: 'payroll',
         loadComponent: () =>
           import('./payroll/pages/employee-payroll-page.component').then(
             (m) => m.EmployeePayrollPageComponent,
           ),
       },
       {
-        path: `${buildEmployeeKeyRoutePath()}/rehire`,
+        path: 'rehire',
         loadComponent: () =>
           import('./lifecycle/rehire/pages/rehire-employee-page.component').then(
             (m) => m.RehireEmployeePageComponent,
           ),
       },
       {
-        path: buildEmployeeKeyRoutePath(),
-        pathMatch: 'full',
-        redirectTo: buildEmployeeDetailRoutePath('contact'),
-      },
-      {
-        path: buildEmployeeUnknownSectionRoutePath(),
-        pathMatch: 'full',
-        redirectTo: buildEmployeeDetailRoutePath('contact'),
-      },
-      {
         path: '',
         pathMatch: 'full',
-        loadComponent: () =>
-          import('./shell/pages/employee-empty-detail-page.component').then(
-            (m) => m.EmployeeEmptyDetailPageComponent,
-          ),
+        redirectTo: 'contact',
       },
       {
-        path: '**',
-        redirectTo: '',
+        path: ':section',
+        pathMatch: 'full',
+        redirectTo: 'contact',
       },
     ],
+  },
+  {
+    path: buildEmployeeUnknownSectionRoutePath(),
+    pathMatch: 'full',
+    redirectTo: '',
   },
 ];
