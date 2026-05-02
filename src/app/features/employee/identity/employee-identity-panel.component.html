@@ -1,0 +1,50 @@
+<div class="identity-panel">
+  <!-- Avatar + name + status -->
+  <div class="identity-panel__hero">
+    <div class="identity-panel__avatar" [attr.aria-hidden]="true">{{ initials() }}</div>
+    <div class="identity-panel__name-row">
+      <span class="identity-panel__name">{{ employee()?.displayName ?? '—' }}</span>
+      <p-tag
+        class="identity-panel__status"
+        [value]="statusLabel()"
+        [severity]="statusSeverity()"
+      />
+    </div>
+  </div>
+
+  <!-- Key data fields -->
+  <dl class="identity-panel__fields">
+    <div class="identity-panel__field">
+      <dt class="identity-panel__field-label">{{ texts.employeeConvenioLabel }}</dt>
+      <dd class="identity-panel__field-value">{{ employeeKey().ruleSystemCode }}</dd>
+    </div>
+    <div class="identity-panel__field">
+      <dt class="identity-panel__field-label">{{ texts.employeeTypeLabel }}</dt>
+      <dd class="identity-panel__field-value">{{ employeeKey().employeeTypeCode }}</dd>
+    </div>
+    <div class="identity-panel__field">
+      <dt class="identity-panel__field-label">{{ texts.employeeNumberLabel }}</dt>
+      <dd class="identity-panel__field-value identity-panel__field-value--mono">{{ employeeKey().employeeNumber }}</dd>
+    </div>
+    @if (hireDate()) {
+      <div class="identity-panel__field">
+        <dt class="identity-panel__field-label">{{ texts.employeeFechaAltaLabel }}</dt>
+        <dd class="identity-panel__field-value">{{ hireDate() }}</dd>
+      </div>
+    }
+  </dl>
+
+  <div class="identity-panel__divider"></div>
+
+  <!-- Section navigation -->
+  <nav class="identity-panel__nav" [attr.aria-label]="texts.detailNavAriaLabel">
+    @for (item of navItems(); track item.section) {
+      <a
+        class="identity-panel__nav-item"
+        [routerLink]="item.routeCommands"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >{{ item.label }}</a>
+    }
+  </nav>
+</div>

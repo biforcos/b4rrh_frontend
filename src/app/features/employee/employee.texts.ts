@@ -725,4 +725,9 @@ export const employeeTexts = {
   rehireEmployeeSummaryDateLabel: 'Fecha de reincorporación',
   rehireEmployeeSummaryWorkingTimeTitle: 'Nueva jornada',
   rehireEmployeeSummarySincePrefix: 'Desde',
+  employeeConvenioLabel: 'Convenio',
+  employeeTypeLabel: 'Tipo',
+  employeeNumberLabel: 'Número',
+  employeeFechaAltaLabel: 'Fecha alta',
+  detailNavAriaLabel: 'Secciones del empleado',
 } as const;
