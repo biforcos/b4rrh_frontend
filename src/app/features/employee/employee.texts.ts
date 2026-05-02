@@ -729,5 +729,10 @@ export const employeeTexts = {
   employeeTypeLabel: 'Tipo',
   employeeNumberLabel: 'Número',
   employeeFechaAltaLabel: 'Fecha alta',
+  employeeNameColumnLabel: 'Nombre',
+  employeeClaveColumnLabel: 'Clave',
+  employeeTypeColumnLabel: 'Tipo',
+  employeeConvenioColumnLabel: 'Convenio',
+  employeeStatusColumnLabel: 'Estado',
   detailNavAriaLabel: 'Secciones del empleado',
 } as const;

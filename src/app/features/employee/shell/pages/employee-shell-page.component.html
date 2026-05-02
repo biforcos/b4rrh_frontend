@@ -1,178 +1,76 @@
-<app-master-detail-shell [title]="texts.masterTitle" [subtitle]="''">
-  <aside slot="list" class="employee-shell__master">
-    <div class="employee-shell__status-filters" role="group" aria-label="Filtrar por estado">
-      <button
-        class="employee-shell__filter-chip"
-        [class.employee-shell__filter-chip--active]="statusFilter() === 'all'"
-        (click)="setStatusFilter('all')"
-      >Todos <span class="employee-shell__filter-chip-count">{{ filteredEmployees().length }}</span></button>
-      <button
-        class="employee-shell__filter-chip"
-        [class.employee-shell__filter-chip--active]="statusFilter() === 'active'"
-        (click)="setStatusFilter('active')"
-      >{{ texts.employeeStatusActiveLabel }} <span class="employee-shell__filter-chip-count">{{ activeCount() }}</span></button>
-      <button
-        class="employee-shell__filter-chip"
-        [class.employee-shell__filter-chip--active]="statusFilter() === 'inactive'"
-        (click)="setStatusFilter('inactive')"
-      >{{ texts.employeeStatusInactiveLabel }} <span class="employee-shell__filter-chip-count">{{ inactiveCount() }}</span></button>
-    </div>
+<div class="employee-directory">
 
-    @if (recentEmployees().length > 0 && !loadingDirectory()) {
-      <div class="employee-shell__recents">
-        <p class="employee-shell__recents-label">Vistos recientemente</p>
-        <div class="employee-shell__recents-list">
-          @for (recent of recentEmployees(); track employeeListKey(recent)) {
-            <button
-              class="employee-shell__recent-item"
-              [class.employee-shell__recent-item--active]="activeEmployeeListKey() === employeeListKey(recent)"
-              (click)="openEmployeeListItem(recent)"
-              [attr.aria-label]="recent.displayName"
-            >
-              <span class="employee-shell__recent-avatar">{{ recent.displayName.charAt(0) }}</span>
-              <span class="employee-shell__recent-name">{{ recent.displayName }}</span>
-            </button>
-          }
-        </div>
-      </div>
+  <!-- Page header -->
+  <header class="employee-directory__header">
+    <h1 class="employee-directory__title">{{ texts.masterTitle }}</h1>
+    <app-ui-button
+      [label]="texts.hireEmployeeTitle"
+      icon="pi pi-plus"
+      (pressed)="onHireClick()"
+    />
+  </header>
+
+  <!-- Search -->
+  <div class="employee-directory__search-row">
+    <p-iconfield class="employee-directory__search-field">
+      <p-inputicon styleClass="pi pi-search" />
+      <input
+        pInputText
+        class="employee-directory__search-input"
+        type="text"
+        [attr.aria-label]="texts.searchLabel"
+        [placeholder]="texts.searchPlaceholder"
+        [value]="searchValue()"
+        (input)="updateSearch($any($event.target).value)"
+      />
+    </p-iconfield>
+    <span class="employee-directory__count">{{ displayedEmployees().length }} empleados</span>
+  </div>
+
+  <!-- DataTable -->
+  <div class="employee-directory__table-wrapper">
+    @if (error()) {
+      <p class="employee-directory__error">{{ texts.directoryLoadFailedMessage }}</p>
     }
 
-    <app-master-list-panel
-      [title]="''"
-      [subtitle]="texts.masterSubtitle"
-      [items]="displayedEmployees()"
-      [emptyState]="employeeListEmptyState()"
-      [loading]="loadingDirectory()"
-      [errorMessage]="directoryError() ? texts.directoryLoadFailedMessage : null"
-      [primaryActionLabel]="texts.hireEmployeeTitle"
-      [searchPlaceholder]="texts.searchPlaceholder"
-      [searchValue]="searchValue()"
-      [selectedItemKey]="activeEmployeeListKey()"
-      [itemKey]="employeeListKey"
-      [listAriaLabel]="texts.masterTitle"
-      (createNew)="onHireClick()"
-      (itemSelected)="openEmployeeListItem($event)"
-      (searchValueChange)="updateSearchValue($event)"
+    <p-table
+      [value]="$any(displayedEmployees())"
+      [loading]="loading()"
+      [rows]="50"
+      [paginator]="displayedEmployees().length > 50"
+      styleClass="employee-directory__table"
     >
-      <ng-template let-employee let-selected="selected">
-        <app-list-item
-          [selected]="selected"
-          [status]="resolveEmployeeStatusLabel(employee.statusLabel)"
-          [statusSeverity]="resolveEmployeeStatusSeverity(employee.statusLabel)"
-        >
-          <div listItemHeader class="employee-shell__list-headline">
-            <span class="employee-shell__list-name">{{ employee.displayName }}</span>
-          </div>
-
-          <div class="employee-shell__list-chips" [attr.aria-label]="texts.currentEmployeeKeyLabel">
-            <app-ui-tag [value]="employee.employeeNumber" severity="contrast" [rounded]="true" />
-            <app-ui-tag [value]="employee.employeeTypeCode" severity="secondary" [rounded]="true" />
-            <app-ui-tag [value]="employee.ruleSystemCode" severity="secondary" [rounded]="true" />
-          </div>
-
-          <p class="employee-shell__list-context">
-            <span class="employee-shell__list-context-label">{{ texts.detailHeaderWorkCenterLabel }}:</span>
-            <span class="employee-shell__list-context-value">{{ employee.workCenter }}</span>
-          </p>
-        </app-list-item>
+      <ng-template pTemplate="header">
+        <tr>
+          <th class="employee-directory__th">{{ texts.employeeNameColumnLabel }}</th>
+          <th class="employee-directory__th">{{ texts.employeeClaveColumnLabel }}</th>
+          <th class="employee-directory__th">{{ texts.employeeTypeColumnLabel }}</th>
+          <th class="employee-directory__th">{{ texts.employeeConvenioColumnLabel }}</th>
+          <th class="employee-directory__th">{{ texts.employeeStatusColumnLabel }}</th>
+        </tr>
       </ng-template>
-    </app-master-list-panel>
-  </aside>
-
-  <section slot="detail" class="employee-shell__detail">
-      @if (activeEmployeeKey()) {
-        @if (loadingDetail()) {
-          <p class="employee-shell__detail-feedback employee-shell__detail-feedback--loading">
-            {{ texts.detailLoadingMessage }}
-          </p>
-        }
-      }
-
-      @if (selectedEmployee(); as employee) {
-        <section id="employee-section-overview" class="employee-shell__identity-zone">
-          <app-employee-page-header
-            [fullName]="employee.displayName"
-            [employeeNumber]="employee.employeeNumber"
-            [ruleSystemCode]="employee.ruleSystemCode"
-            [employeeTypeCode]="employee.employeeTypeCode"
-            [status]="headerStatus()"
-            [companyCode]="headerCompany()"
-            [workCenterCode]="headerWorkCenter()"
-            [hireDate]="headerHireDate()"
-            [email]="headerEmail()"
-            [phone]="headerPhone()"
-            (editIdentityRequested)="openIdentityEditorFromHeader()"
-            (terminateRequested)="openTerminatePanel()"
-            (rehireRequested)="onRehireRequested()"
-            (printRequested)="onPrintRequested()"
-          />
-
-          <app-employee-detail-header
-            class="employee-shell__identity-editor"
-            [employee]="employee"
-            [editorOnly]="true"
-            [openEditorRequestId]="openIdentityEditorRequestId()"
-            [updating]="updatingIdentity()"
-            [updateError]="updateIdentityError()"
-            [updateSuccess]="updateIdentitySuccess()"
-            (updateRequested)="submitIdentityUpdate($event)"
-            (editInteractionStarted)="clearIdentityFeedback()"
-          />
-        </section>
-
-        <div class="employee-shell__content-layout">
-          <div class="employee-shell__message-overlay" aria-live="polite">
-            <app-global-message-rail
-              class="employee-shell__message-rail"
-              [messages]="globalMessages()"
-              [summary]="globalMessageSummary()"
-              [expanded]="globalMessageExpanded()"
-              (toggleRequested)="toggleGlobalMessages()"
-              (closeRequested)="closeGlobalMessages()"
-              (sectionRequested)="navigateToMessageSection($event)"
+      <ng-template pTemplate="body" let-employee>
+        <tr class="employee-directory__row" (click)="openEmployee(employee)" role="button" tabindex="0" (keydown.enter)="openEmployee(employee)">
+          <td class="employee-directory__td employee-directory__td--name">{{ employee.displayName }}</td>
+          <td class="employee-directory__td employee-directory__td--mono">{{ employee.employeeNumber }}</td>
+          <td class="employee-directory__td">{{ employee.employeeTypeCode }}</td>
+          <td class="employee-directory__td">{{ employee.ruleSystemCode }}</td>
+          <td class="employee-directory__td">
+            <app-ui-tag
+              [value]="resolveStatusLabel(employee.statusLabel)"
+              [severity]="resolveStatusSeverity(employee.statusLabel)"
             />
-          </div>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="5" class="employee-directory__empty">
+            {{ searchValue() ? texts.noResultEmployeesTitle : texts.emptyDirectoryTitle }}
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
 
-          <section class="employee-shell__main-zone">
-            @if (!isRehireWorkflow()) {
-              @if (activeEmployeeKey(); as activeEmployeeKey) {
-                <section class="employee-shell__nav-zone">
-                  <app-employee-detail-nav
-                    [employeeKey]="activeEmployeeKey"
-                    [activeSection]="activeDetailSection()"
-                  />
-                </section>
-              }
-            }
-            <section class="employee-shell__detail-content-zone">
-              <router-outlet />
-            </section>
-          </section>
-
-          @if (!isRehireWorkflow()) {
-            <aside id="employee-section-journey" class="employee-shell__timeline-zone" aria-label="Panel contextual del historial del empleado">
-              @if (!terminatePanelOpen()) {
-                <app-employee-journey-timeline
-                  [journey]="journey()"
-                  [loading]="loadingJourney()"
-                  [error]="journeyError()"
-                  [presences]="presences()"
-                />
-              } @else {
-                  @if (activeEmployeeKey(); as key) {
-                    <app-employee-terminate-panel
-                      [employeeKey]="key"
-                      (closed)="closeTerminatePanel()"
-                    />
-                  }
-              }
-            </aside>
-          }
-        </div>
-      } @else {
-        <section class="employee-shell__detail-content-zone employee-shell__detail-content-zone--standalone">
-          <router-outlet />
-        </section>
-      }
-  </section>
-</app-master-detail-shell>
+</div>
