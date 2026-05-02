@@ -2,7 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, map, of, throwError } from 'rxjs';
 
-import { DefaultService } from '../generated/api/default.service';
+import { EmployeePresenceService } from '../generated/api/employee-presence.service';
 import { PresenceResponse } from '../generated/model/models';
 import { EmployeeBusinessKeyApiQuery } from './employee-read.client';
 
@@ -22,7 +22,7 @@ export interface EmployeePresenceApiModel {
   providedIn: 'root',
 })
 export class EmployeePresenceReadClient {
-  private readonly api = inject(DefaultService);
+  private readonly api = inject(EmployeePresenceService);
 
   readEmployeePresencesByBusinessKey(
     key: EmployeeBusinessKeyApiQuery,

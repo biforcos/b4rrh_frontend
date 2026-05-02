@@ -2,7 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, map, of, throwError } from 'rxjs';
 
-import { DefaultService } from '../generated/api/default.service';
+import { EmployeeAddressService } from '../generated/api/employee-address.service';
 import { AddressResponse, CloseAddressRequest, CreateAddressRequest, UpdateAddressRequest } from '../generated/model/models';
 import { EmployeeBusinessKeyApiQuery } from './employee-read.client';
 
@@ -23,7 +23,7 @@ export interface EmployeeAddressApiModel {
   providedIn: 'root',
 })
 export class EmployeeAddressReadClient {
-  private readonly api = inject(DefaultService);
+  private readonly api = inject(EmployeeAddressService);
 
   readEmployeeAddressesByBusinessKey(
     key: EmployeeBusinessKeyApiQuery,

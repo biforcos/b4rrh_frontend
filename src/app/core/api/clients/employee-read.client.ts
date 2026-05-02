@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Observable, catchError, map, of, throwError } from 'rxjs';
 
-import { DefaultService } from '../generated/api/default.service';
+import { EmployeeDirectoryService } from '../generated/api/employee-directory.service';
 import {
   EmployeeDirectoryItemResponse,
   EmployeeResponse,
@@ -41,7 +41,7 @@ export interface EmployeeDirectoryApiModel {
   providedIn: 'root',
 })
 export class EmployeeReadClient {
-  private readonly api = inject(DefaultService);
+  private readonly api = inject(EmployeeDirectoryService);
 
   readDirectory(): Observable<ReadonlyArray<EmployeeDirectoryApiModel>> {
     return this.api

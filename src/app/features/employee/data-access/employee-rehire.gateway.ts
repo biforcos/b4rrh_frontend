@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
-import { DefaultService } from '../../../core/api/generated/api/default.service';
+import { EmployeeLifecycleService } from '../../../core/api/generated/api/employee-lifecycle.service';
 import { RehireEmployeeDraft, RehireEmployeeResult } from '../models/employee-rehire.model';
 import { mapDraftToRehireRequest, mapResponseToResult } from './employee-rehire.mapper';
 import { HIRE_EMPLOYEE_DEFAULTS } from '../models/hire-employee.defaults';
@@ -9,7 +9,7 @@ import { HIRE_EMPLOYEE_DEFAULTS } from '../models/hire-employee.defaults';
   providedIn: 'root',
 })
 export class EmployeeRehireGateway {
-  private readonly api = inject(DefaultService);
+  private readonly api = inject(EmployeeLifecycleService);
 
   rehire(draft: RehireEmployeeDraft): Observable<RehireEmployeeResult> {
     const payload = mapDraftToRehireRequest(draft);

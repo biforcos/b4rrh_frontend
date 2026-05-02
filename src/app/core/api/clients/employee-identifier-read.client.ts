@@ -2,7 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, map, of, throwError } from 'rxjs';
 
-import { DefaultService } from '../generated/api/default.service';
+import { EmployeeIdentifierService } from '../generated/api/employee-identifier.service';
 import {
   CreateIdentifierRequest,
   IdentifierResponse,
@@ -23,7 +23,7 @@ export interface EmployeeIdentifierApiModel {
   providedIn: 'root',
 })
 export class EmployeeIdentifierReadClient {
-  private readonly api = inject(DefaultService);
+  private readonly api = inject(EmployeeIdentifierService);
 
   readEmployeeIdentifiersByBusinessKey(
     key: EmployeeBusinessKeyApiQuery,

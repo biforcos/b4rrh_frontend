@@ -1,7 +1,7 @@
 import { Injectable, inject, isDevMode } from '@angular/core';
 import { Observable, catchError, map, of, shareReplay, switchMap, throwError } from 'rxjs';
 
-import { DefaultService } from '../../../core/api/generated/api/default.service';
+import { CatalogsService } from '../../../core/api/generated/api/catalogs.service';
 import {
   CatalogFieldBindingResponse,
   CatalogFieldBindingResponseCatalogKindEnum,
@@ -18,7 +18,7 @@ const CONTACT_TYPE_FIELD_CODE = 'contactTypeCode';
   providedIn: 'root',
 })
 export class WorkCenterFieldCatalogService {
-  private readonly api = inject(DefaultService);
+  private readonly api = inject(CatalogsService);
 
   private readonly bindingsByResourceCache = new Map<string, Observable<ReadonlyArray<CatalogFieldBindingResponse>>>();
   private readonly optionsByDirectCatalogCache = new Map<string, Observable<ReadonlyArray<SlotKeyOption<string>>>>();

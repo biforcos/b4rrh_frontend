@@ -4,7 +4,7 @@ import Aura from '@primeuix/themes/aura';
 export const b4rrhhPrimeNgThemePreset = definePreset(Aura, {
   semantic: {
     primary: {
-      50:  '#eef2ff',
+      50: '#eef2ff',
       100: '#e0e7ff',
       200: '#c7d2fe',
       300: '#a5b4fc',
@@ -19,20 +19,20 @@ export const b4rrhhPrimeNgThemePreset = definePreset(Aura, {
     colorScheme: {
       light: {
         primary: {
-          color:        '{primary.600}',
+          color: '{primary.600}',
           inverseColor: '#ffffff',
-          hoverColor:   '{primary.700}',
-          activeColor:  '{primary.800}',
+          hoverColor: '{primary.700}',
+          activeColor: '{primary.800}',
         },
         highlight: {
-          background:      '{primary.50}',
+          background: '{primary.50}',
           focusBackground: '{primary.100}',
-          color:           '{primary.900}',
-          focusColor:      '{primary.950}',
+          color: '{primary.900}',
+          focusColor: '{primary.950}',
         },
         surface: {
-          0:   '#ffffff',
-          50:  '#f8fafc',
+          0: '#ffffff',
+          50: '#f8fafc',
           100: '#f1f5f9',
           200: '#e2e8f0',
           300: '#cbd5e1',

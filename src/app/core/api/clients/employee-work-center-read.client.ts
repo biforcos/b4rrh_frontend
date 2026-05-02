@@ -2,14 +2,12 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, map, of, throwError } from 'rxjs';
 
-import { DefaultService } from '../generated/api/default.service';
+import { EmployeeWorkCenterService } from '../generated/api/employee-work-center.service';
 import {
-  CloseWorkCenterRequest,
-  CreateWorkCenterRequest as CanonicalCreateWorkCenterRequest,
+  EmployeeCloseWorkCenterRequest,
   EmployeeCreateWorkCenterRequest,
   EmployeeUpdateWorkCenterRequest,
-  UpdateWorkCenterRequest as CanonicalUpdateWorkCenterRequest,
-  WorkCenterResponse,
+  EmployeeWorkCenterAssignmentResponse,
 } from '../generated/model/models';
 import { EmployeeBusinessKeyApiQuery } from './employee-read.client';
 
@@ -24,8 +22,7 @@ export interface EmployeeWorkCenterApiModel {
   deleteForbiddenReason?: string | null;
 }
 
-interface WorkCenterResponseWithDeleteCapabilities extends WorkCenterResponse {
-  workCenterName?: string | null;
+interface WorkCenterResponseWithDeleteCapabilities extends EmployeeWorkCenterAssignmentResponse {
   canDelete?: boolean;
   startsAtPresenceStart?: boolean;
   deleteForbiddenReason?: string | null;
@@ -35,7 +32,7 @@ interface WorkCenterResponseWithDeleteCapabilities extends WorkCenterResponse {
   providedIn: 'root',
 })
 export class EmployeeWorkCenterReadClient {
-  private readonly api = inject(DefaultService);
+  private readonly api = inject(EmployeeWorkCenterService);
 
   readEmployeeWorkCentersByBusinessKey(
     key: EmployeeBusinessKeyApiQuery,
@@ -77,11 +74,11 @@ export class EmployeeWorkCenterReadClient {
     return this.api
       .createWorkCenterByBusinessKey({
         ...normalizedKey,
-        createWorkCenterRequest: {
+        employeeCreateWorkCenterRequest: {
           workCenterCode: request.workCenterCode.trim().toUpperCase(),
           startDate: request.startDate.trim(),
           endDate: this.normalizeOptionalValue(request.endDate),
-        } as unknown as CanonicalCreateWorkCenterRequest,
+        },
       })
       .pipe(map((workCenter) => this.toEmployeeWorkCenterApiModel(workCenter)));
   }
@@ -89,7 +86,7 @@ export class EmployeeWorkCenterReadClient {
   closeWorkCenterByBusinessKey(
     key: EmployeeBusinessKeyApiQuery,
     workCenterAssignmentNumber: number,
-    request: CloseWorkCenterRequest,
+    request: EmployeeCloseWorkCenterRequest,
   ): Observable<EmployeeWorkCenterApiModel> {
     const normalizedKey = this.normalizeKey(key);
 
@@ -97,7 +94,7 @@ export class EmployeeWorkCenterReadClient {
       .closeWorkCenterByBusinessKey({
         ...normalizedKey,
         workCenterAssignmentNumber,
-        closeWorkCenterRequest: {
+        employeeCloseWorkCenterRequest: {
           endDate: request.endDate.trim(),
         },
       })
@@ -115,11 +112,11 @@ export class EmployeeWorkCenterReadClient {
       .updateWorkCenterByBusinessKey({
         ...normalizedKey,
         workCenterAssignmentNumber,
-        updateWorkCenterRequest: {
+        employeeUpdateWorkCenterRequest: {
           workCenterCode: request.workCenterCode.trim().toUpperCase(),
           startDate: request.startDate.trim(),
           endDate: this.normalizeOptionalValue(request.endDate),
-        } as unknown as CanonicalUpdateWorkCenterRequest,
+        },
       })
       .pipe(map((workCenter) => this.toEmployeeWorkCenterApiModel(workCenter)));
   }
@@ -151,23 +148,18 @@ export class EmployeeWorkCenterReadClient {
     return normalizedValue.length > 0 ? normalizedValue : null;
   }
 
-  private toEmployeeWorkCenterApiModel(source: WorkCenterResponse): EmployeeWorkCenterApiModel {
-    const sourceWithDeleteCapabilities = source as WorkCenterResponseWithDeleteCapabilities & {
-      workCenterAssignmentNumber: number;
-      workCenterCode: string;
-      startDate: string;
-      endDate?: string | null;
-    };
+  private toEmployeeWorkCenterApiModel(source: EmployeeWorkCenterAssignmentResponse): EmployeeWorkCenterApiModel {
+    const extended = source as WorkCenterResponseWithDeleteCapabilities;
 
     return {
-      workCenterAssignmentNumber: sourceWithDeleteCapabilities.workCenterAssignmentNumber,
+      workCenterAssignmentNumber: source.workCenterAssignmentNumber,
       workCenterCode: source.workCenterCode,
-      workCenterName: this.normalizeOptionalValue(sourceWithDeleteCapabilities.workCenterName),
+      workCenterName: this.normalizeOptionalValue(source.workCenterName),
       startDate: source.startDate,
       endDate: source.endDate ?? null,
-      canDelete: sourceWithDeleteCapabilities.canDelete,
-      startsAtPresenceStart: sourceWithDeleteCapabilities.startsAtPresenceStart,
-      deleteForbiddenReason: sourceWithDeleteCapabilities.deleteForbiddenReason ?? null,
+      canDelete: extended.canDelete,
+      startsAtPresenceStart: extended.startsAtPresenceStart,
+      deleteForbiddenReason: extended.deleteForbiddenReason ?? null,
     };
   }
 }

@@ -23,7 +23,13 @@ interface IdentityNavItem {
 @Component({
   selector: 'app-employee-identity-panel',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, RouterLinkActive, TagModule, ButtonModule, EmployeePhotoUploadDialogComponent],
+  imports: [
+    RouterLink,
+    RouterLinkActive,
+    TagModule,
+    ButtonModule,
+    EmployeePhotoUploadDialogComponent,
+  ],
   templateUrl: './employee-identity-panel.component.html',
   styleUrl: './employee-identity-panel.component.scss',
 })
@@ -55,16 +61,31 @@ export class EmployeeIdentityPanelComponent {
   protected readonly navItems = computed<ReadonlyArray<IdentityNavItem>>(() => {
     const key = this.employeeKey();
     return [
-      { section: 'overview', label: this.texts.overviewNavLabel,
-        routeCommands: buildEmployeeDetailRouteCommands(key, 'overview') },
-      { section: 'contact', label: this.texts.personalAreaLabel,
-        routeCommands: buildEmployeeDetailRouteCommands(key, 'contact') },
-      { section: 'presence', label: this.texts.laborAreaLabel,
-        routeCommands: buildEmployeeDetailRouteCommands(key, 'presence') },
-      { section: 'organization', label: this.texts.organizationalAreaLabel,
-        routeCommands: buildEmployeeDetailRouteCommands(key, 'organization') },
-      { section: 'payroll', label: this.texts.payrollAreaLabel,
-        routeCommands: buildEmployeeDetailRouteCommands(key, 'payroll') },
+      {
+        section: 'overview',
+        label: this.texts.overviewNavLabel,
+        routeCommands: buildEmployeeDetailRouteCommands(key, 'overview'),
+      },
+      {
+        section: 'contact',
+        label: this.texts.personalAreaLabel,
+        routeCommands: buildEmployeeDetailRouteCommands(key, 'contact'),
+      },
+      {
+        section: 'presence',
+        label: this.texts.laborAreaLabel,
+        routeCommands: buildEmployeeDetailRouteCommands(key, 'presence'),
+      },
+      {
+        section: 'organization',
+        label: this.texts.organizationalAreaLabel,
+        routeCommands: buildEmployeeDetailRouteCommands(key, 'organization'),
+      },
+      {
+        section: 'payroll',
+        label: this.texts.payrollAreaLabel,
+        routeCommands: buildEmployeeDetailRouteCommands(key, 'payroll'),
+      },
     ] as const;
   });
 

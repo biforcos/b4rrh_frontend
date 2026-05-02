@@ -2,7 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, map, of, throwError } from 'rxjs';
 
-import { DefaultService } from '../generated/api/default.service';
+import { EmployeeContactService } from '../generated/api/employee-contact.service';
 import { ContactResponse, CreateContactRequest, UpdateContactRequest } from '../generated/model/models';
 import { EmployeeBusinessKeyApiQuery } from './employee-read.client';
 
@@ -16,7 +16,7 @@ export interface EmployeeContactApiModel {
   providedIn: 'root',
 })
 export class EmployeeContactReadClient {
-  private readonly api = inject(DefaultService);
+  private readonly api = inject(EmployeeContactService);
 
   readEmployeeContactsByBusinessKey(
     key: EmployeeBusinessKeyApiQuery,

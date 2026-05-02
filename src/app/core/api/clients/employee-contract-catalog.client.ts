@@ -1,7 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 
-import { DefaultService } from '../generated/api/default.service';
+import { CatalogsService } from '../generated/api/catalogs.service';
+import { RuleEntitiesService } from '../generated/api/rule-entities.service';
 import {
   ContractSubtypeCatalogItemResponse,
   RuleEntityResponse,
@@ -18,13 +19,14 @@ export interface ContractCatalogApiItem {
   providedIn: 'root',
 })
 export class EmployeeContractCatalogClient {
-  private readonly api = inject(DefaultService);
+  private readonly ruleEntitiesApi = inject(RuleEntitiesService);
+  private readonly catalogsApi = inject(CatalogsService);
 
   listContractTypes(
     ruleSystemCode: string,
     referenceDate?: string | null,
   ): Observable<ReadonlyArray<ContractCatalogApiItem>> {
-    return this.api
+    return this.ruleEntitiesApi
       .listRuleEntities({
         ruleSystemCode: ruleSystemCode.trim(),
         ruleEntityTypeCode: 'CONTRACT',
@@ -39,7 +41,7 @@ export class EmployeeContractCatalogClient {
     contractTypeCode: string,
     referenceDate?: string | null,
   ): Observable<ReadonlyArray<ContractCatalogApiItem>> {
-    return this.api
+    return this.catalogsApi
       .listContractCatalogSubtypes({
         ruleSystemCode: ruleSystemCode.trim(),
         contractTypeCode: contractTypeCode.trim().toUpperCase(),

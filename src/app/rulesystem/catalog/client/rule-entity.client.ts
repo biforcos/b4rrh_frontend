@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { DefaultService } from '../../../core/api/generated/api/default.service';
+import { RuleEntitiesService } from '../../../core/api/generated/api/rule-entities.service';
 import { CloseRuleEntityRequest } from '../../../core/api/generated/model/close-rule-entity-request';
 import { CorrectRuleEntityRequest } from '../../../core/api/generated/model/correct-rule-entity-request';
 import { CreateRuleEntityRequest } from '../../../core/api/generated/model/create-rule-entity-request';
@@ -23,7 +23,7 @@ export interface RuleEntityOccurrenceBusinessKey {
   providedIn: 'root',
 })
 export class RuleEntityClient {
-  private readonly api = inject(DefaultService);
+  private readonly api = inject(RuleEntitiesService);
 
   listRuleEntities(filters: RuleEntityListFilters): Observable<ReadonlyArray<RuleEntityResponse>> {
     return this.api.listRuleEntities({

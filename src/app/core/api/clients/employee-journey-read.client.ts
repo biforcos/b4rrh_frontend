@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 
-import { DefaultService } from '../generated/api/default.service';
+import { EmployeeJourneyService } from '../generated/api/employee-journey.service';
 import {
   EmployeeJourneyResponse,
   JourneyEmployeeHeader,
@@ -38,7 +38,7 @@ export interface EmployeeJourneyApiModel {
   providedIn: 'root',
 })
 export class EmployeeJourneyReadClient {
-  private readonly api = inject(DefaultService);
+  private readonly api = inject(EmployeeJourneyService);
 
   readEmployeeJourneyByBusinessKey(key: EmployeeBusinessKeyApiQuery): Observable<EmployeeJourneyApiModel> {
     const normalizedKey = this.normalizeKey(key);

@@ -2,7 +2,6 @@ import { Injectable, inject, isDevMode } from '@angular/core';
 import { Observable, map, of, shareReplay, switchMap, throwError } from 'rxjs';
 
 import { CatalogsService } from '../../../core/api/generated/api/catalogs.service';
-import { DefaultService } from '../../../core/api/generated/api/default.service';
 import {
   CatalogFieldBindingResponse,
   CatalogFieldBindingResponseCatalogKindEnum,
@@ -30,7 +29,6 @@ type CatalogFieldSpec = (typeof employeeCatalogFields)[keyof typeof employeeCata
   providedIn: 'root',
 })
 export class EmployeeFieldCatalogService {
-  private readonly api = inject(DefaultService);
   private readonly catalogsApi = inject(CatalogsService);
 
   private readonly bindingsByResourceCache = new Map<string, Observable<ReadonlyArray<CatalogFieldBindingResponse>>>();
@@ -150,7 +148,7 @@ export class EmployeeFieldCatalogService {
       return cached;
     }
 
-    const request = this.api
+    const request = this.catalogsApi
       .getCatalogBindingsByResourceCode({ resourceCode: normalizedResourceCode })
       .pipe(
         map((response) => response.fields ?? []),
@@ -176,7 +174,7 @@ export class EmployeeFieldCatalogService {
       return cached;
     }
 
-    const request = this.api
+    const request = this.catalogsApi
       .getDirectCatalogOptions({
         ruleSystemCode,
         ruleEntityTypeCode: normalizedRuleEntityTypeCode,

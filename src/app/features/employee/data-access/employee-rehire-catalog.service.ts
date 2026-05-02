@@ -1,7 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { take } from 'rxjs';
 
-import { DefaultService } from '../../../core/api/generated/api/default.service';
+import { CatalogsService } from '../../../core/api/generated/api/catalogs.service';
 import { ContractSubtypeCatalogItemResponse, AgreementCategoryCatalogItemResponse } from '../../../core/api/generated/model/models';
 import { EmployeeFieldCatalogService } from './employee-field-catalog.service';
 import { SlotKeyOption } from '../shared/ui/section/editable-slot-section.model';
@@ -11,7 +11,7 @@ import { employeeTexts } from '../employee.texts';
   providedIn: 'root',
 })
 export class EmployeeRehireCatalogService {
-  private readonly api = inject(DefaultService);
+  private readonly api = inject(CatalogsService);
   private readonly fieldCatalog = inject(EmployeeFieldCatalogService);
 
   readonly companies = signal<SlotKeyOption<string>[]>([]);

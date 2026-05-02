@@ -2,7 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, map, of, throwError } from 'rxjs';
 
-import { DefaultService } from '../generated/api/default.service';
+import { EmployeeContractService } from '../generated/api/employee-contract.service';
 import {
   CloseContractRequest,
   ContractResponse,
@@ -25,7 +25,7 @@ export interface EmployeeContractApiModel {
   providedIn: 'root',
 })
 export class EmployeeContractReadClient {
-  private readonly api = inject(DefaultService);
+  private readonly api = inject(EmployeeContractService);
 
   readEmployeeContractsByBusinessKey(
     key: EmployeeBusinessKeyApiQuery,

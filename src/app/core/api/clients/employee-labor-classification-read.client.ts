@@ -2,7 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, map, of, throwError } from 'rxjs';
 
-import { DefaultService } from '../generated/api/default.service';
+import { EmployeeLaborClassificationService } from '../generated/api/employee-labor-classification.service';
 import {
   CloseLaborClassificationRequest,
   CreateLaborClassificationRequest,
@@ -30,7 +30,7 @@ interface LaborClassificationResponseWithNames extends LaborClassificationRespon
   providedIn: 'root',
 })
 export class EmployeeLaborClassificationReadClient {
-  private readonly api = inject(DefaultService);
+  private readonly api = inject(EmployeeLaborClassificationService);
 
   readEmployeeLaborClassificationsByBusinessKey(
     key: EmployeeBusinessKeyApiQuery,

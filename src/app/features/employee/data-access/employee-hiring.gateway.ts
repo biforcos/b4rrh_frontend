@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
-import { DefaultService } from '../../../core/api/generated/api/default.service';
+import { EmployeeLifecycleService } from '../../../core/api/generated/api/employee-lifecycle.service';
 import { HireEmployeeDraft, HireEmployeeResult } from '../models/employee-hiring.model';
 import { mapDraftToHireRequest, mapResponseToResult } from './employee-hiring.mapper';
 
@@ -8,7 +8,7 @@ import { mapDraftToHireRequest, mapResponseToResult } from './employee-hiring.ma
   providedIn: 'root',
 })
 export class EmployeeHiringGateway {
-  private readonly api = inject(DefaultService);
+  private readonly api = inject(EmployeeLifecycleService);
 
   hire(draft: HireEmployeeDraft): Observable<HireEmployeeResult> {
     return this.api
