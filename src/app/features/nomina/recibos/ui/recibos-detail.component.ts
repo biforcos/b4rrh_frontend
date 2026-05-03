@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RecibosStore } from '../store/recibos.store';
 import { RecibosFolioComponent } from './recibos-folio.component';
+import { RecibosValorizacionPanelComponent } from './recibos-valorizacion-panel.component';
 
 const STATUS_LABELS: Record<string, string> = {
   CALCULATED: 'CALCULADA',
@@ -14,7 +15,7 @@ const STATUS_LABELS: Record<string, string> = {
   selector: 'app-recibos-detail',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [CommonModule, RecibosFolioComponent],
+  imports: [CommonModule, RecibosFolioComponent, RecibosValorizacionPanelComponent],
   template: `
     @if (store.selectedPayroll(); as payroll) {
       <div class="action-bar">
@@ -48,6 +49,11 @@ const STATUS_LABELS: Record<string, string> = {
               Recalcular
             </button>
           }
+          @if (!store.conceptsLoading()) {
+            <button class="btn btn-valorizacion" (click)="drawerOpen.set(true)">
+              ⊞ Valorización
+            </button>
+          }
         </div>
       </div>
 
@@ -73,6 +79,15 @@ const STATUS_LABELS: Record<string, string> = {
           />
         }
       </div>
+
+      @if (drawerOpen()) {
+        <app-recibos-valorizacion-panel
+          [concepts]="store.concepts()"
+          [loading]="store.conceptsLoading()"
+          [payrollKey]="payroll.employeeNumber + ' · Período ' + payroll.payrollPeriodCode"
+          (close)="drawerOpen.set(false)"
+        />
+      }
     } @else {
       <div class="no-selection">Selecciona una nómina de la lista para ver el detalle.</div>
     }
@@ -150,6 +165,10 @@ const STATUS_LABELS: Record<string, string> = {
         background: #fab387;
         color: #1e1e2e;
       }
+      .btn-valorizacion {
+        background: #cba6f7;
+        color: #1e1e2e;
+      }
       .transition-error {
         max-width: 780px;
         background: #f38ba8;
@@ -163,7 +182,7 @@ const STATUS_LABELS: Record<string, string> = {
       }
       .loading-msg,
       .no-selection {
-        color: #6c757d;
+        color: #6c7086;
         font-size: 12px;
         padding: 20px;
       }
@@ -172,6 +191,14 @@ const STATUS_LABELS: Record<string, string> = {
 })
 export class RecibosDetailComponent {
   protected readonly store = inject(RecibosStore);
+  readonly drawerOpen = signal(false);
+
+  constructor() {
+    effect(() => {
+      this.store.selectedKey();
+      this.drawerOpen.set(false);
+    });
+  }
 
   statusLabel(status: string): string {
     return STATUS_LABELS[status] ?? status;

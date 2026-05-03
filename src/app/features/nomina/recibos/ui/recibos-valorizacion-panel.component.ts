@@ -3,6 +3,7 @@ import {
   Component,
   computed,
   EventEmitter,
+  Input,
   Output,
   signal,
 } from '@angular/core';
@@ -272,12 +273,12 @@ const NATURE_COLOR: Record<string, string> = {
 export class RecibosValorizacionPanelComponent {
   private readonly _concepts = signal<ReadonlyArray<PayrollConceptModel>>([]);
 
-  set concepts(val: ReadonlyArray<PayrollConceptModel>) {
+  @Input() set concepts(val: ReadonlyArray<PayrollConceptModel>) {
     this._concepts.set(val);
   }
 
-  loading = false;
-  payrollKey = '';
+  @Input() loading = false;
+  @Input() payrollKey = '';
 
   @Output() close = new EventEmitter<void>();
 
