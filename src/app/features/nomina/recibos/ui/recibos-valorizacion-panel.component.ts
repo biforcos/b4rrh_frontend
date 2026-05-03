@@ -67,6 +67,7 @@ const NATURE_COLOR: Record<string, string> = {
             <thead>
               <tr>
                 <th class="col-stripe"></th>
+                <th class="col-period">Período</th>
                 <th>Clave</th>
                 <th>Concepto</th>
                 <th class="col-num">Cant.</th>
@@ -78,6 +79,7 @@ const NATURE_COLOR: Record<string, string> = {
               @for (c of filteredConcepts(); track c.lineNumber) {
                 <tr class="val-row">
                   <td class="col-stripe-cell" [style.background]="colorFor(c.conceptNatureCode)"></td>
+                  <td class="col-period-cell">{{ c.originPeriodCode ?? '—' }}</td>
                   <td class="col-code-cell">{{ c.conceptCode }}</td>
                   <td class="col-label-cell">{{ c.conceptLabel }}</td>
                   <td class="col-num-cell">{{ c.quantity != null ? fmt(c.quantity) : '—' }}</td>
@@ -237,6 +239,9 @@ const NATURE_COLOR: Record<string, string> = {
         width: 10px;
         text-align: left !important;
       }
+      .col-period {
+        width: 70px;
+      }
       .col-num {
         width: 70px;
         text-align: right !important;
@@ -250,6 +255,11 @@ const NATURE_COLOR: Record<string, string> = {
       .col-stripe-cell {
         width: 3px;
         padding: 0;
+      }
+      .col-period-cell {
+        padding: 5px 8px;
+        color: #585b70;
+        font-size: 10px;
       }
       .col-code-cell {
         padding: 5px 8px;
