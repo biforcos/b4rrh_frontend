@@ -59,6 +59,13 @@ export const routes: Routes = [
           import('./rulesystem/catalog/catalog.routes').then((m) => m.catalogRoutes),
       },
       {
+        path: 'organizacion/convenios-categorias',
+        loadChildren: () =>
+          import('./rulesystem/agreement-category-profile/agreement-category-profile.routes').then(
+            (m) => m.agreementCategoryProfileRoutes,
+          ),
+      },
+      {
         path: 'configuracion/rule-systems',
         loadChildren: () =>
           import('./rulesystem/rule-system/rule-system.routes').then((m) => m.ruleSystemRoutes),

@@ -1,0 +1,90 @@
+.acp-page {
+  padding: 2rem;
+  max-width: 900px;
+
+  &__header {
+    margin-bottom: 1.5rem;
+
+    h2 { margin: 0 0 0.25rem; }
+    p { margin: 0; color: var(--text-color-secondary, #666); font-size: 0.9rem; }
+  }
+
+  &__selectors {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    max-width: 640px;
+
+    app-ui-select { flex: 1; }
+  }
+
+  &__feedback {
+    margin: 0.75rem 0;
+    font-size: 0.9rem;
+
+    &--error { color: var(--red-500, #ef4444); }
+    &--success { color: var(--green-600, #16a34a); }
+  }
+
+  &__empty { color: var(--text-color-secondary, #666); }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+
+    th, td {
+      padding: 0.6rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--surface-border, #e5e7eb);
+    }
+
+    th {
+      font-weight: 600;
+      background: var(--surface-50, #f9fafb);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--text-color-secondary, #666);
+    }
+  }
+
+  &__row--editing td { background: var(--surface-50, #f9fafb); }
+
+  &__cell--actions { width: 90px; }
+
+  &__code { font-weight: 500; }
+
+  &__name {
+    margin-left: 0.5rem;
+    color: var(--text-color-secondary, #666);
+    font-size: 0.85rem;
+  }
+
+  &__edit-row td { padding: 0; border-bottom: 2px solid var(--primary-color, #6366f1); }
+
+  &__edit-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: flex-end;
+    padding: 1rem 1rem 1rem 1.5rem;
+    background: var(--surface-100, #f3f4f6);
+  }
+
+  &__edit-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    min-width: 220px;
+
+    span { font-size: 0.8rem; font-weight: 600; color: var(--text-color-secondary, #666); }
+  }
+
+  &__edit-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    padding-bottom: 0.1rem;
+  }
+}

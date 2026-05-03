@@ -30,6 +30,10 @@
         <i class="pi pi-book app-shell__nav-icon"></i>
         <span>{{ texts.sectionCatalogs }}</span>
       </a>
+      <a class="app-shell__nav-item" routerLink="/organizacion/convenios-categorias" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }">
+        <i class="pi pi-sitemap app-shell__nav-icon"></i>
+        <span>Convenios SS</span>
+      </a>
 
       <span class="app-shell__nav-group-label">{{ texts.sectionPayroll }}</span>
       <a class="app-shell__nav-item" routerLink="/nomina/recibos" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }">

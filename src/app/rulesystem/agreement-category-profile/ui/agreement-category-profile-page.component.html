@@ -1,0 +1,116 @@
+<div class="acp-page">
+  <header class="acp-page__header">
+    <h2>Perfil SS de categorías de convenio</h2>
+    <p>Asigna el grupo de cotización y tipo de nómina a cada categoría de convenio.</p>
+  </header>
+
+  <section class="acp-page__selectors">
+    <app-ui-select
+      [options]="store.ruleSystemOptions()"
+      [value]="store.selectedRuleSystemCode()"
+      placeholder="Sistema de reglas..."
+      (valueChanged)="store.selectRuleSystem($event)"
+    />
+    <app-ui-select
+      [options]="store.agreementOptions()"
+      [value]="store.selectedAgreementCode()"
+      [disabled]="!store.selectedRuleSystemCode() || store.loading()"
+      placeholder="Convenio..."
+      (valueChanged)="store.selectAgreement($event)"
+    />
+  </section>
+
+  @if (store.errorMessage()) {
+    <p class="acp-page__feedback acp-page__feedback--error">{{ store.errorMessage() }}</p>
+  }
+  @if (store.successMessage()) {
+    <p class="acp-page__feedback acp-page__feedback--success">{{ store.successMessage() }}</p>
+  }
+
+  @if (store.loadingCategories()) {
+    <p class="acp-page__feedback">Cargando categorías...</p>
+  } @else if (store.selectedAgreementCode() && store.categories().length === 0) {
+    <p class="acp-page__empty">No hay categorías para este convenio.</p>
+  } @else if (store.categories().length > 0) {
+    <table class="acp-page__table">
+      <thead>
+        <tr>
+          <th>Categoría</th>
+          <th>Grupo SS</th>
+          <th>Tipo nómina</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (cat of store.categories(); track cat.categoryCode) {
+          <tr
+            class="acp-page__row"
+            [class.acp-page__row--editing]="store.editingCategoryCode() === cat.categoryCode"
+          >
+            <td class="acp-page__cell">
+              <span class="acp-page__code">{{ cat.categoryCode }}</span>
+              @if (cat.categoryName) {
+                <span class="acp-page__name">{{ cat.categoryName }}</span>
+              }
+            </td>
+            <td class="acp-page__cell">{{ cat.grupoCotizacionCode || '—' }}</td>
+            <td class="acp-page__cell">{{ cat.tipoNomina || '—' }}</td>
+            <td class="acp-page__cell acp-page__cell--actions">
+              @if (store.editingCategoryCode() !== cat.categoryCode) {
+                <app-ui-button
+                  label="Editar"
+                  severity="secondary"
+                  [outlined]="true"
+                  [disabled]="store.saving()"
+                  (pressed)="store.startEdit(cat.categoryCode)"
+                />
+              }
+            </td>
+          </tr>
+
+          @if (store.editingCategoryCode() === cat.categoryCode && store.editDraft(); as draft) {
+            <tr class="acp-page__edit-row">
+              <td colspan="4">
+                <div class="acp-page__edit-form">
+                  <label class="acp-page__edit-field">
+                    <span>Grupo de cotización SS</span>
+                    <app-ui-select
+                      [options]="store.grupoCotizacionSelectOptions()"
+                      [value]="draft.grupoCotizacionCode"
+                      [disabled]="store.saving()"
+                      placeholder="Seleccionar grupo..."
+                      (valueChanged)="store.updateDraft('grupoCotizacionCode', $event)"
+                    />
+                  </label>
+                  <label class="acp-page__edit-field">
+                    <span>Tipo de nómina</span>
+                    <app-ui-select
+                      [options]="TIPO_NOMINA_OPTIONS"
+                      [value]="draft.tipoNomina"
+                      [disabled]="store.saving()"
+                      (valueChanged)="store.updateDraft('tipoNomina', $event)"
+                    />
+                  </label>
+                  <div class="acp-page__edit-actions">
+                    <app-ui-button
+                      [label]="store.saving() ? 'Guardando...' : 'Guardar'"
+                      [disabled]="!store.canSave() || store.saving()"
+                      (pressed)="store.saveEdit()"
+                    />
+                    <app-ui-button
+                      label="Cancelar"
+                      severity="secondary"
+                      [outlined]="true"
+                      [disabled]="store.saving()"
+                      (pressed)="store.cancelEdit()"
+                    />
+                  </div>
+                </div>
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  }
+</div>
