@@ -135,7 +135,11 @@ export class AgreementCategoryProfileStore {
           this.categoriesState.update((cats) =>
             cats.map((c) =>
               c.categoryCode === categoryCode
-                ? { ...c, grupoCotizacionCode: saved.grupoCotizacionCode, tipoNomina: saved.tipoNomina }
+                ? {
+                    ...c,
+                    grupoCotizacionCode: saved.grupoCotizacionCode,
+                    tipoNomina: saved.tipoNomina,
+                  }
                 : c,
             ),
           );
