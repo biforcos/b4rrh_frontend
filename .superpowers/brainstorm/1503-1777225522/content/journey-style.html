@@ -1,0 +1,353 @@
+<style>
+  .jrn {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 11px;
+    color: #374151;
+  }
+
+  /* ── STYLE A — Timeline vertical minimalista ── */
+  .jrn-a { padding: 10px 0; }
+  .jrn-a__presence { margin-bottom: 18px; }
+  .jrn-a__presence-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  .jrn-a__presence-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .jrn-a__presence-dot--active { background: #22c55e; box-shadow: 0 0 0 3px #dcfce7; }
+  .jrn-a__presence-dot--closed { background: #d1d5db; }
+  .jrn-a__presence-company { font-size: 11px; font-weight: 700; color: #111827; }
+  .jrn-a__presence-period { font-size: 9px; color: #9ca3af; margin-left: auto; }
+  .jrn-a__chip {
+    font-size: 8px; font-weight: 600; padding: 2px 7px;
+    border-radius: 9999px;
+  }
+  .jrn-a__chip--active { background: #dcfce7; color: #166534; }
+  .jrn-a__chip--closed { background: #f3f4f6; color: #9ca3af; }
+  .jrn-a__events { padding-left: 18px; position: relative; }
+  .jrn-a__events::before {
+    content: '';
+    position: absolute;
+    left: 4px; top: 0; bottom: 0;
+    width: 1px; background: #e5e7eb;
+  }
+  .jrn-a__event {
+    position: relative;
+    padding: 5px 0 5px 14px;
+    display: flex;
+    gap: 8px;
+  }
+  .jrn-a__event::before {
+    content: '';
+    position: absolute;
+    left: -1px; top: 10px;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    border: 1.5px solid #e5e7eb;
+    background: white;
+  }
+  .jrn-a__event--primary::before { border-color: #6366f1; background: #6366f1; }
+  .jrn-a__event-date { font-size: 9px; color: #9ca3af; white-space: nowrap; width: 60px; flex-shrink: 0; padding-top: 1px; }
+  .jrn-a__event-label { font-size: 10px; color: #374151; }
+  .jrn-a__event--primary .jrn-a__event-label { font-weight: 600; color: #111827; }
+
+  /* ── STYLE B — Registro compacto tipo log ── */
+  .jrn-b { padding: 6px 0; }
+  .jrn-b__presence {
+    margin-bottom: 10px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .jrn-b__presence-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 10px;
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .jrn-b__presence-header--active { background: #eff6ff; border-bottom-color: #bfdbfe; }
+  .jrn-b__presence-company { font-weight: 700; font-size: 10px; color: #111827; }
+  .jrn-b__presence-meta { display: flex; align-items: center; gap: 8px; }
+  .jrn-b__presence-period { font-size: 9px; color: #9ca3af; }
+  .jrn-b__chip {
+    font-size: 8px; font-weight: 600; padding: 2px 7px;
+    border-radius: 9999px;
+  }
+  .jrn-b__chip--active { background: #dbeafe; color: #1d4ed8; }
+  .jrn-b__chip--closed { background: #f3f4f6; color: #9ca3af; }
+  .jrn-b__event-row {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 5px 10px;
+    border-bottom: 1px solid #f9fafb;
+  }
+  .jrn-b__event-row:last-child { border-bottom: none; }
+  .jrn-b__event-date { font-size: 9px; color: #9ca3af; width: 65px; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+  .jrn-b__event-type {
+    font-size: 9px; font-weight: 600;
+    padding: 1px 5px; border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .jrn-b__event-type--hire { background: #dcfce7; color: #166534; }
+  .jrn-b__event-type--contract { background: #ede9fe; color: #6d28d9; }
+  .jrn-b__event-type--time { background: #e0f2fe; color: #075985; }
+  .jrn-b__event-type--terminate { background: #fee2e2; color: #991b1b; }
+  .jrn-b__event-label { font-size: 10px; color: #374151; }
+
+  /* ── STYLE C — Cards con peso visual ── */
+  .jrn-c { padding: 6px 0; }
+  .jrn-c__presence {
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.07), 0 0 0 1px #e5e7eb;
+  }
+  .jrn-c__presence-header {
+    padding: 10px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .jrn-c__presence-header--active {
+    background: linear-gradient(135deg, #1d4ed8, #4f46e5);
+    color: white;
+  }
+  .jrn-c__presence-header--closed {
+    background: #f3f4f6;
+    color: #6b7280;
+  }
+  .jrn-c__presence-company { font-weight: 700; font-size: 11px; }
+  .jrn-c__presence-header--active .jrn-c__presence-company { color: white; }
+  .jrn-c__presence-meta { font-size: 9px; opacity: 0.8; }
+  .jrn-c__chip {
+    font-size: 8px; font-weight: 700; padding: 2px 8px;
+    border-radius: 9999px; letter-spacing: 0.04em;
+  }
+  .jrn-c__chip--active { background: rgba(255,255,255,0.25); color: white; }
+  .jrn-c__chip--closed { background: #e5e7eb; color: #6b7280; }
+  .jrn-c__events { background: white; }
+  .jrn-c__event {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 7px 14px;
+    border-bottom: 1px solid #f9fafb;
+  }
+  .jrn-c__event:last-child { border-bottom: none; }
+  .jrn-c__event-icon {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-size: 10px;
+    margin-top: 1px;
+  }
+  .jrn-c__event-icon--hire { background: #dcfce7; }
+  .jrn-c__event-icon--contract { background: #ede9fe; }
+  .jrn-c__event-icon--time { background: #e0f2fe; }
+  .jrn-c__event-icon--terminate { background: #fee2e2; }
+  .jrn-c__event-content { flex: 1; }
+  .jrn-c__event-label { font-size: 10px; font-weight: 600; color: #111827; }
+  .jrn-c__event-date { font-size: 9px; color: #9ca3af; }
+  .jrn-c__event-detail { font-size: 9px; color: #6b7280; margin-top: 1px; }
+</style>
+
+<h2>Journey del empleado — Estilo visual</h2>
+<p class="subtitle">Mismos datos, 3 tratamientos visuales distintos. ¿Cuál siente más profesional?</p>
+
+<div class="cards">
+
+  <!-- STYLE A — Vertical timeline minimalista -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="card-image">
+      <div class="jrn jrn-a">
+
+        <div class="jrn-a__presence" style="opacity:0.7">
+          <div class="jrn-a__presence-header">
+            <span class="jrn-a__presence-dot jrn-a__presence-dot--closed"></span>
+            <span class="jrn-a__presence-company">ABC Distribución S.L.</span>
+            <span class="jrn-a__presence-period">2020 – 2023</span>
+            <span class="jrn-a__chip jrn-a__chip--closed">Cerrado</span>
+          </div>
+          <div class="jrn-a__events">
+            <div class="jrn-a__event jrn-a__event--primary">
+              <span class="jrn-a__event-date">01/01/2020</span>
+              <span class="jrn-a__event-label">Alta en empresa</span>
+            </div>
+            <div class="jrn-a__event">
+              <span class="jrn-a__event-date">15/06/2021</span>
+              <span class="jrn-a__event-label">Cambio de contrato · Indefinido</span>
+            </div>
+            <div class="jrn-a__event jrn-a__event--primary">
+              <span class="jrn-a__event-date">31/12/2023</span>
+              <span class="jrn-a__event-label">Baja voluntaria</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="jrn-a__presence">
+          <div class="jrn-a__presence-header">
+            <span class="jrn-a__presence-dot jrn-a__presence-dot--active"></span>
+            <span class="jrn-a__presence-company">Empresa S.L.</span>
+            <span class="jrn-a__presence-period">2024 – hoy</span>
+            <span class="jrn-a__chip jrn-a__chip--active">Activo</span>
+          </div>
+          <div class="jrn-a__events">
+            <div class="jrn-a__event jrn-a__event--primary">
+              <span class="jrn-a__event-date">01/04/2024</span>
+              <span class="jrn-a__event-label">Reingreso en empresa</span>
+            </div>
+            <div class="jrn-a__event">
+              <span class="jrn-a__event-date">01/10/2024</span>
+              <span class="jrn-a__event-label">Cambio de jornada · 100%</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Timeline vertical minimalista</h3>
+      <p>Línea vertical con nodos. Presencias como secciones con dot de color. Limpio, familiar (GitHub, Linear). Muy legible, fácil de escanear en vertical.</p>
+    </div>
+  </div>
+
+  <!-- STYLE B — Registro compacto -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="card-image">
+      <div class="jrn jrn-b">
+
+        <div class="jrn-b__presence">
+          <div class="jrn-b__presence-header">
+            <span class="jrn-b__presence-company">ABC Distribución S.L.</span>
+            <div class="jrn-b__presence-meta">
+              <span class="jrn-b__presence-period">2020 – 2023</span>
+              <span class="jrn-b__chip jrn-b__chip--closed">Cerrado</span>
+            </div>
+          </div>
+          <div class="jrn-b__event-row">
+            <span class="jrn-b__event-date">01/01/2020</span>
+            <span class="jrn-b__event-type jrn-b__event-type--hire">Alta</span>
+            <span class="jrn-b__event-label">Alta en empresa · Temporal</span>
+          </div>
+          <div class="jrn-b__event-row">
+            <span class="jrn-b__event-date">15/06/2021</span>
+            <span class="jrn-b__event-type jrn-b__event-type--contract">Contrato</span>
+            <span class="jrn-b__event-label">Cambio a Indefinido ordinario</span>
+          </div>
+          <div class="jrn-b__event-row">
+            <span class="jrn-b__event-date">31/12/2023</span>
+            <span class="jrn-b__event-type jrn-b__event-type--terminate">Baja</span>
+            <span class="jrn-b__event-label">Baja voluntaria</span>
+          </div>
+        </div>
+
+        <div class="jrn-b__presence">
+          <div class="jrn-b__presence-header jrn-b__presence-header--active">
+            <span class="jrn-b__presence-company">Empresa S.L.</span>
+            <div class="jrn-b__presence-meta">
+              <span class="jrn-b__presence-period">2024 – hoy</span>
+              <span class="jrn-b__chip jrn-b__chip--active">Activo</span>
+            </div>
+          </div>
+          <div class="jrn-b__event-row">
+            <span class="jrn-b__event-date">01/04/2024</span>
+            <span class="jrn-b__event-type jrn-b__event-type--hire">Reingreso</span>
+            <span class="jrn-b__event-label">Reincorporación · Indefinido</span>
+          </div>
+          <div class="jrn-b__event-row">
+            <span class="jrn-b__event-date">01/10/2024</span>
+            <span class="jrn-b__event-type jrn-b__event-type--time">Jornada</span>
+            <span class="jrn-b__event-label">Cambio a jornada completa 100%</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Registro compacto con chips de tipo</h3>
+      <p>Presencias como "tarjetas-contenedor". Cada evento como una fila con chip de categoría (Alta / Baja / Contrato…). Muy denso en info, fácil de exportar mentalmente como "log".</p>
+    </div>
+  </div>
+
+  <!-- STYLE C — Cards con peso visual -->
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="card-image">
+      <div class="jrn jrn-c">
+
+        <div class="jrn-c__presence" style="opacity:0.75">
+          <div class="jrn-c__presence-header jrn-c__presence-header--closed">
+            <div>
+              <div class="jrn-c__presence-company">ABC Distribución S.L.</div>
+              <div class="jrn-c__presence-meta">2020 – 2023</div>
+            </div>
+            <span class="jrn-c__chip jrn-c__chip--closed">Cerrado</span>
+          </div>
+          <div class="jrn-c__events">
+            <div class="jrn-c__event">
+              <div class="jrn-c__event-icon jrn-c__event-icon--hire">🏢</div>
+              <div class="jrn-c__event-content">
+                <div class="jrn-c__event-label">Alta en empresa</div>
+                <div class="jrn-c__event-date">01/01/2020 · Temporal</div>
+              </div>
+            </div>
+            <div class="jrn-c__event">
+              <div class="jrn-c__event-icon jrn-c__event-icon--terminate">👋</div>
+              <div class="jrn-c__event-content">
+                <div class="jrn-c__event-label">Baja voluntaria</div>
+                <div class="jrn-c__event-date">31/12/2023</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="jrn-c__presence">
+          <div class="jrn-c__presence-header jrn-c__presence-header--active">
+            <div>
+              <div class="jrn-c__presence-company">Empresa S.L.</div>
+              <div class="jrn-c__presence-meta">01/04/2024 – en vigor</div>
+            </div>
+            <span class="jrn-c__chip jrn-c__chip--active">Activo</span>
+          </div>
+          <div class="jrn-c__events">
+            <div class="jrn-c__event">
+              <div class="jrn-c__event-icon jrn-c__event-icon--hire">🔄</div>
+              <div class="jrn-c__event-content">
+                <div class="jrn-c__event-label">Reingreso en empresa</div>
+                <div class="jrn-c__event-date">01/04/2024</div>
+                <div class="jrn-c__event-detail">Indefinido ordinario · 100% jornada</div>
+              </div>
+            </div>
+            <div class="jrn-c__event">
+              <div class="jrn-c__event-icon jrn-c__event-icon--time">⏱</div>
+              <div class="jrn-c__event-content">
+                <div class="jrn-c__event-label">Cambio de jornada</div>
+                <div class="jrn-c__event-date">01/10/2024</div>
+                <div class="jrn-c__event-detail">50% → 100% · 40h/sem</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Cards con peso visual fuerte</h3>
+      <p>Cada presencia es una card con cabecera de color (azul = activo, gris = cerrado). Eventos con icono y contexto extra. Más "visual", más impacto por pantalla pero ocupa más espacio.</p>
+    </div>
+  </div>
+
+</div>

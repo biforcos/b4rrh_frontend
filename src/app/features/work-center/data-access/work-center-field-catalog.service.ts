@@ -20,17 +20,27 @@ const CONTACT_TYPE_FIELD_CODE = 'contactTypeCode';
 export class WorkCenterFieldCatalogService {
   private readonly api = inject(CatalogsService);
 
-  private readonly bindingsByResourceCache = new Map<string, Observable<ReadonlyArray<CatalogFieldBindingResponse>>>();
-  private readonly optionsByDirectCatalogCache = new Map<string, Observable<ReadonlyArray<SlotKeyOption<string>>>>();
+  private readonly bindingsByResourceCache = new Map<
+    string,
+    Observable<ReadonlyArray<CatalogFieldBindingResponse>>
+  >();
+  private readonly optionsByDirectCatalogCache = new Map<
+    string,
+    Observable<ReadonlyArray<SlotKeyOption<string>>>
+  >();
 
   loadContactTypeOptions(ruleSystemCode: string): Observable<ReadonlyArray<SlotKeyOption<string>>> {
     const normalizedRuleSystemCode = this.normalizeRequiredValue(ruleSystemCode);
     if (!normalizedRuleSystemCode) {
-      return throwError(() => new Error('Rule system code is required to load work center contact type options.'));
+      return throwError(
+        () => new Error('Rule system code is required to load work center contact type options.'),
+      );
     }
 
     return this.resolveContactTypeRuleEntityTypeCode().pipe(
-      switchMap((ruleEntityTypeCode) => this.getDirectOptions(normalizedRuleSystemCode, ruleEntityTypeCode)),
+      switchMap((ruleEntityTypeCode) =>
+        this.getDirectOptions(normalizedRuleSystemCode, ruleEntityTypeCode),
+      ),
     );
   }
 
@@ -46,7 +56,9 @@ export class WorkCenterFieldCatalogService {
     );
   }
 
-  private resolveBoundRuleEntityTypeCode(bindings: ReadonlyArray<CatalogFieldBindingResponse>): string {
+  private resolveBoundRuleEntityTypeCode(
+    bindings: ReadonlyArray<CatalogFieldBindingResponse>,
+  ): string {
     const binding = this.findDirectBinding(bindings, CONTACT_TYPE_FIELD_CODE);
     const ruleEntityTypeCode = binding?.ruleEntityTypeCode?.trim() ?? '';
 
@@ -66,17 +78,21 @@ export class WorkCenterFieldCatalogService {
     return CONTACT_TYPE_RULE_ENTITY_TYPE_CODE;
   }
 
-  private getBindingsByResource(resourceCode: string): Observable<ReadonlyArray<CatalogFieldBindingResponse>> {
+  private getBindingsByResource(
+    resourceCode: string,
+  ): Observable<ReadonlyArray<CatalogFieldBindingResponse>> {
     const normalizedResourceCode = this.normalizeRequiredValue(resourceCode);
     const cached = this.bindingsByResourceCache.get(normalizedResourceCode);
     if (cached) {
       return cached;
     }
 
-    const request = this.api.getCatalogBindingsByResourceCode({ resourceCode: normalizedResourceCode }).pipe(
-      map((response) => response.fields ?? []),
-      shareReplay(1),
-    );
+    const request = this.api
+      .getCatalogBindingsByResourceCode({ resourceCode: normalizedResourceCode })
+      .pipe(
+        map((response) => response.fields ?? []),
+        shareReplay(1),
+      );
 
     this.bindingsByResourceCache.set(normalizedResourceCode, request);
     return request;
@@ -97,11 +113,13 @@ export class WorkCenterFieldCatalogService {
       return cached;
     }
 
-    const request = this.api.getDirectCatalogOptions({ ruleSystemCode, ruleEntityTypeCode: normalizedRuleEntityTypeCode }).pipe(
-      map((response) => response.items ?? []),
-      map((items) => this.mapOptions(items)),
-      shareReplay(1),
-    );
+    const request = this.api
+      .getDirectCatalogOptions({ ruleSystemCode, ruleEntityTypeCode: normalizedRuleEntityTypeCode })
+      .pipe(
+        map((response) => response.items ?? []),
+        map((items) => this.mapOptions(items)),
+        shareReplay(1),
+      );
 
     this.optionsByDirectCatalogCache.set(cacheKey, request);
     return request;
@@ -116,14 +134,16 @@ export class WorkCenterFieldCatalogService {
     return (
       bindings.find(
         (binding) =>
-          binding.active === true
-          && binding.fieldCode.trim() === normalizedFieldCode
-          && binding.catalogKind === CatalogFieldBindingResponseCatalogKindEnum.Direct,
+          binding.active === true &&
+          binding.fieldCode.trim() === normalizedFieldCode &&
+          binding.catalogKind === CatalogFieldBindingResponseCatalogKindEnum.Direct,
       ) ?? null
     );
   }
 
-  private mapOptions(items: ReadonlyArray<DirectCatalogOptionResponse>): ReadonlyArray<SlotKeyOption<string>> {
+  private mapOptions(
+    items: ReadonlyArray<DirectCatalogOptionResponse>,
+  ): ReadonlyArray<SlotKeyOption<string>> {
     return items
       .filter((item) => item.active === true)
       .map((item) => {

@@ -5,6 +5,7 @@ export interface EmployeeLaborClassificationReadModel {
   agreementName: string | null;
   agreementCategoryCode: string;
   agreementCategoryName: string | null;
+  grupoCotizacionCode: string | null;
   startDate: string;
   endDate: string | null;
   isActive: boolean;
@@ -28,6 +29,7 @@ export function mapEmployeeLaborClassificationApiToReadModel(
     agreementName: normalizeOptionalValue(source.agreementName),
     agreementCategoryCode,
     agreementCategoryName: normalizeOptionalValue(source.agreementCategoryName),
+    grupoCotizacionCode: normalizeOptionalValue(source.grupoCotizacionCode),
     startDate,
     endDate,
     isActive: endDate === null,

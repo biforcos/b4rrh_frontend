@@ -31,7 +31,9 @@ export class EmployeeIdentifierReadClient {
     const normalizedKey = this.normalizeKey(key);
 
     return this.api.listEmployeeIdentifiersByBusinessKey(normalizedKey).pipe(
-      map((identifiers) => identifiers.map((identifier) => this.toEmployeeIdentifierApiModel(identifier))),
+      map((identifiers) =>
+        identifiers.map((identifier) => this.toEmployeeIdentifierApiModel(identifier)),
+      ),
       catchError((error: HttpErrorResponse) => {
         if (error.status === 404) {
           return of([]);
@@ -83,7 +85,10 @@ export class EmployeeIdentifierReadClient {
       .pipe(map((identifier) => this.toEmployeeIdentifierApiModel(identifier)));
   }
 
-  deleteIdentifierByBusinessKey(key: EmployeeBusinessKeyApiQuery, identifierTypeCode: string): Observable<void> {
+  deleteIdentifierByBusinessKey(
+    key: EmployeeBusinessKeyApiQuery,
+    identifierTypeCode: string,
+  ): Observable<void> {
     const normalizedKey = this.normalizeKey(key);
 
     return this.api

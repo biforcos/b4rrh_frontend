@@ -16,7 +16,10 @@ const employeeCatalogFields = {
   addressType: { resourceCode: 'employee.address', fieldCode: 'addressTypeCode' },
   workCenter: { resourceCode: 'employee.work_center', fieldCode: 'workCenterCode' },
   contractType: { resourceCode: 'employee.contract', fieldCode: 'contractTypeCode' },
-  laborClassificationAgreement: { resourceCode: 'employee.labor_classification', fieldCode: 'agreementCode' },
+  laborClassificationAgreement: {
+    resourceCode: 'employee.labor_classification',
+    fieldCode: 'agreementCode',
+  },
   presenceCompany: { resourceCode: 'employee.presence', fieldCode: 'companyCode' },
   presenceEntryReason: { resourceCode: 'employee.presence', fieldCode: 'entryReasonCode' },
   presenceExitReason: { resourceCode: 'employee.presence', fieldCode: 'exitReasonCode' },
@@ -31,14 +34,22 @@ type CatalogFieldSpec = (typeof employeeCatalogFields)[keyof typeof employeeCata
 export class EmployeeFieldCatalogService {
   private readonly catalogsApi = inject(CatalogsService);
 
-  private readonly bindingsByResourceCache = new Map<string, Observable<ReadonlyArray<CatalogFieldBindingResponse>>>();
-  private readonly optionsByDirectCatalogCache = new Map<string, Observable<ReadonlyArray<SlotKeyOption<string>>>>();
+  private readonly bindingsByResourceCache = new Map<
+    string,
+    Observable<ReadonlyArray<CatalogFieldBindingResponse>>
+  >();
+  private readonly optionsByDirectCatalogCache = new Map<
+    string,
+    Observable<ReadonlyArray<SlotKeyOption<string>>>
+  >();
 
   loadContactTypeOptions(ruleSystemCode: string): Observable<ReadonlyArray<SlotKeyOption<string>>> {
     return this.loadDirectOptionsByField(ruleSystemCode, employeeCatalogFields.contactType);
   }
 
-  loadIdentifierTypeOptions(ruleSystemCode: string): Observable<ReadonlyArray<SlotKeyOption<string>>> {
+  loadIdentifierTypeOptions(
+    ruleSystemCode: string,
+  ): Observable<ReadonlyArray<SlotKeyOption<string>>> {
     return this.loadDirectOptionsByField(ruleSystemCode, employeeCatalogFields.identifierType);
   }
 
@@ -94,23 +105,36 @@ export class EmployeeFieldCatalogService {
     return request;
   }
 
-  loadContractTypeOptions(ruleSystemCode: string): Observable<ReadonlyArray<SlotKeyOption<string>>> {
+  loadContractTypeOptions(
+    ruleSystemCode: string,
+  ): Observable<ReadonlyArray<SlotKeyOption<string>>> {
     return this.loadDirectOptionsByField(ruleSystemCode, employeeCatalogFields.contractType);
   }
 
-  loadLaborClassificationAgreementOptions(ruleSystemCode: string): Observable<ReadonlyArray<SlotKeyOption<string>>> {
-    return this.loadDirectOptionsByField(ruleSystemCode, employeeCatalogFields.laborClassificationAgreement);
+  loadLaborClassificationAgreementOptions(
+    ruleSystemCode: string,
+  ): Observable<ReadonlyArray<SlotKeyOption<string>>> {
+    return this.loadDirectOptionsByField(
+      ruleSystemCode,
+      employeeCatalogFields.laborClassificationAgreement,
+    );
   }
 
-  loadPresenceCompanyOptions(ruleSystemCode: string): Observable<ReadonlyArray<SlotKeyOption<string>>> {
+  loadPresenceCompanyOptions(
+    ruleSystemCode: string,
+  ): Observable<ReadonlyArray<SlotKeyOption<string>>> {
     return this.loadDirectOptionsByField(ruleSystemCode, employeeCatalogFields.presenceCompany);
   }
 
-  loadPresenceEntryReasonOptions(ruleSystemCode: string): Observable<ReadonlyArray<SlotKeyOption<string>>> {
+  loadPresenceEntryReasonOptions(
+    ruleSystemCode: string,
+  ): Observable<ReadonlyArray<SlotKeyOption<string>>> {
     return this.loadDirectOptionsByField(ruleSystemCode, employeeCatalogFields.presenceEntryReason);
   }
 
-  loadPresenceExitReasonOptions(ruleSystemCode: string): Observable<ReadonlyArray<SlotKeyOption<string>>> {
+  loadPresenceExitReasonOptions(
+    ruleSystemCode: string,
+  ): Observable<ReadonlyArray<SlotKeyOption<string>>> {
     return this.loadDirectOptionsByField(ruleSystemCode, employeeCatalogFields.presenceExitReason);
   }
 
@@ -124,7 +148,9 @@ export class EmployeeFieldCatalogService {
   ): Observable<ReadonlyArray<SlotKeyOption<string>>> {
     const normalizedRuleSystemCode = this.normalizeRequiredValue(ruleSystemCode);
     if (!normalizedRuleSystemCode) {
-      return throwError(() => new Error('Rule system code is required to load direct catalog options.'));
+      return throwError(
+        () => new Error('Rule system code is required to load direct catalog options.'),
+      );
     }
 
     return this.getBindingsByResource(fieldSpec.resourceCode).pipe(
@@ -141,7 +167,9 @@ export class EmployeeFieldCatalogService {
     );
   }
 
-  private getBindingsByResource(resourceCode: string): Observable<ReadonlyArray<CatalogFieldBindingResponse>> {
+  private getBindingsByResource(
+    resourceCode: string,
+  ): Observable<ReadonlyArray<CatalogFieldBindingResponse>> {
     const normalizedResourceCode = this.normalizeRequiredValue(resourceCode);
     const cached = this.bindingsByResourceCache.get(normalizedResourceCode);
     if (cached) {
@@ -198,14 +226,16 @@ export class EmployeeFieldCatalogService {
     return (
       bindings.find(
         (binding) =>
-          binding.active === true
-          && binding.fieldCode.trim() === normalizedFieldCode
-          && binding.catalogKind === CatalogFieldBindingResponseCatalogKindEnum.Direct,
+          binding.active === true &&
+          binding.fieldCode.trim() === normalizedFieldCode &&
+          binding.catalogKind === CatalogFieldBindingResponseCatalogKindEnum.Direct,
       ) ?? null
     );
   }
 
-  private mapOptions(items: ReadonlyArray<DirectCatalogOptionResponse>): ReadonlyArray<SlotKeyOption<string>> {
+  private mapOptions(
+    items: ReadonlyArray<DirectCatalogOptionResponse>,
+  ): ReadonlyArray<SlotKeyOption<string>> {
     return items
       .filter((item) => item.active === true)
       .map((item) => {

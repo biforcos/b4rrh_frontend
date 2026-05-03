@@ -40,7 +40,9 @@ export class EmployeeWorkCenterReadClient {
     const normalizedKey = this.normalizeKey(key);
 
     return this.api.listEmployeeWorkCentersByBusinessKey(normalizedKey).pipe(
-      map((workCenters) => workCenters.map((workCenter) => this.toEmployeeWorkCenterApiModel(workCenter))),
+      map((workCenters) =>
+        workCenters.map((workCenter) => this.toEmployeeWorkCenterApiModel(workCenter)),
+      ),
       catchError((error: HttpErrorResponse) => {
         if (error.status === 404) {
           return of([]);
@@ -148,7 +150,9 @@ export class EmployeeWorkCenterReadClient {
     return normalizedValue.length > 0 ? normalizedValue : null;
   }
 
-  private toEmployeeWorkCenterApiModel(source: EmployeeWorkCenterAssignmentResponse): EmployeeWorkCenterApiModel {
+  private toEmployeeWorkCenterApiModel(
+    source: EmployeeWorkCenterAssignmentResponse,
+  ): EmployeeWorkCenterApiModel {
     const extended = source as WorkCenterResponseWithDeleteCapabilities;
 
     return {

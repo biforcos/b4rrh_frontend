@@ -59,7 +59,9 @@ export class EmployeeLaborClassificationCatalogClient {
     };
   }
 
-  private mapAgreementCategory(source: AgreementCategoryCatalogItemResponse): LaborClassificationCatalogApiItem {
+  private mapAgreementCategory(
+    source: AgreementCategoryCatalogItemResponse,
+  ): LaborClassificationCatalogApiItem {
     return {
       code: source.code,
       name: source.name ?? null,

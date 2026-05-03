@@ -17,6 +17,7 @@ export interface EmployeeLaborClassificationApiModel {
   agreementName: string | null;
   agreementCategoryCode: string;
   agreementCategoryName: string | null;
+  grupoCotizacionCode: string | null;
   startDate: string;
   endDate: string | null;
 }
@@ -150,6 +151,7 @@ export class EmployeeLaborClassificationReadClient {
       agreementName: this.normalizeOptionalValue(sourceWithNames.agreementName),
       agreementCategoryCode: source.agreementCategoryCode,
       agreementCategoryName: this.normalizeOptionalValue(sourceWithNames.agreementCategoryName),
+      grupoCotizacionCode: this.normalizeOptionalValue(source.grupoCotizacionCode),
       startDate: source.startDate,
       endDate: source.endDate ?? null,
     };

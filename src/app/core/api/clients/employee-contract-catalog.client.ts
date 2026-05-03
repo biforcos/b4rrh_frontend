@@ -3,10 +3,7 @@ import { Observable, map } from 'rxjs';
 
 import { CatalogsService } from '../generated/api/catalogs.service';
 import { RuleEntitiesService } from '../generated/api/rule-entities.service';
-import {
-  ContractSubtypeCatalogItemResponse,
-  RuleEntityResponse,
-} from '../generated/model/models';
+import { ContractSubtypeCatalogItemResponse, RuleEntityResponse } from '../generated/model/models';
 
 export interface ContractCatalogApiItem {
   code: string;

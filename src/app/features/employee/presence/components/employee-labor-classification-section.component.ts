@@ -30,6 +30,7 @@ type LaborClassificationModalMode = 'create' | 'edit' | 'close';
 interface LaborClassificationPeriodRow extends PeriodTableRow {
   agreementCode: string;
   agreementCategoryCode: string | null;
+  grupoCotizacionCode: string | null;
 }
 
 @Component({
@@ -73,6 +74,7 @@ export class EmployeeLaborClassificationSectionComponent {
       canDelete: false,
       agreementCode: lc.agreementCode,
       agreementCategoryCode: lc.agreementCategoryCode,
+      grupoCotizacionCode: lc.grupoCotizacionCode ?? null,
     })),
   );
 

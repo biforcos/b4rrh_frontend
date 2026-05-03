@@ -40,7 +40,9 @@ export interface EmployeeJourneyApiModel {
 export class EmployeeJourneyReadClient {
   private readonly api = inject(EmployeeJourneyService);
 
-  readEmployeeJourneyByBusinessKey(key: EmployeeBusinessKeyApiQuery): Observable<EmployeeJourneyApiModel> {
+  readEmployeeJourneyByBusinessKey(
+    key: EmployeeBusinessKeyApiQuery,
+  ): Observable<EmployeeJourneyApiModel> {
     const normalizedKey = this.normalizeKey(key);
 
     return this.api
@@ -63,7 +65,9 @@ export class EmployeeJourneyReadClient {
     };
   }
 
-  private toEmployeeJourneyApiHeaderModel(source: JourneyEmployeeHeader): EmployeeJourneyApiHeaderModel {
+  private toEmployeeJourneyApiHeaderModel(
+    source: JourneyEmployeeHeader,
+  ): EmployeeJourneyApiHeaderModel {
     return {
       ruleSystemCode: source.ruleSystemCode,
       employeeTypeCode: source.employeeTypeCode,
@@ -72,7 +76,9 @@ export class EmployeeJourneyReadClient {
     };
   }
 
-  private toEmployeeJourneyApiEventModel(source: JourneyEventResponse): EmployeeJourneyApiEventModel {
+  private toEmployeeJourneyApiEventModel(
+    source: JourneyEventResponse,
+  ): EmployeeJourneyApiEventModel {
     return {
       eventDate: source.eventDate,
       eventType: String(source.eventType),

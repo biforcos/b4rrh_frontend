@@ -2,7 +2,10 @@ import { Injectable, inject, signal } from '@angular/core';
 import { take } from 'rxjs';
 
 import { CatalogsService } from '../../../core/api/generated/api/catalogs.service';
-import { ContractSubtypeCatalogItemResponse, AgreementCategoryCatalogItemResponse } from '../../../core/api/generated/model/models';
+import {
+  ContractSubtypeCatalogItemResponse,
+  AgreementCategoryCatalogItemResponse,
+} from '../../../core/api/generated/model/models';
 import { EmployeeFieldCatalogService } from './employee-field-catalog.service';
 import { SlotKeyOption } from '../shared/ui/section/editable-slot-section.model';
 import { employeeTexts } from '../employee.texts';
@@ -64,11 +67,14 @@ export class EmployeeRehireCatalogService {
     }
 
     this.startRequest();
-    this.fieldCatalog.loadWorkCenterOptionsByCompany(ruleSystemCode, companyCode).pipe(take(1)).subscribe({
-      next: (opts) => this.workCenters.set([...opts]),
-      error: () => this.error.set(employeeTexts.catalogLoadFailedMessage),
-      complete: () => this.finishRequest(),
-    });
+    this.fieldCatalog
+      .loadWorkCenterOptionsByCompany(ruleSystemCode, companyCode)
+      .pipe(take(1))
+      .subscribe({
+        next: (opts) => this.workCenters.set([...opts]),
+        error: () => this.error.set(employeeTexts.catalogLoadFailedMessage),
+        complete: () => this.finishRequest(),
+      });
   }
 
   clearWorkCenters(): void {
@@ -77,29 +83,38 @@ export class EmployeeRehireCatalogService {
 
   private loadCompanies(ruleSystemCode: string): void {
     this.startRequest();
-    this.fieldCatalog.loadPresenceCompanyOptions(ruleSystemCode).pipe(take(1)).subscribe({
-      next: (opts) => this.companies.set([...opts]),
-      error: () => this.error.set(employeeTexts.catalogLoadFailedMessage),
-      complete: () => this.finishRequest(),
-    });
+    this.fieldCatalog
+      .loadPresenceCompanyOptions(ruleSystemCode)
+      .pipe(take(1))
+      .subscribe({
+        next: (opts) => this.companies.set([...opts]),
+        error: () => this.error.set(employeeTexts.catalogLoadFailedMessage),
+        complete: () => this.finishRequest(),
+      });
   }
 
   private loadEntryReasons(ruleSystemCode: string): void {
     this.startRequest();
-    this.fieldCatalog.loadPresenceEntryReasonOptions(ruleSystemCode).pipe(take(1)).subscribe({
-      next: (opts) => this.entryReasons.set([...opts]),
-      error: () => this.error.set(employeeTexts.catalogLoadFailedMessage),
-      complete: () => this.finishRequest(),
-    });
+    this.fieldCatalog
+      .loadPresenceEntryReasonOptions(ruleSystemCode)
+      .pipe(take(1))
+      .subscribe({
+        next: (opts) => this.entryReasons.set([...opts]),
+        error: () => this.error.set(employeeTexts.catalogLoadFailedMessage),
+        complete: () => this.finishRequest(),
+      });
   }
 
   private loadContractTypes(ruleSystemCode: string): void {
     this.startRequest();
-    this.fieldCatalog.loadContractTypeOptions(ruleSystemCode).pipe(take(1)).subscribe({
-      next: (opts) => this.contractTypes.set([...opts]),
-      error: () => this.error.set(employeeTexts.catalogLoadFailedMessage),
-      complete: () => this.finishRequest(),
-    });
+    this.fieldCatalog
+      .loadContractTypeOptions(ruleSystemCode)
+      .pipe(take(1))
+      .subscribe({
+        next: (opts) => this.contractTypes.set([...opts]),
+        error: () => this.error.set(employeeTexts.catalogLoadFailedMessage),
+        complete: () => this.finishRequest(),
+      });
   }
 
   loadContractSubtypes(contractTypeCode: string): void {
@@ -116,7 +131,9 @@ export class EmployeeRehireCatalogService {
       .subscribe({
         next: (resp) => {
           const items = (resp || []) as ContractSubtypeCatalogItemResponse[];
-          this.contractSubtypes.set(items.map((i) => ({ value: i.code, label: `${i.name ?? ''} · ${i.code}` })));
+          this.contractSubtypes.set(
+            items.map((i) => ({ value: i.code, label: `${i.name ?? ''} · ${i.code}` })),
+          );
         },
         error: () => this.error.set(employeeTexts.catalogLoadFailedMessage),
         complete: () => this.finishRequest(),
@@ -125,11 +142,14 @@ export class EmployeeRehireCatalogService {
 
   private loadAgreements(ruleSystemCode: string): void {
     this.startRequest();
-    this.fieldCatalog.loadLaborClassificationAgreementOptions(ruleSystemCode).pipe(take(1)).subscribe({
-      next: (opts) => this.agreements.set([...opts]),
-      error: () => this.error.set(employeeTexts.catalogLoadFailedMessage),
-      complete: () => this.finishRequest(),
-    });
+    this.fieldCatalog
+      .loadLaborClassificationAgreementOptions(ruleSystemCode)
+      .pipe(take(1))
+      .subscribe({
+        next: (opts) => this.agreements.set([...opts]),
+        error: () => this.error.set(employeeTexts.catalogLoadFailedMessage),
+        complete: () => this.finishRequest(),
+      });
   }
 
   loadAgreementCategories(agreementCode: string): void {
@@ -146,7 +166,9 @@ export class EmployeeRehireCatalogService {
       .subscribe({
         next: (resp) => {
           const items = (resp || []) as AgreementCategoryCatalogItemResponse[];
-          this.agreementCategories.set(items.map((i) => ({ value: i.code, label: `${i.name ?? ''} · ${i.code}` })));
+          this.agreementCategories.set(
+            items.map((i) => ({ value: i.code, label: `${i.name ?? ''} · ${i.code}` })),
+          );
         },
         error: () => this.error.set(employeeTexts.catalogLoadFailedMessage),
         complete: () => this.finishRequest(),
@@ -155,11 +177,14 @@ export class EmployeeRehireCatalogService {
 
   private loadCostCenterOptions(ruleSystemCode: string): void {
     this.startRequest();
-    this.fieldCatalog.loadCostCenterOptions(ruleSystemCode).pipe(take(1)).subscribe({
-      next: (opts) => this.costCenterOptions.set([...opts]),
-      error: () => this.error.set(employeeTexts.catalogLoadFailedMessage),
-      complete: () => this.finishRequest(),
-    });
+    this.fieldCatalog
+      .loadCostCenterOptions(ruleSystemCode)
+      .pipe(take(1))
+      .subscribe({
+        next: (opts) => this.costCenterOptions.set([...opts]),
+        error: () => this.error.set(employeeTexts.catalogLoadFailedMessage),
+        complete: () => this.finishRequest(),
+      });
   }
 
   clearContractSubtypes(): void {

@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Laborales — Rediseño completo</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f1f5f9;
+    color: #374151;
+    font-size: 13px;
+    min-height: 100vh;
+  }
+
+  /* ── Shell / chrome ── */
+  .shell { display: flex; height: 100vh; overflow: hidden; }
+  .sidebar {
+    width: 220px; flex-shrink: 0;
+    background: #1e293b;
+    color: #94a3b8;
+    padding: 16px 0;
+    display: flex; flex-direction: column;
+  }
+  .sidebar__logo {
+    font-weight: 800; font-size: 16px; color: white;
+    padding: 0 18px 20px;
+    letter-spacing: -0.03em;
+  }
+  .sidebar__section { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #475569; padding: 12px 18px 6px; }
+  .sidebar__item {
+    padding: 7px 18px;
+    font-size: 12px;
+    cursor: pointer;
+    border-left: 2px solid transparent;
+    transition: all .15s;
+  }
+  .sidebar__item:hover { background: rgba(255,255,255,.05); color: #e2e8f0; }
+  .sidebar__item--active { border-left-color: #6366f1; color: white; background: rgba(99,102,241,.12); }
+
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+  /* ── Employee header ── */
+  .emp-header {
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 14px 28px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .emp-avatar {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px;
+    flex-shrink: 0;
+  }
+  .emp-info { flex: 1; }
+  .emp-name { font-size: 15px; font-weight: 700; color: #111827; }
+  .emp-meta { font-size: 11px; color: #6b7280; margin-top: 1px; }
+  .emp-status {
+    font-size: 11px; font-weight: 600;
+    padding: 4px 10px; border-radius: 9999px;
+    background: #dcfce7; color: #166534;
+  }
+
+  /* ── Tab nav ── */
+  .tab-nav {
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 0 28px;
+    display: flex; gap: 0;
+  }
+  .tab-nav__item {
+    padding: 11px 16px;
+    font-size: 12px; font-weight: 500;
+    color: #6b7280;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    margin-bottom: -1px;
+    transition: all .15s;
+  }
+  .tab-nav__item--active { color: #6366f1; border-bottom-color: #6366f1; font-weight: 600; }
+  .tab-nav__item:hover:not(.tab-nav__item--active) { color: #374151; }
+  .tab-nav__item--disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* ── Content area ── */
+  .content {
+    flex: 1; overflow-y: auto;
+    padding: 24px 28px;
+    display: flex; flex-direction: column; gap: 16px;
+  }
+
+  /* ── Presence summary card (top of Laborales) ── */
+  .presence-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .presence-card__left { flex: 1; }
+  .presence-card__label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #9ca3af; margin-bottom: 4px; }
+  .presence-card__company { font-size: 16px; font-weight: 700; color: #111827; }
+  .presence-card__meta { font-size: 11px; color: #6b7280; margin-top: 2px; }
+  .presence-card__status { font-size: 11px; font-weight: 600; padding: 5px 12px; border-radius: 9999px; background: #dcfce7; color: #166534; }
+  .presence-card__fields { display: flex; gap: 24px; }
+  .presence-card__field { display: flex; flex-direction: column; gap: 1px; }
+  .presence-card__field-label { font-size: 9px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em; }
+  .presence-card__field-value { font-size: 12px; font-weight: 600; color: #374151; }
+
+  /* ── Period table section ── */
+  .period-section {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .period-section__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 20px;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  .period-section__title { font-size: 13px; font-weight: 700; color: #111827; }
+  .period-section__subtitle { font-size: 10px; color: #9ca3af; margin-top: 1px; }
+  .period-section__add-btn {
+    display: flex; align-items: center; gap: 5px;
+    background: #6366f1;
+    color: white;
+    border: none; border-radius: 6px;
+    padding: 7px 14px;
+    font-size: 12px; font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* Period table */
+  .ptable { width: 100%; border-collapse: collapse; }
+  .ptable thead tr { background: #fafafa; }
+  .ptable th {
+    text-align: left;
+    font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+    color: #9ca3af;
+    padding: 9px 16px;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  .ptable td {
+    padding: 12px 16px;
+    font-size: 12px;
+    color: #374151;
+    border-bottom: 1px solid #f9fafb;
+    vertical-align: middle;
+  }
+  .ptable tr:last-child td { border-bottom: none; }
+  .ptable tr:hover td { background: #fafafa; }
+  .ptable tr.row--current td { background: #fafffe; }
+  .ptable tr.row--historical td { opacity: 0.6; }
+
+  .period-range { font-size: 12px; color: #374151; font-variant-numeric: tabular-nums; }
+  .period-range__end { color: #9ca3af; }
+  .period-open { color: #6b7280; font-style: italic; font-size: 11px; }
+
+  .badge {
+    display: inline-flex; align-items: center;
+    padding: 3px 9px; border-radius: 9999px;
+    font-size: 10px; font-weight: 600;
+  }
+  .badge--active { background: #dcfce7; color: #166534; }
+  .badge--closed { background: #f3f4f6; color: #9ca3af; }
+  .badge--indigo { background: #ede9fe; color: #6d28d9; }
+
+  .row-actions { display: flex; gap: 6px; justify-content: flex-end; }
+  .icon-btn {
+    width: 30px; height: 30px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+    background: white;
+    color: #6b7280;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all .12s;
+  }
+  .icon-btn:hover { background: #f9fafb; color: #374151; border-color: #d1d5db; }
+  .icon-btn--edit:hover { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
+  .icon-btn--delete:hover { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
+
+  .value-main { font-weight: 600; color: #111827; }
+  .value-sub { font-size: 11px; color: #6b7280; margin-top: 1px; }
+
+  /* ── Edit modal ── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(15,23,42,.45);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100;
+    backdrop-filter: blur(2px);
+  }
+  .modal {
+    background: white;
+    border-radius: 12px;
+    width: 440px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.2);
+    overflow: hidden;
+  }
+  .modal__header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 18px 22px;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  .modal__title { font-size: 15px; font-weight: 700; color: #111827; }
+  .modal__subtitle { font-size: 11px; color: #6b7280; margin-top: 2px; }
+  .modal__close {
+    width: 30px; height: 30px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 6px; border: none; background: #f3f4f6;
+    color: #6b7280; font-size: 14px; cursor: pointer;
+  }
+  .modal__body { padding: 22px; display: flex; flex-direction: column; gap: 16px; }
+  .modal__footer {
+    display: flex; justify-content: flex-end; gap: 10px;
+    padding: 14px 22px;
+    border-top: 1px solid #f3f4f6;
+    background: #fafafa;
+  }
+
+  .form-field { display: flex; flex-direction: column; gap: 5px; }
+  .form-label { font-size: 11px; font-weight: 600; color: #374151; }
+  .form-input {
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+    padding: 9px 12px;
+    font-size: 13px;
+    color: #111827;
+    outline: none;
+    transition: border-color .12s;
+  }
+  .form-input:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,.12); }
+  .form-input--readonly { background: #f9fafb; color: #6b7280; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .form-hint { font-size: 10px; color: #9ca3af; margin-top: 2px; }
+
+  .btn {
+    padding: 9px 18px; border-radius: 7px;
+    font-size: 13px; font-weight: 600;
+    border: none; cursor: pointer;
+    transition: all .12s;
+  }
+  .btn--primary { background: #6366f1; color: white; }
+  .btn--primary:hover { background: #5558e8; }
+  .btn--ghost { background: white; color: #6b7280; border: 1px solid #e5e7eb; }
+  .btn--ghost:hover { background: #f9fafb; }
+
+  .info-chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: #f0f9ff; border: 1px solid #bae6fd;
+    color: #0369a1; border-radius: 6px;
+    padding: 8px 12px; font-size: 11px; font-weight: 500;
+  }
+</style>
+<script>
+  function openModal() {
+    document.getElementById('edit-modal').style.display = 'flex';
+  }
+  function closeModal() {
+    document.getElementById('edit-modal').style.display = 'none';
+  }
+</script>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="sidebar__logo">B4RRHH</div>
+    <div class="sidebar__section">Plantilla</div>
+    <div class="sidebar__item sidebar__item--active">Empleados</div>
+    <div class="sidebar__item">Centros de trabajo</div>
+    <div class="sidebar__section">Nómina</div>
+    <div class="sidebar__item">Nóminas</div>
+    <div class="sidebar__item">Variables</div>
+    <div class="sidebar__section">Administración</div>
+    <div class="sidebar__item">Reglas</div>
+    <div class="sidebar__item">Empresa</div>
+  </nav>
+
+  <div class="main">
+
+    <!-- Employee header -->
+    <div class="emp-header">
+      <div class="emp-avatar">JB</div>
+      <div class="emp-info">
+        <div class="emp-name">Juan Biforcos Amor</div>
+        <div class="emp-meta">ESP · EMP · 001 &nbsp;·&nbsp; Empresa S.L.</div>
+      </div>
+      <span class="emp-status">● Activo</span>
+    </div>
+
+    <!-- Tab nav -->
+    <nav class="tab-nav">
+      <div class="tab-nav__item">Resumen</div>
+      <div class="tab-nav__item">Personales</div>
+      <div class="tab-nav__item tab-nav__item--active">Laborales</div>
+      <div class="tab-nav__item">Organizativos</div>
+      <div class="tab-nav__item tab-nav__item--disabled">Nómina</div>
+    </nav>
+
+    <!-- Content: Laborales tab -->
+    <div class="content">
+
+      <!-- Presencia block — read-only summary -->
+      <div class="presence-card">
+        <div class="presence-card__left">
+          <div class="presence-card__label">Presencia activa</div>
+          <div class="presence-card__company">Empresa S.L.</div>
+          <div class="presence-card__meta">Alta · 01/04/2024 · Motivo: Nuevo ingreso</div>
+        </div>
+        <div class="presence-card__fields">
+          <div class="presence-card__field">
+            <span class="presence-card__field-label">Presencia nº</span>
+            <span class="presence-card__field-value">#2</span>
+          </div>
+          <div class="presence-card__field">
+            <span class="presence-card__field-label">Desde</span>
+            <span class="presence-card__field-value">01/04/2024</span>
+          </div>
+        </div>
+        <span class="presence-card__status">Activo</span>
+      </div>
+
+      <!-- Contrato -->
+      <div class="period-section">
+        <div class="period-section__header">
+          <div>
+            <div class="period-section__title">Contrato</div>
+            <div class="period-section__subtitle">Tipo y subtipo contractual por período</div>
+          </div>
+          <button class="period-section__add-btn" onclick="openModal()">+ Nuevo período</button>
+        </div>
+        <table class="ptable">
+          <thead>
+            <tr>
+              <th>Período</th>
+              <th>Tipo de contrato</th>
+              <th>Subtipo</th>
+              <th>Estado</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="row--current">
+              <td>
+                <div class="period-range">01/04/2024 <span class="period-range__end">— <span class="period-open">en vigor</span></span></div>
+              </td>
+              <td><div class="value-main">Indefinido ordinario</div></td>
+              <td><span class="badge badge--indigo">Sin subtipo</span></td>
+              <td><span class="badge badge--active">Vigente</span></td>
+              <td>
+                <div class="row-actions">
+                  <button class="icon-btn icon-btn--edit" title="Editar" onclick="openModal()">✏</button>
+                </div>
+              </td>
+            </tr>
+            <tr class="row--historical">
+              <td>
+                <div class="period-range">01/01/2022 <span class="period-range__end">— 31/03/2024</span></div>
+              </td>
+              <td><div class="value-main">Temporal</div></td>
+              <td><div class="value-main">Obra y servicio</div></td>
+              <td><span class="badge badge--closed">Cerrado</span></td>
+              <td>
+                <div class="row-actions">
+                  <button class="icon-btn icon-btn--edit" title="Editar" onclick="openModal()">✏</button>
+                  <button class="icon-btn icon-btn--delete" title="Eliminar">🗑</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Jornada -->
+      <div class="period-section">
+        <div class="period-section__header">
+          <div>
+            <div class="period-section__title">Jornada</div>
+            <div class="period-section__subtitle">Porcentaje de dedicación y horas por período</div>
+          </div>
+          <button class="period-section__add-btn">+ Nuevo período</button>
+        </div>
+        <table class="ptable">
+          <thead>
+            <tr>
+              <th>Período</th>
+              <th>Porcentaje</th>
+              <th>Horas / semana</th>
+              <th>Estado</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="row--current">
+              <td><div class="period-range">01/04/2024 <span class="period-range__end">— <span class="period-open">en vigor</span></span></div></td>
+              <td><div class="value-main">100 %</div></td>
+              <td><div class="value-main">40 h</div><div class="value-sub">8 h/día · 160 h/mes</div></td>
+              <td><span class="badge badge--active">Vigente</span></td>
+              <td><div class="row-actions"><button class="icon-btn icon-btn--edit">✏</button></div></td>
+            </tr>
+            <tr class="row--historical">
+              <td><div class="period-range">01/01/2022 <span class="period-range__end">— 31/03/2024</span></div></td>
+              <td><div class="value-main">50 %</div></td>
+              <td><div class="value-main">20 h</div><div class="value-sub">4 h/día · 80 h/mes</div></td>
+              <td><span class="badge badge--closed">Cerrado</span></td>
+              <td><div class="row-actions"><button class="icon-btn icon-btn--edit">✏</button><button class="icon-btn icon-btn--delete">🗑</button></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Clasificación laboral -->
+      <div class="period-section">
+        <div class="period-section__header">
+          <div>
+            <div class="period-section__title">Convenio y categoría</div>
+            <div class="period-section__subtitle">Acuerdo colectivo y categoría profesional por período</div>
+          </div>
+          <button class="period-section__add-btn">+ Nuevo período</button>
+        </div>
+        <table class="ptable">
+          <thead>
+            <tr>
+              <th>Período</th>
+              <th>Convenio colectivo</th>
+              <th>Categoría</th>
+              <th>Estado</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="row--current">
+              <td><div class="period-range">01/04/2024 <span class="period-range__end">— <span class="period-open">en vigor</span></span></div></td>
+              <td><div class="value-main">Convenio Metal Madrid</div></td>
+              <td><div class="value-main">Grupo 4</div><div class="value-sub">Técnico Especialista</div></td>
+              <td><span class="badge badge--active">Vigente</span></td>
+              <td><div class="row-actions"><button class="icon-btn icon-btn--edit">✏</button></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /shell -->
+
+<!-- Edit modal (Contrato) -->
+<div id="edit-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal__header">
+      <div>
+        <div class="modal__title">Editar período — Contrato</div>
+        <div class="modal__subtitle">Período: 01/04/2024 — en vigor</div>
+      </div>
+      <button class="modal__close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal__body">
+      <div class="info-chip">
+        ℹ Este período está vigente. Los cambios de fechas afectan al historial.
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+          <label class="form-label">Fecha de inicio</label>
+          <input class="form-input" type="text" value="01/04/2024" />
+        </div>
+        <div class="form-field">
+          <label class="form-label">Fecha de fin</label>
+          <input class="form-input form-input--readonly" type="text" value="en vigor" readonly />
+          <span class="form-hint">Para cerrar el período usa "Cerrar período"</span>
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Tipo de contrato</label>
+        <select class="form-input">
+          <option selected>Indefinido ordinario</option>
+          <option>Temporal</option>
+          <option>En prácticas</option>
+          <option>Para la formación</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Subtipo (opcional)</label>
+        <select class="form-input">
+          <option selected>Sin subtipo</option>
+          <option>Obra y servicio</option>
+          <option>Eventual por circunstancias</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn--ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn--primary">Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

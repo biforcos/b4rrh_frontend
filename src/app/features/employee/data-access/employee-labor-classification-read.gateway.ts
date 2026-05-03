@@ -98,6 +98,7 @@ export class EmployeeLaborClassificationReadGateway {
       agreementName: source.agreementName,
       agreementCategoryCode: source.agreementCategoryCode,
       agreementCategoryName: source.agreementCategoryName,
+      grupoCotizacionCode: source.grupoCotizacionCode,
       startDate: source.startDate,
       endDate: source.endDate,
       isActive: source.isActive,

@@ -1,0 +1,334 @@
+<style>
+  .approach-preview {
+    background: #f8f9fa;
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 11px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: #374151;
+    overflow: hidden;
+    height: 260px;
+  }
+  .preview-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+  .preview-section-title {
+    font-weight: 600;
+    font-size: 11px;
+    color: #111827;
+  }
+  .preview-btn-add {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: none;
+    border-radius: 4px;
+    padding: 3px 8px;
+    font-size: 10px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .preview-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .preview-table th {
+    text-align: left;
+    font-size: 9px;
+    color: #6b7280;
+    font-weight: 500;
+    padding: 4px 6px;
+    border-bottom: 1px solid #e5e7eb;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .preview-table td {
+    padding: 5px 6px;
+    font-size: 10px;
+    border-bottom: 1px solid #f3f4f6;
+    color: #374151;
+  }
+  .preview-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 6px;
+    border-radius: 9999px;
+    font-size: 9px;
+    font-weight: 500;
+  }
+  .preview-badge--green { background: #dcfce7; color: #166534; }
+  .preview-badge--gray { background: #f3f4f6; color: #6b7280; }
+  .preview-actions { display: flex; gap: 4px; }
+  .preview-icon-btn {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+    color: #6b7280;
+    font-size: 10px;
+    cursor: pointer;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+  }
+  .gantt-track { display: flex; align-items: center; margin-bottom: 7px; gap: 8px; }
+  .gantt-label {
+    font-size: 9px;
+    color: #6b7280;
+    font-weight: 500;
+    width: 70px;
+    flex-shrink: 0;
+    text-align: right;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .gantt-area {
+    flex: 1;
+    height: 22px;
+    position: relative;
+    background: #f3f4f6;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .gantt-bar {
+    position: absolute;
+    height: 100%;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    padding: 0 6px;
+    font-size: 8px;
+    font-weight: 600;
+    color: white;
+    white-space: nowrap;
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .gantt-bar--blue { background: #3b82f6; }
+  .gantt-bar--indigo { background: #6366f1; }
+  .gantt-bar--violet { background: #8b5cf6; }
+  .gantt-bar--teal { background: #14b8a6; }
+  .gantt-bar--sky { background: #0ea5e9; }
+  .gantt-bar--prev { opacity: 0.45; }
+  .gantt-axis {
+    display: flex;
+    justify-content: space-between;
+    margin-left: 78px;
+    margin-bottom: 6px;
+    font-size: 8px;
+    color: #9ca3af;
+    border-bottom: 1px dashed #e5e7eb;
+    padding-bottom: 4px;
+  }
+  .ficha-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 10px;
+    margin-bottom: 7px;
+  }
+  .ficha-card-title {
+    font-size: 9px;
+    font-weight: 700;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 8px;
+  }
+  .ficha-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .ficha-field { display: flex; flex-direction: column; gap: 1px; }
+  .ficha-field-label { font-size: 8px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.04em; }
+  .ficha-field-value { font-size: 10px; font-weight: 600; color: #111827; }
+  .accordion-item { border: 1px solid #e5e7eb; border-radius: 4px; margin-bottom: 4px; }
+  .accordion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 8px;
+    font-size: 9px;
+    font-weight: 600;
+    color: #374151;
+  }
+  .accordion-chevron { color: #9ca3af; font-size: 8px; }
+  .accordion-body { padding: 2px 8px 6px; font-size: 9px; color: #6b7280; border-top: 1px solid #f3f4f6; }
+  .section-sep { height: 1px; background: #f3f4f6; margin: 8px 0; }
+</style>
+
+<h2>Rediseño: Pestaña Laborales</h2>
+<p class="subtitle">Los datos de presencia, contrato, jornada y convenio — 3 formas de presentarlos y editarlos</p>
+
+<div class="cards">
+
+  <!-- OPTION A: Period Table -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="card-image">
+      <div class="approach-preview">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <div>
+            <div style="font-size:10px;font-weight:700;color:#111827">Empresa S.L.</div>
+            <div style="font-size:9px;color:#6b7280">Alta · desde 01/04/2024</div>
+          </div>
+          <span class="preview-badge preview-badge--green">Activo</span>
+        </div>
+        <div class="section-sep"></div>
+        <div class="preview-section-header">
+          <span class="preview-section-title">Contrato</span>
+          <button class="preview-btn-add">+ Nuevo período</button>
+        </div>
+        <table class="preview-table">
+          <thead><tr><th>Período</th><th>Tipo</th><th>Estado</th><th></th></tr></thead>
+          <tbody>
+            <tr>
+              <td>01/04/2024 —</td>
+              <td>Indefinido ord.</td>
+              <td><span class="preview-badge preview-badge--green">Vigente</span></td>
+              <td><div class="preview-actions"><span class="preview-icon-btn">✏</span></div></td>
+            </tr>
+            <tr style="opacity:0.55">
+              <td>01/01/2022 — 31/03/2024</td>
+              <td>Temporal</td>
+              <td><span class="preview-badge preview-badge--gray">Cerrado</span></td>
+              <td><div class="preview-actions"><span class="preview-icon-btn">✏</span><span class="preview-icon-btn">🗑</span></div></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="section-sep"></div>
+        <div class="preview-section-header">
+          <span class="preview-section-title">Jornada</span>
+          <button class="preview-btn-add">+ Nuevo período</button>
+        </div>
+        <table class="preview-table">
+          <thead><tr><th>Período</th><th>%</th><th>Estado</th><th></th></tr></thead>
+          <tbody>
+            <tr>
+              <td>01/04/2024 —</td>
+              <td>100% · 40 h/sem</td>
+              <td><span class="preview-badge preview-badge--green">Vigente</span></td>
+              <td><div class="preview-actions"><span class="preview-icon-btn">✏</span></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Tabla de períodos directa</h3>
+      <p>Cada concepto es una tabla: <strong>inicio · fin · valor · estado</strong>. Sin vocabulario de "acciones". El usuario edita filas como filas, y añade períodos con un botón. El modelo mental más simple.</p>
+    </div>
+  </div>
+
+  <!-- OPTION B: Timeline Gantt -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="card-image">
+      <div class="approach-preview">
+        <div style="font-size:10px;font-weight:700;color:#111827;margin-bottom:10px;">Historial laboral — vista de tiempo</div>
+        <div class="gantt-axis">
+          <span>2022</span>
+          <span>2023</span>
+          <span>2024</span>
+          <span>Hoy</span>
+        </div>
+        <div class="gantt-track">
+          <span class="gantt-label">Presencia</span>
+          <div class="gantt-area">
+            <div class="gantt-bar gantt-bar--teal" style="left:0;width:100%">Empresa S.L.</div>
+          </div>
+        </div>
+        <div class="gantt-track">
+          <span class="gantt-label">Contrato</span>
+          <div class="gantt-area">
+            <div class="gantt-bar gantt-bar--blue gantt-bar--prev" style="left:0;width:50%">Temporal</div>
+            <div class="gantt-bar gantt-bar--blue" style="left:50%;width:50%">Indefinido</div>
+          </div>
+        </div>
+        <div class="gantt-track">
+          <span class="gantt-label">Jornada</span>
+          <div class="gantt-area">
+            <div class="gantt-bar gantt-bar--indigo gantt-bar--prev" style="left:0;width:28%">50%</div>
+            <div class="gantt-bar gantt-bar--indigo" style="left:28%;width:72%">100%</div>
+          </div>
+        </div>
+        <div class="gantt-track">
+          <span class="gantt-label">Convenio</span>
+          <div class="gantt-area">
+            <div class="gantt-bar gantt-bar--violet" style="left:0;width:100%">Metal · Grupo 4</div>
+          </div>
+        </div>
+        <div class="gantt-track">
+          <span class="gantt-label">Cto. trabajo</span>
+          <div class="gantt-area">
+            <div class="gantt-bar gantt-bar--sky" style="left:50%;width:50%">Madrid-Coslada</div>
+          </div>
+        </div>
+        <div style="margin-top:10px;font-size:9px;color:#9ca3af;text-align:center;font-style:italic;">→ Click en una barra para editar ese período</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Timeline visual (tipo Gantt)</h3>
+      <p>Todos los conceptos en un <strong>eje de tiempo compartido</strong>. De un vistazo ves qué cambió cuándo y cómo se superponen. Clic en una barra = editar ese período. Lo más potente visualmente.</p>
+    </div>
+  </div>
+
+  <!-- OPTION C: Ficha actual + historial colapsable -->
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="card-image">
+      <div class="approach-preview">
+        <div class="ficha-card">
+          <div class="ficha-card-title">Situación actual · 01/04/2024</div>
+          <div class="ficha-grid">
+            <div class="ficha-field">
+              <span class="ficha-field-label">Empresa</span>
+              <span class="ficha-field-value">Empresa S.L.</span>
+            </div>
+            <div class="ficha-field">
+              <span class="ficha-field-label">Contrato</span>
+              <span class="ficha-field-value">Indefinido ord.</span>
+            </div>
+            <div class="ficha-field">
+              <span class="ficha-field-label">Jornada</span>
+              <span class="ficha-field-value">100% · 40h/sem</span>
+            </div>
+            <div class="ficha-field">
+              <span class="ficha-field-label">Convenio · Cat.</span>
+              <span class="ficha-field-value">Metal · Grupo 4</span>
+            </div>
+            <div class="ficha-field">
+              <span class="ficha-field-label">Centro trabajo</span>
+              <span class="ficha-field-value">Madrid-Coslada</span>
+            </div>
+            <div class="ficha-field">
+              <span class="ficha-field-label">Alta</span>
+              <span class="ficha-field-value">01/04/2024</span>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:9px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">Historial</div>
+        <div class="accordion-item">
+          <div class="accordion-header"><span>Contratos (2)</span><span class="accordion-chevron">▼</span></div>
+          <div class="accordion-body">
+            <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #f3f4f6">
+              <span>Temporal · 01/01/22 — 31/03/24</span>
+              <span class="preview-badge preview-badge--gray">Cerrado</span>
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item" style="opacity:0.6">
+          <div class="accordion-header"><span>Jornada (1)</span><span class="accordion-chevron">▶</span></div>
+        </div>
+        <div class="accordion-item" style="opacity:0.6">
+          <div class="accordion-header"><span>Convenio (1)</span><span class="accordion-chevron">▶</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Ficha actual + historial</h3>
+      <p><strong>Snapshot de hoy</strong> en una card con todos los valores vigentes. El historial de cada concepto colapsado debajo. Edición por modal al hacer clic en el campo. Lo más orientado a lectura rápida.</p>
+    </div>
+  </div>
+
+</div>

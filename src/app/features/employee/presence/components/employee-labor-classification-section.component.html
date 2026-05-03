@@ -8,11 +8,15 @@
     <ng-template #columnHeaders>
       <th>Convenio</th>
       <th>Categoría</th>
+      <th>Grupo SS</th>
     </ng-template>
     <ng-template #cellContent let-row>
       <td class="labor-classification-section__cell">{{ row.agreementCode }}</td>
       <td class="labor-classification-section__cell labor-classification-section__cell--secondary">
         {{ row.agreementCategoryCode || '—' }}
+      </td>
+      <td class="labor-classification-section__cell labor-classification-section__cell--secondary">
+        {{ row.grupoCotizacionCode || '—' }}
       </td>
     </ng-template>
   </app-period-table>

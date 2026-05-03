@@ -46,10 +46,14 @@ export class EmployeeReadClient {
   readDirectory(): Observable<ReadonlyArray<EmployeeDirectoryApiModel>> {
     return this.api
       .listEmployees()
-      .pipe(map((employees) => employees.map((employee) => this.toEmployeeDirectoryApiModel(employee))));
+      .pipe(
+        map((employees) => employees.map((employee) => this.toEmployeeDirectoryApiModel(employee))),
+      );
   }
 
-  readEmployeeByBusinessKey(key: EmployeeBusinessKeyApiQuery): Observable<EmployeeReadApiModel | null> {
+  readEmployeeByBusinessKey(
+    key: EmployeeBusinessKeyApiQuery,
+  ): Observable<EmployeeReadApiModel | null> {
     const normalizedKey = this.normalizeKey(key);
 
     return this.api.getEmployeeByBusinessKey(normalizedKey).pipe(
@@ -96,7 +100,9 @@ export class EmployeeReadClient {
     return normalizedValue.length > 0 ? normalizedValue : null;
   }
 
-  private toEmployeeDirectoryApiModel(source: EmployeeDirectoryItemResponse): EmployeeDirectoryApiModel {
+  private toEmployeeDirectoryApiModel(
+    source: EmployeeDirectoryItemResponse,
+  ): EmployeeDirectoryApiModel {
     return {
       ruleSystemCode: source.ruleSystemCode,
       employeeTypeCode: source.employeeTypeCode,

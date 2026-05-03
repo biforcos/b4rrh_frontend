@@ -3,7 +3,11 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, map, of, throwError } from 'rxjs';
 
 import { EmployeeContactService } from '../generated/api/employee-contact.service';
-import { ContactResponse, CreateContactRequest, UpdateContactRequest } from '../generated/model/models';
+import {
+  ContactResponse,
+  CreateContactRequest,
+  UpdateContactRequest,
+} from '../generated/model/models';
 import { EmployeeBusinessKeyApiQuery } from './employee-read.client';
 
 export interface EmployeeContactApiModel {
@@ -70,7 +74,10 @@ export class EmployeeContactReadClient {
       .pipe(map((contact) => this.toEmployeeContactApiModel(contact)));
   }
 
-  deleteContactByBusinessKey(key: EmployeeBusinessKeyApiQuery, contactTypeCode: string): Observable<void> {
+  deleteContactByBusinessKey(
+    key: EmployeeBusinessKeyApiQuery,
+    contactTypeCode: string,
+  ): Observable<void> {
     const normalizedKey = this.normalizeKey(key);
 
     return this.api
