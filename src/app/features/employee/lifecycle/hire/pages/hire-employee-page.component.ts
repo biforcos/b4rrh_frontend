@@ -1,9 +1,20 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, untracked } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+  untracked,
+} from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { EmployeeHiringStore, HireEmployeeErrorCode } from '../../../data-access/employee-hiring.store';
+import {
+  EmployeeHiringStore,
+  HireEmployeeErrorCode,
+} from '../../../data-access/employee-hiring.store';
 import { EmployeeFieldCatalogService } from '../../../data-access/employee-field-catalog.service';
 import { GlobalMessageService } from '../../../data-access/employee-global-message.store';
 import { employeeTexts } from '../../../employee.texts';
@@ -20,7 +31,10 @@ import { MessageModule } from 'primeng/message';
 import { HIRE_EMPLOYEE_DEFAULTS } from '../../../models/hire-employee.defaults';
 import { formatLocalDate } from '../../../shared/utils/local-date-string.util';
 import { GlobalMessageRailComponent } from '../../../shell/components/global-message-rail.component';
-import { buildWorkingTimePreview, formatWorkingTimeHours } from '../../../shared/utils/working-time-preview.util';
+import {
+  buildWorkingTimePreview,
+  formatWorkingTimeHours,
+} from '../../../shared/utils/working-time-preview.util';
 import { parseLocalDate } from '../../../../../shared/utils/local-date.util';
 
 @Component({
@@ -71,7 +85,10 @@ export class HireEmployeePageComponent {
     contractSubtypeCode: [''],
     agreementCode: ['', Validators.required],
     agreementCategoryCode: ['', Validators.required],
-    workingTimePercentage: [null as number | null, [Validators.required, Validators.min(0.01), Validators.max(100)]],
+    workingTimePercentage: [
+      null as number | null,
+      [Validators.required, Validators.min(0.01), Validators.max(100)],
+    ],
   });
 
   // Options
@@ -95,7 +112,9 @@ export class HireEmployeePageComponent {
   readonly formStatus = toSignal(this.form.statusChanges.pipe(startWith(this.form.status)), {
     initialValue: this.form.status,
   });
-  readonly workingTimePreview = computed(() => buildWorkingTimePreview(this.form.controls.workingTimePercentage.value));
+  readonly workingTimePreview = computed(() =>
+    buildWorkingTimePreview(this.form.controls.workingTimePercentage.value),
+  );
   readonly submitDisabled = computed(() => this.hiring() || this.formStatus() !== 'VALID');
 
   constructor() {
@@ -106,10 +125,17 @@ export class HireEmployeePageComponent {
     effect((onCleanup) => {
       const messages = this.buildGlobalMessages();
       untracked(() => {
-        this.globalMessageService.setSourceMessages(HireEmployeePageComponent.GLOBAL_SOURCE_KEY, messages);
+        this.globalMessageService.setSourceMessages(
+          HireEmployeePageComponent.GLOBAL_SOURCE_KEY,
+          messages,
+        );
       });
       onCleanup(() => {
-        untracked(() => this.globalMessageService.clearSourceMessages(HireEmployeePageComponent.GLOBAL_SOURCE_KEY));
+        untracked(() =>
+          this.globalMessageService.clearSourceMessages(
+            HireEmployeePageComponent.GLOBAL_SOURCE_KEY,
+          ),
+        );
       });
     });
 
@@ -170,9 +196,11 @@ export class HireEmployeePageComponent {
       .pipe(take(1))
       .subscribe({
         next: (rss) => {
-          this.ruleSystems.set((rss || []).map(rs => ({ value: rs.code, label: `${rs.name} · ${rs.code}` })));
+          this.ruleSystems.set(
+            (rss || []).map((rs) => ({ value: rs.code, label: `${rs.name} · ${rs.code}` })),
+          );
         },
-        error: () => this.catalogError.set(this.texts.catalogLoadFailedMessage)
+        error: () => this.catalogError.set(this.texts.catalogLoadFailedMessage),
       });
   }
 
@@ -182,52 +210,63 @@ export class HireEmployeePageComponent {
     this.form.get('workCenterCode')?.setValue('');
     (this.catalogService as any).loadPresenceCompanyOptions(ruleSystemCode).subscribe({
       next: (opts: any) => this.companies.set([...opts]),
-      error: () => this.catalogError.set(this.texts.catalogLoadFailedMessage)
+      error: () => this.catalogError.set(this.texts.catalogLoadFailedMessage),
     });
     (this.catalogService as any).loadPresenceEntryReasonOptions(ruleSystemCode).subscribe({
       next: (opts: any) => this.entryReasons.set([...opts]),
-      error: () => this.catalogError.set(this.texts.catalogLoadFailedMessage)
+      error: () => this.catalogError.set(this.texts.catalogLoadFailedMessage),
     });
     (this.catalogService as any).loadContractTypeOptions(ruleSystemCode).subscribe({
       next: (opts: any) => this.contractTypes.set([...opts]),
-      error: () => this.catalogError.set(this.texts.catalogLoadFailedMessage)
+      error: () => this.catalogError.set(this.texts.catalogLoadFailedMessage),
     });
     (this.catalogService as any).loadLaborClassificationAgreementOptions(ruleSystemCode).subscribe({
       next: (opts: any) => this.agreements.set([...opts]),
-      error: () => this.catalogError.set(this.texts.catalogLoadFailedMessage)
+      error: () => this.catalogError.set(this.texts.catalogLoadFailedMessage),
     });
   }
 
   private loadWorkCentersByCompany(ruleSystemCode: string, companyCode: string) {
-    (this.catalogService as any).loadWorkCenterOptionsByCompany(ruleSystemCode, companyCode).subscribe({
-      next: (opts: any) => {
-        this.workCenters.set([...opts]);
+    (this.catalogService as any)
+      .loadWorkCenterOptionsByCompany(ruleSystemCode, companyCode)
+      .subscribe({
+        next: (opts: any) => {
+          this.workCenters.set([...opts]);
 
-        const selectedWorkCenterCode = this.form.get('workCenterCode')?.value;
-        if (selectedWorkCenterCode && !opts.some((option: { value: string }) => option.value === selectedWorkCenterCode)) {
-          this.form.get('workCenterCode')?.setValue('');
-        }
-      },
-      error: () => this.catalogError.set(this.texts.catalogLoadFailedMessage),
-    });
+          const selectedWorkCenterCode = this.form.get('workCenterCode')?.value;
+          if (
+            selectedWorkCenterCode &&
+            !opts.some((option: { value: string }) => option.value === selectedWorkCenterCode)
+          ) {
+            this.form.get('workCenterCode')?.setValue('');
+          }
+        },
+        error: () => this.catalogError.set(this.texts.catalogLoadFailedMessage),
+      });
   }
 
   private loadContractSubtypes(ruleSystemCode: string, contractTypeCode: string) {
     this.catalogsApi.listContractCatalogSubtypes({ ruleSystemCode, contractTypeCode }).subscribe({
       next: (resp) => {
-        this.contractSubtypes.set((resp || []).map(i => ({ value: i.code, label: `${i.name} · ${i.code}` })));
+        this.contractSubtypes.set(
+          (resp || []).map((i) => ({ value: i.code, label: `${i.name} · ${i.code}` })),
+        );
       },
-      error: () => this.catalogError.set(this.texts.catalogLoadFailedMessage)
+      error: () => this.catalogError.set(this.texts.catalogLoadFailedMessage),
     });
   }
 
   private loadAgreementCategories(ruleSystemCode: string, agreementCode: string) {
-    this.catalogsApi.listLaborClassificationAgreementCategories({ ruleSystemCode, agreementCode }).subscribe({
-      next: (resp) => {
-        this.agreementCategories.set((resp || []).map(i => ({ value: i.code, label: `${i.name} · ${i.code}` })));
-      },
-      error: () => this.catalogError.set(this.texts.catalogLoadFailedMessage)
-    });
+    this.catalogsApi
+      .listLaborClassificationAgreementCategories({ ruleSystemCode, agreementCode })
+      .subscribe({
+        next: (resp) => {
+          this.agreementCategories.set(
+            (resp || []).map((i) => ({ value: i.code, label: `${i.name} · ${i.code}` })),
+          );
+        },
+        error: () => this.catalogError.set(this.texts.catalogLoadFailedMessage),
+      });
   }
 
   private resetOptions() {
