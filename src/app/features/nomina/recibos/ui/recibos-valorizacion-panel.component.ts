@@ -78,7 +78,10 @@ const NATURE_COLOR: Record<string, string> = {
             <tbody>
               @for (c of filteredConcepts(); track c.lineNumber) {
                 <tr class="val-row">
-                  <td class="col-stripe-cell" [style.background]="colorFor(c.conceptNatureCode)"></td>
+                  <td
+                    class="col-stripe-cell"
+                    [style.background]="colorFor(c.conceptNatureCode)"
+                  ></td>
                   <td class="col-period-cell">{{ c.originPeriodCode ?? '—' }}</td>
                   <td class="col-code-cell">{{ c.conceptCode }}</td>
                   <td class="col-label-cell">{{ c.conceptLabel }}</td>
@@ -299,8 +302,7 @@ export class RecibosValorizacionPanelComponent {
     if (!term) return this._concepts();
     return this._concepts().filter(
       (c) =>
-        c.conceptCode.toLowerCase().includes(term) ||
-        c.conceptLabel.toLowerCase().includes(term),
+        c.conceptCode.toLowerCase().includes(term) || c.conceptLabel.toLowerCase().includes(term),
     );
   });
 
