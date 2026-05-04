@@ -7,7 +7,8 @@ import { EmployeeHiringStore, HireEmployeeErrorCode } from '../../../data-access
 import { EmployeeFieldCatalogService } from '../../../data-access/employee-field-catalog.service';
 import { GlobalMessageService } from '../../../data-access/employee-global-message.store';
 import { employeeTexts } from '../../../employee.texts';
-import { DefaultService } from '../../../../../core/api/generated/api/default.service';
+import { RuleSystemsService } from '../../../../../core/api/generated/api/rule-systems.service';
+import { CatalogsService } from '../../../../../core/api/generated/api/catalogs.service';
 import { startWith, take } from 'rxjs';
 import { SelectModule } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
@@ -49,7 +50,8 @@ export class HireEmployeePageComponent {
   private readonly router = inject(Router);
   private readonly hiringStore = inject(EmployeeHiringStore);
   private readonly catalogService = inject(EmployeeFieldCatalogService);
-  private readonly api = inject(DefaultService);
+  private readonly ruleSystemsApi = inject(RuleSystemsService);
+  private readonly catalogsApi = inject(CatalogsService);
   private readonly globalMessageService = inject(GlobalMessageService);
 
   protected readonly texts = employeeTexts;
@@ -163,12 +165,12 @@ export class HireEmployeePageComponent {
 
   private loadInitialCatalogs() {
     this.catalogError.set(null);
-    (this.api as any)
+    this.ruleSystemsApi
       .listRuleSystems()
       .pipe(take(1))
       .subscribe({
-        next: (rss: any) => {
-          this.ruleSystems.set((rss || []).map((rs: any) => ({ value: rs.code, label: `${rs.name} · ${rs.code}` })));
+        next: (rss) => {
+          this.ruleSystems.set((rss || []).map(rs => ({ value: rs.code, label: `${rs.name} · ${rs.code}` })));
         },
         error: () => this.catalogError.set(this.texts.catalogLoadFailedMessage)
       });
@@ -211,18 +213,18 @@ export class HireEmployeePageComponent {
   }
 
   private loadContractSubtypes(ruleSystemCode: string, contractTypeCode: string) {
-    (this.api as any).listContractCatalogSubtypes({ ruleSystemCode, contractTypeCode }).subscribe({
-      next: (resp: any) => {
-        this.contractSubtypes.set((resp || []).map((i: any) => ({ value: i.code, label: `${i.name} · ${i.code}` })));
+    this.catalogsApi.listContractCatalogSubtypes({ ruleSystemCode, contractTypeCode }).subscribe({
+      next: (resp) => {
+        this.contractSubtypes.set((resp || []).map(i => ({ value: i.code, label: `${i.name} · ${i.code}` })));
       },
       error: () => this.catalogError.set(this.texts.catalogLoadFailedMessage)
     });
   }
 
   private loadAgreementCategories(ruleSystemCode: string, agreementCode: string) {
-    (this.api as any).listLaborClassificationAgreementCategories({ ruleSystemCode, agreementCode }).subscribe({
-      next: (resp: any) => {
-        this.agreementCategories.set((resp || []).map((i: any) => ({ value: i.code, label: `${i.name} · ${i.code}` })));
+    this.catalogsApi.listLaborClassificationAgreementCategories({ ruleSystemCode, agreementCode }).subscribe({
+      next: (resp) => {
+        this.agreementCategories.set((resp || []).map(i => ({ value: i.code, label: `${i.name} · ${i.code}` })));
       },
       error: () => this.catalogError.set(this.texts.catalogLoadFailedMessage)
     });
