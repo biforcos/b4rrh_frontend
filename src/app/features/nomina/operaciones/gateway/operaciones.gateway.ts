@@ -54,18 +54,16 @@ export class OperacionesGateway {
       ...params,
       payrollTypeCode: params.payrollTypeCode as BulkInvalidatePayrollRequestPayrollTypeCodeEnum,
     } as BulkInvalidatePayrollRequest;
-    return this.payrollApi
-      .bulkInvalidatePayroll({ bulkInvalidatePayrollRequest: request })
-      .pipe(
-        map((r) => ({
-          totalCandidates: r.totalCandidates ?? 0,
-          totalFound: r.totalFound ?? 0,
-          totalInvalidated: r.totalInvalidated ?? 0,
-          totalSkippedAlreadyNotValid: r.totalSkippedAlreadyNotValid ?? 0,
-          totalSkippedProtected: r.totalSkippedProtected ?? 0,
-          totalSkippedNotFound: r.totalSkippedNotFound ?? 0,
-        })),
-      );
+    return this.payrollApi.bulkInvalidatePayroll({ bulkInvalidatePayrollRequest: request }).pipe(
+      map((r) => ({
+        totalCandidates: r.totalCandidates ?? 0,
+        totalFound: r.totalFound ?? 0,
+        totalInvalidated: r.totalInvalidated ?? 0,
+        totalSkippedAlreadyNotValid: r.totalSkippedAlreadyNotValid ?? 0,
+        totalSkippedProtected: r.totalSkippedProtected ?? 0,
+        totalSkippedNotFound: r.totalSkippedNotFound ?? 0,
+      })),
+    );
   }
 
   private mapRun = (r: any): CalculationRun => ({
