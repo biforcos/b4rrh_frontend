@@ -34,12 +34,15 @@
 
       <label class="ops-page__field">
         <span class="ops-page__field-label">Tipo de nómina</span>
-        <input
-          type="text"
+        <select
           class="ops-page__input"
           [value]="store.payrollTypeCode()"
-          (input)="store.setPayrollTypeCode($any($event.target).value)"
-        />
+          (change)="store.setPayrollTypeCode($any($event.target).value)"
+        >
+          @for (opt of store.payrollTypeOptions; track opt.value) {
+            <option [value]="opt.value">{{ opt.label }}</option>
+          }
+        </select>
       </label>
     </div>
 

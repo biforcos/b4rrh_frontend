@@ -3,6 +3,6 @@ export interface PayrollBusinessKey {
   employeeTypeCode: string;
   employeeNumber: string;
   payrollPeriodCode: string;
-  payrollTypeCode: string;
+  payrollTypeCode: 'NORMAL' | 'EXTRA';
   presenceNumber: number;
 }

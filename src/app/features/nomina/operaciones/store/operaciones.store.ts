@@ -44,7 +44,7 @@ export class OperacionesStore implements OnDestroy {
 
   private readonly ruleSystemCodeState = signal<string>('ESP');
   private readonly periodState = signal<number>(currentPeriod());
-  private readonly payrollTypeCodeState = signal<string>('MENSUAL');
+  private readonly payrollTypeCodeState = signal<'NORMAL' | 'EXTRA'>('NORMAL');
   private readonly targetModeState = signal<TargetSelectionMode>('ALL');
   private readonly employeeListTextState = signal<string>('');
   private readonly singleEmployeeTypeState = signal<string>('');
@@ -61,6 +61,11 @@ export class OperacionesStore implements OnDestroy {
   private readonly runState = signal<CalculationRun | null>(null);
   private readonly launchErrorState = signal<string | null>(null);
   private pollSubscription: Subscription | null = null;
+
+  readonly payrollTypeOptions = [
+    { value: 'NORMAL' as const, label: 'Normal' },
+    { value: 'EXTRA' as const, label: 'Extra' },
+  ];
 
   readonly ruleSystemCode = this.ruleSystemCodeState.asReadonly();
   readonly period = this.periodState.asReadonly();
@@ -109,7 +114,7 @@ export class OperacionesStore implements OnDestroy {
   setRuleSystemCode(v: string): void {
     this.ruleSystemCodeState.set(v);
   }
-  setPayrollTypeCode(v: string): void {
+  setPayrollTypeCode(v: 'NORMAL' | 'EXTRA'): void {
     this.payrollTypeCodeState.set(v);
   }
   setTargetMode(v: TargetSelectionMode): void {

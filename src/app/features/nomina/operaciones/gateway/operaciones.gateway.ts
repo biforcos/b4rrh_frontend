@@ -3,9 +3,19 @@ import { Observable, map } from 'rxjs';
 
 import { PayrollCalculationRunService } from '../../../../core/api/generated/api/payroll-calculation-run.service';
 import { PayrollService } from '../../../../core/api/generated/api/payroll.service';
+import {
+  BulkInvalidatePayrollRequest,
+  BulkInvalidatePayrollRequestPayrollTypeCodeEnum,
+} from '../../../../core/api/generated/model/bulk-invalidate-payroll-request';
+import {
+  LaunchPayrollCalculationRequest,
+  LaunchPayrollCalculationRequestPayrollTypeCodeEnum,
+} from '../../../../core/api/generated/model/launch-payroll-calculation-request';
 import { BulkInvalidateResult } from '../models/bulk-invalidate-result.model';
 import { CalculationRun } from '../models/calculation-run.model';
 import { TargetSelectionPayload } from '../models/target-selection.model';
+
+type PayrollTypeCode = 'NORMAL' | 'EXTRA';
 
 @Injectable({ providedIn: 'root' })
 export class OperacionesGateway {
@@ -15,13 +25,17 @@ export class OperacionesGateway {
   launchCalculation(params: {
     ruleSystemCode: string;
     payrollPeriodCode: string;
-    payrollTypeCode: string;
+    payrollTypeCode: PayrollTypeCode;
     calculationEngineCode: string;
     calculationEngineVersion: string;
     targetSelection: TargetSelectionPayload;
   }): Observable<CalculationRun> {
+    const request = {
+      ...params,
+      payrollTypeCode: params.payrollTypeCode as LaunchPayrollCalculationRequestPayrollTypeCodeEnum,
+    } as LaunchPayrollCalculationRequest;
     return this.calculationRunApi
-      .launchPayrollCalculation({ launchPayrollCalculationRequest: params as any })
+      .launchPayrollCalculation({ launchPayrollCalculationRequest: request })
       .pipe(map(this.mapRun));
   }
 
@@ -32,12 +46,16 @@ export class OperacionesGateway {
   bulkInvalidate(params: {
     ruleSystemCode: string;
     payrollPeriodCode: string;
-    payrollTypeCode: string;
+    payrollTypeCode: PayrollTypeCode;
     statusReasonCode: string;
     targetSelection: TargetSelectionPayload;
   }): Observable<BulkInvalidateResult> {
+    const request = {
+      ...params,
+      payrollTypeCode: params.payrollTypeCode as BulkInvalidatePayrollRequestPayrollTypeCodeEnum,
+    } as BulkInvalidatePayrollRequest;
     return this.payrollApi
-      .bulkInvalidatePayroll({ bulkInvalidatePayrollRequest: params as any })
+      .bulkInvalidatePayroll({ bulkInvalidatePayrollRequest: request })
       .pipe(
         map((r) => ({
           totalCandidates: r.totalCandidates ?? 0,
