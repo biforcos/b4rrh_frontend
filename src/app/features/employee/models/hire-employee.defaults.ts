@@ -1,3 +1,3 @@
 export const HIRE_EMPLOYEE_DEFAULTS = {
-  employeeTypeCode: 'EMP',
+  employeeTypeCode: 'INTERNAL',
 } as const;
