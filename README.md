@@ -1,89 +1,197 @@
-# B4RRHH Frontend
+# B4RRHH — HR Management Backoffice
 
-Frontend Angular para B4RRHH con base orientada a backoffice administrativo y crecimiento por verticales.
+**B4RRHH** is a full-featured HR management backoffice built with Angular 21. It covers the complete employee lifecycle — from hire to termination — alongside payroll management, organizational structure, and a configurable rule-system engine for business rules.
+
+The frontend communicates with a [Spring Boot backend](../b4rrhh_backend) via a contract-first OpenAPI integration: the API contract is owned by the backend and the client is generated automatically.
+
+---
 
 ## Stack
 
-- Angular 21 con standalone components
-- Routing moderno con lazy loading por feature
-- Signals + servicios ligeros para estado local
-- Vitest para pruebas unitarias
+| Layer | Technology |
+|---|---|
+| Framework | Angular 21.2 (standalone components, control-flow syntax) |
+| Language | TypeScript 5.9 |
+| Reactivity | Angular Signals + RxJS 7.8 |
+| UI library | PrimeNG 21.1 with custom theme |
+| Testing | Vitest |
+| API client | OpenAPI Generator (`typescript-angular`) |
+| Build | Angular CLI + Vite |
 
-## Estructura base
+---
+
+## Features
+
+### Employee Management
+Complete employee lifecycle management with a tabbed detail view per employee:
+
+- **Overview** — status summary, active presence, contract highlights
+- **Contact** — contact details (phone, email, etc.)
+- **Presence** — work center assignments, contracts, labor classification, and working-time segments
+- **Organization** — cost center distribution and organizational assignments
+- **Identity** — identifier documents
+- **Payroll** — payroll inputs and concept assignments
+- **Lifecycle** — hire and re-hire workflows with period and catalog selection
+
+### Organizational Structure
+- Company profiles with addresses and contacts
+- Work centers with history and contact information
+- Cost center management
+
+### Rule System Engine
+A configuration layer for business rules that drives catalog behavior across the application:
+
+- Rule system definitions (CRUD)
+- Rule entity types and instances
+- Catalog bindings and options
+- Agreement category profiles (convenios / categorías)
+
+### Payroll
+- Payroll receipts viewer
+- Payroll operation tracking
+
+---
+
+## Architecture
+
+The frontend follows a strict layered architecture per feature, inspired by hexagonal design:
+
+```
+Component  →  Store  →  Gateway  →  Client (generated)
+                ↓
+            Mapper  ↔  Model
+```
+
+| Layer | Role |
+|---|---|
+| **Component** | Presentation logic only — renders signals, dispatches actions |
+| **Store** | State container using Angular Signals — loading/error/data signals |
+| **Gateway** | Data access — wraps API client, returns Observables |
+| **Client** | Auto-generated from the OpenAPI contract, never edited manually |
+| **Mapper** | Transforms API responses to domain models, and commands back to requests |
+| **Model** | TypeScript interfaces representing the domain — no coupling to API shapes |
+
+Each feature is lazy-loaded and self-contained under its own route subtree.
+
+### Reactive State with Signals
+
+Stores expose readonly signals for granular reactivity:
+
+```typescript
+// EmployeeAddressStore
+private readonly addressesState = signal<ReadonlyArray<EmployeeAddressModel>>([]);
+readonly addresses = this.addressesState.asReadonly();
+```
+
+Derived state is expressed with `computed()`:
+
+```typescript
+// EmployeeOverviewPageComponent
+protected readonly loading = computed(
+  () => this.loadingDetail() || this.loadingPresences() || this.loadingContracts(),
+);
+protected readonly activePresence = computed(
+  () => this.resolveActivePresence(this.presences()),
+);
+```
+
+All components use `ChangeDetectionStrategy.OnPush` for performance.
+
+### Backend Availability Guard
+
+A `BackendAvailabilityStore` checks backend health at app init via the Spring Actuator endpoint. The router outlet is gated: if the backend is unreachable the app renders an informative fallback instead of a broken UI.
+
+### Request Deduplication
+
+Stores track request IDs internally and discard stale responses, preventing race conditions on rapid user navigation.
+
+---
+
+## API Client Generation
+
+The OpenAPI contract is the single source of truth and lives in the backend repository. The frontend never owns or edits it — it only consumes a snapshot.
+
+```
+b4rrhh_backend/openapi/personnel-administration-api.yaml  ← source of truth
+        │
+        ▼  npm run api:pull
+openapi/personnel-administration-api.yaml               ← local snapshot
+        │
+        ▼  npm run api:generate
+src/app/core/api/generated/                             ← generated client (do not edit)
+```
+
+| Script | Description |
+|---|---|
+| `npm run api:pull` | Copies the contract from the backend repo into this repo |
+| `npm run api:generate` | Runs OpenAPI Generator and outputs a typed Angular client |
+| `npm run api:refresh` | `api:pull` + `api:generate` in one step |
+
+Generated code is committed so the project builds without requiring a local backend clone.
+
+Custom adapters in `core/api/clients/` and transformation logic in `core/api/mappers/` wrap the generated client — insulating the app from breaking changes in the generated layer.
+
+---
+
+## Project Structure
 
 ```
 src/app/
-	core/
-		api/
-			generated/
-			clients/
-			mappers/
-		i18n/
-		layout/
-	shared/
-		ui/
-	features/
-		employee/
-			shell/
-			overview/
-			contact/
-			presence/
-			data-access/
+├── core/
+│   ├── api/
+│   │   ├── generated/          # OpenAPI-generated client (do not edit)
+│   │   ├── clients/            # Custom adapters wrapping generated services
+│   │   └── mappers/            # Shared request/response transformations
+│   ├── auth/                   # Local dev login page
+│   ├── availability/           # Backend health monitoring
+│   ├── layout/                 # App shell and placeholder pages
+│   └── theme/                  # PrimeNG theme preset
+│
+├── features/
+│   ├── employee/               # Employee lifecycle (largest feature)
+│   ├── company/                # Company management
+│   ├── work-center/            # Work center management
+│   └── nomina/                 # Payroll receipts and operations
+│
+├── rulesystem/
+│   ├── rule-system/            # Rule system CRUD
+│   ├── catalog/                # Entity types and catalog
+│   └── agreement-category-profile/
+│
+└── shared/
+    └── ui/                     # Reusable presentational components
+        ├── master-detail-page-shell/
+        ├── section-card/
+        ├── period-table/
+        └── ...
 ```
 
-## Ejecutar en local
+---
 
-1. Instalar dependencias:
+## Running Locally
+
+### Prerequisites
+
+- Node.js 22+
+- The [b4rrhh_backend](../b4rrhh_backend) running on `localhost:8080`
+
+### Setup
 
 ```bash
 npm install
-```
-
-2. Levantar frontend en modo desarrollo:
-
-```bash
 npm start
 ```
 
-El frontend usa [proxy.conf.json](proxy.conf.json) para reenviar rutas de backend al servidor local de Spring Boot en http://localhost:8080.
+The dev server runs on `http://localhost:4200`. API calls are proxied to the backend via [proxy.conf.json](proxy.conf.json) — no CORS configuration needed during development.
 
-## Generacion de cliente OpenAPI
-
-El contrato fuente de verdad esta en el backend:
-
-- ../b4rrhh_backend/openapi/personnel-administration-api.yaml
-
-No se copia manualmente.
-Se sincroniza automaticamente en:
-
-- openapi/personnel-administration-api.yaml
-- src/app/core/api/generated/personnel-administration-api.yaml
-
-Comandos:
-
-- npm run api:pull
-- npm run api:generate
-- npm run api:refresh
-
-Detalles:
-
-- api:pull sincroniza el contrato desde el repo backend al repo frontend (snapshot en openapi y copia junto a generated).
-- api:generate genera cliente TypeScript en src/app/core/api/generated usando la copia local.
-- api:refresh ejecuta pull + generate.
-
-Reglas:
-
-- El codigo generado se escribe en src/app/core/api/generated.
-- No editar manualmente archivos dentro de generated.
-- Adaptadores propios y mapeos van en core/api/clients y core/api/mappers.
-
-## Build y tests
+### Build and Tests
 
 ```bash
 npm run build
 npm run test
 ```
 
+---
 
 ## License
 
@@ -91,4 +199,4 @@ This project is source-available under a Business Source License (BSL).
 
 Commercial use is not permitted without explicit authorization.
 
-See LICENSE.md for details.
+See [LICENSE.md](LICENSE.md) for details.
