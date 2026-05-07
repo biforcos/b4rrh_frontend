@@ -2,8 +2,8 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 
 import {
-  CorrectTaxInformationRequest,
-  CreateTaxInformationRequest,
+  CorrectEmployeeTaxInformationRequest,
+  CreateEmployeeTaxInformationRequest,
   EmployeeTaxInformationClient,
 } from '../../../core/api/clients/employee-tax-information.client';
 import { mapTaxInformationFromApi } from '../../../core/api/mappers/employee-tax-information.mapper';
@@ -22,7 +22,7 @@ export class EmployeeTaxInformationGateway {
       .pipe(map((items) => items.map(mapTaxInformationFromApi)));
   }
 
-  create(key: EmployeeBusinessKey, req: CreateTaxInformationRequest): Observable<EmployeeTaxInformationModel> {
+  create(key: EmployeeBusinessKey, req: CreateEmployeeTaxInformationRequest): Observable<EmployeeTaxInformationModel> {
     const { ruleSystemCode, employeeTypeCode, employeeNumber } = toEmployeeBusinessKey(key);
     return this.client
       .create(ruleSystemCode, employeeTypeCode, employeeNumber, req)
@@ -32,7 +32,7 @@ export class EmployeeTaxInformationGateway {
   correct(
     key: EmployeeBusinessKey,
     validFrom: string,
-    req: CorrectTaxInformationRequest,
+    req: CorrectEmployeeTaxInformationRequest,
   ): Observable<EmployeeTaxInformationModel> {
     const { ruleSystemCode, employeeTypeCode, employeeNumber } = toEmployeeBusinessKey(key);
     return this.client

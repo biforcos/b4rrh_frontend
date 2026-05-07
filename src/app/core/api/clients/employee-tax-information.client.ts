@@ -1,22 +1,18 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
-import { EmployeeTaxInformationModel } from '../../../features/employee/models/employee-tax-information.model';
+import { EmployeeTaxInformationService } from '../generated/api/employee-tax-information.service';
+import {
+  CreateEmployeeTaxInformationRequest,
+  CorrectEmployeeTaxInformationRequest,
+  EmployeeTaxInformationResponse,
+} from '../generated/model/models';
 
-export interface CreateTaxInformationRequest {
+export type { CreateEmployeeTaxInformationRequest, CorrectEmployeeTaxInformationRequest };
+
+export interface EmployeeTaxInformationApiModel {
   validFrom: string;
-  familySituation: string;
-  descendantsCount: number;
-  ascendantsCount: number;
-  disabilityDegree: string;
-  pensionCompensatoria: boolean;
-  geographicMobility: boolean;
-  habitualResidenceLoan: boolean;
-  taxTerritory: string;
-}
-
-export interface CorrectTaxInformationRequest {
   familySituation: string;
   descendantsCount: number;
   ascendantsCount: number;
@@ -29,20 +25,20 @@ export interface CorrectTaxInformationRequest {
 
 @Injectable({ providedIn: 'root' })
 export class EmployeeTaxInformationClient {
-  private readonly http = inject(HttpClient);
-
-  private basePath(ruleSystemCode: string, employeeTypeCode: string, employeeNumber: string): string {
-    return `/api/employees/${ruleSystemCode}/${employeeTypeCode}/${employeeNumber}/tax-information`;
-  }
+  private readonly api = inject(EmployeeTaxInformationService);
 
   list(
     ruleSystemCode: string,
     employeeTypeCode: string,
     employeeNumber: string,
-  ): Observable<EmployeeTaxInformationModel[]> {
-    return this.http.get<EmployeeTaxInformationModel[]>(
-      this.basePath(ruleSystemCode, employeeTypeCode, employeeNumber),
-    );
+  ): Observable<EmployeeTaxInformationApiModel[]> {
+    return this.api
+      .employeesRuleSystemCodeEmployeeTypeCodeEmployeeNumberTaxInformationGet({
+        ruleSystemCode,
+        employeeTypeCode,
+        employeeNumber,
+      })
+      .pipe(map((items) => items.map((item) => this.toApiModel(item))));
   }
 
   get(
@@ -50,22 +46,31 @@ export class EmployeeTaxInformationClient {
     employeeTypeCode: string,
     employeeNumber: string,
     validFrom: string,
-  ): Observable<EmployeeTaxInformationModel> {
-    return this.http.get<EmployeeTaxInformationModel>(
-      `${this.basePath(ruleSystemCode, employeeTypeCode, employeeNumber)}/${validFrom}`,
-    );
+  ): Observable<EmployeeTaxInformationApiModel> {
+    return this.api
+      .employeesRuleSystemCodeEmployeeTypeCodeEmployeeNumberTaxInformationValidFromGet({
+        ruleSystemCode,
+        employeeTypeCode,
+        employeeNumber,
+        validFrom,
+      })
+      .pipe(map((item) => this.toApiModel(item)));
   }
 
   create(
     ruleSystemCode: string,
     employeeTypeCode: string,
     employeeNumber: string,
-    body: CreateTaxInformationRequest,
-  ): Observable<EmployeeTaxInformationModel> {
-    return this.http.post<EmployeeTaxInformationModel>(
-      this.basePath(ruleSystemCode, employeeTypeCode, employeeNumber),
-      body,
-    );
+    body: CreateEmployeeTaxInformationRequest,
+  ): Observable<EmployeeTaxInformationApiModel> {
+    return this.api
+      .employeesRuleSystemCodeEmployeeTypeCodeEmployeeNumberTaxInformationPost({
+        ruleSystemCode,
+        employeeTypeCode,
+        employeeNumber,
+        createEmployeeTaxInformationRequest: body,
+      })
+      .pipe(map((item) => this.toApiModel(item)));
   }
 
   correct(
@@ -73,12 +78,17 @@ export class EmployeeTaxInformationClient {
     employeeTypeCode: string,
     employeeNumber: string,
     validFrom: string,
-    body: CorrectTaxInformationRequest,
-  ): Observable<EmployeeTaxInformationModel> {
-    return this.http.put<EmployeeTaxInformationModel>(
-      `${this.basePath(ruleSystemCode, employeeTypeCode, employeeNumber)}/${validFrom}`,
-      body,
-    );
+    body: CorrectEmployeeTaxInformationRequest,
+  ): Observable<EmployeeTaxInformationApiModel> {
+    return this.api
+      .employeesRuleSystemCodeEmployeeTypeCodeEmployeeNumberTaxInformationValidFromPut({
+        ruleSystemCode,
+        employeeTypeCode,
+        employeeNumber,
+        validFrom,
+        correctEmployeeTaxInformationRequest: body,
+      })
+      .pipe(map((item) => this.toApiModel(item)));
   }
 
   delete(
@@ -87,8 +97,27 @@ export class EmployeeTaxInformationClient {
     employeeNumber: string,
     validFrom: string,
   ): Observable<void> {
-    return this.http.delete<void>(
-      `${this.basePath(ruleSystemCode, employeeTypeCode, employeeNumber)}/${validFrom}`,
-    );
+    return this.api
+      .employeesRuleSystemCodeEmployeeTypeCodeEmployeeNumberTaxInformationValidFromDelete({
+        ruleSystemCode,
+        employeeTypeCode,
+        employeeNumber,
+        validFrom,
+      })
+      .pipe(map(() => undefined));
+  }
+
+  private toApiModel(source: EmployeeTaxInformationResponse): EmployeeTaxInformationApiModel {
+    return {
+      validFrom: source.validFrom ?? '',
+      familySituation: source.familySituation ?? '',
+      descendantsCount: source.descendantsCount ?? 0,
+      ascendantsCount: source.ascendantsCount ?? 0,
+      disabilityDegree: source.disabilityDegree ?? '',
+      pensionCompensatoria: source.pensionCompensatoria ?? false,
+      geographicMobility: source.geographicMobility ?? false,
+      habitualResidenceLoan: source.habitualResidenceLoan ?? false,
+      taxTerritory: source.taxTerritory ?? '',
+    };
   }
 }

@@ -3,8 +3,8 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { take } from 'rxjs';
 
 import {
-  CorrectTaxInformationRequest,
-  CreateTaxInformationRequest,
+  CorrectEmployeeTaxInformationRequest,
+  CreateEmployeeTaxInformationRequest,
 } from '../../../core/api/clients/employee-tax-information.client';
 import { EmployeeTaxInformationModel } from '../models/employee-tax-information.model';
 import { EmployeeBusinessKey } from '../models/employee-business-key.model';
@@ -20,7 +20,8 @@ export type TaxInformationErrorCode = 'request-failed' | 'conflict' | 'not-found
 export class EmployeeTaxInformationStore {
   private readonly gateway = inject(EmployeeTaxInformationGateway);
 
-  private readonly selectedKeyState = signal<EmployeeBusinessKey | null>(null);
+  private readonly selectedEmployeeKeyState = signal<EmployeeBusinessKey | null>(null);
+  readonly selectedEmployeeKey = this.selectedEmployeeKeyState.asReadonly();
   private readonly recordsState = signal<ReadonlyArray<EmployeeTaxInformationModel>>([]);
   private readonly loadingState = signal(false);
   private readonly mutatingState = signal(false);
@@ -44,7 +45,7 @@ export class EmployeeTaxInformationStore {
     this.loadInternal(key, false);
   }
 
-  create(key: EmployeeBusinessKey, req: CreateTaxInformationRequest): void {
+  create(key: EmployeeBusinessKey, req: CreateEmployeeTaxInformationRequest): void {
     if (this.mutatingState()) return;
     const normalizedKey = toEmployeeBusinessKey(key);
     this.mutatingState.set(true);
@@ -67,7 +68,7 @@ export class EmployeeTaxInformationStore {
       });
   }
 
-  correct(key: EmployeeBusinessKey, validFrom: string, req: CorrectTaxInformationRequest): void {
+  correct(key: EmployeeBusinessKey, validFrom: string, req: CorrectEmployeeTaxInformationRequest): void {
     if (this.mutatingState()) return;
     const normalizedKey = toEmployeeBusinessKey(key);
     this.mutatingState.set(true);
@@ -120,14 +121,14 @@ export class EmployeeTaxInformationStore {
     }
 
     const normalizedKey = toEmployeeBusinessKey(key);
-    const isSameKey = areEmployeeBusinessKeysEqual(this.selectedKeyState(), normalizedKey);
+    const isSameKey = areEmployeeBusinessKeysEqual(this.selectedEmployeeKeyState(), normalizedKey);
 
     if (!forceReload && isSameKey && (this.loadingState() || this.errorState() === null)) {
       return;
     }
 
     const hasKeyChanged = !isSameKey;
-    this.selectedKeyState.set(normalizedKey);
+    this.selectedEmployeeKeyState.set(normalizedKey);
     if (hasKeyChanged) {
       this.recordsState.set([]);
     }
@@ -158,7 +159,7 @@ export class EmployeeTaxInformationStore {
 
   private resetState(): void {
     this.requestId += 1;
-    this.selectedKeyState.set(null);
+    this.selectedEmployeeKeyState.set(null);
     this.recordsState.set([]);
     this.loadingState.set(false);
     this.mutatingState.set(false);
