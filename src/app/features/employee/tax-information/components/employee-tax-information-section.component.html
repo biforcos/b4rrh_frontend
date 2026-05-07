@@ -1,0 +1,50 @@
+<app-employee-section-shell title="Información Fiscal (Modelo 145)" [state]="sectionState()">
+  <div class="employee-tax-information-section__body">
+    @if (store.loading()) {
+      <p class="employee-tax-information-section__loading">Cargando...</p>
+    } @else if (store.latest()) {
+      <dl class="employee-tax-information-section__grid">
+        <div class="employee-tax-information-section__row">
+          <dt>Vigente desde</dt>
+          <dd>{{ store.latest()!.validFrom }}</dd>
+        </div>
+        <div class="employee-tax-information-section__row">
+          <dt>Situación familiar</dt>
+          <dd>{{ store.latest()!.familySituation }}</dd>
+        </div>
+        <div class="employee-tax-information-section__row">
+          <dt>Descendientes con derecho</dt>
+          <dd>{{ store.latest()!.descendantsCount }}</dd>
+        </div>
+        <div class="employee-tax-information-section__row">
+          <dt>Ascendientes a cargo</dt>
+          <dd>{{ store.latest()!.ascendantsCount }}</dd>
+        </div>
+        <div class="employee-tax-information-section__row">
+          <dt>Grado de discapacidad</dt>
+          <dd>{{ store.latest()!.disabilityDegree }}</dd>
+        </div>
+        <div class="employee-tax-information-section__row">
+          <dt>Pensión compensatoria</dt>
+          <dd>{{ store.latest()!.pensionCompensatoria ? 'Sí' : 'No' }}</dd>
+        </div>
+        <div class="employee-tax-information-section__row">
+          <dt>Movilidad geográfica</dt>
+          <dd>{{ store.latest()!.geographicMobility ? 'Sí' : 'No' }}</dd>
+        </div>
+        <div class="employee-tax-information-section__row">
+          <dt>Préstamo vivienda habitual</dt>
+          <dd>{{ store.latest()!.habitualResidenceLoan ? 'Sí' : 'No' }}</dd>
+        </div>
+        <div class="employee-tax-information-section__row">
+          <dt>Territorio fiscal</dt>
+          <dd>{{ store.latest()!.taxTerritory }}</dd>
+        </div>
+      </dl>
+    } @else {
+      <p class="employee-tax-information-section__empty">
+        Sin información fiscal registrada. Se aplican valores por defecto (soltero/a, sin cargas, territorio común).
+      </p>
+    }
+  </div>
+</app-employee-section-shell>

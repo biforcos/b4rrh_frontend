@@ -1,0 +1,50 @@
+.employee-tax-information-section__body {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.employee-tax-information-section__grid {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.employee-tax-information-section__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.4rem;
+  padding: 0.42rem 0.52rem;
+  border-bottom: 1px solid #ecf1f6;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  dt {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #445c71;
+  }
+
+  dd {
+    font-size: 0.75rem;
+    color: #1f3246;
+    margin: 0;
+  }
+}
+
+.employee-tax-information-section__loading {
+  font-size: 0.78rem;
+  color: #5e7488;
+  padding: 0.4rem 0.52rem;
+}
+
+.employee-tax-information-section__empty {
+  border: 1px dashed #d1deea;
+  border-radius: 0.62rem;
+  background: #fafafa;
+  color: #5a7185;
+  font-size: 0.79rem;
+  padding: 0.55rem 0.62rem;
+}
