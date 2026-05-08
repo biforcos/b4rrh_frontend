@@ -68,7 +68,11 @@ export class EmployeeTaxInformationStore {
       });
   }
 
-  correct(key: EmployeeBusinessKey, validFrom: string, req: CorrectEmployeeTaxInformationRequest): void {
+  correct(
+    key: EmployeeBusinessKey,
+    validFrom: string,
+    req: CorrectEmployeeTaxInformationRequest,
+  ): void {
     if (this.mutatingState()) return;
     const normalizedKey = toEmployeeBusinessKey(key);
     this.mutatingState.set(true);

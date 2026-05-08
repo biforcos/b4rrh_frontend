@@ -22,7 +22,10 @@ export class EmployeeTaxInformationGateway {
       .pipe(map((items) => items.map(mapTaxInformationFromApi)));
   }
 
-  create(key: EmployeeBusinessKey, req: CreateEmployeeTaxInformationRequest): Observable<EmployeeTaxInformationModel> {
+  create(
+    key: EmployeeBusinessKey,
+    req: CreateEmployeeTaxInformationRequest,
+  ): Observable<EmployeeTaxInformationModel> {
     const { ruleSystemCode, employeeTypeCode, employeeNumber } = toEmployeeBusinessKey(key);
     return this.client
       .create(ruleSystemCode, employeeTypeCode, employeeNumber, req)

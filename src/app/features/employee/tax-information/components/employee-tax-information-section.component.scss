@@ -1,3 +1,18 @@
+.tax-information-section {
+  display: block;
+}
+
+.tax-information-section__count-input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.tax-information-section__delete-message {
+  font-size: 0.85rem;
+  color: #1f3246;
+  margin: 0;
+}
+
 .employee-tax-information-section__body {
   display: grid;
   gap: 0.8rem;

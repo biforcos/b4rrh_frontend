@@ -1,50 +1,139 @@
-<app-employee-section-shell title="Información Fiscal (Modelo 145)" [state]="sectionState()">
-  <div class="employee-tax-information-section__body">
-    @if (store.loading()) {
-      <p class="employee-tax-information-section__loading">Cargando...</p>
-    } @else if (store.latest()) {
-      <dl class="employee-tax-information-section__grid">
-        <div class="employee-tax-information-section__row">
-          <dt>Vigente desde</dt>
-          <dd>{{ store.latest()!.validFrom }}</dd>
-        </div>
-        <div class="employee-tax-information-section__row">
-          <dt>Situación familiar</dt>
-          <dd>{{ store.latest()!.familySituation }}</dd>
-        </div>
-        <div class="employee-tax-information-section__row">
-          <dt>Descendientes con derecho</dt>
-          <dd>{{ store.latest()!.descendantsCount }}</dd>
-        </div>
-        <div class="employee-tax-information-section__row">
-          <dt>Ascendientes a cargo</dt>
-          <dd>{{ store.latest()!.ascendantsCount }}</dd>
-        </div>
-        <div class="employee-tax-information-section__row">
-          <dt>Grado de discapacidad</dt>
-          <dd>{{ store.latest()!.disabilityDegree }}</dd>
-        </div>
-        <div class="employee-tax-information-section__row">
-          <dt>Pensión compensatoria</dt>
-          <dd>{{ store.latest()!.pensionCompensatoria ? 'Sí' : 'No' }}</dd>
-        </div>
-        <div class="employee-tax-information-section__row">
-          <dt>Movilidad geográfica</dt>
-          <dd>{{ store.latest()!.geographicMobility ? 'Sí' : 'No' }}</dd>
-        </div>
-        <div class="employee-tax-information-section__row">
-          <dt>Préstamo vivienda habitual</dt>
-          <dd>{{ store.latest()!.habitualResidenceLoan ? 'Sí' : 'No' }}</dd>
-        </div>
-        <div class="employee-tax-information-section__row">
-          <dt>Territorio fiscal</dt>
-          <dd>{{ store.latest()!.taxTerritory }}</dd>
-        </div>
-      </dl>
-    } @else {
-      <p class="employee-tax-information-section__empty">
-        Sin información fiscal registrada. Se aplican valores por defecto (soltero/a, sin cargas, territorio común).
+<div class="tax-information-section">
+  <app-period-table
+    sectionTitle="Información Fiscal (Modelo 145)"
+    [rows]="rows()"
+    emptyMessage="Sin información fiscal registrada. Se aplican valores por defecto (soltero/a, sin cargas, territorio común)."
+    (addClicked)="openCreate()"
+    (editClicked)="openEdit($event)"
+    (deleteClicked)="openDeleteConfirm($event)"
+  >
+    <ng-template #columnHeaders>
+      <th>Situación familiar</th>
+      <th>Desc.</th>
+      <th>Asc.</th>
+      <th>Discapacidad</th>
+    </ng-template>
+    <ng-template #cellContent let-row>
+      <td>{{ row.familySituation }}</td>
+      <td>{{ row.descendantsCount }}</td>
+      <td>{{ row.ascendantsCount }}</td>
+      <td>{{ row.disabilityDegree }}</td>
+    </ng-template>
+  </app-period-table>
+
+  <app-period-modal
+    [title]="modalTitle()"
+    [subtitle]="modalSubtitle()"
+    [visible]="modalVisible()"
+    [saving]="store.mutating()"
+    [submitEnabled]="isSubmitEnabled()"
+    [submitLabel]="modalSubmitLabel()"
+    (visibleChange)="modalVisible.set($event)"
+    (submitted)="submit()"
+    (cancelled)="closeModal()"
+  >
+    @if (modalMode() === 'create') {
+      <app-ui-date-input
+        [value]="validFromDraft()"
+        (valueChanged)="validFromDraft.set($event)" />
+      <app-ui-select
+        [options]="familySituationOptions"
+        [value]="familySituationDraft()"
+        placeholder="Situación familiar"
+        (valueChanged)="familySituationDraft.set($event)" />
+      <input
+        type="number"
+        min="0"
+        class="tax-information-section__count-input"
+        [value]="descendantsCountDraft()"
+        placeholder="Descendientes con derecho"
+        (input)="descendantsCountDraft.set($any($event.target).value)" />
+      <input
+        type="number"
+        min="0"
+        class="tax-information-section__count-input"
+        [value]="ascendantsCountDraft()"
+        placeholder="Ascendientes a cargo"
+        (input)="ascendantsCountDraft.set($any($event.target).value)" />
+      <app-ui-select
+        [options]="disabilityDegreeOptions"
+        [value]="disabilityDegreeDraft()"
+        placeholder="Grado de discapacidad"
+        (valueChanged)="disabilityDegreeDraft.set($event)" />
+      <app-ui-select
+        [options]="booleanOptions"
+        [value]="pensionCompensatoriaDraft()"
+        placeholder="Pensión compensatoria"
+        (valueChanged)="pensionCompensatoriaDraft.set($event)" />
+      <app-ui-select
+        [options]="booleanOptions"
+        [value]="geographicMobilityDraft()"
+        placeholder="Movilidad geográfica"
+        (valueChanged)="geographicMobilityDraft.set($event)" />
+      <app-ui-select
+        [options]="booleanOptions"
+        [value]="habitualResidenceLoanDraft()"
+        placeholder="Préstamo vivienda habitual"
+        (valueChanged)="habitualResidenceLoanDraft.set($event)" />
+      <app-ui-select
+        [options]="taxTerritoryOptions"
+        [value]="taxTerritoryDraft()"
+        placeholder="Territorio fiscal"
+        (valueChanged)="taxTerritoryDraft.set($event)" />
+    }
+
+    @if (modalMode() === 'edit') {
+      <app-ui-select
+        [options]="familySituationOptions"
+        [value]="familySituationDraft()"
+        placeholder="Situación familiar"
+        (valueChanged)="familySituationDraft.set($event)" />
+      <input
+        type="number"
+        min="0"
+        class="tax-information-section__count-input"
+        [value]="descendantsCountDraft()"
+        placeholder="Descendientes con derecho"
+        (input)="descendantsCountDraft.set($any($event.target).value)" />
+      <input
+        type="number"
+        min="0"
+        class="tax-information-section__count-input"
+        [value]="ascendantsCountDraft()"
+        placeholder="Ascendientes a cargo"
+        (input)="ascendantsCountDraft.set($any($event.target).value)" />
+      <app-ui-select
+        [options]="disabilityDegreeOptions"
+        [value]="disabilityDegreeDraft()"
+        placeholder="Grado de discapacidad"
+        (valueChanged)="disabilityDegreeDraft.set($event)" />
+      <app-ui-select
+        [options]="booleanOptions"
+        [value]="pensionCompensatoriaDraft()"
+        placeholder="Pensión compensatoria"
+        (valueChanged)="pensionCompensatoriaDraft.set($event)" />
+      <app-ui-select
+        [options]="booleanOptions"
+        [value]="geographicMobilityDraft()"
+        placeholder="Movilidad geográfica"
+        (valueChanged)="geographicMobilityDraft.set($event)" />
+      <app-ui-select
+        [options]="booleanOptions"
+        [value]="habitualResidenceLoanDraft()"
+        placeholder="Préstamo vivienda habitual"
+        (valueChanged)="habitualResidenceLoanDraft.set($event)" />
+      <app-ui-select
+        [options]="taxTerritoryOptions"
+        [value]="taxTerritoryDraft()"
+        placeholder="Territorio fiscal"
+        (valueChanged)="taxTerritoryDraft.set($event)" />
+    }
+
+    @if (modalMode() === 'delete-confirm') {
+      <p class="tax-information-section__delete-message">
+        ¿Confirmar la eliminación del registro vigente desde
+        <strong>{{ editingValidFrom() }}</strong>?
       </p>
     }
-  </div>
-</app-employee-section-shell>
+  </app-period-modal>
+</div>
