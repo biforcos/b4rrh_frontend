@@ -1,4 +1,7 @@
-import { HireEmployeeRequest, HireEmployeeResponse } from '../../../core/api/generated/model/models';
+import {
+  HireEmployeeRequest,
+  HireEmployeeResponse,
+} from '../../../core/api/generated/model/models';
 import { HireEmployeeDraft, HireEmployeeResult } from '../models/employee-hiring.model';
 import { HIRE_EMPLOYEE_DEFAULTS } from '../models/hire-employee.defaults';
 
@@ -44,8 +47,6 @@ export function mapDraftToHireRequest(draft: HireEmployeeDraft): HireEmployeeReq
 
 export function mapResponseToResult(response: HireEmployeeResponse): HireEmployeeResult {
   const workingTime = response.workingTime;
-  // Use backend-computed displayName (required: true in OpenAPI), fallback to local computation for robustness
-  const displayName = (response as unknown as { displayName?: string }).displayName ?? buildDisplayName(response);
 
   return {
     employeeKey: {
@@ -53,7 +54,7 @@ export function mapResponseToResult(response: HireEmployeeResponse): HireEmploye
       employeeTypeCode: response.employeeTypeCode,
       employeeNumber: response.employeeNumber,
     },
-    displayName,
+    displayName: response.displayName,
     hireDate: response.hireDate,
     status: response.status,
     workingTime: workingTime
@@ -72,16 +73,4 @@ export function mapResponseToResult(response: HireEmployeeResponse): HireEmploye
 
 function isValidWorkingTimePercentage(value: number | null): value is number {
   return value !== null && Number.isFinite(value) && value > 0 && value <= 100;
-}
-
-function buildDisplayName(response: HireEmployeeResponse): string {
-  const preferredName = response.preferredName?.trim();
-  if (preferredName) {
-    return preferredName;
-  }
-
-  return [response.firstName, response.lastName1, response.lastName2 ?? '']
-    .map((part) => part?.trim() ?? '')
-    .filter((part) => part.length > 0)
-    .join(' ');
 }
