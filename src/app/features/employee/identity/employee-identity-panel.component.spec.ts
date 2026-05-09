@@ -94,7 +94,7 @@ describe('EmployeeIdentityPanelComponent', () => {
       };
       const items = component.navItems();
       expect(items.length).toBe(5);
-      items.forEach(item => {
+      items.forEach((item) => {
         expect(item.icon).toBeTruthy();
         expect(item.icon).toMatch(/^pi-/);
       });

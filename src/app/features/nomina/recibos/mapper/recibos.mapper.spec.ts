@@ -1,5 +1,12 @@
-import { mapPayrollSummaryResponseToModel, mapPayrollConceptResponseToModel } from './recibos.mapper';
-import { PayrollSummaryResponse, PayrollSummaryResponsePayrollTypeCodeEnum, PayrollSummaryResponseStatusEnum } from '../../../../core/api/generated/model/payroll-summary-response';
+import {
+  mapPayrollSummaryResponseToModel,
+  mapPayrollConceptResponseToModel,
+} from './recibos.mapper';
+import {
+  PayrollSummaryResponse,
+  PayrollSummaryResponsePayrollTypeCodeEnum,
+  PayrollSummaryResponseStatusEnum,
+} from '../../../../core/api/generated/model/payroll-summary-response';
 import { PayrollConceptResponse } from '../../../../core/api/generated/model/payroll-concept-response';
 
 describe('recibos.mapper', () => {
