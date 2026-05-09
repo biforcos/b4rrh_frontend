@@ -1,0 +1,69 @@
+<div class="ht" #container>
+  @if (loading()) {
+    <div class="ht__loading">
+      <div class="ht__shimmer ht__shimmer--track"></div>
+    </div>
+  } @else if (error()) {
+    <p class="ht__message">No se pudo cargar el historial del empleado.</p>
+  } @else if (nodes().length === 0) {
+    <p class="ht__message">Sin eventos en el historial.</p>
+  } @else {
+    <div class="ht__track">
+
+      @for (node of nodes(); track node.id) {
+
+        @if (node.type === 'year') {
+          <div class="ht__year">{{ node.label }}</div>
+
+        } @else if (node.type === 'today') {
+          <div class="ht__today-node">
+            <div class="ht__today-dot"></div>
+            <span class="ht__today-label">HOY<br>{{ todayFormatted }}</span>
+          </div>
+
+        } @else if (node.above) {
+          <div class="ht__event ht__event--above">
+            <div
+              class="ht__event-dot"
+              [style.background]="node.dotBg"
+              [style.borderColor]="node.color"
+              [style.color]="node.dotText"
+            >{{ node.icon }}</div>
+            <div class="ht__event-stub" [style.backgroundColor]="node.color"></div>
+            <div class="ht__event-card" [style.borderLeftColor]="node.color">
+              <span class="ht__event-date">{{ node.date }}</span>
+              <span class="ht__event-title">{{ node.title }}</span>
+              @if (node.subtitle) {
+                <span class="ht__event-sub">{{ node.subtitle }}</span>
+              }
+            </div>
+          </div>
+
+        } @else {
+          <div class="ht__event ht__event--below">
+            <div
+              class="ht__event-dot"
+              [style.background]="node.dotBg"
+              [style.borderColor]="node.color"
+              [style.color]="node.dotText"
+            >{{ node.icon }}</div>
+            <div class="ht__event-stub" [style.backgroundColor]="node.color"></div>
+            <div class="ht__event-card" [style.borderLeftColor]="node.color">
+              <span class="ht__event-date">{{ node.date }}</span>
+              <span class="ht__event-title">{{ node.title }}</span>
+              @if (node.subtitle) {
+                <span class="ht__event-sub">{{ node.subtitle }}</span>
+              }
+            </div>
+          </div>
+        }
+
+      }
+
+      @if (!hasFutureEvents()) {
+        <div class="ht__no-future">sin eventos futuros</div>
+      }
+
+    </div>
+  }
+</div>

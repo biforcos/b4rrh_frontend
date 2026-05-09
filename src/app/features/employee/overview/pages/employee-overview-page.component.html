@@ -179,13 +179,12 @@
 
   </div>
 
-  <!-- Journey timeline (Fase 1 stub — uses existing component) -->
+  <!-- Journey timeline horizontal -->
   <div class="employee-overview__timeline">
-    <app-employee-journey-timeline
+    <app-employee-horizontal-timeline
       [journey]="journey()"
       [loading]="loadingJourney()"
       [error]="journeyError()"
-      [presences]="presences()"
     />
   </div>
 

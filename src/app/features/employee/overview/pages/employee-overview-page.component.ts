@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, viewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  viewChild,
+} from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { DatePipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -8,7 +15,7 @@ import { MenuModule } from 'primeng/menu';
 import { ButtonModule } from 'primeng/button';
 import type { MenuItem } from 'primeng/api';
 
-import { EmployeeJourneyTimelineComponent } from '../../shell/components/employee-journey-timeline.component';
+import { EmployeeHorizontalTimelineComponent } from '../components/employee-horizontal-timeline.component';
 import { EmployeeDetailStore } from '../../data-access/employee-detail.store';
 import { EmployeePresenceStore } from '../../data-access/employee-presence.store';
 import { EmployeeContractStore } from '../../data-access/employee-contract.store';
@@ -32,7 +39,7 @@ import {
 @Component({
   selector: 'app-employee-overview-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DatePipe, MenuModule, ButtonModule, EmployeeJourneyTimelineComponent],
+  imports: [DatePipe, MenuModule, ButtonModule, EmployeeHorizontalTimelineComponent],
   templateUrl: './employee-overview-page.component.html',
   styleUrl: './employee-overview-page.component.scss',
 })
@@ -194,14 +201,34 @@ export class EmployeeOverviewPageComponent {
       {
         label: 'Ciclo de vida',
         items: isActive
-          ? [{ label: 'Iniciar cese', icon: 'pi pi-stop-circle', command: () => this.navigateTo('presence') }]
-          : [{ label: 'Recontratación', icon: 'pi pi-replay', command: () => this.navigateToRehire() }],
+          ? [
+              {
+                label: 'Iniciar cese',
+                icon: 'pi pi-stop-circle',
+                command: () => this.navigateTo('presence'),
+              },
+            ]
+          : [
+              {
+                label: 'Recontratación',
+                icon: 'pi pi-replay',
+                command: () => this.navigateToRehire(),
+              },
+            ],
       },
       {
         label: 'Laborales',
         items: [
-          { label: 'Cambiar centro de trabajo', icon: 'pi pi-building', command: () => this.navigateTo('presence') },
-          { label: 'Nuevo contrato', icon: 'pi pi-file-plus', command: () => this.navigateTo('presence') },
+          {
+            label: 'Cambiar centro de trabajo',
+            icon: 'pi pi-building',
+            command: () => this.navigateTo('presence'),
+          },
+          {
+            label: 'Nuevo contrato',
+            icon: 'pi pi-file-plus',
+            command: () => this.navigateTo('presence'),
+          },
           { label: 'Registrar revisión salarial', icon: 'pi pi-chart-line', disabled: true },
         ],
       },
@@ -209,12 +236,24 @@ export class EmployeeOverviewPageComponent {
   });
 
   constructor() {
-    effect(() => { this.contractStore.loadContractsByBusinessKey(this.activeEmployeeKey()); });
-    effect(() => { this.addressStore.loadAddressesByBusinessKey(this.activeEmployeeKey()); });
-    effect(() => { this.laborClassStore.loadLaborClassificationsByBusinessKey(this.activeEmployeeKey()); });
-    effect(() => { this.workingTimeStore.loadWorkingTimesByBusinessKey(this.activeEmployeeKey()); });
-    effect(() => { this.costCenterStore.loadCostCenters(this.activeEmployeeKey()); });
-    effect(() => { this.taxInfoStore.load(this.activeEmployeeKey()); });
+    effect(() => {
+      this.contractStore.loadContractsByBusinessKey(this.activeEmployeeKey());
+    });
+    effect(() => {
+      this.addressStore.loadAddressesByBusinessKey(this.activeEmployeeKey());
+    });
+    effect(() => {
+      this.laborClassStore.loadLaborClassificationsByBusinessKey(this.activeEmployeeKey());
+    });
+    effect(() => {
+      this.workingTimeStore.loadWorkingTimesByBusinessKey(this.activeEmployeeKey());
+    });
+    effect(() => {
+      this.costCenterStore.loadCostCenters(this.activeEmployeeKey());
+    });
+    effect(() => {
+      this.taxInfoStore.load(this.activeEmployeeKey());
+    });
   }
 
   protected navigateTo(section: EmployeeRouteSection): void {

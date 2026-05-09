@@ -110,9 +110,7 @@ describe('EmployeeOverviewPageComponent', () => {
         { contactTypeCode: 'EMAIL', value: 'a@b.com', isPrimary: true },
         { contactTypeCode: 'PHONE', value: '555', isPrimary: false },
       ] as never);
-      mocks.addressStore.addresses = signal([
-        { addressTypeCode: 'HOME' },
-      ] as never);
+      mocks.addressStore.addresses = signal([{ addressTypeCode: 'HOME' }] as never);
       const { fixture } = createFixture(mocks);
 
       const comp = fixture.componentInstance as unknown as {
@@ -128,14 +126,26 @@ describe('EmployeeOverviewPageComponent', () => {
       const mocks = buildMockStores();
       mocks.workCenterStore.workCenters = signal([
         {
-          workCenterAssignmentNumber: 1, workCenterCode: 'MAD', workCenterName: 'Madrid',
-          startDate: '2024-01-01', endDate: null, isActive: true,
-          canDelete: false, startsAtPresenceStart: false, deleteForbiddenReason: null,
+          workCenterAssignmentNumber: 1,
+          workCenterCode: 'MAD',
+          workCenterName: 'Madrid',
+          startDate: '2024-01-01',
+          endDate: null,
+          isActive: true,
+          canDelete: false,
+          startsAtPresenceStart: false,
+          deleteForbiddenReason: null,
         },
         {
-          workCenterAssignmentNumber: 2, workCenterCode: 'BCN', workCenterName: 'Barcelona',
-          startDate: '2023-01-01', endDate: '2023-12-31', isActive: false,
-          canDelete: true, startsAtPresenceStart: false, deleteForbiddenReason: null,
+          workCenterAssignmentNumber: 2,
+          workCenterCode: 'BCN',
+          workCenterName: 'Barcelona',
+          startDate: '2023-01-01',
+          endDate: '2023-12-31',
+          isActive: false,
+          canDelete: true,
+          startsAtPresenceStart: false,
+          deleteForbiddenReason: null,
         },
       ] as never);
       const { fixture } = createFixture(mocks);
@@ -153,9 +163,14 @@ describe('EmployeeOverviewPageComponent', () => {
       const mocks = buildMockStores();
       mocks.workingTimeStore.workingTimes = signal([
         {
-          workingTimeNumber: 1, startDate: '2024-01-01', endDate: null,
-          workingTimePercentage: 100, weeklyHours: 40, dailyHours: 8,
-          monthlyHours: 160, isActive: true,
+          workingTimeNumber: 1,
+          startDate: '2024-01-01',
+          endDate: null,
+          workingTimePercentage: 100,
+          weeklyHours: 40,
+          dailyHours: 8,
+          monthlyHours: 160,
+          isActive: true,
         },
       ] as never);
       const { fixture } = createFixture(mocks);
