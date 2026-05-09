@@ -44,6 +44,8 @@ export function mapDraftToHireRequest(draft: HireEmployeeDraft): HireEmployeeReq
 
 export function mapResponseToResult(response: HireEmployeeResponse): HireEmployeeResult {
   const workingTime = response.workingTime;
+  // Use backend-computed displayName (required: true in OpenAPI), fallback to local computation for robustness
+  const displayName = (response as unknown as { displayName?: string }).displayName ?? buildDisplayName(response);
 
   return {
     employeeKey: {
@@ -51,7 +53,7 @@ export function mapResponseToResult(response: HireEmployeeResponse): HireEmploye
       employeeTypeCode: response.employeeTypeCode,
       employeeNumber: response.employeeNumber,
     },
-    displayName: buildDisplayName(response),
+    displayName,
     hireDate: response.hireDate,
     status: response.status,
     workingTime: workingTime
