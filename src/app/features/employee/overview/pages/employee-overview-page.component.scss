@@ -28,11 +28,11 @@
   border: none;
   border-radius: 8px;
   padding: 8px 14px;
+  font: inherit;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
-  font: inherit;
   transition: opacity 0.12s;
 
   &:hover { opacity: 0.9; }
@@ -47,10 +47,10 @@
   border: 1px solid var(--border-default, #d1d5db);
   border-radius: 8px;
   padding: 8px 12px;
+  font: inherit;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  font: inherit;
   transition: background 0.12s;
 
   &:hover { background: var(--surface-hover, #f9fafb); }
