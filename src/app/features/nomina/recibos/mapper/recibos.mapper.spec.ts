@@ -1,5 +1,5 @@
 import { mapPayrollSummaryResponseToModel, mapPayrollConceptResponseToModel } from './recibos.mapper';
-import { PayrollSummaryResponse, PayrollSummaryResponseStatusEnum } from '../../../../core/api/generated/model/payroll-summary-response';
+import { PayrollSummaryResponse, PayrollSummaryResponsePayrollTypeCodeEnum, PayrollSummaryResponseStatusEnum } from '../../../../core/api/generated/model/payroll-summary-response';
 import { PayrollConceptResponse } from '../../../../core/api/generated/model/payroll-concept-response';
 
 describe('recibos.mapper', () => {
@@ -10,7 +10,7 @@ describe('recibos.mapper', () => {
         employeeTypeCode: 'EMP',
         employeeNumber: 'MAS000001',
         payrollPeriodCode: '202604',
-        payrollTypeCode: 'MENSUAL',
+        payrollTypeCode: PayrollSummaryResponsePayrollTypeCodeEnum.Normal,
         presenceNumber: 1,
         status: PayrollSummaryResponseStatusEnum.Calculated,
         calculatedAt: '2026-04-24T12:00:00',

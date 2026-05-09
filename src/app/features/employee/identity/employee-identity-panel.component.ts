@@ -17,13 +17,16 @@ import { EmployeeDetailStore } from '../data-access/employee-detail.store';
 interface IdentityNavItem {
   section: EmployeeRouteSection;
   label: string;
+  icon: string;
   routeCommands: ReadonlyArray<string>;
-  icon?: string;
 }
 
 @Component({
   selector: 'app-employee-identity-panel',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '[class.identity-panel--collapsed]': 'isOverview()',
+  },
   imports: [
     RouterLink,
     RouterLinkActive,
@@ -40,12 +43,15 @@ export class EmployeeIdentityPanelComponent {
   readonly hireDate = input<string | null>(null);
   readonly status = input<'ACTIVE' | 'TERMINATED'>('TERMINATED');
   readonly isAdmin = input(false);
+  readonly activeSection = input<EmployeeRouteSection>('contact');
 
   protected readonly texts = employeeTexts;
   protected readonly uploadDialogVisible = signal(false);
 
   private readonly photoService = inject(EmployeePhotoService);
   private readonly detailStore = inject(EmployeeDetailStore);
+
+  protected readonly isOverview = computed(() => this.activeSection() === 'overview');
 
   protected readonly initials = computed(() => {
     const name = this.employee()?.displayName ?? '';
@@ -65,26 +71,31 @@ export class EmployeeIdentityPanelComponent {
       {
         section: 'overview',
         label: this.texts.overviewNavLabel,
+        icon: 'pi-home',
         routeCommands: buildEmployeeDetailRouteCommands(key, 'overview'),
       },
       {
         section: 'contact',
         label: this.texts.personalAreaLabel,
+        icon: 'pi-user',
         routeCommands: buildEmployeeDetailRouteCommands(key, 'contact'),
       },
       {
         section: 'presence',
         label: this.texts.laborAreaLabel,
+        icon: 'pi-briefcase',
         routeCommands: buildEmployeeDetailRouteCommands(key, 'presence'),
       },
       {
         section: 'organization',
         label: this.texts.organizationalAreaLabel,
+        icon: 'pi-building',
         routeCommands: buildEmployeeDetailRouteCommands(key, 'organization'),
       },
       {
         section: 'payroll',
         label: this.texts.payrollAreaLabel,
+        icon: 'pi-euro',
         routeCommands: buildEmployeeDetailRouteCommands(key, 'payroll'),
       },
     ] as const;
@@ -100,6 +111,10 @@ export class EmployeeIdentityPanelComponent {
       : this.texts.employeeStatusInactiveLabel,
   );
 
+  protected copyMatricula(): void {
+    void navigator.clipboard.writeText(this.employeeKey().employeeNumber);
+  }
+
   protected openUploadDialog(): void {
     if (!this.isAdmin()) return;
     this.uploadDialogVisible.set(true);
@@ -108,8 +123,6 @@ export class EmployeeIdentityPanelComponent {
   protected onPhotoConfirmed(): void {
     this.detailStore.refreshEmployeeDetailByBusinessKey(this.employeeKey());
   }
-
-  protected copyMatricula(): void {}
 
   protected deletePhoto(): void {
     this.photoService.deletePhoto(this.employeeKey()).subscribe({

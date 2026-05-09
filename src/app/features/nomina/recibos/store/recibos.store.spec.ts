@@ -12,7 +12,7 @@ const MOCK_KEY: PayrollBusinessKey = {
   employeeTypeCode: 'EMP',
   employeeNumber: 'MAS000001',
   payrollPeriodCode: '202604',
-  payrollTypeCode: 'MENSUAL',
+  payrollTypeCode: 'NORMAL',
   presenceNumber: 1,
 };
 

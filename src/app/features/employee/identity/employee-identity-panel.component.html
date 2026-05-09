@@ -76,7 +76,7 @@
         [routerLinkActiveOptions]="{ exact: true }"
         [title]="item.label"
       >
-        <i [class]="'pi identity-panel__nav-icon ' + (item.icon ?? '')"></i>
+        <i [class]="'pi identity-panel__nav-icon ' + item.icon"></i>
         <span class="identity-panel__nav-label">{{ item.label }}</span>
       </a>
     }
