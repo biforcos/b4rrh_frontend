@@ -8,7 +8,6 @@ import { MenuModule } from 'primeng/menu';
 import { ButtonModule } from 'primeng/button';
 import type { MenuItem } from 'primeng/api';
 
-import { UiTagComponent } from '../../../../shared/ui/tag/ui-tag.component';
 import { EmployeeJourneyTimelineComponent } from '../../shell/components/employee-journey-timeline.component';
 import { EmployeeDetailStore } from '../../data-access/employee-detail.store';
 import { EmployeePresenceStore } from '../../data-access/employee-presence.store';
