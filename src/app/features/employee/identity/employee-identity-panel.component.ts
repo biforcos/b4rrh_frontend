@@ -18,6 +18,7 @@ interface IdentityNavItem {
   section: EmployeeRouteSection;
   label: string;
   routeCommands: ReadonlyArray<string>;
+  icon?: string;
 }
 
 @Component({
@@ -107,6 +108,8 @@ export class EmployeeIdentityPanelComponent {
   protected onPhotoConfirmed(): void {
     this.detailStore.refreshEmployeeDetailByBusinessKey(this.employeeKey());
   }
+
+  protected copyMatricula(): void {}
 
   protected deletePhoto(): void {
     this.photoService.deletePhoto(this.employeeKey()).subscribe({

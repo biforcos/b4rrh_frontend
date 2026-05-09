@@ -4,67 +4,65 @@
     <div
       class="identity-panel__avatar"
       [class.identity-panel__avatar--clickable]="isAdmin()"
-      [attr.aria-hidden]="true"
+      [attr.aria-hidden]="!isAdmin() || null"
+      [attr.role]="isAdmin() ? 'button' : null"
+      [attr.aria-label]="isAdmin() ? 'Cambiar foto del empleado' : null"
       (click)="openUploadDialog()"
     >
       @if (photoUrl()) {
         <img class="identity-panel__avatar-photo" [src]="photoUrl()" alt="Foto del empleado" />
         @if (isAdmin()) {
-          <div class="identity-panel__avatar-overlay">
-            <i class="pi pi-pencil"></i>
-          </div>
+          <div class="identity-panel__avatar-overlay"><i class="pi pi-pencil"></i></div>
         }
       } @else {
         {{ initials() }}
         @if (isAdmin()) {
-          <div class="identity-panel__avatar-overlay">
-            <i class="pi pi-camera"></i>
-          </div>
+          <div class="identity-panel__avatar-overlay"><i class="pi pi-camera"></i></div>
         }
       }
+      <div
+        class="identity-panel__status-dot"
+        [class.identity-panel__status-dot--active]="status() === 'ACTIVE'"
+      ></div>
     </div>
 
-    <div class="identity-panel__name-row">
+    <div class="identity-panel__meta">
       <span class="identity-panel__name">{{ employee()?.displayName ?? '—' }}</span>
       <p-tag
-        class="identity-panel__status"
+        class="identity-panel__status-tag"
         [value]="statusLabel()"
         [severity]="statusSeverity()"
       />
     </div>
 
     @if (isAdmin() && photoUrl()) {
-      <button
-        class="identity-panel__delete-photo"
-        type="button"
-        (click)="deletePhoto()"
-      >
+      <button class="identity-panel__delete-photo" type="button" (click)="deletePhoto()">
         ✕ Eliminar foto
       </button>
     }
   </div>
 
-  <!-- Key data fields -->
-  <dl class="identity-panel__fields">
-    <div class="identity-panel__field">
-      <dt class="identity-panel__field-label">{{ texts.employeeConvenioLabel }}</dt>
-      <dd class="identity-panel__field-value">{{ employeeKey().ruleSystemCode }}</dd>
+  <!-- Matrícula hero block -->
+  <div
+    class="identity-panel__mat-block"
+    [class.identity-panel__mat-block--terminated]="status() === 'TERMINATED'"
+  >
+    <span class="identity-panel__mat-label">Matrícula</span>
+    <div class="identity-panel__mat-row">
+      <span class="identity-panel__mat-value">{{ employeeKey().employeeNumber }}</span>
+      <button
+        class="identity-panel__mat-copy"
+        type="button"
+        title="Copiar matrícula"
+        aria-label="Copiar matrícula"
+        (click)="copyMatricula()"
+      >⎘</button>
     </div>
-    <div class="identity-panel__field">
-      <dt class="identity-panel__field-label">{{ texts.employeeTypeLabel }}</dt>
-      <dd class="identity-panel__field-value">{{ employeeKey().employeeTypeCode }}</dd>
-    </div>
-    <div class="identity-panel__field">
-      <dt class="identity-panel__field-label">{{ texts.employeeNumberLabel }}</dt>
-      <dd class="identity-panel__field-value identity-panel__field-value--mono">{{ employeeKey().employeeNumber }}</dd>
-    </div>
-    @if (hireDate()) {
-      <div class="identity-panel__field">
-        <dt class="identity-panel__field-label">{{ texts.employeeFechaAltaLabel }}</dt>
-        <dd class="identity-panel__field-value">{{ hireDate() }}</dd>
-      </div>
-    }
-  </dl>
+  </div>
+
+  @if (hireDate()) {
+    <div class="identity-panel__hire-date">Alta: {{ hireDate() }}</div>
+  }
 
   <div class="identity-panel__divider"></div>
 
@@ -76,12 +74,15 @@
         [routerLink]="item.routeCommands"
         routerLinkActive="active"
         [routerLinkActiveOptions]="{ exact: true }"
-      >{{ item.label }}</a>
+        [title]="item.label"
+      >
+        <i [class]="'pi identity-panel__nav-icon ' + (item.icon ?? '')"></i>
+        <span class="identity-panel__nav-label">{{ item.label }}</span>
+      </a>
     }
   </nav>
 </div>
 
-<!-- Photo upload dialog -->
 @if (isAdmin()) {
   <app-employee-photo-upload-dialog
     [employeeKey]="employeeKey()"
