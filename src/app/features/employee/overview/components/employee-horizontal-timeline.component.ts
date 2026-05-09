@@ -14,13 +14,18 @@ import {
   EmployeeJourneyModel,
 } from '../../models/employee-journey.model';
 
+interface GroupedEvent {
+  title: string;
+  subtitle: string | null;
+  color: string;
+}
+
 interface TimelineNode {
   id: string;
   type: 'event' | 'today' | 'year';
   date: string;
   label?: string;
-  title: string;
-  subtitle: string | null;
+  events: GroupedEvent[];
   color: string;
   dotBg: string;
   dotText: string;
@@ -53,7 +58,10 @@ function resolveEventStyle(ev: EmployeeJourneyEventModel): EventStyle {
   if (
     t.includes(' hire') ||
     t.includes('alta') ||
-    (track === 'PRESENCE' && !t.includes('baja') && !t.includes('terminat') && !t.includes('finish'))
+    (track === 'PRESENCE' &&
+      !t.includes('baja') &&
+      !t.includes('terminat') &&
+      !t.includes('finish'))
   ) {
     return { color: '#059669', dotBg: 'rgba(5,150,105,0.12)', dotText: '#059669', icon: '✦' };
   }
@@ -66,7 +74,12 @@ function resolveEventStyle(ev: EmployeeJourneyEventModel): EventStyle {
   ) {
     return { color: '#4f46e5', dotBg: 'rgba(79,70,229,0.12)', dotText: '#4f46e5', icon: '⇄' };
   }
-  if (t.includes('salary') || t.includes('salario') || t.includes('salarial') || t.includes('wage')) {
+  if (
+    t.includes('salary') ||
+    t.includes('salario') ||
+    t.includes('salarial') ||
+    t.includes('wage')
+  ) {
     return { color: '#d97706', dotBg: 'rgba(217,119,6,0.12)', dotText: '#d97706', icon: '€' };
   }
   if (
@@ -79,6 +92,17 @@ function resolveEventStyle(ev: EmployeeJourneyEventModel): EventStyle {
     return { color: '#dc2626', dotBg: 'rgba(220,38,38,0.12)', dotText: '#dc2626', icon: '✕' };
   }
   return DEFAULT_STYLE;
+}
+
+// Priority order for the dot icon when multiple events share a date
+const ICON_PRIORITY = ['✦', '✕', '⇄', '€'];
+
+function dominantStyle(styles: EventStyle[]): EventStyle {
+  for (const icon of ICON_PRIORITY) {
+    const match = styles.find((s) => s.icon === icon);
+    if (match) return match;
+  }
+  return styles[0] ?? DEFAULT_STYLE;
 }
 
 function todayIsoString(): string {
@@ -115,51 +139,61 @@ export class EmployeeHorizontalTimelineComponent {
     const events = this.journey()?.events ?? [];
     const sorted = [...events].sort((a, b) => a.eventDate.localeCompare(b.eventDate));
 
+    // Group events by date (Map preserves insertion order → chronological)
+    const byDate = new Map<string, EmployeeJourneyEventModel[]>();
+    for (const ev of sorted) {
+      if (!byDate.has(ev.eventDate)) byDate.set(ev.eventDate, []);
+      byDate.get(ev.eventDate)!.push(ev);
+    }
+
     const result: TimelineNode[] = [];
     let lastYear = '';
-    let eventIndex = 0;
+    let groupIndex = 0;
     let todayInserted = false;
 
-    for (const ev of sorted) {
-      if (!todayInserted && ev.eventDate > this.todayStr) {
+    for (const [date, evs] of byDate) {
+      if (!todayInserted && date > this.todayStr) {
         result.push(this.buildTodayNode());
         todayInserted = true;
       }
 
-      const year = ev.eventDate.slice(0, 4);
+      const year = date.slice(0, 4);
       if (year !== lastYear) {
         result.push({
           id: `__year__${year}`,
           type: 'year',
-          date: ev.eventDate,
+          date,
           label: year,
-          title: year,
-          subtitle: null,
+          events: [],
           color: '',
           dotBg: '',
           dotText: '',
           icon: '',
           above: false,
-          isPast: ev.eventDate <= this.todayStr,
+          isPast: date <= this.todayStr,
         });
         lastYear = year;
       }
 
-      const style = resolveEventStyle(ev);
+      const styles = evs.map(resolveEventStyle);
+      const dominant = dominantStyle(styles);
       result.push({
-        id: `${ev.eventDate}-${ev.eventType}-${eventIndex}`,
+        id: `${date}-${groupIndex}`,
         type: 'event',
-        date: ev.eventDate,
-        title: ev.title,
-        subtitle: ev.subtitle,
-        color: style.color,
-        dotBg: style.dotBg,
-        dotText: style.dotText,
-        icon: style.icon,
-        above: eventIndex % 2 === 0,
-        isPast: ev.eventDate <= this.todayStr,
+        date,
+        events: evs.map((ev, i) => ({
+          title: ev.title,
+          subtitle: ev.subtitle ?? null,
+          color: styles[i].color,
+        })),
+        color: dominant.color,
+        dotBg: dominant.dotBg,
+        dotText: dominant.dotText,
+        icon: dominant.icon,
+        above: groupIndex % 2 === 0,
+        isPast: date <= this.todayStr,
       });
-      eventIndex++;
+      groupIndex++;
     }
 
     if (!todayInserted) {
@@ -184,8 +218,7 @@ export class EmployeeHorizontalTimelineComponent {
       id: '__today__',
       type: 'today',
       date: this.todayStr,
-      title: 'HOY',
-      subtitle: null,
+      events: [],
       color: '#111827',
       dotBg: '#111827',
       dotText: '#fff',

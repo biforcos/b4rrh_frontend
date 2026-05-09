@@ -17,7 +17,9 @@ export interface EmployeeDetailReadModel {
 
 const pendingWorkCenterLabel = 'Pending assignment';
 
-export function mapEmployeeReadApiToDetailModel(source: EmployeeReadApiModel): EmployeeDetailReadModel {
+export function mapEmployeeReadApiToDetailModel(
+  source: EmployeeReadApiModel,
+): EmployeeDetailReadModel {
   return {
     id: source.id,
     ruleSystemCode: source.ruleSystemCode,

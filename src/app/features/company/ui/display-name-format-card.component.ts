@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, OnChanges, SimpleChanges, inject, input, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnChanges,
+  SimpleChanges,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { SelectModule } from 'primeng/select';
 import { ButtonModule } from 'primeng/button';
@@ -22,7 +30,7 @@ export class DisplayNameFormatCardComponent implements OnChanges {
 
   private readonly client = inject(EmployeeDisplayNameFormatClient);
 
-  protected readonly formatOptions = DISPLAY_NAME_FORMAT_CODES.map(f => ({
+  protected readonly formatOptions = DISPLAY_NAME_FORMAT_CODES.map((f) => ({
     label: `${f.label} — ${f.example}`,
     value: f.code,
   }));

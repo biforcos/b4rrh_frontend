@@ -22,20 +22,18 @@ export class EmployeePhotoService {
       })
       .pipe(
         switchMap(({ uploadUrl, objectKey }) =>
-          this.http
-            .put(uploadUrl!, blob, { headers: { 'Content-Type': 'image/jpeg' } })
-            .pipe(
-              switchMap(() =>
-                this.api
-                  .confirmEmployeePhoto({
-                    ruleSystemCode: key.ruleSystemCode,
-                    employeeTypeCode: key.employeeTypeCode,
-                    employeeNumber: key.employeeNumber,
-                    confirmEmployeePhotoRequest: { objectKey: objectKey! },
-                  })
-                  .pipe(map((r) => this.toApiModel(r))),
-              ),
+          this.http.put(uploadUrl!, blob, { headers: { 'Content-Type': 'image/jpeg' } }).pipe(
+            switchMap(() =>
+              this.api
+                .confirmEmployeePhoto({
+                  ruleSystemCode: key.ruleSystemCode,
+                  employeeTypeCode: key.employeeTypeCode,
+                  employeeNumber: key.employeeNumber,
+                  confirmEmployeePhotoRequest: { objectKey: objectKey! },
+                })
+                .pipe(map((r) => this.toApiModel(r))),
             ),
+          ),
         ),
       );
   }
