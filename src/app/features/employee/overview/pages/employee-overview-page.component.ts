@@ -9,6 +9,7 @@ import { ButtonModule } from 'primeng/button';
 import type { MenuItem } from 'primeng/api';
 
 import { UiTagComponent } from '../../../../shared/ui/tag/ui-tag.component';
+import { EmployeeJourneyTimelineComponent } from '../../shell/components/employee-journey-timeline.component';
 import { EmployeeDetailStore } from '../../data-access/employee-detail.store';
 import { EmployeePresenceStore } from '../../data-access/employee-presence.store';
 import { EmployeeContractStore } from '../../data-access/employee-contract.store';
@@ -32,7 +33,7 @@ import {
 @Component({
   selector: 'app-employee-overview-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [UiTagComponent, DatePipe, MenuModule, ButtonModule],
+  imports: [DatePipe, MenuModule, ButtonModule, EmployeeJourneyTimelineComponent],
   templateUrl: './employee-overview-page.component.html',
   styleUrl: './employee-overview-page.component.scss',
 })
