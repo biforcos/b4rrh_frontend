@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { TagModule } from 'primeng/tag';
 import { ButtonModule } from 'primeng/button';
@@ -44,6 +44,8 @@ export class EmployeeIdentityPanelComponent {
   readonly status = input<'ACTIVE' | 'TERMINATED'>('TERMINATED');
   readonly isAdmin = input(false);
   readonly activeSection = input<EmployeeRouteSection>('contact');
+
+  readonly editIdentityRequested = output<void>();
 
   protected readonly texts = employeeTexts;
   protected readonly uploadDialogVisible = signal(false);
@@ -110,6 +112,10 @@ export class EmployeeIdentityPanelComponent {
       ? this.texts.employeeStatusActiveLabel
       : this.texts.employeeStatusInactiveLabel,
   );
+
+  protected requestEditIdentity(): void {
+    this.editIdentityRequested.emit();
+  }
 
   protected copyMatricula(): void {
     void navigator.clipboard.writeText(this.employeeKey().employeeNumber);

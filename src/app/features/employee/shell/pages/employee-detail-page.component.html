@@ -18,6 +18,7 @@
         [status]="headerStatus()"
         [isAdmin]="isAdmin()"
         [activeSection]="activeDetailSection()"
+        (editIdentityRequested)="openIdentityEditorFromHeader()"
       />
 
       <!-- Content area (right column) -->
