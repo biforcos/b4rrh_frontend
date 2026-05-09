@@ -27,22 +27,9 @@ export function mapEmployeeReadApiToDetailModel(source: EmployeeReadApiModel): E
     lastName1: source.lastName1,
     lastName2: source.lastName2,
     preferredName: source.preferredName,
-    displayName: buildDisplayName(source),
+    displayName: source.displayName,
     statusLabel: source.status,
     workCenter: pendingWorkCenterLabel,
     photoUrl: source.photoUrl ?? null,
   };
-}
-
-function buildDisplayName(source: EmployeeReadApiModel): string {
-  const preferredName = source.preferredName?.trim();
-  if (preferredName) {
-    return preferredName;
-  }
-
-  const nameParts = [source.firstName, source.lastName1, source.lastName2 ?? '']
-    .map((part) => part.trim())
-    .filter((part) => part.length > 0);
-
-  return nameParts.join(' ');
 }
