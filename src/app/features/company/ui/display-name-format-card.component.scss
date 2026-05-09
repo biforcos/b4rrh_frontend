@@ -1,0 +1,93 @@
+.dnf-card {
+  background: var(--surface-card, #fff);
+  border: 1px solid var(--border-default, #e5e7eb);
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.dnf-card__header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dnf-card__title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary, #111827);
+  margin: 0;
+}
+
+.dnf-card__description {
+  font-size: 13px;
+  color: var(--text-secondary, #6b7280);
+  margin: 0;
+}
+
+.dnf-card__loading {
+  font-size: 13px;
+  color: var(--text-tertiary, #9ca3af);
+}
+
+.dnf-card__form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dnf-card__label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary, #6b7280);
+}
+
+.dnf-card__select {
+  width: 100%;
+}
+
+.dnf-card__preview {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dnf-card__preview-label {
+  font-size: 11px;
+  color: var(--text-tertiary, #9ca3af);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.dnf-card__preview-value {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary, #111827);
+  font-family: 'Courier New', monospace;
+}
+
+.dnf-card__hint {
+  font-size: 12px;
+  color: var(--text-tertiary, #9ca3af);
+  font-style: italic;
+  margin: 0;
+}
+
+.dnf-card__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dnf-card__success {
+  font-size: 13px;
+  color: #059669;
+  font-weight: 500;
+}
+
+.dnf-card__error {
+  font-size: 13px;
+  color: #dc2626;
+}

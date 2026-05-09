@@ -1,0 +1,51 @@
+<div class="dnf-card">
+  <div class="dnf-card__header">
+    <h3 class="dnf-card__title">Formato de nombre normativo</h3>
+    <p class="dnf-card__description">Cómo se presenta el nombre de los empleados en toda la aplicación</p>
+  </div>
+
+  @if (loading()) {
+    <p class="dnf-card__loading">Cargando configuración...</p>
+  } @else {
+    <div class="dnf-card__form">
+      <label class="dnf-card__label" for="dnf-select">Formato</label>
+      <p-select
+        inputId="dnf-select"
+        [options]="formatOptions"
+        [ngModel]="selectedCode()"
+        (ngModelChange)="onFormatChange($event)"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Selecciona un formato"
+        styleClass="dnf-card__select"
+      />
+    </div>
+
+    @if (currentFormat(); as fmt) {
+      <div class="dnf-card__preview">
+        <span class="dnf-card__preview-label">Ejemplo actual:</span>
+        <span class="dnf-card__preview-value">{{ fmt.example }}</span>
+      </div>
+    } @else {
+      <p class="dnf-card__hint">Sin formato configurado — se usará el nombre completo por defecto.</p>
+    }
+
+    <div class="dnf-card__actions">
+      <button
+        type="button"
+        pButton
+        label="Guardar formato"
+        [loading]="saving()"
+        [disabled]="saving()"
+        (click)="save()"
+      ></button>
+
+      @if (saveSuccess()) {
+        <span class="dnf-card__success">Guardado correctamente</span>
+      }
+      @if (saveError(); as err) {
+        <span class="dnf-card__error">{{ err }}</span>
+      }
+    </div>
+  }
+</div>

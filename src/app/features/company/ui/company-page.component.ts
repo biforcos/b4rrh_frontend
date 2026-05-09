@@ -6,6 +6,7 @@ import { CompanyBusinessKey } from '../models/company-ui-state.model';
 import { CompanyFormValue } from '../models/company-form-value.model';
 import { CompanyListComponent } from './company-list.component';
 import { CompanyDetailPanelComponent } from './company-detail-panel.component';
+import { DisplayNameFormatCardComponent } from './display-name-format-card.component';
 import { MasterDetailPageShellComponent } from '../../../shared/ui/master-detail-page-shell/master-detail-page-shell.component';
 import { SectionCardComponent } from '../../../shared/ui/section-card/section-card.component';
 
@@ -18,6 +19,7 @@ import { SectionCardComponent } from '../../../shared/ui/section-card/section-ca
     SectionCardComponent,
     CompanyListComponent,
     CompanyDetailPanelComponent,
+    DisplayNameFormatCardComponent,
   ],
   templateUrl: './company-page.component.html',
   styleUrl: './company-page.component.scss',
