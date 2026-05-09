@@ -73,12 +73,12 @@ export const employeeRoutes: Routes = [
       {
         path: '',
         pathMatch: 'full',
-        redirectTo: 'contact',
+        redirectTo: 'overview',
       },
       {
         path: ':section',
         pathMatch: 'full',
-        redirectTo: 'contact',
+        redirectTo: 'overview',
       },
     ],
   },
