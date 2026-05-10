@@ -24,17 +24,17 @@ export class EmployeeNumberingConfigClient {
 
   get(ruleSystemCode: string): Observable<EmployeeNumberingConfig> {
     return this.http.get<EmployeeNumberingConfig>(
-      `/api/rule-systems/${ruleSystemCode}/employee-numbering-config`
+      `/api/rule-systems/${ruleSystemCode}/employee-numbering-config`,
     );
   }
 
   upsert(
     ruleSystemCode: string,
-    request: UpsertEmployeeNumberingConfigRequest
+    request: UpsertEmployeeNumberingConfigRequest,
   ): Observable<EmployeeNumberingConfig> {
     return this.http.put<EmployeeNumberingConfig>(
       `/api/rule-systems/${ruleSystemCode}/employee-numbering-config`,
-      request
+      request,
     );
   }
 }
