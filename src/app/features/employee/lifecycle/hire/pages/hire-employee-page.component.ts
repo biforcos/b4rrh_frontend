@@ -72,7 +72,6 @@ export class HireEmployeePageComponent {
 
   readonly form = this.fb.group({
     ruleSystemCode: ['', Validators.required],
-    employeeNumber: ['', Validators.required],
     firstName: ['', Validators.required],
     lastName1: ['', Validators.required],
     lastName2: [''],

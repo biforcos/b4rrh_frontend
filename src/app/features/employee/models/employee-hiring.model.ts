@@ -22,7 +22,6 @@ export interface HireEmployeeWorkingTimeResult {
 export interface HireEmployeeDraft {
   ruleSystemCode: string;
   employeeTypeCode?: string;
-  employeeNumber: string;
   firstName: string;
   lastName1: string;
   lastName2: string;
