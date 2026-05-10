@@ -14,7 +14,6 @@ export function mapDraftToHireRequest(draft: HireEmployeeDraft): HireEmployeeReq
   return {
     ruleSystemCode: draft.ruleSystemCode,
     employeeTypeCode: draft.employeeTypeCode || HIRE_EMPLOYEE_DEFAULTS.employeeTypeCode,
-    employeeNumber: draft.employeeNumber,
     firstName: draft.firstName,
     lastName1: draft.lastName1,
     lastName2: draft.lastName2 || null,

@@ -36,6 +36,7 @@
           (cancelled)="onFormCancel()"
         />
         <app-display-name-format-card [ruleSystemCode]="store.selectedKey()!.ruleSystemCode" />
+        <app-employee-numbering-config-card [ruleSystemCode]="store.selectedKey()!.ruleSystemCode" />
       }
     } @else {
       <app-section-card [title]="texts.detailPanelTitle">
