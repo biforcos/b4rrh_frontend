@@ -19,7 +19,7 @@ export const appConfig: ApplicationConfig = {
       theme: {
         preset: b4rrhhPrimeNgThemePreset,
         options: {
-          darkModeSelector: false,
+          darkModeSelector: '[data-theme="dark"]',
         },
       },
     }),

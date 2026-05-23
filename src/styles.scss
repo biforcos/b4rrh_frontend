@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;600;700&display=swap');
 
 :root {
   --font-body: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
@@ -123,4 +123,64 @@ button, input, textarea, select {
   background: var(--accent-muted) !important;
   border: 1px solid var(--accent-border) !important;
   color: var(--accent-primary) !important;
+}
+
+/* ──────────────────────────────────────────
+   Dark mode tokens  (data-theme="dark")
+   ────────────────────────────────────────── */
+[data-theme="dark"] {
+  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+
+  /* Surfaces */
+  --surface-app:          #0b0f1a;
+  --surface-panel:        #0f172a;
+  --surface-card:         #111827;
+  --surface-raised:       #1e293b;
+  --surface-hover:        #141f2e;
+
+  /* Borders */
+  --border-default:       #1e293b;
+  --border-strong:        #334155;
+  --border-accent:        rgba(99, 102, 241, 0.35);
+
+  /* Text */
+  --text-primary:         #f8fafc;
+  --text-secondary:       #94a3b8;
+  --text-tertiary:        #64748b;
+  --text-muted:           #475569;
+  --text-accent:          #a5b4fc;
+
+  /* Accent indigo */
+  --accent-primary:       #6366f1;
+  --accent-primary-hover: #4f46e5;
+  --accent-light:         #818cf8;
+  --accent-muted:         rgba(99, 102, 241, 0.12);
+  --accent-border:        rgba(99, 102, 241, 0.3);
+
+  /* Semantic */
+  --success-bg:           rgba(16, 185, 129, 0.12);
+  --success-border:       rgba(16, 185, 129, 0.25);
+  --success-text:         #34d399;
+  --warning-bg:           rgba(245, 158, 11, 0.12);
+  --warning-text:         #fbbf24;
+  --error-bg:             rgba(239, 68, 68, 0.12);
+  --error-text:           #f87171;
+  --neutral-bg:           rgba(100, 116, 139, 0.1);
+  --neutral-text:         #64748b;
+
+  /* Shadows */
+  --shadow-card:          0 1px 3px rgba(0,0,0,0.4);
+  --shadow-md:            0 4px 12px rgba(0,0,0,0.5);
+  --shadow-lg:            0 8px 24px rgba(0,0,0,0.6);
+
+  /* Radii */
+  --radius-sm:  6px;
+  --radius-md:  10px;
+  --radius-lg:  14px;
+}
+
+/* Dark body background */
+[data-theme="dark"] body {
+  background: var(--surface-app);
+  color: var(--text-primary);
 }
