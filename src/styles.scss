@@ -3,6 +3,7 @@
 :root {
   --font-body: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
   --font-heading: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
 
   /* Surfaces */
   --surface-app:        #f1f5f9;
@@ -137,6 +138,8 @@ button, input, textarea, select {
   --surface-card:         #111827;
   --surface-raised:       #1e293b;
   --surface-hover:        #141f2e;
+  --surface-muted:        #0f172a;
+  --surface-accent:       rgba(99, 102, 241, 0.08);
 
   /* Borders */
   --border-default:       #1e293b;
@@ -170,13 +173,14 @@ button, input, textarea, select {
 
   /* Shadows */
   --shadow-card:          0 1px 3px rgba(0,0,0,0.4);
+  --shadow-panel:         0 4px 12px rgba(0,0,0,0.5);
   --shadow-md:            0 4px 12px rgba(0,0,0,0.5);
   --shadow-lg:            0 8px 24px rgba(0,0,0,0.6);
 
   /* Radii */
   --radius-sm:  6px;
-  --radius-md:  10px;
-  --radius-lg:  14px;
+  --radius-md:  8px;
+  --radius-lg:  12px;
 }
 
 /* Dark body background */
