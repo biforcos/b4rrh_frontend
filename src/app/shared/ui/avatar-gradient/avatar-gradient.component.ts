@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
-const GRADIENTS: [string, string][] = [
+const GRADIENTS: readonly [string, string][] = [
   ['#6366f1', '#818cf8'],
   ['#ec4899', '#f43f5e'],
   ['#f59e0b', '#ef4444'],

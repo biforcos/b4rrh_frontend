@@ -64,4 +64,32 @@ describe('AvatarGradientComponent', () => {
 
     expect(bg1).toBe(bg2);
   });
+
+  it('applies md size class by default', () => {
+    fixture.componentRef.setInput('initials', 'JG');
+    fixture.detectChanges();
+    const el = fixture.debugElement.query(By.css('.avatar--md'));
+    expect(el).toBeTruthy();
+  });
+
+  it('applies lg size class', () => {
+    fixture.componentRef.setInput('initials', 'JG');
+    fixture.componentRef.setInput('size', 'lg');
+    fixture.detectChanges();
+    const el = fixture.debugElement.query(By.css('.avatar--lg'));
+    expect(el).toBeTruthy();
+  });
+
+  it('clears background gradient when photoUrl is provided', () => {
+    fixture.componentRef.setInput('initials', 'JG');
+    fixture.componentRef.setInput('photoUrl', 'https://example.com/photo.jpg');
+    fixture.detectChanges();
+    const el = fixture.debugElement.query(By.css('.avatar')).nativeElement as HTMLElement;
+    expect(el.style.background).toBeFalsy();
+  });
+
+  it('does not crash with empty initials string', () => {
+    fixture.componentRef.setInput('initials', '');
+    expect(() => fixture.detectChanges()).not.toThrow();
+  });
 });
