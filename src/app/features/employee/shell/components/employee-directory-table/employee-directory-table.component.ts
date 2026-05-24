@@ -121,7 +121,7 @@ function statusDisplayLabel(statusLabel: string): string {
     }
     .dir-table__th--avatar { width: 52px; padding-right: 0; }
     .dir-table__row {
-      border-bottom: 1px solid var(--surface-card, #111827);
+      border-bottom: 1px solid var(--surface-card);
       cursor: pointer;
       transition: background 0.1s;
     }
