@@ -1,8 +1,10 @@
 <div class="employee-directory">
 
-  <!-- Page header -->
   <header class="employee-directory__header">
-    <h1 class="employee-directory__title">{{ texts.masterTitle }}</h1>
+    <div>
+      <h1 class="employee-directory__title">{{ texts.masterTitle }}</h1>
+      <p class="employee-directory__subtitle">{{ filteredTableData().length }} personas</p>
+    </div>
     <app-ui-button
       [label]="texts.hireEmployeeTitle"
       icon="pi pi-plus"
@@ -10,12 +12,10 @@
     />
   </header>
 
-  <!-- Search -->
-  <div class="employee-directory__search-row">
-    <p-iconfield class="employee-directory__search-field">
-      <p-inputicon styleClass="pi pi-search" />
+  <div class="employee-directory__toolbar">
+    <div class="employee-directory__search">
+      <span class="employee-directory__search-icon">🔍</span>
       <input
-        pInputText
         class="employee-directory__search-input"
         type="text"
         [attr.aria-label]="texts.searchLabel"
@@ -23,54 +23,42 @@
         [value]="searchValue()"
         (input)="updateSearch($any($event.target).value)"
       />
-    </p-iconfield>
-    <span class="employee-directory__count">{{ tableData().length }} empleados</span>
+    </div>
+
+    <div class="employee-directory__filters">
+      <button
+        class="employee-directory__filter-chip"
+        [class.employee-directory__filter-chip--active]="filterStatus() === 'all'"
+        (click)="filterStatus.set('all')"
+      >
+        Todos
+        <span class="employee-directory__filter-count">{{ tableData().length }}</span>
+      </button>
+      <button
+        class="employee-directory__filter-chip"
+        [class.employee-directory__filter-chip--active]="filterStatus() === 'active'"
+        (click)="filterStatus.set('active')"
+      >
+        Activos
+      </button>
+      <button
+        class="employee-directory__filter-chip"
+        [class.employee-directory__filter-chip--active]="filterStatus() === 'inactive'"
+        (click)="filterStatus.set('inactive')"
+      >
+        Bajas
+      </button>
+    </div>
   </div>
 
-  <!-- DataTable -->
-  <div class="employee-directory__table-wrapper">
-    @if (error()) {
-      <p class="employee-directory__error">{{ texts.directoryLoadFailedMessage }}</p>
-    }
+  @if (error()) {
+    <p class="employee-directory__error">{{ texts.directoryLoadFailedMessage }}</p>
+  }
 
-    <p-table
-      [value]="tableData()"
-      [loading]="loading()"
-      [rows]="50"
-      [paginator]="tableData().length > 50"
-      styleClass="employee-directory__table"
-    >
-      <ng-template pTemplate="header">
-        <tr>
-          <th class="employee-directory__th">{{ texts.employeeNameColumnLabel }}</th>
-          <th class="employee-directory__th">{{ texts.employeeClaveColumnLabel }}</th>
-          <th class="employee-directory__th">{{ texts.employeeTypeColumnLabel }}</th>
-          <th class="employee-directory__th">{{ texts.employeeConvenioColumnLabel }}</th>
-          <th class="employee-directory__th">{{ texts.employeeStatusColumnLabel }}</th>
-        </tr>
-      </ng-template>
-      <ng-template pTemplate="body" let-employee>
-        <tr class="employee-directory__row" (click)="openEmployee(employee)" role="button" tabindex="0" (keydown.enter)="openEmployee(employee)">
-          <td class="employee-directory__td employee-directory__td--name">{{ employee.displayName }}</td>
-          <td class="employee-directory__td employee-directory__td--mono">{{ employee.employeeNumber }}</td>
-          <td class="employee-directory__td">{{ employee.employeeTypeCode }}</td>
-          <td class="employee-directory__td">{{ employee.ruleSystemCode }}</td>
-          <td class="employee-directory__td">
-            <app-ui-tag
-              [value]="resolveStatusLabel(employee.statusLabel)"
-              [severity]="resolveStatusSeverity(employee.statusLabel)"
-            />
-          </td>
-        </tr>
-      </ng-template>
-      <ng-template pTemplate="emptymessage">
-        <tr>
-          <td colspan="5" class="employee-directory__empty">
-            {{ searchValue() ? texts.noResultEmployeesTitle : texts.emptyDirectoryTitle }}
-          </td>
-        </tr>
-      </ng-template>
-    </p-table>
-  </div>
+  <app-employee-directory-table
+    [items]="filteredTableData()"
+    [loading]="loading()"
+    (employeeClicked)="openEmployee($event)"
+  />
 
 </div>

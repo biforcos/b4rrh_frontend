@@ -1,12 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TableModule } from 'primeng/table';
-import { InputTextModule } from 'primeng/inputtext';
-import { IconFieldModule } from 'primeng/iconfield';
-import { InputIconModule } from 'primeng/inputicon';
 
-import { UiTagComponent } from '../../../../shared/ui/tag/ui-tag.component';
 import { UiButtonComponent } from '../../../../shared/ui/button/ui-button.component';
+import { EmployeeDirectoryTableComponent } from '../components/employee-directory-table/employee-directory-table.component';
 import { EmployeeDirectoryStore } from '../../data-access/employee-directory.store';
 import { EmployeeRecentsService } from '../../data-access/employee-recents.service';
 import { employeeTexts } from '../../employee.texts';
@@ -19,12 +15,8 @@ import { toEmployeeBusinessKey } from '../../routing/employee-route-key.util';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    TableModule,
-    InputTextModule,
-    IconFieldModule,
-    InputIconModule,
-    UiTagComponent,
     UiButtonComponent,
+    EmployeeDirectoryTableComponent,
   ],
   templateUrl: './employee-shell-page.component.html',
   styleUrl: './employee-shell-page.component.scss',
@@ -37,10 +29,23 @@ export class EmployeeShellPageComponent {
 
   protected readonly texts = employeeTexts;
   protected readonly searchValue = signal('');
+  protected readonly filterStatus = signal<'all' | 'active' | 'inactive'>('all');
   protected readonly loading = this.directoryStore.loading;
   protected readonly error = this.directoryStore.error;
 
   protected readonly tableData = computed(() => [...this.directoryStore.filteredEmployees()]);
+
+  protected readonly filteredTableData = computed(() => {
+    const all = this.tableData();
+    const f = this.filterStatus();
+    if (f === 'all') return all;
+    if (f === 'active') return all.filter(
+      (e) => e.statusLabel.toLowerCase().includes('active') || e.statusLabel.toLowerCase().includes('alta'),
+    );
+    return all.filter(
+      (e) => !e.statusLabel.toLowerCase().includes('active') && !e.statusLabel.toLowerCase().includes('alta'),
+    );
+  });
 
   protected updateSearch(value: string): void {
     this.searchValue.set(value);
@@ -56,19 +61,5 @@ export class EmployeeShellPageComponent {
 
   protected onHireClick(): void {
     void this.router.navigate(['hire'], { relativeTo: this.route });
-  }
-
-  protected resolveStatusLabel(statusLabel: string): string {
-    const n = statusLabel.trim().toLowerCase();
-    if (n.includes('active') || n.includes('alta')) return this.texts.employeeStatusActiveLabel;
-    if (n.includes('pending') || n.includes('draft')) return this.texts.employeeStatusPendingLabel;
-    return this.texts.employeeStatusInactiveLabel;
-  }
-
-  protected resolveStatusSeverity(statusLabel: string): 'success' | 'secondary' | 'warn' {
-    const n = statusLabel.trim().toLowerCase();
-    if (n.includes('active') || n.includes('alta')) return 'success';
-    if (n.includes('pending') || n.includes('draft')) return 'warn';
-    return 'secondary';
   }
 }
