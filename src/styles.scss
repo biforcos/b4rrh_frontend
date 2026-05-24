@@ -132,22 +132,22 @@ button, input, textarea, select {
 [data-theme="dark"] {
   --font-mono: 'JetBrains Mono', 'Courier New', monospace;
 
-  /* Surfaces */
-  --surface-app:          #0b0f1a;
-  --surface-panel:        #0f172a;
-  --surface-card:         #111827;
-  --surface-raised:       #1e293b;
-  --surface-hover:        #141f2e;
-  --surface-muted:        #0f172a;
-  --surface-accent:       rgba(99, 102, 241, 0.08);
+  /* Surfaces — shifted one notch lighter vs. previous pitch-black palette */
+  --surface-app:          #0d1117;   /* was #0b0f1a */
+  --surface-panel:        #161b2e;   /* was #0f172a */
+  --surface-card:         #1a2540;   /* was #111827 */
+  --surface-raised:       #1e2d45;   /* was #1e293b */
+  --surface-hover:        #192235;   /* was #141f2e */
+  --surface-muted:        #161b2e;   /* was #0f172a */
+  --surface-accent:       rgba(99, 102, 241, 0.10);
 
-  /* Borders */
-  --border-default:       #1e293b;
-  --border-strong:        #334155;
+  /* Borders — slightly more visible to compensate for lighter surfaces */
+  --border-default:       #1d2d44;   /* was #1e293b */
+  --border-strong:        #2d4060;   /* was #334155 */
   --border-accent:        rgba(99, 102, 241, 0.35);
 
   /* Text */
-  --text-primary:         #f8fafc;
+  --text-primary:         #f1f5f9;
   --text-secondary:       #94a3b8;
   --text-tertiary:        #64748b;
   --text-muted:           #475569;
@@ -172,10 +172,10 @@ button, input, textarea, select {
   --neutral-text:         #64748b;
 
   /* Shadows */
-  --shadow-card:          0 1px 3px rgba(0,0,0,0.4);
-  --shadow-panel:         0 4px 12px rgba(0,0,0,0.5);
-  --shadow-md:            0 4px 12px rgba(0,0,0,0.5);
-  --shadow-lg:            0 8px 24px rgba(0,0,0,0.6);
+  --shadow-card:          0 1px 3px rgba(0,0,0,0.35);
+  --shadow-panel:         0 4px 12px rgba(0,0,0,0.4);
+  --shadow-md:            0 4px 12px rgba(0,0,0,0.4);
+  --shadow-lg:            0 8px 24px rgba(0,0,0,0.5);
 
   /* Radii */
   --radius-sm:  6px;
