@@ -4,28 +4,25 @@
   <nav class="employee-detail__breadcrumb" aria-label="Breadcrumb">
     <a class="employee-detail__breadcrumb-link" routerLink="/personas/empleados">{{ texts.masterTitle }}</a>
     <span class="employee-detail__breadcrumb-sep" aria-hidden="true">›</span>
-    <span class="employee-detail__breadcrumb-current">{{ selectedEmployee()?.displayName ?? '...' }}</span>
+    <span class="employee-detail__breadcrumb-current">{{ selectedEmployeeDetail()?.displayName ?? '...' }}</span>
   </nav>
 
   @if (activeEmployeeKey(); as key) {
     <div class="employee-detail__body">
 
-      <!-- Identity panel (left column) -->
-      <app-employee-identity-panel
-        [employeeKey]="key"
-        [employee]="selectedEmployee()"
-        [hireDate]="headerHireDate()"
-        [status]="headerStatus()"
-        [isAdmin]="isAdmin()"
-        [activeSection]="activeDetailSection()"
-        (editIdentityRequested)="openIdentityEditorFromHeader()"
-      />
+      <!-- Section rail (48px left) -->
+      @if (selectedEmployeeDetail(); as emp) {
+        <app-employee-section-rail
+          [initials]="((emp.firstName[0] ?? '') + (emp.lastName1[0] ?? '')).toUpperCase()"
+          [routeBase]="employeeRouteBase()"
+        />
+      }
 
-      <!-- Content area (right column) -->
+      <!-- Content area -->
       <div class="employee-detail__content">
 
-        <!-- Hidden identity editor drawer -->
-        @if (selectedEmployee(); as employee) {
+        <!-- Hidden identity editor (kept for edit flow) -->
+        @if (selectedEmployeeDetail(); as employee) {
           <app-employee-detail-header
             class="employee-detail__identity-editor"
             [employee]="employee"
@@ -39,6 +36,9 @@
           />
         }
 
+        <!-- Sticky identity bar -->
+        <app-employee-identity-bar [employee]="selectedEmployeeDetail()" />
+
         <!-- Global messages -->
         <div class="employee-detail__messages" aria-live="polite">
           <app-global-message-rail
@@ -51,10 +51,8 @@
           />
         </div>
 
-        <!-- Sections + timeline grid -->
+        <!-- Section content + journey timeline -->
         <div class="employee-detail__sections-timeline">
-
-          <!-- Section router outlet -->
           <section class="employee-detail__section-area">
             @if (!isRehireWorkflow()) {
               @if (loadingDetail()) {
@@ -64,7 +62,6 @@
             <router-outlet />
           </section>
 
-          <!-- Journey timeline (kept intact) -->
           @if (!isRehireWorkflow()) {
             <aside class="employee-detail__timeline-area" id="employee-section-journey" aria-label="Historial del empleado">
               @if (!terminatePanelOpen()) {
@@ -82,8 +79,8 @@
               }
             </aside>
           }
-
         </div>
+
       </div>
     </div>
   }

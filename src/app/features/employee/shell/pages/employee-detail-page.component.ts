@@ -12,7 +12,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router';
 import { filter, startWith } from 'rxjs';
 
-import { EmployeeIdentityPanelComponent } from '../../identity/employee-identity-panel.component';
+import { EmployeeSectionRailComponent } from '../../identity/employee-section-rail/employee-section-rail.component';
+import { EmployeeIdentityBarComponent } from '../components/employee-identity-bar/employee-identity-bar.component';
 import { EmployeeJourneyTimelineComponent } from '../components/employee-journey-timeline.component';
 import { EmployeeTerminatePanelComponent } from '../components/employee-terminate-panel.component';
 import { GlobalMessageRailComponent } from '../components/global-message-rail.component';
@@ -49,7 +50,8 @@ import { EmployeeDetailHeaderComponent } from '../components/employee-detail-hea
   imports: [
     RouterLink,
     RouterOutlet,
-    EmployeeIdentityPanelComponent,
+    EmployeeSectionRailComponent,
+    EmployeeIdentityBarComponent,
     EmployeeJourneyTimelineComponent,
     EmployeeTerminatePanelComponent,
     GlobalMessageRailComponent,
@@ -100,6 +102,14 @@ export class EmployeeDetailPageComponent {
   );
   protected readonly openIdentityEditorRequestId = signal(0);
   protected readonly terminatePanelOpen = signal(false);
+
+  protected readonly employeeRouteBase = computed(() => {
+    const key = this.activeEmployeeKey();
+    if (!key) return '';
+    // buildEmployeeDetailRouteCommands returns ['/personas/empleados', ruleSystemCode, type, num, section]
+    // dropping the last element gives the base route
+    return buildEmployeeDetailRouteCommands(key, 'overview').slice(0, -1).join('/');
+  });
 
   protected readonly selectedEmployee = computed<EmployeeDetailModel | null>(() => {
     const activeEmployeeKey = this.activeEmployeeKey();
