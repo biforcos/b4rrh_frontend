@@ -1,0 +1,13 @@
+<div
+  class="avatar"
+  [class.avatar--sm]="size() === 'sm'"
+  [class.avatar--md]="size() === 'md'"
+  [class.avatar--lg]="size() === 'lg'"
+  [style.background]="photoUrl() ? null : gradient()"
+>
+  @if (photoUrl()) {
+    <img class="avatar__photo" [src]="photoUrl()" alt="" aria-hidden="true" />
+  } @else {
+    <span class="avatar__initials">{{ initials() }}</span>
+  }
+</div>
