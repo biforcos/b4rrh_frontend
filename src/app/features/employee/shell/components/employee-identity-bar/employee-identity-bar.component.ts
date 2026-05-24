@@ -104,7 +104,7 @@ export class EmployeeIdentityBarComponent {
   protected readonly initials = computed(() => {
     const e = this.employee();
     if (!e) return '';
-    return (e.firstName[0] + e.lastName1[0]).toUpperCase();
+    return ((e.firstName[0] ?? '') + (e.lastName1[0] ?? '')).toUpperCase();
   });
 
   protected readonly chipVariant = computed((): StatusChipVariant => {
