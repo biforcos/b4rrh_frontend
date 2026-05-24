@@ -7,7 +7,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { DatePipe } from '@angular/common';
+import { DatePipe, NgClass } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { map } from 'rxjs';
 import { Menu } from 'primeng/menu';
@@ -15,7 +15,7 @@ import { MenuModule } from 'primeng/menu';
 import { ButtonModule } from 'primeng/button';
 import type { MenuItem } from 'primeng/api';
 
-import { EmployeeHorizontalTimelineComponent } from '../components/employee-horizontal-timeline.component';
+import { DataCardComponent } from '../../../../shared/ui/data-card/data-card.component';
 import { EmployeeDetailStore } from '../../data-access/employee-detail.store';
 import { EmployeePresenceStore } from '../../data-access/employee-presence.store';
 import { EmployeeContractStore } from '../../data-access/employee-contract.store';
@@ -39,7 +39,7 @@ import {
 @Component({
   selector: 'app-employee-overview-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DatePipe, MenuModule, ButtonModule, EmployeeHorizontalTimelineComponent],
+  imports: [DatePipe, NgClass, MenuModule, ButtonModule, DataCardComponent],
   templateUrl: './employee-overview-page.component.html',
   styleUrl: './employee-overview-page.component.scss',
 })
@@ -191,6 +191,30 @@ export class EmployeeOverviewPageComponent {
       familySituation: latest?.familySituation ?? null,
       loading: this.taxInfoStore.loading(),
     };
+  });
+
+  protected readonly seniorityYears = computed(() => {
+    const hire = this.hireDate();
+    if (!hire) return 0;
+    const ms = Date.now() - new Date(hire).getTime();
+    return Math.floor(ms / (1000 * 60 * 60 * 24 * 365.25));
+  });
+
+  protected readonly seniorityMonths = computed(() => {
+    const hire = this.hireDate();
+    if (!hire) return 0;
+    const ms = Date.now() - new Date(hire).getTime();
+    return Math.floor((ms / (1000 * 60 * 60 * 24 * 30.44)) % 12);
+  });
+
+  protected readonly journeyEvents = computed(() => {
+    const j = this.journey();
+    if (!j || !('events' in j) || !j.events) return [];
+    return j.events.slice(0, 5).map((e) => ({
+      label: e.title,
+      date: e.eventDate,
+      type: e.eventType ?? 'default',
+    }));
   });
 
   /* ── Action menu ── */

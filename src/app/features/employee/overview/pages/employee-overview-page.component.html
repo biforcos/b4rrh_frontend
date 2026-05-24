@@ -1,12 +1,8 @@
-<section class="employee-overview">
+<div class="overview">
 
   <!-- Action bar -->
-  <div class="employee-overview__action-bar">
-    <button
-      class="employee-overview__btn-primary"
-      type="button"
-      (click)="navigateTo('payroll')"
-    >
+  <div class="overview__actions">
+    <button class="overview__btn-primary" type="button" (click)="navigateTo('payroll')">
       <i class="pi pi-calculator"></i>
       Calcular nómina
     </button>
@@ -16,176 +12,120 @@
       [popup]="true"
       [model]="actionMenuItems()"
     />
-    <button
-      class="employee-overview__btn-secondary"
-      type="button"
-      (click)="showActionsMenu($event)"
-    >
+    <button class="overview__btn-secondary" type="button" (click)="showActionsMenu($event)">
       Acciones <i class="pi pi-chevron-down"></i>
     </button>
   </div>
 
-  <!-- Snapshot cards — 7 verticals -->
-  <div class="employee-overview__cards">
+  <div class="overview__layout">
 
-    <!-- 1. Contacto -->
-    <div
-      class="employee-overview__card employee-overview__card--contacto"
-      role="button"
-      tabindex="0"
-      (click)="navigateTo('contact')"
-      (keydown.enter)="navigateTo('contact')"
-    >
-      <span class="employee-overview__card-label">Contacto</span>
-      @if (contactCard().loading) {
-        <div class="employee-overview__shimmer employee-overview__shimmer--value"></div>
-        <div class="employee-overview__shimmer employee-overview__shimmer--value employee-overview__shimmer--short"></div>
-      } @else {
-        <span class="employee-overview__card-value">{{ contactCard().count }} contactos</span>
-        <span class="employee-overview__card-sub">{{ contactCard().addressCount }} dirección</span>
-      }
-      <span class="employee-overview__card-arrow" aria-hidden="true">›</span>
+    <!-- Main column -->
+    <div class="overview__main">
+
+      <!-- Summary cards -->
+      <section class="overview__section">
+        <h2 class="overview__section-title">Resumen</h2>
+        <div class="overview__cards-grid">
+          <app-data-card
+            label="Contrato"
+            [value]="contractCard().typeName ?? '—'"
+            [sub]="contractCard().startDate"
+            [loading]="contractCard().loading"
+          />
+          <app-data-card
+            label="Jornada"
+            [value]="workingTimeCard().percentage !== null ? (workingTimeCard().percentage + '%') : '—'"
+            [sub]="workingTimeCard().weeklyHours !== null ? (workingTimeCard().weeklyHours + 'h/semana') : null"
+            [loading]="workingTimeCard().loading"
+          />
+          <app-data-card
+            label="Categoría"
+            [value]="classificationCard().categoryName ?? '—'"
+            [sub]="classificationCard().agreementName"
+            [loading]="classificationCard().loading"
+          />
+          <app-data-card
+            label="Centro de trabajo"
+            [value]="workCenterCard().name ?? '—'"
+            [sub]="workCenterCard().code"
+            [loading]="workCenterCard().loading"
+          />
+          <app-data-card
+            label="Centro de coste"
+            [value]="costCenterCard().name ?? '—'"
+            [sub]="costCenterCard().code"
+            [loading]="costCenterCard().loading"
+          />
+          <app-data-card
+            label="Última nómina"
+            [value]="taxCard().territory ?? '—'"
+            [sub]="taxCard().familySituation"
+            [loading]="taxCard().loading"
+            [accent]="true"
+          />
+        </div>
+      </section>
+
+      <!-- Contact quick view -->
+      <section class="overview__section">
+        <h2 class="overview__section-title">
+          Contacto
+          <a class="overview__section-link" role="button" tabindex="0" (click)="navigateTo('contact')" (keydown.enter)="navigateTo('contact')">Ver todo →</a>
+        </h2>
+        <div class="overview__contact-card">
+          <div class="overview__contact-count">
+            {{ contactCard().count }} contacto{{ contactCard().count !== 1 ? 's' : '' }}
+            @if (contactCard().addressCount > 0) {
+              · {{ contactCard().addressCount }} dirección{{ contactCard().addressCount !== 1 ? 'es' : '' }}
+            }
+          </div>
+        </div>
+      </section>
+
     </div>
 
-    <!-- 2. Contrato -->
-    <div
-      class="employee-overview__card employee-overview__card--contrato"
-      role="button"
-      tabindex="0"
-      (click)="navigateTo('presence')"
-      (keydown.enter)="navigateTo('presence')"
-    >
-      <span class="employee-overview__card-label">Contrato</span>
-      @if (contractCard().loading) {
-        <div class="employee-overview__shimmer employee-overview__shimmer--value"></div>
-        <div class="employee-overview__shimmer employee-overview__shimmer--value employee-overview__shimmer--short"></div>
-      } @else {
-        <span class="employee-overview__card-value">{{ contractCard().typeName ?? '—' }}</span>
-        @if (contractCard().startDate) {
-          <span class="employee-overview__card-sub">Desde {{ contractCard().startDate | date:'dd/MM/yyyy' }}</span>
-        }
-      }
-      <span class="employee-overview__card-arrow" aria-hidden="true">›</span>
-    </div>
+    <!-- Aside: stats + timeline -->
+    <aside class="overview__aside">
 
-    <!-- 3. Centro de trabajo -->
-    <div
-      class="employee-overview__card employee-overview__card--centrotrabajo"
-      role="button"
-      tabindex="0"
-      (click)="navigateTo('presence')"
-      (keydown.enter)="navigateTo('presence')"
-    >
-      <span class="employee-overview__card-label">Centro trabajo</span>
-      @if (workCenterCard().loading) {
-        <div class="employee-overview__shimmer employee-overview__shimmer--value"></div>
-        <div class="employee-overview__shimmer employee-overview__shimmer--value employee-overview__shimmer--short"></div>
-      } @else {
-        <span class="employee-overview__card-value">{{ workCenterCard().name ?? '—' }}</span>
-        @if (workCenterCard().code) {
-          <span class="employee-overview__card-sub">{{ workCenterCard().code }}</span>
-        }
+      <!-- Seniority -->
+      @if (hireDate(); as hire) {
+        <div class="overview__stats-card">
+          <h3 class="overview__stats-title">Antigüedad</h3>
+          <div class="overview__stats-grid">
+            <div class="overview__stat">
+              <div class="overview__stat-value">{{ seniorityYears() }}</div>
+              <div class="overview__stat-label">Años</div>
+            </div>
+            <div class="overview__stat">
+              <div class="overview__stat-value">{{ seniorityMonths() }}</div>
+              <div class="overview__stat-label">Meses</div>
+            </div>
+          </div>
+        </div>
       }
-      <span class="employee-overview__card-arrow" aria-hidden="true">›</span>
-    </div>
 
-    <!-- 4. Centro de coste -->
-    <div
-      class="employee-overview__card employee-overview__card--centrocoste"
-      role="button"
-      tabindex="0"
-      (click)="navigateTo('organization')"
-      (keydown.enter)="navigateTo('organization')"
-    >
-      <span class="employee-overview__card-label">Centro coste</span>
-      @if (costCenterCard().loading) {
-        <div class="employee-overview__shimmer employee-overview__shimmer--value"></div>
-        <div class="employee-overview__shimmer employee-overview__shimmer--value employee-overview__shimmer--short"></div>
-      } @else {
-        <span class="employee-overview__card-value">{{ costCenterCard().name ?? '—' }}</span>
-        @if (costCenterCard().code) {
-          <span class="employee-overview__card-sub">{{ costCenterCard().code }}</span>
-        }
-      }
-      <span class="employee-overview__card-arrow" aria-hidden="true">›</span>
-    </div>
-
-    <!-- 5. Clasificación -->
-    <div
-      class="employee-overview__card employee-overview__card--clasificacion"
-      role="button"
-      tabindex="0"
-      (click)="navigateTo('presence')"
-      (keydown.enter)="navigateTo('presence')"
-    >
-      <span class="employee-overview__card-label">Clasificación</span>
-      @if (classificationCard().loading) {
-        <div class="employee-overview__shimmer employee-overview__shimmer--value"></div>
-        <div class="employee-overview__shimmer employee-overview__shimmer--value employee-overview__shimmer--short"></div>
-      } @else {
-        <span class="employee-overview__card-value">{{ classificationCard().agreementName ?? '—' }}</span>
-        @if (classificationCard().categoryName) {
-          <span class="employee-overview__card-sub">{{ classificationCard().categoryName }}</span>
-        }
-      }
-      <span class="employee-overview__card-arrow" aria-hidden="true">›</span>
-    </div>
-
-    <!-- 6. Jornada -->
-    <div
-      class="employee-overview__card employee-overview__card--jornada"
-      role="button"
-      tabindex="0"
-      (click)="navigateTo('presence')"
-      (keydown.enter)="navigateTo('presence')"
-    >
-      <span class="employee-overview__card-label">Jornada</span>
-      @if (workingTimeCard().loading) {
-        <div class="employee-overview__shimmer employee-overview__shimmer--value"></div>
-        <div class="employee-overview__shimmer employee-overview__shimmer--value employee-overview__shimmer--short"></div>
-      } @else {
-        @if (workingTimeCard().weeklyHours !== null) {
-          <span class="employee-overview__card-value">{{ workingTimeCard().weeklyHours }}h / semana</span>
+      <!-- Journey timeline (vertical) -->
+      <div class="overview__timeline-card">
+        <h3 class="overview__timeline-title">Historial</h3>
+        @if (loadingJourney()) {
+          <div class="overview__timeline-loading">Cargando...</div>
         } @else {
-          <span class="employee-overview__card-value">—</span>
+          <div class="overview__timeline-events">
+            @for (event of journeyEvents(); track event.date) {
+              <div class="overview__timeline-event">
+                <div class="overview__timeline-dot" [ngClass]="'overview__timeline-dot--' + event.type"></div>
+                <div class="overview__timeline-body">
+                  <div class="overview__timeline-label">{{ event.label }}</div>
+                  <div class="overview__timeline-date">{{ event.date }}</div>
+                </div>
+              </div>
+            }
+          </div>
         }
-        @if (workingTimeCard().percentage !== null) {
-          <span class="employee-overview__card-sub">{{ workingTimeCard().percentage }}%</span>
-        }
-      }
-      <span class="employee-overview__card-arrow" aria-hidden="true">›</span>
-    </div>
+      </div>
 
-    <!-- 7. Nómina -->
-    <div
-      class="employee-overview__card employee-overview__card--nomina"
-      role="button"
-      tabindex="0"
-      (click)="navigateTo('payroll')"
-      (keydown.enter)="navigateTo('payroll')"
-    >
-      <span class="employee-overview__card-label">Nómina</span>
-      @if (taxCard().loading) {
-        <div class="employee-overview__shimmer employee-overview__shimmer--value"></div>
-        <div class="employee-overview__shimmer employee-overview__shimmer--value employee-overview__shimmer--short"></div>
-      } @else {
-        <span class="employee-overview__card-value">{{ taxCard().territory ?? '—' }}</span>
-        @if (taxCard().familySituation) {
-          <span class="employee-overview__card-sub">{{ taxCard().familySituation }}</span>
-        }
-      }
-      <span class="employee-overview__card-arrow" aria-hidden="true">›</span>
-    </div>
+    </aside>
 
   </div>
 
-  <!-- Journey timeline horizontal -->
-  <div class="employee-overview__timeline">
-    <app-employee-horizontal-timeline
-      [journey]="journey()"
-      [loading]="loadingJourney()"
-      [error]="journeyError()"
-    />
-  </div>
-
-</section>
+</div>
