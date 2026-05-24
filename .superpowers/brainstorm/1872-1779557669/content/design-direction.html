@@ -1,0 +1,88 @@
+<h2>¿Hacia dónde queremos ir?</h2>
+<p class="subtitle">Elige la dirección estética que más encaja con B4RRHH. No es el diseño final — es el tono.</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="clean" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#f8fafc;padding:16px;font-family:system-ui;border-bottom:1px solid #e2e8f0">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <div style="width:28px;height:28px;background:#1e293b;border-radius:6px"></div>
+        <span style="font-size:13px;font-weight:600;color:#1e293b">B4RRHH</span>
+        <span style="margin-left:auto;font-size:11px;color:#94a3b8">Empleados</span>
+      </div>
+      <div style="background:white;border:1px solid #e2e8f0;border-radius:8px;padding:12px">
+        <div style="font-size:11px;font-weight:600;color:#64748b;margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">3 empleados</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #f1f5f9">
+            <div style="width:28px;height:28px;background:#e0e7ff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#4f46e5">JG</div>
+            <div><div style="font-size:12px;font-weight:500;color:#1e293b">Juan García</div><div style="font-size:10px;color:#94a3b8">Desarrollador · ESP-001</div></div>
+            <div style="margin-left:auto;width:6px;height:6px;background:#10b981;border-radius:50%"></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:6px 0">
+            <div style="width:28px;height:28px;background:#fce7f3;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#db2777">AM</div>
+            <div><div style="font-size:12px;font-weight:500;color:#1e293b">Ana Martínez</div><div style="font-size:10px;color:#94a3b8">Diseñadora · ESP-002</div></div>
+            <div style="margin-left:auto;width:6px;height:6px;background:#10b981;border-radius:50%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Clean &amp; Minimal</h3>
+      <p>Mucho espacio en blanco, tipografía legible, datos sin ruido. Estilo Linear/Notion. La UI desaparece; el contenido manda.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="enterprise" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#f0f4f8;padding:10px;font-family:system-ui;border-bottom:1px solid #cbd5e1">
+      <div style="background:#1a3a5c;padding:6px 10px;border-radius:4px;display:flex;align-items:center;gap:12px;margin-bottom:8px">
+        <span style="font-size:11px;font-weight:700;color:white">B4RRHH</span>
+        <span style="font-size:10px;color:#93c5fd">Gestión Personal</span>
+        <span style="font-size:10px;color:#93c5fd">Nómina</span>
+        <span style="font-size:10px;color:#93c5fd">Informes</span>
+      </div>
+      <div style="background:white;border:1px solid #94a3b8;border-radius:4px;padding:8px">
+        <div style="display:flex;gap:4px;margin-bottom:6px">
+          <input style="flex:1;border:1px solid #94a3b8;padding:2px 6px;font-size:10px;border-radius:3px" placeholder="Buscar empleado..." />
+          <button style="background:#1a3a5c;color:white;border:none;padding:2px 8px;font-size:10px;border-radius:3px">Filtros ▼</button>
+        </div>
+        <table style="width:100%;font-size:10px;border-collapse:collapse">
+          <tr style="background:#e8edf2"><th style="padding:3px 6px;text-align:left;color:#475569">NOMBRE</th><th style="padding:3px 6px;text-align:left;color:#475569">MATRÍCULA</th><th style="padding:3px 6px;text-align:left;color:#475569">TIPO</th><th style="padding:3px 6px;text-align:left;color:#475569">ESTADO</th></tr>
+          <tr style="border-bottom:1px solid #e2e8f0"><td style="padding:3px 6px">García, Juan</td><td style="padding:3px 6px;font-family:monospace">001</td><td style="padding:3px 6px">Interno</td><td style="padding:3px 6px"><span style="background:#dcfce7;color:#166534;padding:1px 5px;border-radius:3px;font-size:9px">Activo</span></td></tr>
+          <tr><td style="padding:3px 6px">Martínez, Ana</td><td style="padding:3px 6px;font-family:monospace">002</td><td style="padding:3px 6px">Interno</td><td style="padding:3px 6px"><span style="background:#dcfce7;color:#166534;padding:1px 5px;border-radius:3px;font-size:9px">Activo</span></td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Enterprise Profesional</h3>
+      <p>Denso, estructurado, informativo. Estilo Workday/SuccessFactors. Navegación top-bar, tablas compactas, filtros avanzados. Serio y completo.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="modern-hr" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#fafafa;padding:14px;font-family:system-ui;border-bottom:1px solid #e5e7eb">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <div style="width:8px;height:24px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:4px"></div>
+        <span style="font-size:13px;font-weight:700;color:#111827">Personas</span>
+        <div style="margin-left:auto;display:flex;gap:6px">
+          <button style="background:#f3f4f6;border:none;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:600;color:#6366f1">Todos</button>
+          <button style="background:transparent;border:none;padding:3px 10px;border-radius:20px;font-size:10px;color:#9ca3af">Activos</button>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+        <div style="background:white;border:1px solid #e5e7eb;border-radius:10px;padding:8px;display:flex;align-items:center;gap:8px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+          <div style="width:32px;height:32px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:700">JG</div>
+          <div><div style="font-size:11px;font-weight:600;color:#111827">Juan García</div><div style="font-size:9px;color:#9ca3af">Desarrollador</div></div>
+        </div>
+        <div style="background:white;border:1px solid #e5e7eb;border-radius:10px;padding:8px;display:flex;align-items:center;gap:8px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+          <div style="width:32px;height:32px;background:linear-gradient(135deg,#ec4899,#f43f5e);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:700">AM</div>
+          <div><div style="font-size:11px;font-weight:600;color:#111827">Ana Martínez</div><div style="font-size:9px;color:#9ca3af">Diseñadora</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Modern HR SaaS</h3>
+      <p>Cards, gradientes, chips de filtro, íconos con personalidad. Estilo Personio/Factorial/Bob. Cercano pero pulido. El look que asocias a "producto moderno".</p>
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,100 @@
+<h2>Paleta de color</h2>
+<p class="subtitle">El acento define la personalidad del producto. ¿Con cuál se identifica B4RRHH?</p>
+
+<div class="cards">
+
+  <!-- A: Keep Indigo (current) -->
+  <div class="card" data-choice="indigo" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#fafafa;padding:12px;font-family:system-ui;border-bottom:1px solid #e5e7eb">
+      <!-- Mini UI in Indigo -->
+      <div style="display:flex;flex-direction:column;gap:5px">
+        <div style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:8px;box-shadow:0 1px 3px rgba(0,0,0,.05)">
+          <div style="width:30px;height:30px;background:linear-gradient(135deg,#6366f1,#818cf8);border-radius:50%;color:white;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">JG</div>
+          <div style="flex:1"><div style="font-size:11px;font-weight:600;color:#111827">Juan García</div></div>
+          <span style="background:#ede9fe;color:#6366f1;padding:2px 7px;border-radius:10px;font-size:8px;font-weight:600">ESP-001</span>
+        </div>
+        <div style="display:flex;gap:4px">
+          <button style="background:#6366f1;color:white;border:none;padding:5px 14px;border-radius:7px;font-size:10px;font-weight:600;flex:1">Calcular nómina</button>
+          <button style="background:#f3f4f6;color:#374151;border:none;padding:5px 10px;border-radius:7px;font-size:10px">Acciones ▾</button>
+        </div>
+        <div style="display:flex;gap:4px">
+          <div style="flex:1;background:#6366f1;border-radius:6px;height:3px"></div>
+          <div style="flex:1;background:#e5e7eb;border-radius:6px;height:3px"></div>
+          <div style="flex:1;background:#e5e7eb;border-radius:6px;height:3px"></div>
+        </div>
+        <div style="display:flex;gap:3px">
+          <span style="background:#d1fae5;color:#059669;padding:2px 8px;border-radius:10px;font-size:9px;font-weight:600">Activo</span>
+          <span style="background:#ede9fe;color:#6366f1;padding:2px 8px;border-radius:10px;font-size:9px;font-weight:600">Indefinido</span>
+          <span style="background:#f3f4f6;color:#6b7280;padding:2px 8px;border-radius:10px;font-size:9px">Jornada</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Índigo <span style="display:inline-block;width:12px;height:12px;background:#6366f1;border-radius:3px;vertical-align:middle;margin-left:4px"></span></h3>
+      <p>El actual. Limpio, tech, confiable. Funciona bien con la marca B4RRHH. No sorprende, pero tampoco desentona.</p>
+    </div>
+  </div>
+
+  <!-- B: Violet/Purple -->
+  <div class="card" data-choice="violet" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#fafafa;padding:12px;font-family:system-ui;border-bottom:1px solid #e5e7eb">
+      <div style="display:flex;flex-direction:column;gap:5px">
+        <div style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:8px;box-shadow:0 1px 3px rgba(0,0,0,.05)">
+          <div style="width:30px;height:30px;background:linear-gradient(135deg,#7c3aed,#a78bfa);border-radius:50%;color:white;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">JG</div>
+          <div style="flex:1"><div style="font-size:11px;font-weight:600;color:#111827">Juan García</div></div>
+          <span style="background:#f5f3ff;color:#7c3aed;padding:2px 7px;border-radius:10px;font-size:8px;font-weight:600">ESP-001</span>
+        </div>
+        <div style="display:flex;gap:4px">
+          <button style="background:linear-gradient(135deg,#7c3aed,#9d4edd);color:white;border:none;padding:5px 14px;border-radius:7px;font-size:10px;font-weight:600;flex:1">Calcular nómina</button>
+          <button style="background:#f3f4f6;color:#374151;border:none;padding:5px 10px;border-radius:7px;font-size:10px">Acciones ▾</button>
+        </div>
+        <div style="display:flex;gap:4px">
+          <div style="flex:1;background:linear-gradient(90deg,#7c3aed,#9d4edd);border-radius:6px;height:3px"></div>
+          <div style="flex:1;background:#e5e7eb;border-radius:6px;height:3px"></div>
+          <div style="flex:1;background:#e5e7eb;border-radius:6px;height:3px"></div>
+        </div>
+        <div style="display:flex;gap:3px">
+          <span style="background:#d1fae5;color:#059669;padding:2px 8px;border-radius:10px;font-size:9px;font-weight:600">Activo</span>
+          <span style="background:#f5f3ff;color:#7c3aed;padding:2px 8px;border-radius:10px;font-size:9px;font-weight:600">Indefinido</span>
+          <span style="background:#f3f4f6;color:#6b7280;padding:2px 8px;border-radius:10px;font-size:9px">Jornada</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Violeta <span style="display:inline-block;width:12px;height:12px;background:#7c3aed;border-radius:3px;vertical-align:middle;margin-left:4px"></span></h3>
+      <p>Más profundo y distintivo que el índigo. Transmite innovación, creatividad. Muy usado en HR tech moderno (Rippling, Deel).</p>
+    </div>
+  </div>
+
+  <!-- C: Dark slate + indigo accent (premium) -->
+  <div class="card" data-choice="slate-premium" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0f172a;padding:12px;font-family:system-ui;border-bottom:1px solid #1e293b">
+      <div style="display:flex;flex-direction:column;gap:5px">
+        <div style="background:#1e293b;border:1px solid #334155;border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:8px">
+          <div style="width:30px;height:30px;background:linear-gradient(135deg,#6366f1,#818cf8);border-radius:50%;color:white;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">JG</div>
+          <div style="flex:1"><div style="font-size:11px;font-weight:600;color:#f1f5f9">Juan García</div></div>
+          <span style="background:#312e81;color:#a5b4fc;padding:2px 7px;border-radius:10px;font-size:8px;font-weight:600">ESP-001</span>
+        </div>
+        <div style="display:flex;gap:4px">
+          <button style="background:#6366f1;color:white;border:none;padding:5px 14px;border-radius:7px;font-size:10px;font-weight:600;flex:1">Calcular nómina</button>
+          <button style="background:#1e293b;color:#94a3b8;border:1px solid #334155;padding:5px 10px;border-radius:7px;font-size:10px">Acciones ▾</button>
+        </div>
+        <div style="display:flex;gap:4px">
+          <div style="flex:1;background:#6366f1;border-radius:6px;height:3px"></div>
+          <div style="flex:1;background:#334155;border-radius:6px;height:3px"></div>
+          <div style="flex:1;background:#334155;border-radius:6px;height:3px"></div>
+        </div>
+        <div style="display:flex;gap:3px">
+          <span style="background:#064e3b;color:#34d399;padding:2px 8px;border-radius:10px;font-size:9px;font-weight:600">Activo</span>
+          <span style="background:#312e81;color:#a5b4fc;padding:2px 8px;border-radius:10px;font-size:9px;font-weight:600">Indefinido</span>
+          <span style="background:#1e293b;color:#64748b;padding:2px 8px;border-radius:10px;font-size:9px">Jornada</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Dark mode premium <span style="display:inline-block;width:12px;height:12px;background:#0f172a;border-radius:3px;vertical-align:middle;margin-left:4px;border:1px solid #334155"></span></h3>
+      <p>Fondo oscuro slate con acento índigo. Look premium, más descansado para sesiones largas. Poco habitual en HR español, diferenciador.</p>
+    </div>
+  </div>
+
+</div>

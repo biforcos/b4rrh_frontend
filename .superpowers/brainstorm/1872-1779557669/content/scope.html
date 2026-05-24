@@ -1,0 +1,120 @@
+<h2>¿Qué rediseñamos?</h2>
+<p class="subtitle">Tenemos dos pantallas principales en gestión de personal. ¿Dónde ponemos el foco?</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="directory" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#fafafa;padding:14px;font-family:system-ui;border-bottom:1px solid #e5e7eb">
+      <!-- Directory mockup -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div>
+          <div style="font-size:14px;font-weight:700;color:#111827">Empleados</div>
+          <div style="font-size:10px;color:#9ca3af">24 personas activas</div>
+        </div>
+        <button style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;border:none;padding:4px 12px;border-radius:20px;font-size:10px;font-weight:600">+ Alta</button>
+      </div>
+      <!-- Search + filters -->
+      <div style="display:flex;gap:6px;margin-bottom:8px">
+        <div style="flex:1;background:white;border:1px solid #e5e7eb;border-radius:8px;padding:4px 8px;font-size:10px;color:#9ca3af;display:flex;align-items:center;gap:4px">
+          <span>🔍</span> Buscar...
+        </div>
+        <div style="display:flex;gap:4px">
+          <span style="background:#ede9fe;color:#6366f1;padding:3px 8px;border-radius:20px;font-size:9px;font-weight:600">Activos ✕</span>
+          <span style="background:#f3f4f6;color:#6b7280;padding:3px 8px;border-radius:20px;font-size:9px">+ Filtro</span>
+        </div>
+      </div>
+      <!-- Employee cards -->
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <div style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:7px 10px;display:flex;align-items:center;gap:8px;box-shadow:0 1px 2px rgba(0,0,0,.04)">
+          <div style="width:30px;height:30px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:50%;color:white;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">JG</div>
+          <div style="flex:1"><div style="font-size:11px;font-weight:600;color:#111827">Juan García</div><div style="font-size:9px;color:#9ca3af">Programador · ESP · <span style="font-family:monospace">001</span></div></div>
+          <span style="width:6px;height:6px;background:#10b981;border-radius:50%;display:block"></span>
+        </div>
+        <div style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:7px 10px;display:flex;align-items:center;gap:8px;box-shadow:0 1px 2px rgba(0,0,0,.04)">
+          <div style="width:30px;height:30px;background:linear-gradient(135deg,#ec4899,#f43f5e);border-radius:50%;color:white;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">AM</div>
+          <div style="flex:1"><div style="font-size:11px;font-weight:600;color:#111827">Ana Martínez</div><div style="font-size:9px;color:#9ca3af">Diseñadora · ESP · <span style="font-family:monospace">002</span></div></div>
+          <span style="width:6px;height:6px;background:#10b981;border-radius:50%;display:block"></span>
+        </div>
+        <div style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:7px 10px;display:flex;align-items:center;gap:8px;box-shadow:0 1px 2px rgba(0,0,0,.04);opacity:.5">
+          <div style="width:30px;height:30px;background:#d1d5db;border-radius:50%;color:white;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">PL</div>
+          <div style="flex:1"><div style="font-size:11px;font-weight:600;color:#111827">Pedro López</div><div style="font-size:9px;color:#9ca3af">Contable · ESP · <span style="font-family:monospace">003</span></div></div>
+          <span style="width:6px;height:6px;background:#d1d5db;border-radius:50%;display:block"></span>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Directorio de empleados</h3>
+      <p>La lista. Cards en vez de tabla raw, chips de filtro, avatar con color, estado visual. Primera impresión del producto.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="detail" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#fafafa;padding:10px;font-family:system-ui;border-bottom:1px solid #e5e7eb">
+      <!-- Detail page mockup -->
+      <div style="display:flex;height:130px;gap:6px">
+        <!-- Left panel -->
+        <div style="width:72px;background:white;border:1px solid #e5e7eb;border-radius:8px;padding:8px 6px;display:flex;flex-direction:column;align-items:center;gap:4px">
+          <div style="width:36px;height:36px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:50%;color:white;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">JG</div>
+          <div style="font-size:8px;font-weight:700;color:#111827;text-align:center;line-height:1.2">Juan García</div>
+          <div style="background:#6366f1;color:white;font-size:7px;padding:2px 4px;border-radius:4px;font-family:monospace;font-weight:700">001</div>
+          <div style="width:100%;height:1px;background:#f3f4f6;margin:2px 0"></div>
+          <div style="width:20px;height:4px;background:#6366f1;border-radius:2px"></div>
+          <div style="width:20px;height:4px;background:#e5e7eb;border-radius:2px"></div>
+          <div style="width:20px;height:4px;background:#e5e7eb;border-radius:2px"></div>
+          <div style="width:20px;height:4px;background:#e5e7eb;border-radius:2px"></div>
+        </div>
+        <!-- Right content -->
+        <div style="flex:1;display:flex;flex-direction:column;gap:5px">
+          <!-- Overview cards 2x3 -->
+          <div style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:8px">
+            <div style="font-size:9px;font-weight:700;color:#111827;margin-bottom:5px">Resumen</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px">
+              <div style="background:#fafafa;border-radius:6px;padding:5px;border:1px solid #f3f4f6">
+                <div style="font-size:7px;color:#9ca3af;margin-bottom:2px">CONTRATO</div>
+                <div style="font-size:9px;font-weight:600;color:#111827">Indefinido</div>
+              </div>
+              <div style="background:#fafafa;border-radius:6px;padding:5px;border:1px solid #f3f4f6">
+                <div style="font-size:7px;color:#9ca3af;margin-bottom:2px">JORNADA</div>
+                <div style="font-size:9px;font-weight:600;color:#111827">Completa</div>
+              </div>
+              <div style="background:#fafafa;border-radius:6px;padding:5px;border:1px solid #f3f4f6">
+                <div style="font-size:7px;color:#9ca3af;margin-bottom:2px">CATEGORÍA</div>
+                <div style="font-size:9px;font-weight:600;color:#111827">Grupo 1</div>
+              </div>
+            </div>
+          </div>
+          <!-- Timeline hint -->
+          <div style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:6px 8px;flex:1">
+            <div style="font-size:9px;font-weight:700;color:#111827;margin-bottom:4px">Timeline</div>
+            <div style="display:flex;align-items:center;gap:3px">
+              <div style="width:6px;height:6px;background:#10b981;border-radius:50%"></div>
+              <div style="flex:1;height:2px;background:linear-gradient(90deg,#10b981,#6366f1)"></div>
+              <div style="width:6px;height:6px;background:#6366f1;border-radius:50%"></div>
+              <div style="flex:1;height:2px;background:#e5e7eb"></div>
+              <div style="width:6px;height:6px;background:#e5e7eb;border-radius:50%;border:1px solid #d1d5db"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Ficha del empleado</h3>
+      <p>El detalle. Mejorar las tarjetas de resumen, la sección de navegación lateral, el layout general. Donde el usuario pasa más tiempo.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="both" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:linear-gradient(135deg,#f0f4ff,#fdf2ff);padding:16px;font-family:system-ui;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:center;min-height:100px">
+      <div style="text-align:center">
+        <div style="font-size:28px;margin-bottom:6px">✦</div>
+        <div style="font-size:12px;font-weight:700;color:#6366f1">Diseño cohesivo completo</div>
+        <div style="font-size:10px;color:#9ca3af;margin-top:3px">Directorio + Ficha + design tokens</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Todo el flujo completo</h3>
+      <p>Abordar ambas pantallas con coherencia desde el sistema de diseño. Más ambicioso, pero el resultado es más consistente.</p>
+    </div>
+  </div>
+
+</div>

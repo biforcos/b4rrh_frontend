@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>B4RRHH — Ficha del empleado</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0b0f1a;
+    color: #e2e8f0;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    display: flex;
+  }
+
+  /* ── GLOBAL APP NAV (same as directory) ── */
+  .app-nav {
+    width: 52px; background: #060910; border-right: 1px solid #1e293b;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 14px 0; gap: 4px; flex-shrink: 0;
+  }
+  .app-nav-logo {
+    width: 32px; height: 32px; background: linear-gradient(135deg,#6366f1,#818cf8);
+    border-radius: 8px; display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 800; color: white; margin-bottom: 12px;
+  }
+  .app-nav-item {
+    width: 36px; height: 36px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; cursor: pointer; color: #475569;
+  }
+  .app-nav-item.active { background: rgba(99,102,241,.2); color: #818cf8; }
+  .app-nav-spacer { flex: 1; }
+
+  /* ── SECTION RAIL (employee sections) ── */
+  .section-rail {
+    width: 48px; background: #0b0f1a; border-right: 1px solid #1e293b;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 16px 0 16px; gap: 2px; flex-shrink: 0;
+  }
+
+  /* Avatar in rail */
+  .rail-avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: linear-gradient(135deg,#6366f1,#818cf8);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: white;
+    margin-bottom: 10px; flex-shrink: 0;
+    box-shadow: 0 0 0 2px #0b0f1a, 0 0 0 3px rgba(99,102,241,.4);
+  }
+  .rail-divider {
+    width: 28px; height: 1px; background: #1e293b; margin: 6px 0;
+  }
+
+  .rail-item {
+    width: 36px; height: 36px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; cursor: pointer; color: #475569;
+    transition: background .12s, color .12s;
+    position: relative;
+  }
+  .rail-item:hover { background: #111827; color: #94a3b8; }
+  .rail-item.active {
+    background: rgba(99,102,241,.2); color: #818cf8;
+  }
+  .rail-item.active::before {
+    content: ''; position: absolute;
+    left: -1px; top: 50%; transform: translateY(-50%);
+    width: 3px; height: 18px;
+    background: #6366f1; border-radius: 0 2px 2px 0;
+  }
+
+  /* Tooltip */
+  .rail-item[title]:hover::after {
+    content: attr(title);
+    position: absolute; left: calc(100% + 10px); top: 50%;
+    transform: translateY(-50%);
+    background: #1e293b; color: #e2e8f0;
+    padding: 4px 8px; border-radius: 6px;
+    font-size: 11px; font-weight: 500; white-space: nowrap;
+    border: 1px solid #334155;
+    pointer-events: none; z-index: 100;
+  }
+
+  /* ── MAIN CONTENT ── */
+  .main {
+    flex: 1; display: flex; flex-direction: column;
+    min-width: 0; overflow: hidden;
+  }
+
+  /* Breadcrumb */
+  .breadcrumb {
+    padding: 10px 24px 0;
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; color: #475569;
+  }
+  .breadcrumb a { color: #6366f1; text-decoration: none; }
+  .breadcrumb a:hover { color: #818cf8; }
+  .breadcrumb-sep { color: #334155; }
+
+  /* Identity bar (sticky) */
+  .identity-bar {
+    margin: 10px 24px 0;
+    background: #0f172a; border: 1px solid #1e293b;
+    border-radius: 12px; padding: 14px 20px;
+    display: flex; align-items: center; gap: 16px;
+    box-shadow: 0 4px 16px rgba(0,0,0,.3);
+  }
+  .id-avatar {
+    width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(135deg,#6366f1,#818cf8);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 700; color: white;
+    box-shadow: 0 0 0 3px rgba(99,102,241,.25);
+  }
+  .id-info { flex: 1; min-width: 0; }
+  .id-name { font-size: 16px; font-weight: 700; color: #f8fafc; letter-spacing: -.01em; }
+  .id-meta { font-size: 12px; color: #64748b; margin-top: 2px; display: flex; align-items: center; gap: 10px; }
+  .id-sep { color: #334155; }
+
+  .id-chips { display: flex; align-items: center; gap: 8px; }
+  .chip-status-active {
+    padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600;
+    background: rgba(16,185,129,.12); color: #34d399;
+    border: 1px solid rgba(16,185,129,.25);
+    display: flex; align-items: center; gap: 5px;
+  }
+  .status-dot { width: 6px; height: 6px; border-radius: 50%; background: #34d399; }
+  .chip-matricula {
+    padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;
+    background: rgba(99,102,241,.15); color: #a5b4fc;
+    border: 1px solid rgba(99,102,241,.3);
+    font-family: 'JetBrains Mono', monospace; letter-spacing: .04em;
+  }
+
+  .id-actions { display: flex; gap: 8px; flex-shrink: 0; }
+  .btn-primary {
+    background: #6366f1; color: white; border: none;
+    padding: 8px 16px; border-radius: 8px; font-size: 12px;
+    font-weight: 600; cursor: pointer; white-space: nowrap;
+  }
+  .btn-secondary {
+    background: #111827; color: #94a3b8;
+    border: 1px solid #1e293b; padding: 8px 14px;
+    border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer;
+  }
+
+  /* ── CONTENT AREA ── */
+  .content-area {
+    flex: 1; overflow-y: auto;
+    padding: 16px 24px 24px;
+    display: flex; gap: 16px;
+  }
+
+  /* Main column */
+  .content-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
+
+  /* Section header */
+  .section-hdr {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 2px;
+  }
+  .section-hdr-title {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .08em; color: #475569;
+  }
+  .section-hdr-action {
+    font-size: 11px; color: #6366f1; cursor: pointer;
+  }
+  .section-hdr-action:hover { color: #818cf8; }
+
+  /* Data cards grid */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .data-card {
+    background: #111827; border: 1px solid #1e293b;
+    border-radius: 10px; padding: 14px 16px;
+    cursor: pointer; transition: border-color .15s, background .15s;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .data-card:hover {
+    border-color: #334155; background: #141f2e;
+  }
+  .data-card.accent {
+    border-color: rgba(99,102,241,.3);
+    background: rgba(99,102,241,.07);
+  }
+  .data-card.accent:hover { border-color: rgba(99,102,241,.5); }
+
+  .dc-label {
+    font-size: 9px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .1em; color: #475569;
+  }
+  .dc-value { font-size: 15px; font-weight: 600; color: #f1f5f9; }
+  .dc-sub { font-size: 11px; color: #64748b; }
+  .dc-link { font-size: 11px; color: #6366f1; margin-top: 4px; }
+
+  /* Contact card */
+  .contact-card {
+    background: #111827; border: 1px solid #1e293b;
+    border-radius: 10px; padding: 14px 16px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .contact-row {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .contact-icon {
+    width: 28px; height: 28px; background: #0f172a;
+    border: 1px solid #1e293b; border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; flex-shrink: 0;
+  }
+  .contact-label { font-size: 10px; color: #475569; }
+  .contact-value { font-size: 13px; color: #e2e8f0; margin-top: 1px; }
+
+  /* Timeline aside */
+  .timeline-aside {
+    width: 220px; flex-shrink: 0;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .timeline-card {
+    background: #0f172a; border: 1px solid #1e293b;
+    border-radius: 10px; padding: 14px 16px;
+  }
+  .timeline-title {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .08em; color: #475569; margin-bottom: 14px;
+  }
+
+  /* Vertical timeline events */
+  .tl-events { display: flex; flex-direction: column; position: relative; }
+  .tl-line {
+    position: absolute; left: 9px; top: 0; bottom: 0;
+    width: 1px; background: #1e293b;
+  }
+  .tl-event {
+    display: flex; gap: 12px; padding-bottom: 16px;
+    position: relative; z-index: 1;
+  }
+  .tl-event:last-child { padding-bottom: 0; }
+  .tl-dot {
+    width: 18px; height: 18px; border-radius: 50%;
+    flex-shrink: 0; display: flex; align-items: center;
+    justify-content: center; font-size: 9px;
+    border: 2px solid #0f172a;
+  }
+  .tl-dot-hire { background: #10b981; }
+  .tl-dot-contract { background: #6366f1; }
+  .tl-dot-raise { background: #f59e0b; }
+  .tl-dot-future { background: #1e293b; border-color: #334155; }
+  .tl-body { flex: 1; }
+  .tl-event-label { font-size: 11px; font-weight: 600; color: #94a3b8; }
+  .tl-event-date { font-size: 10px; color: #475569; margin-top: 2px; }
+
+  /* Stats mini */
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .stat-box {
+    background: #111827; border: 1px solid #1e293b;
+    border-radius: 8px; padding: 10px 12px; text-align: center;
+  }
+  .stat-value { font-size: 18px; font-weight: 700; color: #f1f5f9; }
+  .stat-label { font-size: 9px; color: #475569; margin-top: 2px; text-transform: uppercase; letter-spacing: .06em; }
+
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- Global app nav -->
+<nav class="app-nav">
+  <div class="app-nav-logo">B4</div>
+  <div class="app-nav-item active">👥</div>
+  <div class="app-nav-item">💰</div>
+  <div class="app-nav-item">📊</div>
+  <div class="app-nav-item">⚙️</div>
+  <div class="app-nav-spacer"></div>
+  <div class="app-nav-item">👤</div>
+</nav>
+
+<!-- Section rail -->
+<div class="section-rail">
+  <div class="rail-avatar">GR</div>
+  <div class="rail-divider"></div>
+  <div class="rail-item active" title="Resumen">▦</div>
+  <div class="rail-item" title="Contacto">📞</div>
+  <div class="rail-item" title="Dirección">📍</div>
+  <div class="rail-item" title="Contrato">📄</div>
+  <div class="rail-item" title="Organización">🏢</div>
+  <div class="rail-item" title="Clasificación">⚖️</div>
+  <div class="rail-item" title="Jornada">🕐</div>
+  <div class="rail-item" title="Nómina">💰</div>
+  <div class="rail-item" title="Fiscal">📑</div>
+  <div class="rail-item" title="Ciclo de vida">🔄</div>
+</div>
+
+<!-- Main content -->
+<div class="main">
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a href="#">Empleados</a>
+    <span class="breadcrumb-sep">›</span>
+    <span>García Ruiz, Juan</span>
+  </div>
+
+  <!-- Identity bar -->
+  <div class="identity-bar">
+    <div class="id-avatar">GR</div>
+    <div class="id-info">
+      <div class="id-name">García Ruiz, Juan</div>
+      <div class="id-meta">
+        <span>Programador Senior</span>
+        <span class="id-sep">·</span>
+        <span>Tecnología</span>
+        <span class="id-sep">·</span>
+        <span>desde ene 2021</span>
+      </div>
+    </div>
+    <div class="id-chips">
+      <div class="chip-status-active"><span class="status-dot"></span>Activo</div>
+      <div class="chip-matricula">ESP · 001</div>
+    </div>
+    <div class="id-actions">
+      <button class="btn-primary">Calcular nómina</button>
+      <button class="btn-secondary">Acciones ▾</button>
+    </div>
+  </div>
+
+  <!-- Content area -->
+  <div class="content-area">
+
+    <!-- Main column -->
+    <div class="content-main">
+
+      <!-- Overview cards -->
+      <div>
+        <div class="section-hdr">
+          <div class="section-hdr-title">Resumen</div>
+          <div class="section-hdr-action">Editar →</div>
+        </div>
+        <div class="cards-grid">
+          <div class="data-card">
+            <div class="dc-label">Contrato</div>
+            <div class="dc-value">Indefinido</div>
+            <div class="dc-sub">Tiempo completo</div>
+          </div>
+          <div class="data-card">
+            <div class="dc-label">Jornada</div>
+            <div class="dc-value">Completa</div>
+            <div class="dc-sub">40h semanales</div>
+          </div>
+          <div class="data-card">
+            <div class="dc-label">Categoría</div>
+            <div class="dc-value">Grupo 1</div>
+            <div class="dc-sub">Convenio Metal</div>
+          </div>
+          <div class="data-card">
+            <div class="dc-label">Centro de trabajo</div>
+            <div class="dc-value">Madrid</div>
+            <div class="dc-sub">Delegación Sur</div>
+          </div>
+          <div class="data-card">
+            <div class="dc-label">Centro de coste</div>
+            <div class="dc-value">Tecnología</div>
+            <div class="dc-sub">TEC-001</div>
+          </div>
+          <div class="data-card accent">
+            <div class="dc-label" style="color:#6366f1">Última nómina</div>
+            <div class="dc-value" style="color:#a5b4fc">Abr 2026</div>
+            <div class="dc-link">Ver desglose →</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact quick view -->
+      <div>
+        <div class="section-hdr">
+          <div class="section-hdr-title">Contacto</div>
+          <div class="section-hdr-action">Ver todo →</div>
+        </div>
+        <div class="contact-card">
+          <div class="contact-row">
+            <div class="contact-icon">📧</div>
+            <div>
+              <div class="contact-label">Email corporativo</div>
+              <div class="contact-value">juan.garcia@empresa.com</div>
+            </div>
+          </div>
+          <div class="contact-row">
+            <div class="contact-icon">📱</div>
+            <div>
+              <div class="contact-label">Teléfono móvil</div>
+              <div class="contact-value">+34 612 345 678</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Timeline aside -->
+    <div class="timeline-aside">
+
+      <!-- Quick stats -->
+      <div>
+        <div class="section-hdr" style="margin-bottom:8px">
+          <div class="section-hdr-title">Antigüedad</div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="stat-value" style="color:#818cf8">5</div>
+            <div class="stat-label">Años</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value" style="color:#818cf8">4</div>
+            <div class="stat-label">Meses</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Journey timeline -->
+      <div class="timeline-card">
+        <div class="timeline-title">Historial</div>
+        <div class="tl-events">
+          <div class="tl-line"></div>
+          <div class="tl-event">
+            <div class="tl-dot tl-dot-hire"></div>
+            <div class="tl-body">
+              <div class="tl-event-label">Alta</div>
+              <div class="tl-event-date">ene 2021</div>
+            </div>
+          </div>
+          <div class="tl-event">
+            <div class="tl-dot tl-dot-contract"></div>
+            <div class="tl-body">
+              <div class="tl-event-label">Cambio contrato</div>
+              <div class="tl-event-date">mar 2022</div>
+            </div>
+          </div>
+          <div class="tl-event">
+            <div class="tl-dot tl-dot-raise"></div>
+            <div class="tl-body">
+              <div class="tl-event-label">Revisión salarial</div>
+              <div class="tl-event-date">ene 2024</div>
+            </div>
+          </div>
+          <div class="tl-event">
+            <div class="tl-dot tl-dot-future"></div>
+            <div class="tl-body">
+              <div class="tl-event-label" style="color:#334155">Próxima revisión</div>
+              <div class="tl-event-date">ene 2027</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

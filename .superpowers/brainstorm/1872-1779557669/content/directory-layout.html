@@ -1,0 +1,154 @@
+<h2>Directorio de empleados — ¿cómo lo mostramos?</h2>
+<p class="subtitle">Hoy es una tabla PrimeNG con columnas "INTERNAL" y "ESP". ¿Por qué estilo apostamos?</p>
+
+<div class="cards">
+
+  <!-- OPTION A: Rich list rows -->
+  <div class="card" data-choice="rich-list" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#fff;padding:12px 14px;font-family:system-ui;border-bottom:1px solid #e5e7eb">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="display:flex;gap:5px">
+          <span style="background:#ede9fe;color:#6366f1;padding:2px 8px;border-radius:20px;font-size:9px;font-weight:600">Todos <span style="background:#6366f1;color:white;border-radius:10px;padding:0 4px;margin-left:2px">24</span></span>
+          <span style="background:#f3f4f6;color:#6b7280;padding:2px 8px;border-radius:20px;font-size:9px">Activos</span>
+          <span style="background:#f3f4f6;color:#6b7280;padding:2px 8px;border-radius:20px;font-size:9px">Bajas</span>
+        </div>
+        <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:6px;padding:2px 7px;font-size:9px;color:#6b7280">↕ Apellidos</div>
+      </div>
+      <div style="display:flex;flex-direction:column">
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f3f4f6">
+          <div style="width:32px;height:32px;flex-shrink:0;background:linear-gradient(135deg,#6366f1,#818cf8);border-radius:50%;color:white;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">JG</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:11px;font-weight:600;color:#111827">Juan García Ruiz</div>
+            <div style="font-size:9px;color:#9ca3af">Programador Senior · <span style="font-family:monospace;color:#6b7280">ESP-001</span></div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+            <span style="background:#d1fae5;color:#059669;padding:1px 6px;border-radius:10px;font-size:8px;font-weight:600">Activo</span>
+            <span style="font-size:8px;color:#d1d5db">desde 2021</span>
+          </div>
+          <span style="font-size:12px;color:#d1d5db">›</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f3f4f6">
+          <div style="width:32px;height:32px;flex-shrink:0;background:linear-gradient(135deg,#ec4899,#f43f5e);border-radius:50%;color:white;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">AM</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:11px;font-weight:600;color:#111827">Ana Martínez López</div>
+            <div style="font-size:9px;color:#9ca3af">Diseñadora UX · <span style="font-family:monospace;color:#6b7280">ESP-002</span></div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+            <span style="background:#d1fae5;color:#059669;padding:1px 6px;border-radius:10px;font-size:8px;font-weight:600">Activo</span>
+            <span style="font-size:8px;color:#d1d5db">desde 2022</span>
+          </div>
+          <span style="font-size:12px;color:#d1d5db">›</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 0">
+          <div style="width:32px;height:32px;flex-shrink:0;background:linear-gradient(135deg,#f59e0b,#ef4444);border-radius:50%;color:white;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">PL</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:11px;font-weight:600;color:#6b7280">Pedro López Castro</div>
+            <div style="font-size:9px;color:#9ca3af">Contable · <span style="font-family:monospace;color:#6b7280">ESP-003</span></div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+            <span style="background:#f3f4f6;color:#6b7280;padding:1px 6px;border-radius:10px;font-size:8px;font-weight:600">Baja</span>
+            <span style="font-size:8px;color:#d1d5db">dic 2023</span>
+          </div>
+          <span style="font-size:12px;color:#d1d5db">›</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Lista rica</h3>
+      <p>Filas densas con avatar, nombre completo, puesto humanizado, chip de estado. Escala bien con 200+ empleados. Estilo Linear/Notion.</p>
+    </div>
+  </div>
+
+  <!-- OPTION B: Card grid -->
+  <div class="card" data-choice="card-grid" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#f8fafc;padding:12px;font-family:system-ui;border-bottom:1px solid #e5e7eb">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="display:flex;gap:5px">
+          <span style="background:#ede9fe;color:#6366f1;padding:2px 8px;border-radius:20px;font-size:9px;font-weight:600">Todos 24</span>
+          <span style="background:#f3f4f6;color:#6b7280;padding:2px 8px;border-radius:20px;font-size:9px">Activos</span>
+        </div>
+        <div style="display:flex;gap:3px">
+          <div style="background:#ede9fe;border-radius:4px;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:9px">⊞</div>
+          <div style="background:#f3f4f6;border-radius:4px;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:9px;color:#9ca3af">☰</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">
+        <div style="background:white;border:1px solid #e5e7eb;border-radius:10px;padding:10px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.05)">
+          <div style="width:36px;height:36px;background:linear-gradient(135deg,#6366f1,#818cf8);border-radius:50%;color:white;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 5px">JG</div>
+          <div style="font-size:10px;font-weight:600;color:#111827;margin-bottom:1px">Juan García</div>
+          <div style="font-size:8px;color:#9ca3af;margin-bottom:5px">Programador</div>
+          <span style="background:#d1fae5;color:#059669;padding:1px 7px;border-radius:10px;font-size:8px;font-weight:600">Activo</span>
+        </div>
+        <div style="background:white;border:1px solid #e5e7eb;border-radius:10px;padding:10px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.05)">
+          <div style="width:36px;height:36px;background:linear-gradient(135deg,#ec4899,#f43f5e);border-radius:50%;color:white;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 5px">AM</div>
+          <div style="font-size:10px;font-weight:600;color:#111827;margin-bottom:1px">Ana Martínez</div>
+          <div style="font-size:8px;color:#9ca3af;margin-bottom:5px">Diseñadora</div>
+          <span style="background:#d1fae5;color:#059669;padding:1px 7px;border-radius:10px;font-size:8px;font-weight:600">Activo</span>
+        </div>
+        <div style="background:white;border:1px solid #e5e7eb;border-radius:10px;padding:10px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.05);opacity:.6">
+          <div style="width:36px;height:36px;background:#e5e7eb;border-radius:50%;color:#9ca3af;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 5px">PL</div>
+          <div style="font-size:10px;font-weight:600;color:#6b7280;margin-bottom:1px">Pedro López</div>
+          <div style="font-size:8px;color:#9ca3af;margin-bottom:5px">Contable</div>
+          <span style="background:#f3f4f6;color:#6b7280;padding:1px 7px;border-radius:10px;font-size:8px;font-weight:600">Baja</span>
+        </div>
+        <div style="background:white;border:1px dashed #e5e7eb;border-radius:10px;padding:10px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px">
+          <div style="width:28px;height:28px;background:#f3f4f6;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;color:#9ca3af">+</div>
+          <div style="font-size:9px;color:#9ca3af">Dar de alta</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Grid de cards</h3>
+      <p>Vista de cuadrícula, una card por persona. Visual y amigable. Ideal para equipos pequeños (&lt;50). Con toggle lista/grid.</p>
+    </div>
+  </div>
+
+  <!-- OPTION C: Power table -->
+  <div class="card" data-choice="power-table" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#fff;padding:12px 14px;font-family:system-ui;border-bottom:1px solid #e5e7eb">
+      <div style="display:flex;gap:6px;margin-bottom:7px;align-items:center">
+        <div style="flex:1;background:#f9fafb;border:1px solid #e5e7eb;border-radius:6px;padding:3px 8px;font-size:9px;color:#9ca3af;display:flex;align-items:center;gap:4px">🔍 Buscar o filtrar...</div>
+        <button style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;border:none;padding:3px 10px;border-radius:6px;font-size:9px;font-weight:600">+ Alta</button>
+      </div>
+      <table style="width:100%;font-size:9px;border-collapse:collapse">
+        <thead>
+          <tr style="border-bottom:2px solid #f3f4f6">
+            <th style="padding:4px 6px;text-align:left;color:#9ca3af;font-weight:600;text-transform:uppercase;letter-spacing:.05em;width:36px"></th>
+            <th style="padding:4px 6px;text-align:left;color:#9ca3af;font-weight:600;text-transform:uppercase;letter-spacing:.05em">Nombre</th>
+            <th style="padding:4px 6px;text-align:left;color:#9ca3af;font-weight:600;text-transform:uppercase;letter-spacing:.05em">Puesto</th>
+            <th style="padding:4px 6px;text-align:left;color:#9ca3af;font-weight:600;text-transform:uppercase;letter-spacing:.05em">Estado</th>
+            <th style="padding:4px 6px;text-align:right;color:#9ca3af;font-weight:600;text-transform:uppercase;letter-spacing:.05em">Alta</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid #f9fafb;cursor:pointer">
+            <td style="padding:5px 6px"><div style="width:24px;height:24px;background:linear-gradient(135deg,#6366f1,#818cf8);border-radius:50%;color:white;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center">JG</div></td>
+            <td style="padding:5px 6px"><div style="font-weight:600;color:#111827">García Ruiz, Juan</div><div style="color:#9ca3af;font-family:monospace;font-size:8px">ESP-001</div></td>
+            <td style="padding:5px 6px;color:#4b5563">Programador Sr.</td>
+            <td style="padding:5px 6px"><span style="background:#d1fae5;color:#059669;padding:1px 6px;border-radius:10px;font-size:8px;font-weight:600">Activo</span></td>
+            <td style="padding:5px 6px;text-align:right;color:#9ca3af">ene 2021</td>
+          </tr>
+          <tr style="border-bottom:1px solid #f9fafb;cursor:pointer">
+            <td style="padding:5px 6px"><div style="width:24px;height:24px;background:linear-gradient(135deg,#ec4899,#f43f5e);border-radius:50%;color:white;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center">AM</div></td>
+            <td style="padding:5px 6px"><div style="font-weight:600;color:#111827">Martínez López, Ana</div><div style="color:#9ca3af;font-family:monospace;font-size:8px">ESP-002</div></td>
+            <td style="padding:5px 6px;color:#4b5563">Diseñadora UX</td>
+            <td style="padding:5px 6px"><span style="background:#d1fae5;color:#059669;padding:1px 6px;border-radius:10px;font-size:8px;font-weight:600">Activo</span></td>
+            <td style="padding:5px 6px;text-align:right;color:#9ca3af">mar 2022</td>
+          </tr>
+          <tr style="cursor:pointer;opacity:.6">
+            <td style="padding:5px 6px"><div style="width:24px;height:24px;background:#e5e7eb;border-radius:50%;color:#9ca3af;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center">PL</div></td>
+            <td style="padding:5px 6px"><div style="font-weight:600;color:#6b7280">López Castro, Pedro</div><div style="color:#9ca3af;font-family:monospace;font-size:8px">ESP-003</div></td>
+            <td style="padding:5px 6px;color:#9ca3af">Contable</td>
+            <td style="padding:5px 6px"><span style="background:#f3f4f6;color:#6b7280;padding:1px 6px;border-radius:10px;font-size:8px;font-weight:600">Baja</span></td>
+            <td style="padding:5px 6px;text-align:right;color:#9ca3af">dic 2023</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card-body">
+      <h3>C — Tabla potente</h3>
+      <p>Tabla mejorada: avatar integrado, apellidos primero, puesto humanizado, estado chip, ordenación por columna. Familiar pero elegante. Escala a 500+ empleados.</p>
+    </div>
+  </div>
+
+</div>
