@@ -7,7 +7,6 @@ describe('employee-hiring.mapper', () => {
     const draft: HireEmployeeDraft = {
       ruleSystemCode: 'ESP',
       employeeTypeCode: 'EMP',
-      employeeNumber: 'E001',
       firstName: 'Ana',
       lastName1: 'Lopez',
       lastName2: '',
@@ -44,6 +43,7 @@ describe('employee-hiring.mapper', () => {
       ruleSystemCode: 'ESP',
       employeeTypeCode: 'EMP',
       employeeNumber: 'E001',
+      displayName: 'Ana Lopez Garcia',
       firstName: 'Ana',
       lastName1: 'Lopez',
       lastName2: 'Garcia',

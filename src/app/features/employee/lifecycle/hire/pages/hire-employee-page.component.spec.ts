@@ -100,7 +100,6 @@ describe('HireEmployeePageComponent', () => {
   it('blocks submit and shows a local error when working time percentage is missing', () => {
     component.form.patchValue({
       ruleSystemCode: 'ESP',
-      employeeNumber: 'E001',
       firstName: 'Ana',
       lastName1: 'Lopez',
       hireDate: new Date(2026, 2, 23),
@@ -125,7 +124,6 @@ describe('HireEmployeePageComponent', () => {
   it('submits the working time percentage inside the local hire draft', () => {
     component.form.patchValue({
       ruleSystemCode: 'ESP',
-      employeeNumber: 'E001',
       firstName: 'Ana',
       lastName1: 'Lopez',
       hireDate: new Date(2026, 2, 23),
@@ -153,7 +151,6 @@ describe('HireEmployeePageComponent', () => {
   it('enables the submit button when the hire form is valid', () => {
     component.form.patchValue({
       ruleSystemCode: 'ESP',
-      employeeNumber: 'E001',
       firstName: 'Ana',
       lastName1: 'Lopez',
       hireDate: new Date(2026, 2, 23),
