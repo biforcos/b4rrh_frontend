@@ -9,9 +9,9 @@
 }
 
 .employee-identifier-section__slot {
-  border: 1px solid #dce6f1;
+  border: 1px solid var(--border-default);
   border-radius: 0.65rem;
-  background: #fafafa;
+  background: var(--surface-hover);
   padding: 0.64rem;
 }
 
@@ -31,17 +31,17 @@
 .employee-identifier-section__readonly-field span {
   font-size: 0.68rem;
   line-height: 1.2;
-  color: #5f7386;
+  color: var(--text-tertiary);
 }
 
 .employee-identifier-section__form-grid input[type='text'],
 .employee-identifier-section__form-grid input[type='date'],
 .employee-identifier-section__form-grid select {
   width: 100%;
-  border: 1px solid #cedae7;
+  border: 1px solid var(--border-default);
   border-radius: 0.42rem;
-  background: #ffffff;
-  color: #1f3246;
+  background: var(--surface-panel);
+  color: var(--text-primary);
   font-size: 0.75rem;
   line-height: 1.2;
   padding: 0.34rem 0.42rem;
@@ -52,20 +52,20 @@
 .employee-identifier-section__form-grid input[type='date']:focus-visible,
 .employee-identifier-section__form-grid select:focus-visible {
   outline: none;
-  border-color: #7ea6cc;
-  box-shadow: 0 0 0 2px rgba(126, 166, 204, 0.2);
+  border-color: var(--accent-border);
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.18);
 }
 
 .employee-identifier-section__form-grid .employee-identifier-section__input--invalid,
 .employee-identifier-section__form-grid .employee-identifier-section__input--invalid:focus-visible {
-  border-color: #d14343;
-  box-shadow: 0 0 0 2px rgba(209, 67, 67, 0.16);
+  border-color: var(--error-text);
+  box-shadow: 0 0 0 2px rgba(185, 28, 28, 0.16);
 }
 
 .employee-identifier-section__field-error {
   font-size: 0.68rem;
   line-height: 1.2;
-  color: #b42318;
+  color: var(--error-text);
 }
 
 .employee-identifier-section__checkbox-field {
@@ -77,24 +77,24 @@
 
 .employee-identifier-section__checkbox-field span {
   font-size: 0.7rem;
-  color: #3c546b;
+  color: var(--text-secondary);
 }
 
 .employee-identifier-section__checkbox-field input[type='checkbox'] {
   width: 0.95rem;
   height: 0.95rem;
-  accent-color: #5f88b0;
+  accent-color: var(--accent-primary);
 }
 
 .employee-identifier-section__readonly-field strong {
   font-size: 0.74rem;
-  color: #1f3246;
+  color: var(--text-primary);
 }
 
 .employee-identifier-section__readonly-field {
-  border: 1px solid #d4dfea;
+  border: 1px solid var(--border-default);
   border-radius: 0.42rem;
-  background: #f9fafb;
+  background: var(--surface-hover);
   padding: 0.34rem 0.42rem;
 }
 
@@ -110,9 +110,9 @@
   display: flex;
   justify-content: space-between;
   gap: 0.7rem;
-  border: 1px solid #dbe5f0;
+  border: 1px solid var(--border-default);
   border-radius: 0.62rem;
-  background: #ffffff;
+  background: var(--surface-panel);
   padding: 0.56rem;
 }
 
@@ -133,7 +133,7 @@
   margin: 0;
   font-size: 0.72rem;
   font-weight: 700;
-  color: #2d4458;
+  color: var(--text-primary);
 }
 
 .employee-identifier-section__badge {
@@ -143,19 +143,19 @@
 .employee-identifier-section__row-value {
   margin: 0;
   font-size: 0.8rem;
-  color: #475f74;
+  color: var(--text-secondary);
 }
 
 .employee-identifier-section__row-meta {
   margin: 0;
   font-size: 0.72rem;
-  color: #6a8196;
+  color: var(--text-tertiary);
 }
 
 .employee-identifier-section__confirm-text {
   margin: 0;
   font-size: 0.72rem;
-  color: #7a2530;
+  color: var(--error-text);
 }
 
 .employee-identifier-section__row-actions {
@@ -168,10 +168,10 @@
 
 .employee-identifier-section__empty {
   margin: 0;
-  border: 1px dashed #d1deea;
+  border: 1px dashed var(--border-default);
   border-radius: 0.62rem;
-  background: #fafafa;
-  color: #5a7185;
+  background: var(--surface-hover);
+  color: var(--text-secondary);
   font-size: 0.79rem;
   padding: 0.55rem 0.62rem;
 }

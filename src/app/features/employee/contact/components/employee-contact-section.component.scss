@@ -8,9 +8,9 @@
 }
 
 .employee-contact-section__slot {
-  border: 1px solid #dce6f1;
+  border: 1px solid var(--border-default);
   border-radius: 0.65rem;
-  background: #fafafa;
+  background: var(--surface-hover);
   padding: 0.64rem;
 }
 
@@ -30,7 +30,7 @@
 .employee-contact-section__form-label {
   font-size: 0.68rem;
   line-height: 1.2;
-  color: #5f7386;
+  color: var(--text-tertiary);
 }
 
 .employee-contact-section__form-input {
@@ -44,18 +44,18 @@
 }
 
 .employee-contact-section__form-field :where(select.employee-contact-section__form-input) {
-  border: 1px solid #cedae7;
+  border: 1px solid var(--border-default);
   border-radius: 0.42rem;
-  background: #ffffff;
-  color: #1f3246;
+  background: var(--surface-panel);
+  color: var(--text-primary);
   line-height: 1.2;
   padding: 0.34rem 0.42rem;
 }
 
 .employee-contact-section__form-field :where(select.employee-contact-section__form-input:focus-visible) {
   outline: none;
-  border-color: #7ea6cc;
-  box-shadow: 0 0 0 2px rgba(126, 166, 204, 0.2);
+  border-color: var(--accent-border);
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.18);
 }
 
 .employee-contact-section__list {
@@ -70,9 +70,9 @@
   display: flex;
   justify-content: space-between;
   gap: 0.7rem;
-  border: 1px solid #dbe5f0;
+  border: 1px solid var(--border-default);
   border-radius: 0.62rem;
-  background: #ffffff;
+  background: var(--surface-panel);
   padding: 0.56rem;
 }
 
@@ -86,13 +86,13 @@
   margin: 0;
   font-size: 0.72rem;
   font-weight: 700;
-  color: #2d4458;
+  color: var(--text-primary);
 }
 
 .employee-contact-section__row-value {
   margin: 0;
   font-size: 0.8rem;
-  color: #475f74;
+  color: var(--text-secondary);
 }
 
 .employee-contact-section__inline-input {
@@ -103,7 +103,7 @@
 .employee-contact-section__confirm-text {
   margin: 0;
   font-size: 0.72rem;
-  color: #7a2530;
+  color: var(--error-text);
 }
 
 .employee-contact-section__row-actions {
@@ -119,19 +119,19 @@
 }
 
 .employee-contact-section__secondary-action :where(button.p-button) {
-  color: #3f5d78;
+  color: var(--text-secondary);
 }
 
 .employee-contact-section__danger-action :where(button.p-button) {
-  color: #8a1f2e;
+  color: var(--error-text);
 }
 
 .employee-contact-section__empty {
   margin: 0;
-  border: 1px dashed #d1deea;
+  border: 1px dashed var(--border-default);
   border-radius: 0.62rem;
-  background: #fafafa;
-  color: #5a7185;
+  background: var(--surface-hover);
+  color: var(--text-secondary);
   font-size: 0.79rem;
   padding: 0.55rem 0.62rem;
 }
