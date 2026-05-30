@@ -1,5 +1,5 @@
 .contract-section {
-  &__cell { font-size: 13px; color: #374151; }
-  &__cell--secondary { color: #6b7280; font-size: 12px; }
-  &__cascade-warning { font-size: 12px; color: #b45309; margin: 2px 0 4px; }
+  &__cell { font-size: 13px; color: var(--text-secondary); }
+  &__cell--secondary { color: var(--text-tertiary); font-size: 12px; }
+  &__cascade-warning { font-size: 12px; color: var(--warning-text); margin: 2px 0 4px; }
 }

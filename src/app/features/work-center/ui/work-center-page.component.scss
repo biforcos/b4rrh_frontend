@@ -7,9 +7,9 @@
 }
 
 .work-center-page__feedback--error {
-  color: #9f1239;
+  color: var(--error-text);
 }
 
 .work-center-page__feedback--loading {
-  color: #475569;
+  color: var(--text-secondary);
 }

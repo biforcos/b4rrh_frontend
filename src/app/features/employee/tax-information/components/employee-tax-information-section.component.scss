@@ -9,7 +9,7 @@
 
 .tax-information-section__delete-message {
   font-size: 0.85rem;
-  color: #1f3246;
+  color: var(--text-primary);
   margin: 0;
 }
 
@@ -30,7 +30,7 @@
   grid-template-columns: 1fr 1fr;
   gap: 0.4rem;
   padding: 0.42rem 0.52rem;
-  border-bottom: 1px solid #ecf1f6;
+  border-bottom: 1px solid var(--border-default);
 
   &:last-child {
     border-bottom: none;
@@ -39,27 +39,27 @@
   dt {
     font-size: 0.75rem;
     font-weight: 600;
-    color: #445c71;
+    color: var(--text-secondary);
   }
 
   dd {
     font-size: 0.75rem;
-    color: #1f3246;
+    color: var(--text-primary);
     margin: 0;
   }
 }
 
 .employee-tax-information-section__loading {
   font-size: 0.78rem;
-  color: #5e7488;
+  color: var(--text-secondary);
   padding: 0.4rem 0.52rem;
 }
 
 .employee-tax-information-section__empty {
-  border: 1px dashed #d1deea;
+  border: 1px dashed var(--border-default);
   border-radius: 0.62rem;
-  background: #fafafa;
-  color: #5a7185;
+  background: var(--surface-hover);
+  color: var(--text-secondary);
   font-size: 0.79rem;
   padding: 0.55rem 0.62rem;
 }

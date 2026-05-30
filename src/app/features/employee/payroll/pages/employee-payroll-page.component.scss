@@ -12,8 +12,8 @@
 
 .employee-area__module {
   align-self: start;
-  border: 1px solid #d1dce8;
+  border: 1px solid var(--border-default);
   border-radius: 0.62rem;
-  background: #f9fafb;
+  background: var(--surface-hover);
   padding: 0.5rem 0.56rem;
 }
