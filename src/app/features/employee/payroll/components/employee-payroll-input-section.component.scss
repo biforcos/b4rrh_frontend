@@ -22,10 +22,10 @@
   justify-content: center;
   width: 1.6rem;
   height: 1.6rem;
-  border: 1px solid #cedae7;
+  border: 1px solid var(--border-default);
   border-radius: 0.38rem;
-  background: #f4f7fa;
-  color: #3c546b;
+  background: var(--surface-hover);
+  color: var(--text-secondary);
   font-size: 1.1rem;
   line-height: 1;
   cursor: pointer;
@@ -34,8 +34,8 @@
 }
 
 .employee-payroll-input-section__period-btn:hover:not(:disabled) {
-  background: #e8eef5;
-  border-color: #b3c5d4;
+  background: var(--surface-muted);
+  border-color: var(--border-strong);
 }
 
 .employee-payroll-input-section__period-btn:disabled {
@@ -48,7 +48,7 @@
   text-align: center;
   font-size: 0.78rem;
   font-weight: 600;
-  color: #2d4458;
+  color: var(--text-primary);
 }
 
 .employee-payroll-input-section__body {
@@ -57,9 +57,9 @@
 }
 
 .employee-payroll-input-section__slot {
-  border: 1px solid #dce6f1;
+  border: 1px solid var(--border-default);
   border-radius: 0.65rem;
-  background: #fafafa;
+  background: var(--surface-hover);
   padding: 0.64rem;
 }
 
@@ -77,15 +77,15 @@
 .employee-payroll-input-section__field span {
   font-size: 0.68rem;
   line-height: 1.2;
-  color: #5f7386;
+  color: var(--text-tertiary);
 }
 
 .employee-payroll-input-section__input {
   width: 100%;
-  border: 1px solid #cedae7;
+  border: 1px solid var(--border-default);
   border-radius: 0.42rem;
-  background: #ffffff;
-  color: #1f3246;
+  background: var(--surface-panel);
+  color: var(--text-primary);
   font-size: 0.75rem;
   line-height: 1.2;
   padding: 0.34rem 0.42rem;
@@ -95,13 +95,13 @@
 
 .employee-payroll-input-section__input:focus-visible {
   outline: none;
-  border-color: #7ea6cc;
-  box-shadow: 0 0 0 2px rgba(126, 166, 204, 0.2);
+  border-color: var(--accent-border);
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.18);
 }
 
 .employee-payroll-input-section__input:disabled {
-  background: #f4f7fa;
-  color: #8a9eb0;
+  background: var(--surface-hover);
+  color: var(--text-tertiary);
 }
 
 .employee-payroll-input-section__select.p-select {
@@ -137,9 +137,9 @@
   justify-content: space-between;
   align-items: center;
   gap: 0.7rem;
-  border: 1px solid #dbe5f0;
+  border: 1px solid var(--border-default);
   border-radius: 0.62rem;
-  background: #ffffff;
+  background: var(--surface-panel);
   padding: 0.56rem;
 }
 
@@ -153,19 +153,19 @@
   margin: 0;
   font-size: 0.72rem;
   font-weight: 700;
-  color: #2d4458;
+  color: var(--text-primary);
 }
 
 .employee-payroll-input-section__row-quantity {
   margin: 0;
   font-size: 0.8rem;
-  color: #475f74;
+  color: var(--text-secondary);
 }
 
 .employee-payroll-input-section__confirm-text {
   margin: 0;
   font-size: 0.72rem;
-  color: #7a2530;
+  color: var(--error-text);
 }
 
 .employee-payroll-input-section__field--inline {
@@ -174,10 +174,10 @@
 
 .employee-payroll-input-section__empty {
   margin: 0;
-  border: 1px dashed #d1deea;
+  border: 1px dashed var(--border-default);
   border-radius: 0.62rem;
-  background: #fafafa;
-  color: #5a7185;
+  background: var(--surface-hover);
+  color: var(--text-secondary);
   font-size: 0.79rem;
   padding: 0.55rem 0.62rem;
 }
