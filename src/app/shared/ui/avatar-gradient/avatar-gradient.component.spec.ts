@@ -55,12 +55,14 @@ describe('AvatarGradientComponent', () => {
   it('produces same gradient for same initials', () => {
     fixture.componentRef.setInput('initials', 'AB');
     fixture.detectChanges();
-    const bg1 = (fixture.debugElement.query(By.css('.avatar')).nativeElement as HTMLElement).style.background;
+    const bg1 = (fixture.debugElement.query(By.css('.avatar')).nativeElement as HTMLElement).style
+      .background;
 
     const fixture2 = TestBed.createComponent(AvatarGradientComponent);
     fixture2.componentRef.setInput('initials', 'AB');
     fixture2.detectChanges();
-    const bg2 = (fixture2.debugElement.query(By.css('.avatar')).nativeElement as HTMLElement).style.background;
+    const bg2 = (fixture2.debugElement.query(By.css('.avatar')).nativeElement as HTMLElement).style
+      .background;
 
     expect(bg1).toBe(bg2);
   });

@@ -14,10 +14,7 @@ import { toEmployeeBusinessKey } from '../../routing/employee-route-key.util';
   selector: 'app-employee-shell-page',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [
-    UiButtonComponent,
-    EmployeeDirectoryTableComponent,
-  ],
+  imports: [UiButtonComponent, EmployeeDirectoryTableComponent],
   templateUrl: './employee-shell-page.component.html',
   styleUrl: './employee-shell-page.component.scss',
 })
@@ -39,11 +36,16 @@ export class EmployeeShellPageComponent {
     const all = this.tableData();
     const f = this.filterStatus();
     if (f === 'all') return all;
-    if (f === 'active') return all.filter(
-      (e) => e.statusLabel.toLowerCase().includes('active') || e.statusLabel.toLowerCase().includes('alta'),
-    );
+    if (f === 'active')
+      return all.filter(
+        (e) =>
+          e.statusLabel.toLowerCase().includes('active') ||
+          e.statusLabel.toLowerCase().includes('alta'),
+      );
     return all.filter(
-      (e) => !e.statusLabel.toLowerCase().includes('active') && !e.statusLabel.toLowerCase().includes('alta'),
+      (e) =>
+        !e.statusLabel.toLowerCase().includes('active') &&
+        !e.statusLabel.toLowerCase().includes('alta'),
     );
   });
 

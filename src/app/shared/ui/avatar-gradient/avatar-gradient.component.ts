@@ -36,35 +36,50 @@ function gradientForInitials(initials: string): string {
       }
     </div>
   `,
-  styles: [`
-    .avatar {
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      flex-shrink: 0;
-    }
-    .avatar--sm { width: 28px; height: 28px; }
-    .avatar--md { width: 36px; height: 36px; }
-    .avatar--lg { width: 44px; height: 44px; }
+  styles: [
+    `
+      .avatar {
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        flex-shrink: 0;
+      }
+      .avatar--sm {
+        width: 28px;
+        height: 28px;
+      }
+      .avatar--md {
+        width: 36px;
+        height: 36px;
+      }
+      .avatar--lg {
+        width: 44px;
+        height: 44px;
+      }
 
-    .avatar__initials {
-      color: #ffffff;
-      font-weight: 700;
-      line-height: 1;
-      user-select: none;
-      font-size: 12px;
-    }
-    .avatar--sm .avatar__initials { font-size: 10px; }
-    .avatar--lg .avatar__initials { font-size: 15px; }
+      .avatar__initials {
+        color: #ffffff;
+        font-weight: 700;
+        line-height: 1;
+        user-select: none;
+        font-size: 12px;
+      }
+      .avatar--sm .avatar__initials {
+        font-size: 10px;
+      }
+      .avatar--lg .avatar__initials {
+        font-size: 15px;
+      }
 
-    .avatar__photo {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-  `],
+      .avatar__photo {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    `,
+  ],
 })
 export class AvatarGradientComponent {
   initials = input.required<string>();

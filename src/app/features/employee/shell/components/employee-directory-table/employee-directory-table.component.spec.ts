@@ -5,8 +5,22 @@ import { EmployeeDirectoryTableComponent } from './employee-directory-table.comp
 import { EmployeeListItemModel } from '../../../models/employee-list-item.model';
 
 const MOCK_ITEMS: EmployeeListItemModel[] = [
-  { ruleSystemCode: 'ESP', employeeTypeCode: 'INTERNAL', employeeNumber: '001', displayName: 'García Ruiz, Juan', workCenter: 'Madrid', statusLabel: 'Alta' },
-  { ruleSystemCode: 'ESP', employeeTypeCode: 'INTERNAL', employeeNumber: '002', displayName: 'Martínez López, Ana', workCenter: 'Madrid', statusLabel: 'Baja' },
+  {
+    ruleSystemCode: 'ESP',
+    employeeTypeCode: 'INTERNAL',
+    employeeNumber: '001',
+    displayName: 'García Ruiz, Juan',
+    workCenter: 'Madrid',
+    statusLabel: 'Alta',
+  },
+  {
+    ruleSystemCode: 'ESP',
+    employeeTypeCode: 'INTERNAL',
+    employeeNumber: '002',
+    displayName: 'Martínez López, Ana',
+    workCenter: 'Madrid',
+    statusLabel: 'Baja',
+  },
 ];
 
 describe('EmployeeDirectoryTableComponent', () => {
@@ -44,7 +58,9 @@ describe('EmployeeDirectoryTableComponent', () => {
     fixture.componentRef.setInput('items', MOCK_ITEMS);
     fixture.detectChanges();
     let emitted: EmployeeListItemModel | null = null;
-    fixture.componentInstance.employeeClicked.subscribe((e: EmployeeListItemModel) => (emitted = e));
+    fixture.componentInstance.employeeClicked.subscribe(
+      (e: EmployeeListItemModel) => (emitted = e),
+    );
     const row = fixture.debugElement.query(By.css('.dir-table__row'));
     row.triggerEventHandler('click', null);
     expect(emitted).toEqual(MOCK_ITEMS[0]);
