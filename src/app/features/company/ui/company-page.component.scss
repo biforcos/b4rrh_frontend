@@ -12,15 +12,15 @@
   line-height: 1.4;
 
   &--loading {
-    color: #365169;
-    border: 1px solid #d5e2ef;
-    background: #f5faff;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-default);
+    background: var(--surface-accent);
   }
 
   &--error {
-    color: #7b1f1f;
-    background-color: #fff5f5;
-    border: 1px solid #fecaca;
+    color: var(--error-text);
+    background-color: var(--error-bg);
+    border: 1px solid var(--error-border);
   }
 }
 
