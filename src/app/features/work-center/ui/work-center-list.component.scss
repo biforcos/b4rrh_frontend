@@ -9,7 +9,7 @@
 }
 
 .work-center-list__company {
-  color: #64748b;
+  color: var(--text-secondary);
   font-size: 0.92rem;
 }
 
@@ -40,7 +40,7 @@
 .work-center-list__meta-item dt {
   font-size: 0.75rem;
   text-transform: uppercase;
-  color: #64748b;
+  color: var(--text-tertiary);
 }
 
 .work-center-list__meta-item dd {

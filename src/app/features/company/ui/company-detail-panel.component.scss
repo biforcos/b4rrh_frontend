@@ -47,27 +47,27 @@
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #617b91;
+  color: var(--text-tertiary);
 }
 
 .company-detail-panel__view-value {
   font-size: 0.96rem;
   line-height: 1.4;
-  color: #17384f;
+  color: var(--text-primary);
   font-weight: 600;
 }
 
 .company-detail-panel__view-value--soft {
   font-size: 0.86rem;
   font-weight: 500;
-  color: #456078;
+  color: var(--text-secondary);
 }
 
 .company-detail-panel__empty-copy {
   margin: 0;
   font-size: 0.84rem;
   line-height: 1.45;
-  color: #5a7389;
+  color: var(--text-secondary);
 }
 
 .company-detail-panel__grid {
@@ -90,18 +90,18 @@
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #567187;
+  color: var(--text-tertiary);
 }
 
 .company-detail-panel__required {
-  color: #c53030;
+  color: var(--error-text);
 }
 
 .company-detail-panel :where(input.p-inputtext, textarea.p-textarea, .p-datepicker input) {
   width: 100%;
   border-radius: 0.72rem;
-  border-color: rgba(148, 163, 184, 0.4);
-  background: #fff;
+  border-color: var(--border-default);
+  background: var(--surface-panel);
 }
 
 .company-detail-panel :where(input.p-inputtext, .p-datepicker input) {
@@ -115,7 +115,7 @@
 
 .company-detail-panel__error {
   font-size: 0.72rem;
-  color: #b42318;
+  color: var(--error-text);
 }
 
 .company-detail-panel__actions {
@@ -123,7 +123,7 @@
   justify-content: flex-end;
   gap: 0.55rem;
   padding: 0.8rem 0 0.1rem;
-  border-top: 1px solid rgba(203, 213, 225, 0.68);
+  border-top: 1px solid var(--border-default);
 }
 
 @media (max-width: 860px) {

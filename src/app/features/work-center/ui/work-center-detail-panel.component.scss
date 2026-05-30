@@ -33,16 +33,16 @@
 .work-center-detail-panel__label,
 .work-center-detail-panel__view-label {
   font-size: 0.82rem;
-  color: #64748b;
+  color: var(--text-tertiary);
 }
 
 .work-center-detail-panel__view-value--soft,
 .work-center-detail-panel__empty-copy {
-  color: #64748b;
+  color: var(--text-secondary);
 }
 
 .work-center-detail-panel__required {
-  color: #be123c;
+  color: var(--error-text);
 }
 
 .work-center-detail-panel__actions,
@@ -66,14 +66,14 @@
   align-items: flex-start;
   gap: 1rem;
   padding: 0.9rem 1rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-default);
   border-radius: 0.9rem;
-  background: #f8fafc;
+  background: var(--surface-hover);
 }
 
 .work-center-detail-panel__contact-card--editing {
-  border-color: #cbd5e1;
-  background: #eef0f4;
+  border-color: var(--border-strong);
+  background: var(--surface-muted);
 }
 
 .work-center-detail-panel__contact-main,
@@ -94,7 +94,7 @@
 
 .work-center-detail-panel__contact-number {
   font-size: 0.8rem;
-  color: #64748b;
+  color: var(--text-secondary);
 }
 
 .work-center-detail-panel__contact-value {
@@ -104,7 +104,7 @@
 .work-center-detail-panel__contact-editor {
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--border-default);
 }
 
 .work-center-detail-panel__contact-editor-header {
@@ -122,7 +122,7 @@
 }
 
 .work-center-detail-panel__empty-copy--error {
-  color: #9f1239;
+  color: var(--error-text);
 }
 
 @media (max-width: 900px) {
