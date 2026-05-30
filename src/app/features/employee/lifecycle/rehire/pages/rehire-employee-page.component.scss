@@ -16,13 +16,13 @@
 }
 .rehire-subtitle {
 	font-size: 1rem;
-	color: #6b7280;
+	color: var(--text-secondary);
 	margin: 0.25rem 0 0 0;
 }
 
 .rehire-summary {
-	background: #f8fafc;
-	border: 1px solid #e5e7eb;
+	background: var(--surface-hover);
+	border: 1px solid var(--border-default);
 	border-radius: 0.5rem;
 	padding: 1rem 1.5rem;
 	margin-bottom: 2rem;
@@ -38,7 +38,7 @@
 }
 .rehire-summary-label {
 	font-weight: 600;
-	color: #64748b;
+	color: var(--text-secondary);
 }
 
 .rehire-section {
@@ -48,7 +48,7 @@
 	font-size: 1.1rem;
 	font-weight: 600;
 	margin-bottom: 1rem;
-	color: #334155;
+	color: var(--text-primary);
 }
 .rehire-fields {
 	display: flex;
@@ -66,7 +66,7 @@
 .rehire-field label {
 	font-weight: 500;
 	margin-bottom: 0.25rem;
-	color: #475569;
+	color: var(--text-secondary);
 }
 .rehire-field {
 	display: flex;
@@ -86,7 +86,7 @@
 
 .rehire-working-time-hint {
 	margin: 0;
-	color: #64748b;
+	color: var(--text-secondary);
 	font-size: 0.92rem;
 }
 
@@ -102,19 +102,19 @@
 	gap: 0.3rem;
 	padding: 0.85rem 0.9rem;
 	border-radius: 0.85rem;
-	background: linear-gradient(180deg, #f8fafc 0%, #f0f4ff 100%);
-	border: 1px solid #dbeafe;
+	background: var(--surface-accent);
+	border: 1px solid var(--accent-border);
 }
 
 .rehire-working-time-preview__label {
-	color: #475569;
+	color: var(--text-secondary);
 	font-size: 0.85rem;
 }
 
 .rehire-summary-working-time {
 	margin-top: 1rem;
 	padding-top: 1rem;
-	border-top: 1px solid #e5e7eb;
+	border-top: 1px solid var(--border-default);
 	display: flex;
 	flex-direction: column;
 	gap: 0.35rem;

@@ -5,9 +5,9 @@
 }
 
 .ops-page__context {
-  border: 1px solid #c8d9ed;
+  border: 1px solid var(--border-default);
   border-radius: 8px;
-  background: #f0f4fa;
+  background: var(--surface-accent);
   padding: 0.8rem;
   display: grid;
   gap: 0.6rem;
@@ -26,15 +26,15 @@
 
 .ops-page__field-label {
   font-size: 0.68rem;
-  color: #5f7386;
+  color: var(--text-tertiary);
   line-height: 1.2;
 }
 
 .ops-page__input {
-  border: 1px solid #cedae7;
+  border: 1px solid var(--border-default);
   border-radius: 0.42rem;
-  background: #fff;
-  color: #1f3246;
+  background: var(--surface-panel);
+  color: var(--text-primary);
   font-size: 0.75rem;
   padding: 0.32rem 0.42rem;
   min-height: 2rem;
@@ -44,13 +44,13 @@
 
 .ops-page__input:focus-visible {
   outline: none;
-  border-color: #7ea6cc;
-  box-shadow: 0 0 0 2px rgba(126, 166, 204, 0.2);
+  border-color: var(--accent-border);
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.18);
 }
 
 .ops-page__input:disabled {
-  background: #f4f7fa;
-  color: #8a9eb0;
+  background: var(--surface-hover);
+  color: var(--text-tertiary);
 }
 
 .ops-page__period-nav {
@@ -65,18 +65,18 @@
   justify-content: center;
   width: 1.6rem;
   height: 1.6rem;
-  border: 1px solid #cedae7;
+  border: 1px solid var(--border-default);
   border-radius: 0.38rem;
-  background: #f4f7fa;
-  color: #3c546b;
+  background: var(--surface-hover);
+  color: var(--text-secondary);
   font-size: 1.1rem;
   cursor: pointer;
   padding: 0;
 }
 
 .ops-page__period-btn:hover:not(:disabled) {
-  background: #e8eef5;
-  border-color: #b3c5d4;
+  background: var(--surface-muted);
+  border-color: var(--border-strong);
 }
 
 .ops-page__period-label {
@@ -84,7 +84,7 @@
   text-align: center;
   font-size: 0.78rem;
   font-weight: 600;
-  color: #2d4458;
+  color: var(--text-primary);
 }
 
 .ops-page__target-section {
@@ -99,10 +99,10 @@
 }
 
 .ops-page__target-tab {
-  border: 1px solid #cedae7;
+  border: 1px solid var(--border-default);
   border-radius: 4px;
-  background: #fff;
-  color: #475f74;
+  background: var(--surface-panel);
+  color: var(--text-secondary);
   font-size: 0.7rem;
   padding: 0.25rem 0.6rem;
   cursor: pointer;
@@ -118,10 +118,10 @@
 .ops-page__textarea {
   width: 100%;
   box-sizing: border-box;
-  border: 1px solid #cedae7;
+  border: 1px solid var(--border-default);
   border-radius: 0.42rem;
-  background: #fff;
-  color: #1f3246;
+  background: var(--surface-panel);
+  color: var(--text-primary);
   font-size: 0.74rem;
   padding: 0.4rem 0.5rem;
   resize: vertical;
@@ -130,8 +130,8 @@
 
 .ops-page__textarea:focus-visible {
   outline: none;
-  border-color: #7ea6cc;
-  box-shadow: 0 0 0 2px rgba(126, 166, 204, 0.2);
+  border-color: var(--accent-border);
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.18);
 }
 
 .ops-page__single-employee {
@@ -154,6 +154,7 @@
   align-content: start;
 }
 
+/* Semantic state panels — colors are intentional, not migrated */
 .ops-page__panel--invalidate {
   border: 1px solid #fca5a5;
   background: #fff8f8;
@@ -170,7 +171,7 @@
   margin: 0;
 }
 
-.ops-page__panel-title--invalidate { color: #b91c1c; }
+.ops-page__panel-title--invalidate { color: var(--error-text); }
 .ops-page__panel-title--calculate  { color: #15803d; }
 
 .ops-page__engine-fields {
@@ -182,14 +183,14 @@
 .ops-page__status-text {
   margin: 0;
   font-size: 0.72rem;
-  color: #5f7386;
+  color: var(--text-tertiary);
   font-style: italic;
 }
 
 .ops-page__error {
   margin: 0;
   font-size: 0.72rem;
-  color: #b42318;
+  color: var(--error-text);
 }
 
 .ops-page__result-grid {
@@ -199,7 +200,7 @@
 }
 
 .ops-page__counter {
-  background: #f1f5f9;
+  background: var(--surface-hover);
   border-radius: 5px;
   padding: 0.35rem;
   text-align: center;
@@ -207,6 +208,7 @@
   gap: 0.08rem;
 }
 
+/* Semantic counters — colors are intentional */
 .ops-page__counter--success { background: #dcfce7; }
 .ops-page__counter--warn    { background: #fef9c3; }
 .ops-page__counter--error   { background: #fee2e2; }
@@ -215,13 +217,13 @@
 .ops-page__counter-value {
   font-size: 1rem;
   font-weight: 700;
-  color: #1f3246;
+  color: var(--text-primary);
   line-height: 1;
 }
 
 .ops-page__counter-label {
   font-size: 0.58rem;
-  color: #5f7386;
+  color: var(--text-tertiary);
 }
 
 .ops-page__run-panel {
@@ -246,6 +248,7 @@
   color: #1e40af;
 }
 
+/* Semantic badges — colors are intentional */
 .ops-badge {
   border-radius: 10px;
   padding: 0.15rem 0.5rem;
