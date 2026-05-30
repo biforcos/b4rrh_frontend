@@ -12,11 +12,11 @@
   margin: 0;
   font-size: 0.78rem;
   line-height: 1.3;
-  color: #3d556b;
+  color: var(--text-secondary);
 }
 
 .employee-area__state--error {
-  color: #7f1d1d;
+  color: var(--error-text);
 }
 
 /*
