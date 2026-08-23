@@ -18,3 +18,13 @@ export interface AuthSessionState {
   loading: boolean;
   error: string | null;
 }
+/** Perfiles que ofrece la demo: sujeto -> roles de su token. */
+export type DemoAuthSubjects = Record<string, string[]>;
+
+export interface DemoAuthResponse {
+  tokenType: string;
+  token: string;
+  subject: string;
+  roles: string[];
+  expiresAt: string;
+}

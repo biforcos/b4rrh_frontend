@@ -14,6 +14,22 @@ export const appTexts = {
   authLoginSubmittingAction: 'Entrando...',
   authLoginErrorMessage: 'No se pudo obtener un token local. Revisa el subject o el backend local.',
   authLoginInvalidSubjectMessage: 'El subject es obligatorio.',
+
+  // --- Demo publica ---
+  demoLoginTitle: 'B4RRHH · demo',
+  demoLoginIntro:
+    'Un ERP de nomina y recursos humanos. Esto es una demostracion abierta: los datos son sinteticos y no corresponden a ninguna persona real.',
+  demoLoginInviteTitle: 'Puedes tocar lo que quieras',
+  demoLoginInvite:
+    'Contrata, da de baja, recontrata, cambia contratos. Los datos se regeneran periodicamente, asi que no hay nada que romper.',
+  demoProfileLabel: 'Perfil',
+  demoPasswordLabel: 'Contrasena',
+  demoPasswordHint: 'La contrasena esta a la vista a proposito: la demo es para que entres.',
+  demoLoginSubmitAction: 'Entrar en la demo',
+  demoLoginSubmittingAction: 'Entrando...',
+  demoLoginErrorMessage: 'No se pudo entrar. Revisa el perfil y la contrasena.',
+  demoLoginInvalidMessage: 'Elige un perfil e introduce la contrasena.',
+  demoRolesLabel: 'Permisos:',
   sectionGeneral: 'General',
   sectionHome: 'Inicio',
   sectionPeople: 'Personas',

@@ -3,6 +3,7 @@ import { firstValueFrom } from 'rxjs';
 
 import { appTexts } from '../i18n/app-texts';
 import { AuthSessionState } from './auth.models';
+import { DemoAuthGateway } from './demo-auth.gateway';
 import { LocalDevAuthGateway } from './local-dev-auth.gateway';
 
 const AUTH_STORAGE_KEY = 'b4rrhh.auth.session';
@@ -21,6 +22,7 @@ const initialAuthSessionState: AuthSessionState = {
 })
 export class AuthStore {
   private readonly gateway = inject(LocalDevAuthGateway);
+  private readonly demoGateway = inject(DemoAuthGateway);
 
   private readonly sessionState = signal<AuthSessionState>(initialAuthSessionState);
 
@@ -73,6 +75,48 @@ export class AuthStore {
         ...initialAuthSessionState,
         loading: false,
         error: appTexts.authLoginErrorMessage,
+      });
+      return false;
+    }
+  }
+
+  /**
+   * Acceso a la demo publica. Mismo estado de sesion que el de desarrollo: para
+   * el resto de la aplicacion un token es un token, venga de donde venga.
+   */
+  async loginDemo(subject: string, password: string): Promise<boolean> {
+    const trimmedSubject = subject.trim();
+    if (!trimmedSubject || !password) {
+      this.sessionState.update((state) => ({ ...state, error: appTexts.demoLoginInvalidMessage }));
+      return false;
+    }
+    if (this.sessionState().loading) {
+      return false;
+    }
+
+    this.sessionState.update((state) => ({ ...state, loading: true, error: null }));
+
+    try {
+      const response = await firstValueFrom(this.demoGateway.login(trimmedSubject, password));
+
+      const nextState: AuthSessionState = {
+        token: response.token,
+        subject: response.subject,
+        expiresAt: response.expiresAt,
+        isAuthenticated: true,
+        loading: false,
+        error: null,
+      };
+
+      this.sessionState.set(nextState);
+      this.persistSession(nextState);
+      return true;
+    } catch {
+      this.clearPersistedSession();
+      this.sessionState.set({
+        ...initialAuthSessionState,
+        loading: false,
+        error: appTexts.demoLoginErrorMessage,
       });
       return false;
     }
