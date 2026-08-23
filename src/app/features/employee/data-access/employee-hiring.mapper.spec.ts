@@ -7,7 +7,6 @@ describe('employee-hiring.mapper', () => {
     const draft: HireEmployeeDraft = {
       ruleSystemCode: 'ESP',
       employeeTypeCode: 'EMP',
-      employeeNumber: 'E001',
       firstName: 'Ana',
       lastName1: 'Lopez',
       lastName2: '',
@@ -48,6 +47,7 @@ describe('employee-hiring.mapper', () => {
       lastName1: 'Lopez',
       lastName2: 'Garcia',
       preferredName: null,
+      displayName: 'Ana Lopez Garcia',
       status: 'ACTIVE',
       hireDate: '2026-03-23',
       initialPresence: {
@@ -113,6 +113,7 @@ describe('employee-hiring.mapper', () => {
       lastName1: 'Lopez',
       lastName2: 'Garcia',
       preferredName: null,
+      displayName: 'Ana Lopez Garcia',
       status: 'ACTIVE',
       hireDate: '2026-03-23',
       initialPresence: {

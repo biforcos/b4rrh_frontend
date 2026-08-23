@@ -1,5 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { filter } from 'rxjs';
 import { TableModule } from 'primeng/table';
 import { InputTextModule } from 'primeng/inputtext';
 import { IconFieldModule } from 'primeng/iconfield';
@@ -11,6 +13,7 @@ import { EmployeeDirectoryStore } from '../../data-access/employee-directory.sto
 import { EmployeeRecentsService } from '../../data-access/employee-recents.service';
 import { employeeTexts } from '../../employee.texts';
 import { EmployeeListItemModel } from '../../models/employee-list-item.model';
+import { hasRehireRefreshMarker } from '../../routing/employee-refresh-marker.util';
 import { buildEmployeeDetailRouteCommands } from '../../routing/employee-route-builder.util';
 import { toEmployeeBusinessKey } from '../../routing/employee-route-key.util';
 
@@ -34,6 +37,25 @@ export class EmployeeShellPageComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly directoryStore = inject(EmployeeDirectoryStore);
   private readonly recentsService = inject(EmployeeRecentsService);
+
+  /**
+   * Una recontratacion cambia el estado del empleado, y el estado se ve y se
+   * filtra en este listado. El listado se entera solo: no depende de que el
+   * detalle se acuerde de avisarle.
+   *
+   * El detalle borra el marcador despues de usarlo, pero esa navegacion es
+   * asincrona y la entrega del evento es sincrona, asi que aqui todavia esta.
+   */
+  private readonly rehireRefreshSubscription = this.router.events
+    .pipe(
+      filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+      takeUntilDestroyed(),
+    )
+    .subscribe(() => {
+      if (hasRehireRefreshMarker(this.route.snapshot)) {
+        this.directoryStore.refreshDirectory();
+      }
+    });
 
   protected readonly texts = employeeTexts;
   protected readonly searchValue = signal('');

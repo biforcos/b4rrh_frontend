@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 
-import { DefaultService } from '../../../core/api/generated/api/default.service';
+import { CatalogsService } from '../../../core/api/generated/api/catalogs.service';
 import { CatalogFieldBindingResponseCatalogKindEnum } from '../../../core/api/generated/model/catalog-field-binding-response';
 import { WorkCenterFieldCatalogService } from './work-center-field-catalog.service';
 
@@ -60,7 +60,9 @@ describe('WorkCenterFieldCatalogService', () => {
     };
 
     TestBed.configureTestingModule({
-      providers: [{ provide: DefaultService, useValue: apiMock }],
+      // El servicio inyecta CatalogsService: cuando se regenero el cliente,
+      // estas operaciones se movieron ahi desde DefaultService.
+      providers: [{ provide: CatalogsService, useValue: apiMock }],
     });
 
     service = TestBed.inject(WorkCenterFieldCatalogService);

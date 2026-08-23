@@ -115,6 +115,11 @@ describe('EmployeeShellPageComponent', () => {
   };
 
   beforeEach(async () => {
+    // Los mocks son const de fichero: sin esto, el historial de llamadas se
+    // arrastra de un test al siguiente y un test negativo ve las llamadas del
+    // anterior. Limpia el historial, no las implementaciones.
+    vi.clearAllMocks();
+
     await TestBed.configureTestingModule({
       imports: [EmployeeShellPageComponent],
       providers: [
@@ -142,37 +147,19 @@ describe('EmployeeShellPageComponent', () => {
     fixture.detectChanges();
   });
 
-  it('forces shell refresh when returning from rehire with refresh marker', () => {
+  it('refreshes the employee directory when returning from a rehire', () => {
     routeMock.snapshot = buildSnapshot(['personas', 'empleados', 'ESP', 'EMP', 'E001', 'overview'], { refresh: 'rehire' });
 
     routerEvents.next(new NavigationEnd(1, '/personas/empleados/ESP/EMP/E001/overview?refresh=rehire', '/personas/empleados/ESP/EMP/E001/overview?refresh=rehire'));
 
     expect(directoryStoreMock.refreshDirectory).toHaveBeenCalled();
-    expect(detailStoreMock.refreshEmployeeDetailByBusinessKey).toHaveBeenCalledWith({
-      ruleSystemCode: 'ESP',
-      employeeTypeCode: 'EMP',
-      employeeNumber: 'E001',
-    });
-    expect(presenceStoreMock.refreshPresencesByBusinessKey).toHaveBeenCalledWith({
-      ruleSystemCode: 'ESP',
-      employeeTypeCode: 'EMP',
-      employeeNumber: 'E001',
-    });
-    expect(workCenterStoreMock.refreshWorkCenters).toHaveBeenCalledWith({
-      ruleSystemCode: 'ESP',
-      employeeTypeCode: 'EMP',
-      employeeNumber: 'E001',
-    });
-    expect(journeyStoreMock.refreshJourneyByBusinessKey).toHaveBeenCalledWith({
-      ruleSystemCode: 'ESP',
-      employeeTypeCode: 'EMP',
-      employeeNumber: 'E001',
-    });
-    expect(routerMock.navigate).toHaveBeenCalledWith([], {
-      relativeTo: routeMock,
-      queryParams: { refresh: null },
-      queryParamsHandling: 'merge',
-      replaceUrl: true,
-    });
+  });
+
+  it('does not refresh the directory when there is no rehire marker', () => {
+    routeMock.snapshot = buildSnapshot(['personas', 'empleados', 'ESP', 'EMP', 'E001', 'overview']);
+
+    routerEvents.next(new NavigationEnd(2, '/personas/empleados/ESP/EMP/E001/overview', '/personas/empleados/ESP/EMP/E001/overview'));
+
+    expect(directoryStoreMock.refreshDirectory).not.toHaveBeenCalled();
   });
 });

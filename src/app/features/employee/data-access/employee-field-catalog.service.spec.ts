@@ -2,7 +2,6 @@ import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 
 import { CatalogsService } from '../../../core/api/generated/api/catalogs.service';
-import { DefaultService } from '../../../core/api/generated/api/default.service';
 import { CatalogFieldBindingResponseCatalogKindEnum } from '../../../core/api/generated/model/catalog-field-binding-response';
 import { EmployeeFieldCatalogService } from './employee-field-catalog.service';
 
@@ -183,8 +182,10 @@ describe('EmployeeFieldCatalogService', () => {
 
     TestBed.configureTestingModule({
       providers: [
-        { provide: DefaultService, useValue: apiMock },
-        { provide: CatalogsService, useValue: catalogsApiMock },
+        // Los tres metodos cuelgan hoy de CatalogsService. Se entrega la union
+        // de los dos mocks: el spread copia las mismas funciones vi.fn(), asi
+        // que las aserciones sobre apiMock y catalogsApiMock siguen valiendo.
+        { provide: CatalogsService, useValue: { ...apiMock, ...catalogsApiMock } },
       ],
     });
 

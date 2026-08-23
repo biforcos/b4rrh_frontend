@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router';
+import { hasRehireRefreshMarker } from '../../routing/employee-refresh-marker.util';
 import { filter, startWith } from 'rxjs';
 
 import { EmployeeIdentityPanelComponent } from '../../identity/employee-identity-panel.component';
@@ -409,9 +410,7 @@ export class EmployeeDetailPageComponent {
   }
 
   private shouldForceRefreshAfterRehire(): boolean {
-    let snapshot = this.route.snapshot;
-    while (snapshot.firstChild) snapshot = snapshot.firstChild;
-    return snapshot.queryParamMap.get('refresh') === 'rehire';
+    return hasRehireRefreshMarker(this.route.snapshot);
   }
 
   private focusSection(sectionId: string): void {
