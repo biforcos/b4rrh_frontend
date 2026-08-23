@@ -23,6 +23,6 @@ export const appConfig: ApplicationConfig = {
         },
       },
     }),
-    { provide: BASE_PATH, useValue: '' },
+    { provide: BASE_PATH, useValue: '/api' },
   ],
 };
