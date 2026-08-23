@@ -21,6 +21,12 @@ export interface AuthSessionState {
 /** Perfiles que ofrece la demo: sujeto -> roles de su token. */
 export type DemoAuthSubjects = Record<string, string[]>;
 
+/** Lo que el backend le cuenta a la pantalla de acceso de la demo. */
+export interface DemoAuthInfo {
+  password: string;
+  subjects: DemoAuthSubjects;
+}
+
 export interface DemoAuthResponse {
   tokenType: string;
   token: string;

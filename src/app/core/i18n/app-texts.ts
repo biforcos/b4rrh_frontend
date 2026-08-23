@@ -18,17 +18,17 @@ export const appTexts = {
   // --- Demo publica ---
   demoLoginTitle: 'B4RRHH · demo',
   demoLoginIntro:
-    'Un ERP de nomina y recursos humanos. Esto es una demostracion abierta: los datos son sinteticos y no corresponden a ninguna persona real.',
+    'Un ERP de nómina y recursos humanos. Esto es una demostración abierta: los datos son sintéticos y no corresponden a ninguna persona real.',
   demoLoginInviteTitle: 'Puedes tocar lo que quieras',
   demoLoginInvite:
-    'Contrata, da de baja, recontrata, cambia contratos. Los datos se regeneran periodicamente, asi que no hay nada que romper.',
+    'Contrata, da de baja, recontrata, cambia contratos. Los datos se regeneran periódicamente, así que no hay nada que romper.',
   demoProfileLabel: 'Perfil',
-  demoPasswordLabel: 'Contrasena',
-  demoPasswordHint: 'La contrasena esta a la vista a proposito: la demo es para que entres.',
+  demoPasswordLabel: 'Contraseña',
+  demoPasswordHint: 'Ya está puesta. Está a la vista a propósito: la demo es para que entres.',
   demoLoginSubmitAction: 'Entrar en la demo',
   demoLoginSubmittingAction: 'Entrando...',
-  demoLoginErrorMessage: 'No se pudo entrar. Revisa el perfil y la contrasena.',
-  demoLoginInvalidMessage: 'Elige un perfil e introduce la contrasena.',
+  demoLoginErrorMessage: 'No se pudo entrar. Revisa el perfil y la contraseña.',
+  demoLoginInvalidMessage: 'Elige un perfil e introduce la contraseña.',
   demoRolesLabel: 'Permisos:',
   sectionGeneral: 'General',
   sectionHome: 'Inicio',

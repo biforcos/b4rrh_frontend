@@ -20,17 +20,21 @@ export class DemoModeService {
 
   private readonly state = signal<'desconocido' | 'demo' | 'desarrollo'>('desconocido');
   private readonly subjectsState = signal<DemoAuthSubjects>({});
+  private readonly passwordState = signal('');
   private probe: Promise<void> | null = null;
 
   readonly mode = this.state.asReadonly();
   readonly isDemo = computed(() => this.state() === 'demo');
   readonly subjects = this.subjectsState.asReadonly();
+  /** Publica a proposito: en una demo abierta la contrasena es una instruccion. */
+  readonly password = this.passwordState.asReadonly();
 
   /** Se resuelve una sola vez; las llamadas siguientes reutilizan la promesa. */
   resolve(): Promise<void> {
-    this.probe ??= firstValueFrom(this.gateway.listSubjects())
-      .then((subjects) => {
-        this.subjectsState.set(subjects ?? {});
+    this.probe ??= firstValueFrom(this.gateway.info())
+      .then((info) => {
+        this.subjectsState.set(info?.subjects ?? {});
+        this.passwordState.set(info?.password ?? '');
         this.state.set('demo');
       })
       .catch(() => {

@@ -39,7 +39,7 @@ import { UiButtonComponent } from '../../../shared/ui/button/ui-button.component
 
           <label class="demo-login__field">
             <span>{{ texts.demoPasswordLabel }}</span>
-            <input pInputText type="password" formControlName="password" autocomplete="off" />
+            <input pInputText type="text" formControlName="password" autocomplete="off" spellcheck="false" />
           </label>
           <p class="demo-login__hint">{{ texts.demoPasswordHint }}</p>
 
@@ -209,6 +209,9 @@ export class DemoLoginPageComponent {
     if (primero) {
       this.form.controls.subject.setValue(primero.subject);
     }
+    // La contrasena viene del backend y se deja puesta: en una demo abierta,
+    // obligar a teclear algo que ya estas ensenando solo anade friccion.
+    this.form.controls.password.setValue(this.demoMode.password());
   }
 
   protected async submit(): Promise<void> {
