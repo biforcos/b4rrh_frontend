@@ -1,0 +1,103 @@
+# ============================================================
+#  CI/CD del frontend de B4RRHH
+#
+#  Mismo esqueleto que el del backend, con dos diferencias: aqui no hace
+#  falta base de datos (los tests van sobre jsdom) y quien construye es
+#  Node en vez de Maven.
+#
+#  Los tests corren en un contenedor aparte y no en el del job para no
+#  depender de que la imagen del runner traiga Node 22, y para usar la
+#  misma version con la que se construye la imagen de produccion.
+# ============================================================
+name: Test, build and deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  REGISTRY: 192.168.1.104:3000/b4rrhh
+  IMAGEN: b4rrhh-web
+  SERVIDOR: 192.168.1.151
+  NODE: node-${{ github.sha }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar el codigo
+        uses: actions/checkout@v4
+
+      - name: Pasar la suite
+        run: |
+          docker rm -f "${{ env.NODE }}" 2>/dev/null || true
+
+          # Techos sobre lo que tiene la CT104 (8 hilos, 12 GB), donde vive
+          # tambien Gitea. Sin ellos, un build deja la web sin responder.
+          #
+          # --no-watch explicito: 'ng test' se queda escuchando cambios si no
+          # detecta que esta en CI, y el job se quedaria colgado para siempre
+          # con la suite en verde.
+          docker create \
+            --name "${{ env.NODE }}" \
+            --cpus 5 \
+            -m 4g \
+            -e CI=true \
+            -e TZ=Europe/Madrid \
+            -v b4rrhh-npm:/root/.npm \
+            -w /app \
+            node:22-alpine \
+            sh -c "npm ci && npm test -- --no-watch"
+
+          # El "/." copia el CONTENIDO: docker create -w /app ya ha creado
+          # /app, y sin el la carpeta entraria dentro (/app/frontend/...).
+          docker cp "$GITHUB_WORKSPACE/." "${{ env.NODE }}":/app
+
+          # -a propaga el codigo de salida: si un test falla, el paso falla.
+          docker start -a "${{ env.NODE }}"
+
+      - name: Entrar en el registry
+        run: |
+          echo "${{ secrets.REGISTRY_TOKEN }}" \
+            | docker login ${{ env.REGISTRY }} -u "${{ secrets.REGISTRY_USER }}" --password-stdin
+
+      - name: Construir y subir la imagen
+        run: |
+          docker build \
+            -t ${{ env.REGISTRY }}/${{ env.IMAGEN }}:${{ github.sha }} \
+            -t ${{ env.REGISTRY }}/${{ env.IMAGEN }}:latest \
+            .
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGEN }}:${{ github.sha }}
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGEN }}:latest
+
+      - name: Preparar la llave SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/deploy
+          chmod 600 ~/.ssh/deploy
+          ssh-keyscan -H ${{ env.SERVIDOR }} >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Desplegar
+        run: |
+          # Solo se toca .env.web-tag: el del backend vive aparte para que
+          # publicar el front no le cambie la imagen a la api.
+          ssh -i ~/.ssh/deploy deploy@${{ env.SERVIDOR }} \
+            "cd /opt/b4rrhh && \
+             [ -f .env.api-tag ] || echo 'API_TAG=latest' > .env.api-tag && \
+             echo 'WEB_TAG=${{ github.sha }}' > .env.web-tag && \
+             docker compose --env-file .env --env-file .env.api-tag --env-file .env.web-tag pull web && \
+             docker compose --env-file .env --env-file .env.api-tag --env-file .env.web-tag up -d && \
+             docker image prune -f"
+
+      - name: Comprobar que sigue en pie
+        run: |
+          sleep 10
+          ssh -i ~/.ssh/deploy deploy@${{ env.SERVIDOR }} \
+            "cd /opt/b4rrhh && docker compose ps --format '{{.Name}} {{.Status}}'"
+
+      - name: Recoger el contenedor de los tests
+        if: always()
+        run: |
+          docker rm -f "${{ env.NODE }}" 2>/dev/null || true
